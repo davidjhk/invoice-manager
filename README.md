@@ -168,6 +168,15 @@ return [
     'senderEmail' => 'noreply@your_domain.com',
     'senderName' => 'Your Name',
     'bccEmail' => 'bcc@your_domain.com',
+    'users' => [
+        '100' => [
+            'id' => '100',
+            'username' => 'admin',
+            'password' => 'admin123',
+            'authKey' => 'test100key',
+            'accessToken' => '100-token',
+        ],
+    ],
 ];
 ```
 
@@ -210,8 +219,8 @@ nano config/web.php
 3. **도메인 인증 (권장):**
 
    ```
-   1. "Settings" → "Sender Domains" 선택
-   2. "Add Domain" 버튼 클릭
+   1. "Sending" → "Verified Senders" 선택
+   2. "Add Sender Domain" 버튼 클릭
    3. 사용할 도메인 입력 (예: yourdomain.com)
    4. DNS 설정에 제공된 SPF, DKIM 레코드 추가
    5. 도메인 인증 완료 후 해당 도메인 이메일 사용 가능
@@ -482,6 +491,48 @@ tail -f runtime/logs/app.log
 ### 기본 로그인:
 
 - 사용자명: `admin` / 비밀번호: `admin123`
-- 비밀번호 변경은 `models/User.php` 파일을 수정하여 변경할 수 있습니다.
+- 비밀번호 변경은 `config/params-local.php` 파일의 `users` 섹션에서 변경할 수 있습니다.
+
+### 비밀번호 변경 방법:
+
+1. `config/params-local.php` 파일을 편집합니다:
+
+   ```bash
+   nano config/params-local.php
+   ```
+
+2. `users` 섹션에서 원하는 사용자의 `password` 값을 변경합니다:
+
+   ```php
+   'users' => [
+       '100' => [
+           'id' => '100',
+           'username' => 'admin',
+           'password' => 'your_new_password_here',  // 이 부분을 변경
+           'authKey' => 'test100key',
+           'accessToken' => '100-token',
+       ],
+   ],
+   ```
+
+3. 추가 사용자를 생성하려면 새로운 배열 요소를 추가합니다:
+   ```php
+   'users' => [
+       '100' => [
+           'id' => '100',
+           'username' => 'admin',
+           'password' => 'admin123',
+           'authKey' => 'test100key',
+           'accessToken' => '100-token',
+       ],
+       '101' => [
+           'id' => '101',
+           'username' => 'user2',
+           'password' => 'user2_password',
+           'authKey' => 'test101key',
+           'accessToken' => '101-token',
+       ],
+   ],
+   ```
 
 이제 Yii2 기반 Invoice Manager가 완전히 설정되었습니다.

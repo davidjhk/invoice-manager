@@ -1,7 +1,16 @@
 <?php
 
 return [
-    'senderEmail' => 'sender@example.com',
-    'senderName' => 'Your Company Name',
-	'bccEmail' => 'bcc@example.com',
+    'senderEmail' => 'info@jdosa.com',
+    'senderName' => 'Hun Kook Joo',
+	'bccEmail' => 'davidjhk@gmail.com',
+    'users' => [
+        '100' => [
+            'id' => '100',
+            'username' => 'admin',
+            'password' => 'admin123',
+            'authKey' => 'test100key',
+            'accessToken' => '100-token',
+        ],
+    ],
 ];
