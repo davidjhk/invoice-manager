@@ -119,8 +119,8 @@ $this->params['breadcrumbs'][] = 'Receive Payment';
 	<input type="hidden" name="notes" id="payment-notes-hidden" value="">
 
 	<div class="form-group mt-4">
-		<?= Html::submitButton('Save Payment', ['class' => 'btn btn-success btn-lg']) ?>
-		<?= Html::a('Cancel', ['view', 'id' => $startInvoice->id], ['class' => 'btn btn-secondary btn-lg']) ?>
+		<?= Html::submitButton('Save Payment', ['class' => 'btn btn-success']) ?>
+		<?= Html::a('Cancel', ['view', 'id' => $startInvoice->id], ['class' => 'btn btn-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

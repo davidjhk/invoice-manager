@@ -12,7 +12,7 @@ use app\models\Product;
 
 <div class="product-form">
 
-    <?php $form = ActiveForm::begin([
+	<?php $form = ActiveForm::begin([
         'id' => 'product-form',
         'options' => ['class' => 'needs-validation', 'novalidate' => true],
         'fieldConfig' => [
@@ -22,153 +22,154 @@ use app\models\Product;
         ],
     ]); ?>
 
-    <div class="row">
-        <!-- Left Column -->
-        <div class="col-lg-8">
-            
-            <!-- Basic Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Basic Information</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-                        </div>
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'type')->dropDownList(Product::getTypeOptions(), ['prompt' => 'Select Type']) ?>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'category')->dropDownList(Product::getCategoryOptions(), ['prompt' => 'Select Category']) ?>
-                        </div>
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
-                        </div>
-                    </div>
-                    
-                    <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
-                </div>
-            </div>
+	<div class="row">
+		<!-- Left Column -->
+		<div class="col-lg-8">
 
-            <!-- Pricing Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Pricing & Cost</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <?= $form->field($model, 'unit')->dropDownList(Product::getUnitOptions(), ['prompt' => 'Select Unit']) ?>
-                        </div>
-                        <div class="col-md-4">
-                            <?= $form->field($model, 'price')->textInput([
+			<!-- Basic Information -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h6 class="mb-0">Basic Information</h6>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-6">
+							<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+						</div>
+						<div class="col-md-6">
+							<?= $form->field($model, 'type')->dropDownList(Product::getTypeOptions(), ['prompt' => 'Select Type']) ?>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<?= $form->field($model, 'category')->dropDownList(Product::getCategoryOptions(), ['prompt' => 'Select Category']) ?>
+						</div>
+						<div class="col-md-6">
+							<?= $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
+						</div>
+					</div>
+
+					<?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
+				</div>
+			</div>
+
+			<!-- Pricing Information -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h6 class="mb-0">Pricing & Cost</h6>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-4">
+							<?= $form->field($model, 'unit')->dropDownList(Product::getUnitOptions(), ['prompt' => 'Select Unit']) ?>
+						</div>
+						<div class="col-md-4">
+							<?= $form->field($model, 'price')->textInput([
                                 'type' => 'number',
                                 'min' => 0,
                                 'step' => 0.01,
                                 'id' => 'price-input'
                             ]) ?>
-                        </div>
-                        <div class="col-md-4">
-                            <?= $form->field($model, 'cost')->textInput([
+						</div>
+						<div class="col-md-4">
+							<?= $form->field($model, 'cost')->textInput([
                                 'type' => 'number',
                                 'min' => 0,
                                 'step' => 0.01,
                                 'id' => 'cost-input'
                             ]) ?>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">Profit Margin</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="margin-display" readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">Profit Amount</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">$</span>
-                                    </div>
-                                    <input type="text" class="form-control" id="profit-display" readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+						</div>
+					</div>
 
-        </div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="form-label">Profit Margin</label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="margin-display" readonly>
+									<div class="input-group-append">
+										<span class="input-group-text">%</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="form-label">Profit Amount</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text">$</span>
+									</div>
+									<input type="text" class="form-control" id="profit-display" readonly>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-        <!-- Right Column -->
-        <div class="col-lg-4">
-            
-            <!-- Settings -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Settings</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-check mb-3">
-                        <?= $form->field($model, 'is_taxable')->checkbox([
+		</div>
+
+		<!-- Right Column -->
+		<div class="col-lg-4">
+
+			<!-- Settings -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h6 class="mb-0">Settings</h6>
+				</div>
+				<div class="card-body">
+					<div class="form-check mb-3">
+						<?= $form->field($model, 'is_taxable')->checkbox([
                             'class' => 'form-check-input',
                             'label' => false,
                         ]) ?>
-                        <label class="form-check-label" for="product-is_taxable">
-                            This product/service is taxable
-                        </label>
-                    </div>
-                    
-                    <div class="form-check mb-3">
-                        <?= $form->field($model, 'is_active')->checkbox([
+						<label class="form-check-label" for="product-is_taxable">
+							This product/service is taxable
+						</label>
+					</div>
+
+					<div class="form-check mb-3">
+						<?= $form->field($model, 'is_active')->checkbox([
                             'class' => 'form-check-input',
                             'label' => false,
                         ]) ?>
-                        <label class="form-check-label" for="product-is_active">
-                            Product is active
-                        </label>
-                    </div>
-                </div>
-            </div>
+						<label class="form-check-label" for="product-is_active">
+							Product is active
+						</label>
+					</div>
+				</div>
+			</div>
 
-            <!-- Company Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Company</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">Company</label>
-                        <input type="text" class="form-control" value="<?= Html::encode($company->company_name) ?>" readonly>
-                    </div>
-                </div>
-            </div>
+			<!-- Company Information -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h6 class="mb-0">Company</h6>
+				</div>
+				<div class="card-body">
+					<div class="form-group">
+						<label class="form-label">Company</label>
+						<input type="text" class="form-control" value="<?= Html::encode($company->company_name) ?>"
+							readonly>
+					</div>
+				</div>
+			</div>
 
-        </div>
-    </div>
+		</div>
+	</div>
 
-    <!-- Form Actions -->
-    <div class="form-group mt-4">
-        <?= Html::submitButton($model->isNewRecord ? 'Create Product' : 'Update Product', [
-            'class' => 'btn btn-success btn-lg'
+	<!-- Form Actions -->
+	<div class="form-group mt-4">
+		<?= Html::submitButton($model->isNewRecord ? 'Create Product' : 'Update Product', [
+            'class' => 'btn btn-success'
         ]) ?>
-        <?= Html::a('Cancel', $model->isNewRecord ? ['index'] : ['view', 'id' => $model->id], [
+		<?= Html::a('Cancel', $model->isNewRecord ? ['index'] : ['view', 'id' => $model->id], [
             'class' => 'btn btn-secondary'
         ]) ?>
-    </div>
+	</div>
 
-    <?php ActiveForm::end(); ?>
+	<?php ActiveForm::end(); ?>
 
 </div>
 

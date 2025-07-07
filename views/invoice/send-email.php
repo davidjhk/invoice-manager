@@ -97,7 +97,7 @@ Best regards,
 
 					<div class="form-group">
 						<?= Html::submitButton('<i class="fas fa-paper-plane mr-2"></i>Send Email', [
-                            'class' => 'btn btn-success btn-lg',
+                            'class' => 'btn btn-success',
                             'id' => 'send-email-btn'
                         ]) ?>
 						<?= Html::a('Cancel', ['view', 'id' => $model->id], ['class' => 'btn btn-secondary']) ?>

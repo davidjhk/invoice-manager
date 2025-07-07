@@ -200,8 +200,8 @@ $this->registerJsVar('estimateConfig', [
 	</div>
 
 	<div class="form-group mt-4">
-		<?= Html::submitButton($model->isNewRecord ? 'Create Estimate' : 'Update Estimate', ['class' => 'btn btn-success btn-lg']) ?>
-		<?= Html::a('Cancel', ['index'], ['class' => 'btn btn-secondary btn-lg']) ?>
+		<?= Html::submitButton($model->isNewRecord ? 'Create Estimate' : 'Update Estimate', ['class' => 'btn btn-success']) ?>
+		<?= Html::a('Cancel', ['index'], ['class' => 'btn btn-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
