@@ -458,7 +458,7 @@ tail -f runtime/logs/app.log
 ### 일반적인 문제들:
 
 1. **권한 문제**: `sudo chmod -R 777 runtime web/assets`
-2. **데이터베이스 연결 오류**: `config/db.php` 설정 확인
+2. **데이터베이스 연결 오류**: `config/db-local.php` 설정 확인
 3. **웹서버 403 오류**: 가상 호스트 설정 및 DocumentRoot 확인
 4. **PHP 오류**: `/var/log/apache2/error.log` 또는 `/var/log/nginx/error.log` 확인
 
