@@ -119,11 +119,23 @@ sudo chmod -R 755 /var/www/html/invoice-manager
 
 ## 4. Yii2 설정
 
+### 로컬 설정 파일 생성:
+
+프로젝트에는 로컬 환경별 설정을 위한 예제 파일들이 포함되어 있습니다. 다음 파일들을 복사하여 로컬 설정을 생성하세요:
+
+```bash
+# 데이터베이스 설정 파일 복사
+cp config/db-local.php.example config/db-local.php
+
+# 사용자 파라미터 설정 파일 복사
+cp config/params-local.php.example config/params-local.php
+```
+
 ### 데이터베이스 연결 설정:
 
 ```bash
 # 데이터베이스 설정 파일 편집
-nano config/db.php
+nano config/db-local.php
 ```
 
 다음 내용으로 수정:
@@ -140,11 +152,12 @@ return [
 ];
 ```
 
+### 사용자 파라미터 설정:
+
+```bash
 # 사용자 파라미터 설정 파일 편집
-
-nano config/params.php
-
-````
+nano config/params-local.php
+```
 
 다음 내용으로 수정:
 
@@ -152,11 +165,13 @@ nano config/params.php
 <?php
 
 return [
-    'senderEmail' => 'noreplyl@example.com',
+    'senderEmail' => 'noreply@example.com',
     'senderName' => 'Your Name',
-	'bccEmail' => 'bcc@example.com',
+    'bccEmail' => 'bcc@example.com',
 ];
-````
+```
+
+**중요:** `config/db-local.php`와 `config/params-local.php` 파일은 로컬 환경에서만 사용되며, Git에 추가되지 않습니다. 서버별로 다른 설정이 필요한 경우 각 서버에서 개별적으로 생성해야 합니다.
 
 ### 쿠키 검증 키 설정:
 
