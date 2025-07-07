@@ -104,7 +104,7 @@ EXIT;
 cd /var/www/html
 
 # Git에서 프로젝트 클론
-git clone [repository-url] invoice-manager
+git clone https://github.com/davidjhk/invoice-manager invoice-manager
 
 # 프로젝트 디렉토리로 이동
 cd invoice-manager
@@ -165,13 +165,11 @@ nano config/params-local.php
 <?php
 
 return [
-    'senderEmail' => 'noreply@example.com',
+    'senderEmail' => 'noreply@your_domain.com',
     'senderName' => 'Your Name',
-    'bccEmail' => 'bcc@example.com',
+    'bccEmail' => 'bcc@your_domain.com',
 ];
 ```
-
-**중요:** `config/db-local.php`와 `config/params-local.php` 파일은 로컬 환경에서만 사용되며, Git에 추가되지 않습니다. 서버별로 다른 설정이 필요한 경우 각 서버에서 개별적으로 생성해야 합니다.
 
 ### 쿠키 검증 키 설정:
 
@@ -185,6 +183,51 @@ nano config/web.php
 ```php
 'cookieValidationKey' => 'your-secret-key-here-32-characters-long',
 ```
+
+### SMTP2GO API 설정:
+
+이 애플리케이션은 이메일 발송을 위해 SMTP2GO API를 사용합니다. 인보이스 및 견적서 이메일 발송을 위해 SMTP2GO API 키가 필요합니다.
+
+#### SMTP2GO API 키 생성 방법:
+
+1. **SMTP2GO 계정 생성:**
+
+   - [SMTP2GO 웹사이트](https://www.smtp2go.com/)에 접속
+   - 무료 계정 생성 (월 1,000통 무료)
+
+2. **API 키 생성:**
+
+   ```
+   1. SMTP2GO 대시보드 로그인
+   2. 좌측 메뉴에서 "Settings" → "API Keys" 선택
+   3. "Create API Key" 버튼 클릭
+   4. API 키 이름 입력 (예: "Invoice Manager")
+   5. 권한 설정:
+      - Send Email: 체크 (필수)
+      - Stats: 체크 (선택사항)
+   6. "Create API Key" 버튼 클릭
+   7. 생성된 API 키 복사 (한 번만 표시됨)
+   ```
+
+3. **도메인 인증 (권장):**
+
+   ```
+   1. "Settings" → "Sender Domains" 선택
+   2. "Add Domain" 버튼 클릭
+   3. 사용할 도메인 입력 (예: yourdomain.com)
+   4. DNS 설정에 제공된 SPF, DKIM 레코드 추가
+   5. 도메인 인증 완료 후 해당 도메인 이메일 사용 가능
+   ```
+
+4. **API 키 설정:**
+   - 애플리케이션 설치 후 웹 인터페이스에서 회사 설정(`/company/settings`) 페이지로 이동
+   - "SMTP2GO API Key" 필드에 생성된 API 키 입력
+   - 설정 저장
+
+**참고:**
+
+- SMTP2GO API 키는 Company 모델에서 관리되므로 웹 인터페이스를 통해 설정해야 합니다.
+- 도메인 인증 없이도 사용 가능하지만, 이메일 전송률과 신뢰도 향상을 위해 도메인 인증을 권장합니다.
 
 ## 5. 데이터베이스 마이그레이션 실행
 
@@ -426,7 +469,7 @@ tail -f runtime/logs/app.log
 5. **견적서 관리** - 견적서 생성, 인보이스 변환
 6. **결제 관리** - 결제 기록 관리
 7. **PDF 생성** - 인보이스/견적서 PDF 생성
-8. **이메일 발송** - SMTP2GO 및 SwiftMailer 지원
+8. **이메일 발송** - SMTP2GO API 및 SwiftMailer 지원
 
 ### 접근 URL:
 
