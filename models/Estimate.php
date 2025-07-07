@@ -238,18 +238,23 @@ class Estimate extends ActiveRecord
         $taxAmount = 0;
 
         foreach ($this->estimateItems as $item) {
-            $subtotal += $item->amount;
+            $itemAmount = is_numeric($item->amount) ? (float) $item->amount : 0;
+            $itemTaxAmount = is_numeric($item->tax_amount) ? (float) $item->tax_amount : 0;
+            
+            $subtotal += $itemAmount;
             if ($item->is_taxable) {
-                $taxAmount += $item->tax_amount;
+                $taxAmount += $itemTaxAmount;
             }
         }
 
         // Apply discount
         $discountAmount = 0;
+        $discountValue = is_numeric($this->discount_value) ? (float) $this->discount_value : 0;
+        
         if ($this->discount_type == 'percentage') {
-            $discountAmount = $subtotal * ($this->discount_value / 100);
+            $discountAmount = $subtotal * ($discountValue / 100);
         } elseif ($this->discount_type == 'fixed') {
-            $discountAmount = $this->discount_value;
+            $discountAmount = $discountValue;
         }
 
         $this->subtotal = $subtotal;

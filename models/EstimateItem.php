@@ -110,11 +110,16 @@ class EstimateItem extends ActiveRecord
      */
     public function calculateAmount()
     {
-        $this->amount = $this->quantity * $this->rate;
+        // Ensure numeric values
+        $quantity = is_numeric($this->quantity) ? (float) $this->quantity : 0;
+        $rate = is_numeric($this->rate) ? (float) $this->rate : 0;
+        $taxRate = is_numeric($this->tax_rate) ? (float) $this->tax_rate : 0;
+        
+        $this->amount = $quantity * $rate;
         
         // Calculate tax amount if taxable
-        if ($this->is_taxable && $this->tax_rate > 0) {
-            $this->tax_amount = $this->amount * ($this->tax_rate / 100);
+        if ($this->is_taxable && $taxRate > 0) {
+            $this->tax_amount = $this->amount * ($taxRate / 100);
         } else {
             $this->tax_amount = 0;
         }
@@ -226,7 +231,9 @@ class EstimateItem extends ActiveRecord
             
             // Create or update items
             foreach ($itemsData as $index => $itemData) {
-                if (empty($itemData['description']) || empty($itemData['quantity']) || !isset($itemData['rate'])) {
+                if (empty($itemData['description']) || 
+                    !isset($itemData['quantity']) || $itemData['quantity'] === '' || 
+                    !isset($itemData['rate']) || $itemData['rate'] === '') {
                     continue; // Skip empty items
                 }
                 
@@ -247,9 +254,9 @@ class EstimateItem extends ActiveRecord
                 
                 $item->product_service_name = $itemData['product_service_name'] ?? null;
                 $item->description = $itemData['description'];
-                $item->quantity = (float) $itemData['quantity'];
-                $item->rate = (float) $itemData['rate'];
-                $item->tax_rate = (float) ($itemData['tax_rate'] ?? 0);
+                $item->quantity = is_numeric($itemData['quantity']) ? (float) $itemData['quantity'] : 1;
+                $item->rate = is_numeric($itemData['rate']) ? (float) $itemData['rate'] : 0;
+                $item->tax_rate = is_numeric($itemData['tax_rate'] ?? 0) ? (float) ($itemData['tax_rate'] ?? 0) : 0;
                 $item->is_taxable = isset($itemData['is_taxable']) ? (bool) $itemData['is_taxable'] : true;
                 $item->sort_order = $index + 1;
                 

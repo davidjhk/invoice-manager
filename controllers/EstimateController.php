@@ -118,7 +118,7 @@ class EstimateController extends Controller
             try {
                 if ($model->save()) {
                     // Handle estimate items
-                    $itemsData = Yii::$app->request->post('items', []);
+                    $itemsData = Yii::$app->request->post('EstimateItem', []);
                     if (!empty($itemsData)) {
                         EstimateItem::createMultiple($model->id, $itemsData);
                     }
@@ -165,7 +165,7 @@ class EstimateController extends Controller
             try {
                 if ($model->save()) {
                     // Handle estimate items
-                    $itemsData = Yii::$app->request->post('items', []);
+                    $itemsData = Yii::$app->request->post('EstimateItem', []);
                     EstimateItem::createMultiple($model->id, $itemsData);
                     
                     // Recalculate totals
