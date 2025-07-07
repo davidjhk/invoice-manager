@@ -1,0 +1,7 @@
+<?php
+
+return [
+    'senderEmail' => 'sender@example.com',
+    'senderName' => 'Your Company Name',
+	'bccEmail' => 'bcc@example.com',
+];
