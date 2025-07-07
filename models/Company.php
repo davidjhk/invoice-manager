@@ -18,6 +18,8 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $logo_filename
  * @property string|null $smtp2go_api_key
  * @property string|null $sender_email
+ * @property string|null $sender_name
+ * @property string|null $bcc_email
  * @property float $tax_rate
  * @property string $currency
  * @property string $invoice_prefix
@@ -77,10 +79,10 @@ class Company extends ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
             [['company_name'], 'string', 'max' => 255],
             [['company_phone'], 'string', 'max' => 50],
-            [['company_email', 'smtp2go_api_key', 'sender_email'], 'string', 'max' => 255],
+            [['company_email', 'smtp2go_api_key', 'sender_email', 'sender_name', 'bcc_email'], 'string', 'max' => 255],
             [['currency'], 'string', 'max' => 10],
             [['invoice_prefix', 'estimate_prefix'], 'string', 'max' => 20],
-            [['company_email', 'sender_email'], 'email'],
+            [['company_email', 'sender_email', 'bcc_email'], 'email'],
             [['logo_path', 'logo_filename'], 'string', 'max' => 500],
             [['logo_upload'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg, gif', 'maxSize' => 2 * 1024 * 1024],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
@@ -103,6 +105,8 @@ class Company extends ActiveRecord
             'logo_upload' => 'Company Logo',
             'smtp2go_api_key' => 'SMTP2GO API Key',
             'sender_email' => 'Sender Email',
+            'sender_name' => 'Sender Name',
+            'bcc_email' => 'BCC Email',
             'tax_rate' => 'Tax Rate (%)',
             'currency' => 'Currency',
             'invoice_prefix' => 'Invoice Prefix',

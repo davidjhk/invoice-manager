@@ -460,8 +460,11 @@ class EstimateController extends Controller
     {
         $mailer = Yii::$app->mailer;
         
+        $senderEmail = $model->company->sender_email ?: $model->company->company_email;
+        $senderName = $model->company->sender_name ?: $model->company->company_name;
+        
         $message = $mailer->compose()
-            ->setFrom([$model->company->company_email => $model->company->company_name])
+            ->setFrom([$senderEmail => $senderName])
             ->setTo($emailData['to'])
             ->setSubject($emailData['subject'])
             ->setHtmlBody($emailData['message']);
@@ -471,12 +474,17 @@ class EstimateController extends Controller
             $message->setCc($emailData['cc']);
         }
         
-        // Always add configured BCC email, plus any additional BCC addresses
-        $bccAddresses = [Yii::$app->params['bccEmail'] ?? 'davidjhk@gmail.com'];
+        // Add configured BCC email if available, plus any additional BCC addresses
+        $bccAddresses = [];
+        if (!empty($model->company->bcc_email)) {
+            $bccAddresses[] = $model->company->bcc_email;
+        }
         if (!empty($emailData['bcc'])) {
             $bccAddresses = array_merge($bccAddresses, (array)$emailData['bcc']);
         }
-        $message->setBcc($bccAddresses);
+        if (!empty($bccAddresses)) {
+            $message->setBcc($bccAddresses);
+        }
         
         // Attach PDF
         $pdfContent = PdfGenerator::generateEstimatePdf($model, 'S');

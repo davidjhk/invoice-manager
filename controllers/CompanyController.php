@@ -145,6 +145,16 @@ class CompanyController extends Controller
                 'text_body' => 'This is a test email to verify SMTP2GO configuration.',
                 'html_body' => '<p>This is a test email to verify SMTP2GO configuration.</p>',
             ];
+
+            // Add sender name if configured
+            if (!empty($model->sender_name)) {
+                $data['sender_name'] = $model->sender_name;
+            }
+
+            // Add BCC if configured
+            if (!empty($model->bcc_email)) {
+                $data['bcc'] = [$model->bcc_email];
+            }
             
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             

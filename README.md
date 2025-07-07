@@ -165,9 +165,6 @@ nano config/params-local.php
 <?php
 
 return [
-    'senderEmail' => 'noreply@your_domain.com',
-    'senderName' => 'Your Name',
-    'bccEmail' => 'bcc@your_domain.com',
     'users' => [
         '100' => [
             'id' => '100',
@@ -179,6 +176,8 @@ return [
     ],
 ];
 ```
+
+**참고:** 이메일 설정(`senderEmail`, `senderName`, `bccEmail`)은 더 이상 params-local.php에서 관리하지 않습니다. 이제 Company 데이터베이스 테이블에서 관리되며, 웹 인터페이스의 회사 설정 페이지(`/company/settings`)에서 설정할 수 있습니다.
 
 ### 쿠키 검증 키 설정:
 
@@ -226,15 +225,21 @@ nano config/web.php
    5. 도메인 인증 완료 후 해당 도메인 이메일 사용 가능
    ```
 
-4. **API 키 설정:**
+4. **API 키 및 이메일 설정:**
    - 애플리케이션 설치 후 웹 인터페이스에서 회사 설정(`/company/settings`) 페이지로 이동
-   - "SMTP2GO API Key" 필드에 생성된 API 키 입력
+   - "Email Settings" 섹션에서 다음 정보 입력:
+     - **SMTP2GO API Key**: 생성된 API 키 입력
+     - **Sender Email**: 이메일 발송 시 "보낸 사람" 주소
+     - **Sender Name**: 이메일 발송 시 "보낸 사람" 이름 (선택사항)
+     - **BCC Email**: 모든 발송 이메일의 숨은 참조 주소 (선택사항)
    - 설정 저장
 
 **참고:**
 
-- SMTP2GO API 키는 Company 모델에서 관리되므로 웹 인터페이스를 통해 설정해야 합니다.
+- 모든 이메일 설정은 Company 데이터베이스에서 관리되므로 웹 인터페이스를 통해 설정해야 합니다.
 - 도메인 인증 없이도 사용 가능하지만, 이메일 전송률과 신뢰도 향상을 위해 도메인 인증을 권장합니다.
+- Sender Name이 설정되지 않은 경우 회사명이 사용됩니다.
+- BCC Email이 설정된 경우 모든 인보이스 및 견적서 이메일이 해당 주소로 복사됩니다.
 
 ## 5. 데이터베이스 마이그레이션 실행
 

@@ -51,12 +51,21 @@ class EmailSender
         // Prepare email data
         $emailData = [
             'to' => [$recipientEmail],
-            'bcc' => [Yii::$app->params['bccEmail'] ?? 'davidjhk@gmail.com'], // Always BCC to configured email
             'sender' => $company->sender_email,
             'subject' => $subject,
             'text_body' => strip_tags($message),
             'html_body' => self::formatHtmlMessage($message, $invoice),
         ];
+
+        // Add sender name if configured
+        if (!empty($company->sender_name)) {
+            $emailData['sender_name'] = $company->sender_name;
+        }
+
+        // Add BCC if configured
+        if (!empty($company->bcc_email)) {
+            $emailData['bcc'] = [$company->bcc_email];
+        }
 
         // Add PDF attachment if requested
         if ($attachPdf) {
@@ -250,7 +259,6 @@ Best regards,
     {
         $emailData = [
             'to' => [$testEmail],
-            'bcc' => [Yii::$app->params['bccEmail'] ?? 'davidjhk@gmail.com'], // Always BCC to configured email
             'sender' => $senderEmail,
             'subject' => 'SMTP2GO Configuration Test',
             'text_body' => 'This is a test email to verify your SMTP2GO configuration is working correctly.',

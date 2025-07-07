@@ -125,11 +125,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         'placeholder' => 'noreply@yourcompany.com'
                     ]) ?>
                     
+                    <?= $form->field($model, 'sender_name')->textInput([
+                        'maxlength' => true,
+                        'placeholder' => 'Your Company Name'
+                    ]) ?>
+                    
+                    <?= $form->field($model, 'bcc_email')->input('email', [
+                        'maxlength' => true,
+                        'placeholder' => 'admin@yourcompany.com'
+                    ]) ?>
+                    
                     <div class="alert alert-info">
                         <small>
                             <i class="fas fa-info-circle mr-1"></i>
                             To use email functionality, you need to configure SMTP2GO API. 
                             <a href="https://www.smtp2go.com" target="_blank">Get your API key here</a>.
+                            <br><br>
+                            <strong>Email Configuration:</strong>
+                            <br>• <strong>Sender Email:</strong> The email address that will appear as "From" in sent emails
+                            <br>• <strong>Sender Name:</strong> The name that will appear as sender (defaults to company name)
+                            <br>• <strong>BCC Email:</strong> Email address to receive blind carbon copy of all sent emails
                         </small>
                     </div>
                 </div>
@@ -182,18 +197,28 @@ $this->params['breadcrumbs'][] = $this->title;
                         'max' => 365
                     ]) ?>
                 </div>
+                <div class="col-md-3">
+                    <?= $form->field($model, 'estimate_validity_days')->textInput([
+                        'type' => 'number',
+                        'min' => 1,
+                        'max' => 365
+                    ]) ?>
+                </div>
             </div>
             
             <div class="alert alert-light">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <small><strong>Next Invoice Number:</strong> <span id="next-invoice-number"><?= $model->generateInvoiceNumber() ?></span></small>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <small><strong>Next Estimate Number:</strong> <span id="next-estimate-number"><?= $model->generateEstimateNumber() ?></span></small>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <small><strong>Default Due Date:</strong> <?= Yii::$app->formatter->asDate($model->getDefaultDueDate()) ?></small>
+                    </div>
+                    <div class="col-md-3">
+                        <small><strong>Default Estimate Expiry:</strong> <?= Yii::$app->formatter->asDate($model->getDefaultExpiryDate()) ?></small>
                     </div>
                 </div>
             </div>

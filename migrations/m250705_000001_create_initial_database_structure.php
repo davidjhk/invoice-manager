@@ -25,6 +25,9 @@ class m250705_000001_create_initial_database_structure extends Migration
             'logo_filename' => $this->string(255),
             'smtp2go_api_key' => $this->string(255),
             'sender_email' => $this->string(255),
+            'sender_name' => $this->string(255),
+            'bcc_email' => $this->string(255),
+            'estimate_validity_days' => $this->integer()->defaultValue(30),
             'tax_rate' => $this->decimal(5, 2)->defaultValue(10.00),
             'currency' => $this->string(10)->defaultValue('USD'),
             'invoice_prefix' => $this->string(20)->defaultValue('INV-'),
@@ -58,9 +61,11 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create jdosa_products table
-        $this->createTable('{{%jdosa_products}}', [
+        // Create jdosa_products table (only if it doesn't exist)
+        if (!$this->db->schema->getTableSchema('{{%jdosa_products}}', true)) {
+            $this->createTable('{{%jdosa_products}}', [
             'id' => $this->primaryKey(),
             'company_id' => $this->integer()->notNull(),
             'name' => $this->string(255)->notNull(),
@@ -76,8 +81,10 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create jdosa_invoices table
+        // Create jdosa_invoices table (only if it doesn't exist)
+        if (!$this->db->schema->getTableSchema('{{%jdosa_invoices}}', true)) {
         $this->createTable('{{%jdosa_invoices}}', [
             'id' => $this->primaryKey(),
             'invoice_number' => $this->string(100)->notNull()->unique(),
@@ -110,9 +117,11 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create jdosa_invoice_items table
-        $this->createTable('{{%jdosa_invoice_items}}', [
+        // Create jdosa_invoice_items table (only if it doesn't exist)
+        if (!$this->db->schema->getTableSchema('{{%jdosa_invoice_items}}', true)) {
+            $this->createTable('{{%jdosa_invoice_items}}', [
             'id' => $this->primaryKey(),
             'invoice_id' => $this->integer()->notNull(),
             'product_id' => $this->integer()->null(),
@@ -128,9 +137,11 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create jdosa_estimates table
-        $this->createTable('{{%jdosa_estimates}}', [
+        // Create jdosa_estimates table (only if it doesn't exist)
+        if (!$this->db->schema->getTableSchema('{{%jdosa_estimates}}', true)) {
+            $this->createTable('{{%jdosa_estimates}}', [
             'id' => $this->primaryKey(),
             'estimate_number' => $this->string(100)->notNull()->unique(),
             'company_id' => $this->integer()->notNull(),
@@ -163,9 +174,11 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create jdosa_estimate_items table
-        $this->createTable('{{%jdosa_estimate_items}}', [
+        // Create jdosa_estimate_items table (only if it doesn't exist)
+        if (!$this->db->schema->getTableSchema('{{%jdosa_estimate_items}}', true)) {
+            $this->createTable('{{%jdosa_estimate_items}}', [
             'id' => $this->primaryKey(),
             'estimate_id' => $this->integer()->notNull(),
             'product_id' => $this->integer()->null(),
@@ -181,9 +194,11 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create jdosa_payments table
-        $this->createTable('{{%jdosa_payments}}', [
+        // Create jdosa_payments table (only if it doesn't exist)
+        if (!$this->db->schema->getTableSchema('{{%jdosa_payments}}', true)) {
+            $this->createTable('{{%jdosa_payments}}', [
             'id' => $this->primaryKey(),
             'invoice_id' => $this->integer()->notNull(),
             'payment_date' => $this->date()->notNull(),
@@ -194,86 +209,34 @@ class m250705_000001_create_initial_database_structure extends Migration
             'created_at' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+        }
 
-        // Create indexes for companies table
-        $this->createIndex('idx-jdosa_companies-is_active', '{{%jdosa_companies}}', 'is_active');
+        // Call addMissingColumns to handle existing tables
+        $this->addMissingColumns();
 
-        // Create indexes for customers table
-        $this->createIndex('idx-jdosa_customers-company_id', '{{%jdosa_customers}}', 'company_id');
-        $this->createIndex('idx-jdosa_customers-is_active', '{{%jdosa_customers}}', 'is_active');
-        $this->createIndex('idx-jdosa_customers-customer_email', '{{%jdosa_customers}}', 'customer_email');
-        $this->createIndex('idx-jdosa_customers-contact_name', '{{%jdosa_customers}}', 'contact_name');
+        // Create indexes and foreign keys safely
+        $this->createIndexesAndForeignKeys();
 
-        // Create indexes for products table
-        $this->createIndex('idx-jdosa_products-company_id', '{{%jdosa_products}}', 'company_id');
-        $this->createIndex('idx-jdosa_products-type', '{{%jdosa_products}}', 'type');
-        $this->createIndex('idx-jdosa_products-sku', '{{%jdosa_products}}', ['company_id', 'sku']);
-        $this->createIndex('idx-jdosa_products-name', '{{%jdosa_products}}', 'name');
-
-        // Create indexes for invoices table
-        $this->createIndex('idx-jdosa_invoices-invoice_number', '{{%jdosa_invoices}}', 'invoice_number', true);
-        $this->createIndex('idx-jdosa_invoices-company_id', '{{%jdosa_invoices}}', 'company_id');
-        $this->createIndex('idx-jdosa_invoices-customer_id', '{{%jdosa_invoices}}', 'customer_id');
-        $this->createIndex('idx-jdosa_invoices-status', '{{%jdosa_invoices}}', 'status');
-        $this->createIndex('idx-jdosa_invoices-invoice_date', '{{%jdosa_invoices}}', 'invoice_date');
-        $this->createIndex('idx-jdosa_invoices-due_date', '{{%jdosa_invoices}}', 'due_date');
-        $this->createIndex('idx-jdosa_invoices-shipping_date', '{{%jdosa_invoices}}', 'shipping_date');
-        $this->createIndex('idx-jdosa_invoices-tracking_number', '{{%jdosa_invoices}}', 'tracking_number');
-        $this->createIndex('idx-jdosa_invoices-terms', '{{%jdosa_invoices}}', 'terms');
-
-        // Create indexes for invoice items table
-        $this->createIndex('idx-jdosa_invoice_items-invoice_id', '{{%jdosa_invoice_items}}', 'invoice_id');
-        $this->createIndex('idx-jdosa_invoice_items-product_id', '{{%jdosa_invoice_items}}', 'product_id');
-        $this->createIndex('idx-jdosa_invoice_items-sort_order', '{{%jdosa_invoice_items}}', 'sort_order');
-        $this->createIndex('idx-jdosa_invoice_items-product_service_name', '{{%jdosa_invoice_items}}', 'product_service_name');
-
-        // Create indexes for estimates table
-        $this->createIndex('idx-jdosa_estimates-estimate_number', '{{%jdosa_estimates}}', 'estimate_number', true);
-        $this->createIndex('idx-jdosa_estimates-company_id', '{{%jdosa_estimates}}', 'company_id');
-        $this->createIndex('idx-jdosa_estimates-customer_id', '{{%jdosa_estimates}}', 'customer_id');
-        $this->createIndex('idx-jdosa_estimates-status', '{{%jdosa_estimates}}', 'status');
-        $this->createIndex('idx-jdosa_estimates-estimate_date', '{{%jdosa_estimates}}', 'estimate_date');
-        $this->createIndex('idx-jdosa_estimates-expiry_date', '{{%jdosa_estimates}}', 'expiry_date');
-        $this->createIndex('idx-jdosa_estimates-converted', '{{%jdosa_estimates}}', 'converted_to_invoice');
-        $this->createIndex('idx-jdosa_estimates-invoice_id', '{{%jdosa_estimates}}', 'invoice_id');
-
-        // Create indexes for estimate items table
-        $this->createIndex('idx-jdosa_estimate_items-estimate_id', '{{%jdosa_estimate_items}}', 'estimate_id');
-        $this->createIndex('idx-jdosa_estimate_items-product_id', '{{%jdosa_estimate_items}}', 'product_id');
-        $this->createIndex('idx-jdosa_estimate_items-sort_order', '{{%jdosa_estimate_items}}', 'sort_order');
-        $this->createIndex('idx-jdosa_estimate_items-product_service_name', '{{%jdosa_estimate_items}}', 'product_service_name');
-
-        // Create indexes for payments table
-        $this->createIndex('idx-jdosa_payments-invoice_id', '{{%jdosa_payments}}', 'invoice_id');
-        $this->createIndex('idx-jdosa_payments-payment_date', '{{%jdosa_payments}}', 'payment_date');
-
-        // Add foreign key constraints
-        $this->addForeignKey('fk-jdosa_customers-company_id', '{{%jdosa_customers}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_products-company_id', '{{%jdosa_products}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_invoices-company_id', '{{%jdosa_invoices}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_invoices-customer_id', '{{%jdosa_invoices}}', 'customer_id', '{{%jdosa_customers}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_invoice_items-invoice_id', '{{%jdosa_invoice_items}}', 'invoice_id', '{{%jdosa_invoices}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_invoice_items-product_id', '{{%jdosa_invoice_items}}', 'product_id', '{{%jdosa_products}}', 'id', 'SET NULL');
-        $this->addForeignKey('fk-jdosa_estimates-company_id', '{{%jdosa_estimates}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_estimates-customer_id', '{{%jdosa_estimates}}', 'customer_id', '{{%jdosa_customers}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_estimates-invoice_id', '{{%jdosa_estimates}}', 'invoice_id', '{{%jdosa_invoices}}', 'id', 'SET NULL');
-        $this->addForeignKey('fk-jdosa_estimate_items-estimate_id', '{{%jdosa_estimate_items}}', 'estimate_id', '{{%jdosa_estimates}}', 'id', 'CASCADE');
-        $this->addForeignKey('fk-jdosa_estimate_items-product_id', '{{%jdosa_estimate_items}}', 'product_id', '{{%jdosa_products}}', 'id', 'SET NULL');
-        $this->addForeignKey('fk-jdosa_payments-invoice_id', '{{%jdosa_payments}}', 'invoice_id', '{{%jdosa_invoices}}', 'id', 'CASCADE');
-
-        // Insert default company data
-        $this->insert('{{%jdosa_companies}}', [
-            'company_name' => 'Company Name',
-            'company_address' => 'Company Address',
-            'company_phone' => 'Company Phone',
-            'company_email' => 'example@example.com',
-            'sender_email' => 'example@example.com',
-            'tax_rate' => 10.00,
-            'currency' => 'USD',
-            'invoice_prefix' => 'INV',
-            'due_date_days' => 30,
-            'is_active' => true,
-        ]);
+        // Insert default company data (only if no companies exist)
+        $companyCount = $this->db->createCommand("SELECT COUNT(*) FROM {{%jdosa_companies}}")->queryScalar();
+        if ($companyCount == 0) {
+            $this->insert('{{%jdosa_companies}}', [
+                'company_name' => 'Company Name',
+                'company_address' => 'Company Address',
+                'company_phone' => 'Company Phone',
+                'company_email' => 'example@example.com',
+                'sender_email' => 'example@example.com',
+                'sender_name' => 'Company Name',
+                'bcc_email' => null,
+                'estimate_validity_days' => 30,
+                'tax_rate' => 10.00,
+                'currency' => 'USD',
+                'invoice_prefix' => 'INV',
+                'estimate_prefix' => 'EST',
+                'due_date_days' => 30,
+                'is_active' => true,
+            ]);
+        }
     }
 
     /**
@@ -322,6 +285,115 @@ class m250705_000001_create_initial_database_structure extends Migration
             if (!isset($companiesTable->columns['estimate_prefix'])) {
                 $this->addColumn('{{%jdosa_companies}}', 'estimate_prefix', $this->string(20)->defaultValue('EST-'));
             }
+            if (!isset($companiesTable->columns['sender_name'])) {
+                $this->addColumn('{{%jdosa_companies}}', 'sender_name', $this->string(255));
+            }
+            if (!isset($companiesTable->columns['bcc_email'])) {
+                $this->addColumn('{{%jdosa_companies}}', 'bcc_email', $this->string(255));
+            }
+            if (!isset($companiesTable->columns['estimate_validity_days'])) {
+                $this->addColumn('{{%jdosa_companies}}', 'estimate_validity_days', $this->integer()->defaultValue(30));
+            }
         }
+
+        // Check and add missing columns to other tables as needed
+        // This method will be called for existing installations to add any new columns
+        // Add more table column checks here as the schema evolves
+    }
+
+    /**
+     * Create indexes and foreign keys safely (only if they don't exist)
+     */
+    private function createIndexesAndForeignKeys()
+    {
+        // Helper method to safely create index
+        $createIndexSafely = function($name, $table, $columns, $unique = false) {
+            try {
+                $this->createIndex($name, $table, $columns, $unique);
+            } catch (\Exception $e) {
+                // Index already exists, skip
+                if (strpos($e->getMessage(), 'Duplicate key name') === false) {
+                    throw $e; // Re-throw if it's not a duplicate key error
+                }
+            }
+        };
+
+        // Helper method to safely create foreign key
+        $createForeignKeySafely = function($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null) {
+            try {
+                $this->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
+            } catch (\Exception $e) {
+                // Foreign key already exists, skip
+                if (strpos($e->getMessage(), 'Duplicate') === false && strpos($e->getMessage(), 'already exists') === false) {
+                    throw $e; // Re-throw if it's not a duplicate error
+                }
+            }
+        };
+
+        // Create indexes for companies table
+        $createIndexSafely('idx-jdosa_companies-is_active', '{{%jdosa_companies}}', 'is_active');
+
+        // Create indexes for customers table
+        $createIndexSafely('idx-jdosa_customers-company_id', '{{%jdosa_customers}}', 'company_id');
+        $createIndexSafely('idx-jdosa_customers-is_active', '{{%jdosa_customers}}', 'is_active');
+        $createIndexSafely('idx-jdosa_customers-customer_email', '{{%jdosa_customers}}', 'customer_email');
+        $createIndexSafely('idx-jdosa_customers-contact_name', '{{%jdosa_customers}}', 'contact_name');
+
+        // Create indexes for products table
+        $createIndexSafely('idx-jdosa_products-company_id', '{{%jdosa_products}}', 'company_id');
+        $createIndexSafely('idx-jdosa_products-type', '{{%jdosa_products}}', 'type');
+        $createIndexSafely('idx-jdosa_products-sku', '{{%jdosa_products}}', ['company_id', 'sku']);
+        $createIndexSafely('idx-jdosa_products-name', '{{%jdosa_products}}', 'name');
+
+        // Create indexes for invoices table
+        $createIndexSafely('idx-jdosa_invoices-invoice_number', '{{%jdosa_invoices}}', 'invoice_number', true);
+        $createIndexSafely('idx-jdosa_invoices-company_id', '{{%jdosa_invoices}}', 'company_id');
+        $createIndexSafely('idx-jdosa_invoices-customer_id', '{{%jdosa_invoices}}', 'customer_id');
+        $createIndexSafely('idx-jdosa_invoices-status', '{{%jdosa_invoices}}', 'status');
+        $createIndexSafely('idx-jdosa_invoices-invoice_date', '{{%jdosa_invoices}}', 'invoice_date');
+        $createIndexSafely('idx-jdosa_invoices-due_date', '{{%jdosa_invoices}}', 'due_date');
+        $createIndexSafely('idx-jdosa_invoices-shipping_date', '{{%jdosa_invoices}}', 'shipping_date');
+        $createIndexSafely('idx-jdosa_invoices-tracking_number', '{{%jdosa_invoices}}', 'tracking_number');
+        $createIndexSafely('idx-jdosa_invoices-terms', '{{%jdosa_invoices}}', 'terms');
+
+        // Create indexes for invoice items table
+        $createIndexSafely('idx-jdosa_invoice_items-invoice_id', '{{%jdosa_invoice_items}}', 'invoice_id');
+        $createIndexSafely('idx-jdosa_invoice_items-product_id', '{{%jdosa_invoice_items}}', 'product_id');
+        $createIndexSafely('idx-jdosa_invoice_items-sort_order', '{{%jdosa_invoice_items}}', 'sort_order');
+        $createIndexSafely('idx-jdosa_invoice_items-product_service_name', '{{%jdosa_invoice_items}}', 'product_service_name');
+
+        // Create indexes for estimates table
+        $createIndexSafely('idx-jdosa_estimates-estimate_number', '{{%jdosa_estimates}}', 'estimate_number', true);
+        $createIndexSafely('idx-jdosa_estimates-company_id', '{{%jdosa_estimates}}', 'company_id');
+        $createIndexSafely('idx-jdosa_estimates-customer_id', '{{%jdosa_estimates}}', 'customer_id');
+        $createIndexSafely('idx-jdosa_estimates-status', '{{%jdosa_estimates}}', 'status');
+        $createIndexSafely('idx-jdosa_estimates-estimate_date', '{{%jdosa_estimates}}', 'estimate_date');
+        $createIndexSafely('idx-jdosa_estimates-expiry_date', '{{%jdosa_estimates}}', 'expiry_date');
+        $createIndexSafely('idx-jdosa_estimates-converted', '{{%jdosa_estimates}}', 'converted_to_invoice');
+        $createIndexSafely('idx-jdosa_estimates-invoice_id', '{{%jdosa_estimates}}', 'invoice_id');
+
+        // Create indexes for estimate items table
+        $createIndexSafely('idx-jdosa_estimate_items-estimate_id', '{{%jdosa_estimate_items}}', 'estimate_id');
+        $createIndexSafely('idx-jdosa_estimate_items-product_id', '{{%jdosa_estimate_items}}', 'product_id');
+        $createIndexSafely('idx-jdosa_estimate_items-sort_order', '{{%jdosa_estimate_items}}', 'sort_order');
+        $createIndexSafely('idx-jdosa_estimate_items-product_service_name', '{{%jdosa_estimate_items}}', 'product_service_name');
+
+        // Create indexes for payments table
+        $createIndexSafely('idx-jdosa_payments-invoice_id', '{{%jdosa_payments}}', 'invoice_id');
+        $createIndexSafely('idx-jdosa_payments-payment_date', '{{%jdosa_payments}}', 'payment_date');
+
+        // Create foreign key constraints
+        $createForeignKeySafely('fk-jdosa_customers-company_id', '{{%jdosa_customers}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_products-company_id', '{{%jdosa_products}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_invoices-company_id', '{{%jdosa_invoices}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_invoices-customer_id', '{{%jdosa_invoices}}', 'customer_id', '{{%jdosa_customers}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_invoice_items-invoice_id', '{{%jdosa_invoice_items}}', 'invoice_id', '{{%jdosa_invoices}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_invoice_items-product_id', '{{%jdosa_invoice_items}}', 'product_id', '{{%jdosa_products}}', 'id', 'SET NULL');
+        $createForeignKeySafely('fk-jdosa_estimates-company_id', '{{%jdosa_estimates}}', 'company_id', '{{%jdosa_companies}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_estimates-customer_id', '{{%jdosa_estimates}}', 'customer_id', '{{%jdosa_customers}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_estimates-invoice_id', '{{%jdosa_estimates}}', 'invoice_id', '{{%jdosa_invoices}}', 'id', 'SET NULL');
+        $createForeignKeySafely('fk-jdosa_estimate_items-estimate_id', '{{%jdosa_estimate_items}}', 'estimate_id', '{{%jdosa_estimates}}', 'id', 'CASCADE');
+        $createForeignKeySafely('fk-jdosa_estimate_items-product_id', '{{%jdosa_estimate_items}}', 'product_id', '{{%jdosa_products}}', 'id', 'SET NULL');
+        $createForeignKeySafely('fk-jdosa_payments-invoice_id', '{{%jdosa_payments}}', 'invoice_id', '{{%jdosa_invoices}}', 'id', 'CASCADE');
     }
 }
