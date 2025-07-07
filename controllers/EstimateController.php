@@ -63,7 +63,7 @@ class EstimateController extends Controller
             'query' => Estimate::find()
                 ->where(['company_id' => $company->id])
                 ->with(['customer', 'estimateItems'])
-                ->orderBy(['created_at' => SORT_DESC]),
+                ->orderBy(['estimate_number' => SORT_DESC]),
             'pagination' => [
                 'pageSize' => 20,
             ],
@@ -378,12 +378,8 @@ class EstimateController extends Controller
     {
         $model = $this->findModel($id);
         
-        // Set layout to print layout
-        $this->layout = 'print';
-        
-        return $this->render('print', [
-            'model' => $model,
-        ]);
+        // Generate PDF using PdfGenerator
+        return PdfGenerator::generateEstimatePdf($model, 'D');
     }
 
     /**

@@ -327,6 +327,21 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Print invoice
+     *
+     * @param int $id
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionPrint($id)
+    {
+        $model = $this->findModel($id);
+        
+        // Generate PDF using PdfGenerator
+        return PdfGenerator::generateInvoicePdf($model, 'D');
+    }
+
+    /**
      * Send invoice email
      *
      * @param int $id

@@ -23,6 +23,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $invoice_prefix
  * @property string $estimate_prefix
  * @property int $due_date_days
+ * @property int $estimate_validity_days
  * @property bool $is_active
  * @property string $created_at
  * @property string $updated_at
@@ -71,7 +72,7 @@ class Company extends ActiveRecord
             [['company_name'], 'required'],
             [['company_address'], 'string'],
             [['tax_rate'], 'number', 'min' => 0, 'max' => 100],
-            [['due_date_days'], 'integer', 'min' => 1],
+            [['due_date_days', 'estimate_validity_days'], 'integer', 'min' => 1],
             [['is_active'], 'boolean'],
             [['created_at', 'updated_at'], 'safe'],
             [['company_name'], 'string', 'max' => 255],
@@ -107,6 +108,7 @@ class Company extends ActiveRecord
             'invoice_prefix' => 'Invoice Prefix',
             'estimate_prefix' => 'Estimate Prefix',
             'due_date_days' => 'Due Date Days',
+            'estimate_validity_days' => 'Estimate Validity Days',
             'is_active' => 'Is Active',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -249,6 +251,18 @@ class Company extends ActiveRecord
     public function getDefaultDueDate()
     {
         return date('Y-m-d', strtotime('+' . $this->due_date_days . ' days'));
+    }
+
+    /**
+     * Get default estimate expiry date
+     *
+     * @return string
+     */
+    public function getDefaultExpiryDate()
+    {
+        // Default to 30 days if not set or invalid
+        $days = $this->estimate_validity_days > 0 ? $this->estimate_validity_days : 30;
+        return date('Y-m-d', strtotime('+' . $days . ' days'));
     }
 
     /**

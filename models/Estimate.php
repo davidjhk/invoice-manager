@@ -421,9 +421,14 @@ class Estimate extends ActiveRecord
             $this->status = self::STATUS_EXPIRED;
         }
 
-        // Set default expiry date if not provided
-        if ($insert && empty($this->expiry_date)) {
-            $this->expiry_date = $this->getDefaultExpiryDate();
+        // Set default expiry date if not provided or if estimate_date has changed
+        if ($insert || $this->isAttributeChanged('estimate_date')) {
+            if (empty($this->expiry_date)) {
+                $company = Company::findOne($this->company_id);
+                if ($company) {
+                    $this->expiry_date = $company->getDefaultExpiryDate();
+                }
+            }
         }
 
         return parent::beforeSave($insert);
