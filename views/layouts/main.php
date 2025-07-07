@@ -106,7 +106,11 @@ AppAsset::register($this);
 
 	<footer class="footer mt-auto py-3 text-muted">
 		<div class="container">
-			<p class="float-left">&copy; JDOSA <?= date('Y') ?></p>
+			<?php 
+			$company = \app\models\Company::getDefault();
+			$companyName = $company ? $company->company_name : 'JDOSA';
+			?>
+			<p class="float-left">&copy; <?= Html::encode($companyName) ?> <?= date('Y') ?></p>
 			<p class="float-right"><?= Yii::powered() ?></p>
 		</div>
 	</footer>
