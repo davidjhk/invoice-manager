@@ -199,13 +199,11 @@ nano config/web.php
 
    ```
    1. SMTP2GO 대시보드 로그인
-   2. 좌측 메뉴에서 "Settings" → "API Keys" 선택
-   3. "Create API Key" 버튼 클릭
-   4. API 키 이름 입력 (예: "Invoice Manager")
-   5. 권한 설정:
-      - Send Email: 체크 (필수)
-      - Stats: 체크 (선택사항)
-   6. "Create API Key" 버튼 클릭
+   2. 좌측 메뉴에서 "Sending" → "API Keys" 선택
+   3. "Add API Key" 버튼 클릭
+   4. API 키 설명 입력 (예: "Invoice Manager")
+   5. "Permissions" 탭을 눌러  권한 설정: 전체 선택
+   6. "Add API Key" 버튼 클릭
    7. 생성된 API 키 복사 (한 번만 표시됨)
    ```
 
