@@ -23,7 +23,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             color: #333;
         }
         .header {
-            border-bottom: 3px solid #007bff;
+            border-bottom: 3px solid #667eea;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
@@ -32,7 +32,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             width: 50%;
         }
         .company-info h2 {
-            color: #007bff;
+            color: #667eea;
             margin: 0 0 10px 0;
         }
         .estimate-info {
@@ -41,7 +41,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             text-align: right;
         }
         .estimate-info h1 {
-            color: #007bff;
+            color: #667eea;
             margin: 0 0 20px 0;
             font-size: 36px;
         }
@@ -69,7 +69,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             margin-right: 2%;
         }
         .bill-to h3, .ship-to h3 {
-            color: #007bff;
+            color: #667eea;
             border-bottom: 2px solid #e9ecef;
             padding-bottom: 5px;
             margin-bottom: 15px;
@@ -81,7 +81,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .items-table th {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #667eea, #5a6fd8);
             color: white;
             padding: 12px 8px;
             text-align: left;
@@ -122,7 +122,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             border-bottom: 1px solid #dee2e6;
         }
         .total-row {
-            border-top: 3px solid #007bff;
+            border-top: 3px solid #667eea;
             font-weight: bold;
             font-size: 16px;
             background: white;
@@ -132,7 +132,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
             clear: both;
         }
         .notes h3 {
-            color: #007bff;
+            color: #667eea;
             border-bottom: 2px solid #e9ecef;
             padding-bottom: 5px;
         }

@@ -1,5 +1,8 @@
 <?php
 
+// Define the path to the custom font directory
+define('K_PATH_FONTS', dirname(__DIR__) . '/fonts/tcpdf-fonts/');
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 

@@ -15,6 +15,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\helpers\Json;
+use app\components\PdfGenerator;
 
 /**
  * EstimateController implements the CRUD actions for Estimate model.
@@ -447,39 +448,10 @@ class EstimateController extends Controller
     {
         $model = $this->findModel($id);
         
-        // Generate PDF content
-        $pdfContent = $this->generatePdfContent($model);
-        
-        // Set response headers for PDF download
-        Yii::$app->response->format = Response::FORMAT_RAW;
-        Yii::$app->response->headers->add('Content-Type', 'application/pdf');
-        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="estimate-' . $model->estimate_number . '.pdf"');
-        
-        return $pdfContent;
+        // Generate PDF using PdfGenerator
+        return PdfGenerator::generateEstimatePdf($model, 'D');
     }
 
-    /**
-     * Generate PDF content for estimate
-     *
-     * @param Estimate $model
-     * @return string
-     */
-    protected function generatePdfContent($model)
-    {
-        // For now, return HTML content that can be converted to PDF
-        // In production, you would use a PDF library like mPDF, TCPDF, or DomPDF
-        $html = $this->renderPartial('pdf-template', ['model' => $model]);
-        
-        // This is a placeholder - you would integrate with a PDF library here
-        // For example, with mPDF:
-        /*
-        $mpdf = new \Mpdf\Mpdf();
-        $mpdf->WriteHTML($html);
-        return $mpdf->Output('', 'S');
-        */
-        
-        return $html;
-    }
 
     /**
      * Send estimate email
@@ -511,7 +483,7 @@ class EstimateController extends Controller
         $message->setBcc($bccAddresses);
         
         // Attach PDF
-        $pdfContent = $this->generatePdfContent($model);
+        $pdfContent = PdfGenerator::generateEstimatePdf($model, 'S');
         $message->attachContent($pdfContent, [
             'fileName' => 'estimate-' . $model->estimate_number . '.pdf',
             'contentType' => 'application/pdf'

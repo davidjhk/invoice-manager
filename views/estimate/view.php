@@ -12,81 +12,63 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="estimate-view">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>
-            <?= Html::encode($model->estimate_number) ?>
-            <span class="badge badge-<?= $model->getStatusClass() ?> ml-2">
-                <?= $model->getStatusLabel() ?>
-            </span>
-            <?php if ($model->isExpired()): ?>
-                <span class="badge badge-warning ml-1">Expired</span>
-            <?php endif; ?>
-        </h1>
-        <div class="btn-group" role="group">
-            <?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], [
-                'class' => 'btn btn-primary'
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1>
+			<?= Html::encode($model->estimate_number) ?>
+			<span class="badge badge-<?= $model->getStatusClass() ?> ml-2">
+				<?= Html::encode($model->getStatusLabel()) ?>
+			</span>
+			<?php if ($model->isExpired()): ?>
+				<span class="badge badge-warning ml-1">Expired</span>
+			<?php endif; ?>
+		</h1>
+		<div class="btn-group" role="group">
+			<?php if (!$model->converted_to_invoice): ?>
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+			<?php endif; ?>
+
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>Preview', ['preview', 'id' => $model->id], [
+                'class' => 'btn btn-info',
+                'target' => '_blank',
+                'encode' => false
             ]) ?>
-            
-            <?= Html::a('<i class="fas fa-print mr-1"></i>Print', ['print', 'id' => $model->id], [
-                'class' => 'btn btn-secondary',
-                'target' => '_blank'
+
+			<?php if ($model->status === \app\models\Estimate::STATUS_DRAFT): ?>
+			<?= Html::a('<i class="fas fa-envelope mr-1"></i>Send Email', ['send-email', 'id' => $model->id], ['class' => 'btn btn-success', 'encode' => false]) ?>
+			<?php endif; ?>
+
+			<?php if ($model->canConvertToInvoice()): ?>
+			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>Convert to Invoice', ['convert-to-invoice', 'id' => $model->id], [
+				'class' => 'btn btn-warning',
+				'data' => [
+					'confirm' => 'Are you sure you want to convert this estimate to an invoice?',
+					'method' => 'post',
+				],
+				'encode' => false
+			]) ?>
+			<?php endif; ?>
+
+			<?= Html::a('<i class="fas fa-copy mr-1"></i>Duplicate', ['duplicate', 'id' => $model->id], [
+                'class' => 'btn btn-info',
+                'data' => [
+                    'confirm' => 'Are you sure you want to duplicate this estimate?',
+                    'method' => 'post',
+                ],
+                'encode' => false
             ]) ?>
-            
-            <?= Html::a('<i class="fas fa-envelope mr-1"></i>Send Email', ['send-email', 'id' => $model->id], [
-                'class' => 'btn btn-info'
-            ]) ?>
-            
-            <?= Html::a('<i class="fas fa-download mr-1"></i>Download PDF', ['download-pdf', 'id' => $model->id], [
-                'class' => 'btn btn-outline-secondary',
-                'target' => '_blank'
-            ]) ?>
-            
-            <?= Html::a('<i class="fas fa-copy mr-1"></i>Duplicate', ['duplicate', 'id' => $model->id], [
-                'class' => 'btn btn-outline-info'
-            ]) ?>
-            
-            <?= Html::a('<i class="fas fa-eye mr-1"></i>Preview', ['preview', 'id' => $model->id], [
-                'class' => 'btn btn-outline-secondary',
-                'target' => '_blank'
-            ]) ?>
-            
-            <?php if ($model->canConvertToInvoice()): ?>
-                <?= Html::a('Convert to Invoice', ['convert-to-invoice', 'id' => $model->id], [
-                    'class' => 'btn btn-success',
-                    'data' => [
-                        'confirm' => 'Are you sure you want to convert this estimate to an invoice?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
-            <?php endif; ?>
-            
-            <!-- Status Change Dropdown -->
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
-                    Change Status
-                </button>
-                <div class="dropdown-menu">
-                    <?php foreach ($model::getStatusOptions() as $status => $label): ?>
-                        <?php if ($status !== $model->status): ?>
-                            <?= Html::a($label, ['change-status', 'id' => $model->id, 'status' => $status], [
-                                'class' => 'dropdown-item'
-                            ]) ?>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            
-            <?php if (!$model->converted_to_invoice): ?>
-                <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+
+			<?php if (!$model->converted_to_invoice): ?>
+			<?= Html::a('<i class="fas fa-trash mr-1"></i>Delete', ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
                         'confirm' => 'Are you sure you want to delete this estimate?',
                         'method' => 'post',
                     ],
+                    'encode' => false
                 ]) ?>
-            <?php endif; ?>
-        </div>
-    </div>
+			<?php endif; ?>
+		</div>
+	</div>
 
     <?php if ($model->converted_to_invoice): ?>
         <div class="alert alert-success">
