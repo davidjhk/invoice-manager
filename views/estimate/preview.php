@@ -1,0 +1,266 @@
+<?php
+
+use yii\helpers\Html;
+
+/** @var yii\web\View $this */
+/** @var app\models\Estimate $model */
+
+$this->title = 'Preview Estimate: ' . $model->estimate_number;
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title><?= Html::encode($this->title) ?></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .company-info {
+            float: left;
+            width: 50%;
+        }
+        .estimate-info {
+            float: right;
+            width: 45%;
+            text-align: right;
+        }
+        .clear {
+            clear: both;
+        }
+        .customer-section {
+            margin-bottom: 30px;
+        }
+        .bill-to, .ship-to {
+            float: left;
+            width: 48%;
+            margin-right: 2%;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th,
+        .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .totals {
+            float: right;
+            width: 300px;
+            margin-top: 20px;
+        }
+        .totals table {
+            width: 100%;
+        }
+        .totals table td {
+            padding: 5px 10px;
+            border: none;
+        }
+        .total-row {
+            border-top: 2px solid #333;
+            font-weight: bold;
+        }
+        .notes {
+            margin-top: 40px;
+            clear: both;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print" style="margin-bottom: 20px;">
+        <?= Html::button('Print', [
+            'onclick' => 'window.print()',
+            'class' => 'btn btn-primary'
+        ]) ?>
+        <?= Html::a('Back to Estimate', ['view', 'id' => $model->id], [
+            'class' => 'btn btn-secondary'
+        ]) ?>
+    </div>
+
+    <div class="header">
+        <div class="company-info">
+            <h2><?= Html::encode($model->company->company_name) ?></h2>
+            <?php if ($model->company->company_address): ?>
+                <div><?= nl2br(Html::encode($model->company->company_address)) ?></div>
+            <?php endif; ?>
+            <?php if ($model->company->company_phone): ?>
+                <div>Phone: <?= Html::encode($model->company->company_phone) ?></div>
+            <?php endif; ?>
+            <?php if ($model->company->company_email): ?>
+                <div>Email: <?= Html::encode($model->company->company_email) ?></div>
+            <?php endif; ?>
+        </div>
+        
+        <div class="estimate-info">
+            <h1>ESTIMATE</h1>
+            <table>
+                <tr>
+                    <td><strong>Estimate #:</strong></td>
+                    <td><?= Html::encode($model->estimate_number) ?></td>
+                </tr>
+                <tr>
+                    <td><strong>Date:</strong></td>
+                    <td><?= Yii::$app->formatter->asDate($model->estimate_date) ?></td>
+                </tr>
+                <?php if ($model->expiry_date): ?>
+                <tr>
+                    <td><strong>Expires:</strong></td>
+                    <td><?= Yii::$app->formatter->asDate($model->expiry_date) ?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if ($model->terms): ?>
+                <tr>
+                    <td><strong>Terms:</strong></td>
+                    <td><?= Html::encode($model->terms) ?></td>
+                </tr>
+                <?php endif; ?>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="customer-section">
+        <div class="bill-to">
+            <h3>Bill To:</h3>
+            <strong><?= Html::encode($model->customer->customer_name) ?></strong><br>
+            <?php if ($model->customer->contact_name): ?>
+                Attn: <?= Html::encode($model->customer->contact_name) ?><br>
+            <?php endif; ?>
+            <?php if ($model->customer->billing_address): ?>
+                <?= nl2br(Html::encode($model->customer->billing_address)) ?><br>
+            <?php endif; ?>
+            <?php if ($model->customer->customer_phone): ?>
+                Phone: <?= Html::encode($model->customer->customer_phone) ?><br>
+            <?php endif; ?>
+            <?php if ($model->customer->customer_email): ?>
+                Email: <?= Html::encode($model->customer->customer_email) ?>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($model->ship_to_address): ?>
+        <div class="ship-to">
+            <h3>Ship To:</h3>
+            <?= nl2br(Html::encode($model->ship_to_address)) ?>
+            <?php if ($model->shipping_method): ?>
+                <br><strong>Via:</strong> <?= Html::encode($model->shipping_method) ?>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+        
+        <div class="clear"></div>
+    </div>
+
+    <?php if (!empty($model->estimateItems)): ?>
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th width="5%">#</th>
+                <th width="25%">Product/Service</th>
+                <th width="35%">Description</th>
+                <th width="10%" class="text-center">Qty</th>
+                <th width="12%" class="text-right">Rate</th>
+                <th width="13%" class="text-right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($model->estimateItems as $index => $item): ?>
+            <tr>
+                <td class="text-center"><?= $index + 1 ?></td>
+                <td><?= Html::encode($item->product_service_name ?: '-') ?></td>
+                <td><?= Html::encode($item->description) ?></td>
+                <td class="text-center"><?= $item->getFormattedQuantity() ?></td>
+                <td class="text-right"><?= $model->formatAmount($item->rate) ?></td>
+                <td class="text-right"><?= $item->getFormattedAmount() ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endif; ?>
+
+    <div class="totals">
+        <table>
+            <tr>
+                <td>Subtotal:</td>
+                <td class="text-right"><?= $model->formatAmount($model->subtotal) ?></td>
+            </tr>
+            <?php if ($model->discount_amount > 0): ?>
+            <tr>
+                <td>
+                    Discount
+                    <?php if ($model->discount_type == 'percentage'): ?>
+                        (<?= $model->discount_value ?>%):
+                    <?php else: ?>
+                        (Fixed):
+                    <?php endif; ?>
+                </td>
+                <td class="text-right">-<?= $model->formatAmount($model->discount_amount) ?></td>
+            </tr>
+            <?php endif; ?>
+            <?php if ($model->tax_amount > 0): ?>
+            <tr>
+                <td>Tax (<?= $model->tax_rate ?>%):</td>
+                <td class="text-right"><?= $model->formatAmount($model->tax_amount) ?></td>
+            </tr>
+            <?php endif; ?>
+            <tr class="total-row">
+                <td><strong>Total:</strong></td>
+                <td class="text-right"><strong><?= $model->formatAmount($model->total_amount) ?></strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <?php if ($model->customer_notes): ?>
+    <div class="notes">
+        <h3>Notes:</h3>
+        <p><?= nl2br(Html::encode($model->customer_notes)) ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($model->payment_instructions): ?>
+    <div class="notes">
+        <h3>Payment Instructions:</h3>
+        <p><?= nl2br(Html::encode($model->payment_instructions)) ?></p>
+    </div>
+    <?php endif; ?>
+
+    <div class="footer">
+        <p>This estimate is valid until <?= Yii::$app->formatter->asDate($model->expiry_date) ?></p>
+        <p>Thank you for your business!</p>
+    </div>
+
+</body>
+</html>
