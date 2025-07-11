@@ -107,6 +107,14 @@ AppAsset::register($this);
 		display: inline-block !important;
 		position: relative !important;
 		overflow: hidden !important;
+		/* Liquid Glass Style - 기본 상태 */
+		background: rgba(75, 85, 99, 0.1) !important;
+		border: 1px solid rgba(156, 163, 175, 0.2) !important;
+		backdrop-filter: blur(8px) !important;
+		box-shadow: 
+			0 1px 3px rgba(0, 0, 0, 0.1),
+			0 1px 2px rgba(0, 0, 0, 0.06),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 	}
 
 	body .main-navbar .navbar-nav .nav-link::before {
@@ -129,14 +137,56 @@ AppAsset::register($this);
 		color: white !important;
 		text-decoration: none !important;
 		transform: translateY(-2px) !important;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+		/* Liquid Glass Style - 호버 상태 */
+		background: rgba(75, 85, 99, 0.25) !important;
+		border: 1px solid rgba(156, 163, 175, 0.4) !important;
+		backdrop-filter: blur(12px) !important;
+		box-shadow: 
+			0 8px 25px -5px rgba(0, 0, 0, 0.15),
+			0 10px 10px -5px rgba(0, 0, 0, 0.1),
+			inset 0 1px 0 rgba(255, 255, 255, 0.2),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
 	}
 
 	body .main-navbar .navbar-nav .nav-link.active {
 		background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
 		font-weight: 600 !important;
 		color: white !important;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+		/* Liquid Glass Style - 활성 상태 강화 */
+		border: 2px solid rgba(79, 70, 229, 0.8) !important;
+		backdrop-filter: blur(20px) !important;
+		transform: translateY(-1px) !important;
+		box-shadow: 
+			0 12px 30px -8px rgba(79, 70, 229, 0.5),
+			0 8px 16px -4px rgba(79, 70, 229, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.4),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+			0 0 0 1px rgba(79, 70, 229, 0.2) !important;
+	}
+
+	body .main-navbar .navbar-nav .nav-link.active::before {
+		width: 100% !important;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+	}
+
+	/* 활성 상태 펄스 효과 */
+	body .main-navbar .navbar-nav .nav-link.active::after {
+		content: '' !important;
+		position: absolute !important;
+		top: -2px !important;
+		left: -2px !important;
+		right: -2px !important;
+		bottom: -2px !important;
+		background: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(124, 58, 237, 0.3)) !important;
+		border-radius: 0.5rem !important;
+		z-index: -2 !important;
+		opacity: 0.8 !important;
+		animation: activeGlow 2s ease-in-out infinite alternate !important;
+	}
+
+	@keyframes activeGlow {
+		0% { opacity: 0.5; transform: scale(1); }
+		100% { opacity: 0.8; transform: scale(1.02); }
 	}
 
 	/* Dropdown styles */
@@ -157,6 +207,14 @@ AppAsset::register($this);
 		display: inline-block !important;
 		position: relative !important;
 		overflow: hidden !important;
+		/* Liquid Glass Style - 드롭다운 기본 상태 */
+		background: rgba(75, 85, 99, 0.1) !important;
+		border: 1px solid rgba(156, 163, 175, 0.2) !important;
+		backdrop-filter: blur(8px) !important;
+		box-shadow: 
+			0 1px 3px rgba(0, 0, 0, 0.1),
+			0 1px 2px rgba(0, 0, 0, 0.06),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 	}
 
 	body .main-navbar .dropdown .nav-link::before {
@@ -179,7 +237,15 @@ AppAsset::register($this);
 		color: white !important;
 		text-decoration: none !important;
 		transform: translateY(-2px) !important;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+		/* Liquid Glass Style - 드롭다운 호버 상태 */
+		background: rgba(75, 85, 99, 0.25) !important;
+		border: 1px solid rgba(156, 163, 175, 0.4) !important;
+		backdrop-filter: blur(12px) !important;
+		box-shadow: 
+			0 8px 25px -5px rgba(0, 0, 0, 0.15),
+			0 10px 10px -5px rgba(0, 0, 0, 0.1),
+			inset 0 1px 0 rgba(255, 255, 255, 0.2),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
 	}
 
 	/* Dark mode navbar adjustments */
@@ -191,6 +257,63 @@ AppAsset::register($this);
 
 	body.dark-mode .main-navbar .navbar-nav .nav-link {
 		color: #d1d5db !important;
+		/* Liquid Glass Style - 다크모드 기본 상태 */
+		background: rgba(31, 41, 55, 0.15) !important;
+		border: 1px solid rgba(75, 85, 99, 0.3) !important;
+		backdrop-filter: blur(10px) !important;
+		box-shadow: 
+			0 1px 3px rgba(0, 0, 0, 0.2),
+			0 1px 2px rgba(0, 0, 0, 0.1),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+	}
+
+	body.dark-mode .main-navbar .navbar-nav .nav-link:hover {
+		/* Liquid Glass Style - 다크모드 호버 상태 */
+		background: rgba(31, 41, 55, 0.3) !important;
+		border: 1px solid rgba(75, 85, 99, 0.5) !important;
+		backdrop-filter: blur(15px) !important;
+		box-shadow: 
+			0 8px 25px -5px rgba(0, 0, 0, 0.25),
+			0 10px 10px -5px rgba(0, 0, 0, 0.15),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+	}
+
+	body.dark-mode .main-navbar .navbar-nav .nav-link.active {
+		/* Liquid Glass Style - 다크모드 활성 상태 강화 */
+		border: 2px solid rgba(79, 70, 229, 0.9) !important;
+		backdrop-filter: blur(25px) !important;
+		transform: translateY(-1px) !important;
+		box-shadow: 
+			0 12px 30px -8px rgba(79, 70, 229, 0.6),
+			0 8px 16px -4px rgba(79, 70, 229, 0.4),
+			inset 0 1px 0 rgba(255, 255, 255, 0.3),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			0 0 0 1px rgba(79, 70, 229, 0.3) !important;
+	}
+
+	/* Dark mode dropdown styles */
+	body.dark-mode .main-navbar .dropdown .nav-link {
+		/* Liquid Glass Style - 다크모드 드롭다운 기본 상태 */
+		background: rgba(31, 41, 55, 0.15) !important;
+		border: 1px solid rgba(75, 85, 99, 0.3) !important;
+		backdrop-filter: blur(10px) !important;
+		box-shadow: 
+			0 1px 3px rgba(0, 0, 0, 0.2),
+			0 1px 2px rgba(0, 0, 0, 0.1),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+	}
+
+	body.dark-mode .main-navbar .dropdown .nav-link:hover {
+		/* Liquid Glass Style - 다크모드 드롭다운 호버 상태 */
+		background: rgba(31, 41, 55, 0.3) !important;
+		border: 1px solid rgba(75, 85, 99, 0.5) !important;
+		backdrop-filter: blur(15px) !important;
+		box-shadow: 
+			0 8px 25px -5px rgba(0, 0, 0, 0.25),
+			0 10px 10px -5px rgba(0, 0, 0, 0.15),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
 	}
 
 	/* Light mode navbar adjustments */
@@ -203,16 +326,66 @@ AppAsset::register($this);
 	body:not(.dark-mode) .main-navbar .navbar-nav .nav-link {
 		color: #374151 !important;
 		font-weight: 500 !important;
+		/* Liquid Glass Style - 라이트모드 기본 상태 */
+		background: rgba(255, 255, 255, 0.2) !important;
+		border: 1px solid rgba(229, 231, 235, 0.4) !important;
+		backdrop-filter: blur(10px) !important;
+		box-shadow: 
+			0 1px 3px rgba(0, 0, 0, 0.05),
+			0 1px 2px rgba(0, 0, 0, 0.03),
+			inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+	}
+
+	body:not(.dark-mode) .main-navbar .navbar-nav .nav-link:hover {
+		/* Liquid Glass Style - 라이트모드 호버 상태 */
+		background: rgba(255, 255, 255, 0.4) !important;
+		border: 1px solid rgba(229, 231, 235, 0.6) !important;
+		backdrop-filter: blur(15px) !important;
+		box-shadow: 
+			0 8px 25px -5px rgba(0, 0, 0, 0.1),
+			0 10px 10px -5px rgba(0, 0, 0, 0.05),
+			inset 0 1px 0 rgba(255, 255, 255, 0.5),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.05) !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .dropdown .nav-link {
 		color: #374151 !important;
 		font-weight: 500 !important;
+		/* Liquid Glass Style - 라이트모드 드롭다운 기본 상태 */
+		background: rgba(255, 255, 255, 0.2) !important;
+		border: 1px solid rgba(229, 231, 235, 0.4) !important;
+		backdrop-filter: blur(10px) !important;
+		box-shadow: 
+			0 1px 3px rgba(0, 0, 0, 0.05),
+			0 1px 2px rgba(0, 0, 0, 0.03),
+			inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+	}
+
+	body:not(.dark-mode) .main-navbar .dropdown .nav-link:hover {
+		/* Liquid Glass Style - 라이트모드 드롭다운 호버 상태 */
+		background: rgba(255, 255, 255, 0.4) !important;
+		border: 1px solid rgba(229, 231, 235, 0.6) !important;
+		backdrop-filter: blur(15px) !important;
+		box-shadow: 
+			0 8px 25px -5px rgba(0, 0, 0, 0.1),
+			0 10px 10px -5px rgba(0, 0, 0, 0.05),
+			inset 0 1px 0 rgba(255, 255, 255, 0.5),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.05) !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .navbar-nav .nav-link.active {
 		color: white !important;
 		font-weight: 600 !important;
+		/* Liquid Glass Style - 라이트모드 활성 상태 강화 */
+		border: 2px solid rgba(79, 70, 229, 0.7) !important;
+		backdrop-filter: blur(25px) !important;
+		transform: translateY(-1px) !important;
+		box-shadow: 
+			0 12px 30px -8px rgba(79, 70, 229, 0.4),
+			0 8px 16px -4px rgba(79, 70, 229, 0.25),
+			inset 0 1px 0 rgba(255, 255, 255, 0.5),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+			0 0 0 1px rgba(79, 70, 229, 0.15) !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .navbar-nav .nav-link:hover {
