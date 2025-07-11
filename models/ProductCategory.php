@@ -159,20 +159,24 @@ class ProductCategory extends ActiveRecord
     public function getProductsCount()
     {
         try {
-            // Check if products table has category_id column
-            $db = \Yii::$app->db;
-            $tableSchema = $db->getTableSchema('{{%jdosa_products}}');
-            
-            if ($tableSchema && isset($tableSchema->columns['category_id'])) {
-                // New system: count using category_id relationship
-                return $this->getProducts()->count();
-            } else {
-                // Old system: count using category name field
-                return \app\models\Product::find()
+            // Check both old category field and new category_id field
+            $countByName = \app\models\Product::find()
+                ->where(['company_id' => $this->company_id])
+                ->andWhere(['category' => $this->name])
+                ->count();
+                
+            $countById = 0;
+            try {
+                $countById = \app\models\Product::find()
                     ->where(['company_id' => $this->company_id])
-                    ->andWhere(['category' => $this->name])
+                    ->andWhere(['category_id' => $this->id])
                     ->count();
+            } catch (\Exception $e) {
+                // category_id column might not exist yet
+                $countById = 0;
             }
+            
+            return $countByName + $countById;
         } catch (\Exception $e) {
             // If anything fails, return 0
             return 0;
@@ -187,24 +191,27 @@ class ProductCategory extends ActiveRecord
     public function canDelete()
     {
         try {
-            // Check if products table has category_id column
-            $db = \Yii::$app->db;
-            $tableSchema = $db->getTableSchema('{{%jdosa_products}}');
-            
-            if ($tableSchema && isset($tableSchema->columns['category_id'])) {
-                // New system: check category_id relationship
-                $count = $this->getProducts()->count();
-                return $count === 0;
-            } else {
-                // Old system: check category name field
-                $count = \app\models\Product::find()
+            // Check both old category field and new category_id field
+            $countByName = \app\models\Product::find()
+                ->where(['company_id' => $this->company_id])
+                ->andWhere(['category' => $this->name])
+                ->count();
+                
+            $countById = 0;
+            try {
+                $countById = \app\models\Product::find()
                     ->where(['company_id' => $this->company_id])
-                    ->andWhere(['category' => $this->name])
+                    ->andWhere(['category_id' => $this->id])
                     ->count();
-                return $count === 0;
+            } catch (\Exception $e) {
+                // category_id column might not exist yet
+                $countById = 0;
             }
+            
+            $totalCount = $countByName + $countById;
+            return $totalCount === 0;
         } catch (\Exception $e) {
-            // If anything fails, allow deletion to avoid blocking the UI
+            // If any error occurs, allow deletion to avoid blocking UI
             return true;
         }
     }
