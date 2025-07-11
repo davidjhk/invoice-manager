@@ -1,3 +1,0 @@
-This directory is for company logos.
-Supported formats: PNG, JPG, JPEG, GIF
-Maximum size: 2MB

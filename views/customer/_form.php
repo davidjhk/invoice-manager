@@ -131,22 +131,25 @@ use yii\widgets\ActiveForm;
 		<div class="col-lg-4">
 			<!-- Help Information -->
 			<div class="card">
-				<div class="card-header">
-					<h6 class="card-title mb-0">
-						<i class="fas fa-info-circle mr-2"></i>Customer Information
+				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#customer-help-collapse" aria-expanded="false">
+					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+						<span><i class="fas fa-question-circle mr-2"></i>Customer Help</span>
+						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h6>
 				</div>
-				<div class="card-body">
-					<div class="alert alert-info">
-						<small>
-							<strong>Customer Name:</strong> Required field for identification.<br><br>
-							<strong>Email:</strong> Used for sending invoices and communication.<br><br>
-							<strong>Phone:</strong> Primary contact number for quick communication.<br><br>
-							<strong>Fax:</strong> Fax number for document transmission.<br><br>
-							<strong>Mobile:</strong> Mobile phone number for urgent communication.<br><br>
-							<strong>Contact Name:</strong> Primary contact person name.<br><br>
-							<strong>Addresses:</strong> Customer, billing, and shipping addresses for invoices.
-						</small>
+				<div class="collapse" id="customer-help-collapse">
+					<div class="card-body py-2">
+						<div class="alert alert-info py-2 mb-0">
+							<small>
+								<strong>Customer Name:</strong> Required field for identification.<br>
+								<strong>Email:</strong> Used for sending invoices and communication.<br>
+								<strong>Phone:</strong> Primary contact number for quick communication.<br>
+								<strong>Fax:</strong> Fax number for document transmission.<br>
+								<strong>Mobile:</strong> Mobile phone number for urgent communication.<br>
+								<strong>Contact Name:</strong> Primary contact person name.<br>
+								<strong>Addresses:</strong> Customer, billing, and shipping addresses for invoices.
+							</small>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -228,6 +231,22 @@ $this->registerJs("
         }
         
         this.value = value;
+    });
+    
+    // Handle collapse icon rotation
+    $(document).ready(function() {
+        $('[data-toggle="collapse"]').on('click', function() {
+            const target = $(this).attr('data-target');
+            const icon = $(this).find('.collapse-icon');
+            
+            $(target).on('shown.bs.collapse', function() {
+                icon.attr('aria-expanded', 'true');
+            });
+            
+            $(target).on('hidden.bs.collapse', function() {
+                icon.attr('aria-expanded', 'false');
+            });
+        });
     });
 ");
 ?>

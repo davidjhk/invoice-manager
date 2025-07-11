@@ -166,22 +166,25 @@ use app\models\Product;
 
 			<!-- Help Information -->
 			<div class="card mb-4">
-				<div class="card-header">
-					<h6 class="card-title mb-0">
-						<i class="fas fa-question-circle mr-2"></i>Product Help
+				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#product-help-collapse" aria-expanded="false">
+					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+						<span><i class="fas fa-question-circle mr-2"></i>Product Help</span>
+						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h6>
 				</div>
-				<div class="card-body">
-					<div class="alert alert-info">
-						<small>
-							<strong>Name:</strong> Product or service name for identification.<br><br>
-							<strong>Type:</strong> Product or Service classification.<br><br>
-							<strong>Category:</strong> Group products for better organization.<br><br>
-							<strong>SKU:</strong> Stock Keeping Unit for inventory tracking.<br><br>
-							<strong>Price:</strong> Selling price charged to customers.<br><br>
-							<strong>Cost:</strong> Your cost for profit margin calculation.<br><br>
-							<strong>Taxable:</strong> Whether sales tax applies to this item.
-						</small>
+				<div class="collapse" id="product-help-collapse">
+					<div class="card-body py-2">
+						<div class="alert alert-info py-2 mb-0">
+							<small>
+								<strong>Name:</strong> Product or service name for identification.<br>
+								<strong>Type:</strong> Product or Service classification.<br>
+								<strong>Category:</strong> Group products for better organization.<br>
+								<strong>SKU:</strong> Stock Keeping Unit for inventory tracking.<br>
+								<strong>Price:</strong> Selling price charged to customers.<br>
+								<strong>Cost:</strong> Your cost for profit margin calculation.<br>
+								<strong>Taxable:</strong> Whether sales tax applies to this item.
+							</small>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -234,5 +237,21 @@ $this->registerJs("
     
     // Calculate initial margin
     calculateMargin();
+    
+    // Handle collapse icon rotation
+    $(document).ready(function() {
+        $('[data-toggle="collapse"]').on('click', function() {
+            const target = $(this).attr('data-target');
+            const icon = $(this).find('.collapse-icon');
+            
+            $(target).on('shown.bs.collapse', function() {
+                icon.attr('aria-expanded', 'true');
+            });
+            
+            $(target).on('hidden.bs.collapse', function() {
+                icon.attr('aria-expanded', 'false');
+            });
+        });
+    });
 ");
 ?>

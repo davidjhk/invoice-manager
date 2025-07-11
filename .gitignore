@@ -47,3 +47,16 @@ tests/_support/_generated
 
 # temporary files
 /temp_backup/
+
+# uploads folder - ignore content but keep structure
+/web/uploads/*
+!/web/uploads/.gitkeep
+!/web/uploads/logos/
+/web/uploads/logos/*
+!/web/uploads/logos/.gitkeep
+!/web/uploads/documents/
+/web/uploads/documents/*
+!/web/uploads/documents/.gitkeep
+!/web/uploads/attachments/
+/web/uploads/attachments/*
+!/web/uploads/attachments/.gitkeep

@@ -1,0 +1,2 @@
+# This file ensures the documents directory structure is maintained in git
+# while ignoring actual uploaded document files
