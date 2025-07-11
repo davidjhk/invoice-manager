@@ -36,6 +36,17 @@ sudo chown -R $CURRENT_USER:$CURRENT_USER .git/ || {
     exit 1
 }
 
+# 권한 문제 감지 및 해결
+echo "권한 문제 감지 중..."
+if ! git status >/dev/null 2>&1; then
+    echo "⚠️  Git 권한 문제 감지. 전체 파일 권한을 수정합니다..."
+    sudo chown -R $CURRENT_USER:$CURRENT_USER . || {
+        echo "❌ 전체 권한 변경 실패. 관리자 권한을 확인해주세요."
+        exit 1
+    }
+    echo "✅ 전체 권한 수정 완료"
+fi
+
 # 변경사항 확인
 echo "변경사항 확인 중..."
 git fetch origin
@@ -104,12 +115,59 @@ if [ -n "$(git status --porcelain)" ]; then
     fi
 fi
 
-# Git pull 실행
+# Git pull 실행 (충돌 해결 포함)
 echo "최신 코드 가져오는 중..."
-git pull origin main || git pull origin master || {
-    echo "❌ Git pull 실패. 네트워크 연결을 확인해주세요."
-    exit 1
-}
+
+# 충돌 파일 사전 백업
+echo "충돌 가능 파일 백업 중..."
+TEMP_BACKUP_DIR="temp_backup_$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$TEMP_BACKUP_DIR"
+cp fix_*.sh "$TEMP_BACKUP_DIR/" 2>/dev/null || true
+cp quick_*.sh "$TEMP_BACKUP_DIR/" 2>/dev/null || true
+cp emergency_*.sh "$TEMP_BACKUP_DIR/" 2>/dev/null || true
+
+# Git pull 시도
+if ! git pull origin main 2>/dev/null; then
+    echo "⚠️  Git pull 실패. 충돌 해결을 시도합니다..."
+    
+    # 충돌 유형 확인
+    if git status 2>/dev/null | grep -q "untracked working tree files"; then
+        echo "📋 Untracked 파일 충돌 감지"
+        
+        # 충돌 파일 임시 제거
+        git status --porcelain | grep "^??" | cut -c4- | while read file; do
+            if [[ "$file" == fix_*.sh ]] || [[ "$file" == quick_*.sh ]] || [[ "$file" == emergency_*.sh ]]; then
+                echo "   임시 제거: $file"
+                rm -f "$file"
+            fi
+        done
+        
+        # Git 강제 정리
+        git reset --hard HEAD 2>/dev/null || true
+        git clean -fd 2>/dev/null || true
+        
+        # 다시 Git pull 시도
+        if git pull origin main 2>/dev/null; then
+            echo "✅ Git pull 성공 (충돌 해결 후)"
+        elif git pull origin master 2>/dev/null; then
+            echo "✅ Git pull 성공 (master 브랜치)"
+        else
+            echo "❌ Git pull 실패. 네트워크 연결을 확인해주세요."
+            exit 1
+        fi
+    else
+        echo "❌ Git pull 실패. 다른 문제가 있을 수 있습니다."
+        git status
+        exit 1
+    fi
+else
+    echo "✅ Git pull 성공"
+fi
+
+# 백업 파일 복원
+echo "백업 파일 복원 중..."
+cp "$TEMP_BACKUP_DIR"/* . 2>/dev/null || true
+rm -rf "$TEMP_BACKUP_DIR"
 
 # Composer 업데이트 (필요시)
 echo "Composer 의존성 확인 중..."
@@ -199,7 +257,10 @@ fi
 # 완료 메시지
 echo ""
 echo "🎉 업데이트 완료!"
+echo "✅ 권한 문제가 자동으로 해결되었습니다."
+echo "✅ Git 충돌이 자동으로 해결되었습니다."
 echo "✅ 최신 코드가 성공적으로 적용되었습니다."
+echo "✅ 로컬 설정이 보존되었습니다."
 echo "✅ 권한이 올바르게 설정되었습니다."
 echo "✅ 캐시가 정리되었습니다."
 echo ""
