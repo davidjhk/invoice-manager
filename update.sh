@@ -23,7 +23,8 @@ fi
 
 # 백업 생성 (선택사항)
 echo "기존 설정 파일 백업 중..."
-mkdir -p backups
+sudo mkdir -p backups
+sudo chown $CURRENT_USER:$CURRENT_USER backups/
 cp -f config/db.php backups/db.php.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 cp -f config/web.php backups/web.php.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
@@ -50,12 +51,13 @@ if [ -n "$(git status --porcelain)" ]; then
         
         # 백업 디렉토리 생성
         BACKUP_DIR="backups/local_changes_$(date +%Y%m%d_%H%M%S)"
-        mkdir -p "$BACKUP_DIR"
+        sudo mkdir -p "$BACKUP_DIR"
+        sudo chown $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR"
         
         # 수정된 파일 백업
         git diff --name-only | while read file; do
             if [ -f "$file" ]; then
-                mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+                sudo mkdir -p "$BACKUP_DIR/$(dirname "$file")"
                 cp "$file" "$BACKUP_DIR/$file"
             fi
         done
@@ -68,7 +70,7 @@ if [ -n "$(git status --porcelain)" ]; then
             fi
             
             if [ -f "$file" ]; then
-                mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+                sudo mkdir -p "$BACKUP_DIR/$(dirname "$file")"
                 cp "$file" "$BACKUP_DIR/$file"
             elif [ -d "$file" ]; then
                 cp -r "$file" "$BACKUP_DIR/$file"

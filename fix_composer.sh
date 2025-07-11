@@ -8,6 +8,8 @@ cd /opt/bitnami/apps/invoice-manager
 
 # 기존 lock 파일 백업
 echo "기존 composer.lock 백업 중..."
+sudo mkdir -p backups
+sudo chown $(whoami):$(whoami) backups/
 if [ -f "composer.lock" ]; then
     cp composer.lock "backups/composer.lock.backup.$(date +%Y%m%d_%H%M%S)"
     echo "✅ 백업 완료"
