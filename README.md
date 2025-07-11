@@ -292,6 +292,68 @@ git pull
 sudo chown -R daemon:daemon .
 ```
 
+### 🔀 Git 충돌 해결
+`git pull` 실행 시 파일 충돌이 발생하는 경우:
+
+#### 충돌 유형 1: 로컬 변경사항과 원격 변경사항 충돌
+```bash
+# 로컬 변경사항 백업
+git stash push -m "Local changes backup"
+
+# 새로운 파일들 임시 백업
+mkdir -p temp_backup
+find . -name "*.php" -path "./controllers/*" -o -path "./models/*" -o -path "./views/*" -o -path "./migrations/*" | \
+    grep -E "(Admin|Demo|ChangePassword)" | \
+    xargs -I {} cp --parents {} temp_backup/ 2>/dev/null || true
+
+# 새로운 파일들 제거
+git clean -fd
+
+# Git pull 실행
+git pull
+
+# 백업된 파일들 복원
+cp -r temp_backup/* . 2>/dev/null || true
+rm -rf temp_backup
+
+# 스태시 복원 (선택사항)
+git stash pop
+```
+
+#### 충돌 유형 2: 완전히 새로 시작 (주의: 모든 로컬 변경사항 손실)
+```bash
+# 모든 로컬 변경사항 무시
+git reset --hard HEAD
+git clean -fd
+git pull
+```
+
+### 🔧 Composer 문제 해결
+업데이트 후 Composer 오류가 발생하는 경우:
+
+#### 문제: "Required package is not present in the lock file"
+```bash
+# 방법 1: 자동 해결 스크립트 사용
+./fix_composer.sh
+
+# 방법 2: 수동 해결
+# Lock 파일 백업
+cp composer.lock backups/composer.lock.backup.$(date +%Y%m%d_%H%M%S)
+
+# 의존성 재설치
+composer clear-cache
+rm -f composer.lock
+rm -rf vendor/
+composer install --no-dev --optimize-autoloader
+```
+
+#### 문제: "Lock file is not up to date"
+```bash
+# 캐시 정리 후 업데이트
+composer clear-cache
+composer update --no-dev --optimize-autoloader
+```
+
 ## 지원 및 문의
 
 ### 🐛 버그 리포트

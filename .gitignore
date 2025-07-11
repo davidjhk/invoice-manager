@@ -41,3 +41,9 @@ tests/_support/_generated
 # config folder
 /config/db-local.php
 /config/params-local.php
+
+# backups folder
+/backups/
+
+# temporary files
+/temp_backup/
