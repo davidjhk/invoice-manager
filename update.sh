@@ -150,7 +150,19 @@ if [ -n "$(git status --porcelain)" ]; then
         fi
         
         # 변경사항 스태시
-        git stash push -m "Auto stash before update $(date)"
+        if ! git stash push -m "Auto stash before update $(date)" 2>/dev/null; then
+            echo "⚠️  Git stash 권한 문제 감지. 전체 권한을 수정합니다..."
+            sudo chown -R $CURRENT_USER:$CURRENT_USER . || {
+                echo "❌ 전체 권한 수정 실패. 강제로 Git 상태를 초기화합니다..."
+                sudo git reset --hard HEAD 2>/dev/null || true
+                sudo chown -R $CURRENT_USER:$CURRENT_USER .
+            }
+            # 권한 수정 후 다시 스태시 시도
+            git stash push -m "Auto stash before update $(date)" || {
+                echo "⚠️  스태시 실패. 변경사항을 리셋합니다..."
+                git reset --hard HEAD
+            }
+        fi
         
         # 새로운 파일들 제거
         git clean -fd
@@ -174,7 +186,24 @@ cp emergency_*.sh "$TEMP_BACKUP_DIR/" 2>/dev/null || true
 
 # Git pull 시도
 if ! git pull origin main 2>/dev/null; then
-    echo "⚠️  Git pull 실패. 충돌 해결을 시도합니다..."
+    echo "⚠️  Git pull 실패. 권한 문제를 해결하고 재시도합니다..."
+    
+    # 전체 권한 수정
+    echo "전체 프로젝트 권한 수정 중..."
+    sudo chown -R $CURRENT_USER:$CURRENT_USER . || {
+        echo "❌ sudo 권한 수정 실패"
+        exit 1
+    }
+    
+    # Git 상태 초기화
+    echo "Git 상태 초기화 중..."
+    git reset --hard HEAD 2>/dev/null || true
+    git clean -fd 2>/dev/null || true
+    
+    # 다시 Git pull 시도
+    echo "Git pull 재시도 중..."
+    if ! git pull origin main; then
+        echo "⚠️  Git pull 여전히 실패. 충돌 해결을 시도합니다..."
     
     # 충돌 유형 확인
     if git status 2>/dev/null | grep -q "untracked working tree files"; then
