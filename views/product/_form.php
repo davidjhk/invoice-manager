@@ -225,7 +225,7 @@ use app\models\ProductCategory;
 </div>
 
 <!-- Category Modal -->
-<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true" data-backdrop="true" data-keyboard="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -340,8 +340,15 @@ $this->registerJs("
                     $('#modal-category-description').val('');
                     $('#modal-category-active').prop('checked', true);
                     
-                    // Close modal
+                    // Close modal properly
                     $('#categoryModal').modal('hide');
+                    
+                    // Force remove backdrop and modal-open class
+                    setTimeout(function() {
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+                        $('body').css('padding-right', '');
+                    }, 300);
                     
                     // Show success message
                     alert('Category \"' + response.category.name + '\" has been added successfully!');
@@ -359,16 +366,48 @@ $this->registerJs("
         });
     });
     
-    // Clear modal when it's closed
+    // Clear modal when it's closed and ensure backdrop is removed
     $('#categoryModal').on('hidden.bs.modal', function() {
         $('#modal-category-name').val('');
         $('#modal-category-description').val('');
         $('#modal-category-active').prop('checked', true);
+        
+        // Ensure backdrop is completely removed
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+        $('body').css('padding-right', '');
+    });
+    
+    // Handle modal close button clicks
+    $('#categoryModal .close, #categoryModal [data-dismiss=\"modal\"]').on('click', function() {
+        $('#categoryModal').modal('hide');
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('padding-right', '');
+        }, 300);
     });
     
     // Initialize tooltips
     $('[title]').tooltip();
     
     // Collapse functionality is handled by collapse-helper.js
+");
+
+// Add CSS to ensure modal backdrop is properly handled
+$this->registerCss("
+    /* Ensure modal backdrop is properly removed */
+    .modal-backdrop {
+        z-index: 1040;
+    }
+    
+    .modal {
+        z-index: 1050;
+    }
+    
+    /* Force remove any lingering backdrop styles */
+    body.modal-open {
+        overflow: hidden;
+    }
 ");
 ?>
