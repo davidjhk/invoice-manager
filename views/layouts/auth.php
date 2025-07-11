@@ -18,7 +18,7 @@ use yii\bootstrap4\Html;
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -335,8 +335,9 @@ use yii\bootstrap4\Html;
         }
         
         .auth-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            font-size: 2rem !important;
+            font-weight: 700 !important;
             color: var(--auth-text);
             margin-bottom: 0.25rem;
             line-height: 1.2;
@@ -472,6 +473,11 @@ use yii\bootstrap4\Html;
             overflow: hidden;
             border: none;
             letter-spacing: 0.02em;
+            width: 100% !important;
+            text-align: center !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
         
         .btn-auth::before {
@@ -528,12 +534,13 @@ use yii\bootstrap4\Html;
             background: rgba(255, 255, 255, 0.95);
             border: 2px solid var(--auth-border);
             color: var(--auth-text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             gap: 0.75rem;
             text-decoration: none;
             backdrop-filter: blur(10px);
+            text-align: center !important;
         }
         
         .btn-google.btn-auth:hover {
@@ -543,16 +550,64 @@ use yii\bootstrap4\Html;
             text-decoration: none;
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
         }
         
         .btn-google.btn-auth:active {
             transform: translateY(-1px) scale(0.98);
             transition: all 0.1s ease;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
         }
         
         .btn-google.btn-auth i {
             font-size: 1.25rem;
             color: #ea4335;
+        }
+        
+        /* Ensure Bootstrap btn-block works properly */
+        .btn-block,
+        .btn-block + .btn-block {
+            width: 100% !important;
+            display: block !important;
+        }
+        
+        /* Form actions styling */
+        .form-actions .btn {
+            width: 100% !important;
+        }
+        
+        /* Auth social buttons */
+        .auth-social .btn {
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+        }
+        
+        /* Auth footer buttons */
+        .auth-footer .btn {
+            width: 100% !important;
+            text-align: center !important;
+        }
+        
+        /* Ensure all buttons have centered text */
+        .btn-block {
+            text-align: center !important;
+        }
+        
+        /* Specific styling for outline buttons */
+        .btn-outline-primary.btn-auth {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
         }
         
         /* Dividers */
@@ -711,7 +766,8 @@ use yii\bootstrap4\Html;
             }
             
             .auth-title {
-                font-size: 1.25rem;
+                font-size: 1.75rem;
+                font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
             
             .form-floating > .form-control,
@@ -756,7 +812,8 @@ use yii\bootstrap4\Html;
             }
             
             .auth-title {
-                font-size: 1.125rem;
+                font-size: 1.5rem;
+                font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
             
             .auth-subtitle {
@@ -797,7 +854,8 @@ use yii\bootstrap4\Html;
             }
             
             .auth-title {
-                font-size: 1rem;
+                font-size: 1.25rem;
+                font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
             
             .auth-subtitle {
@@ -835,7 +893,8 @@ use yii\bootstrap4\Html;
             }
             
             .auth-title {
-                font-size: 0.95rem;
+                font-size: 1.125rem;
+                font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
             
             .auth-subtitle {

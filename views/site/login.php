@@ -93,7 +93,7 @@ $this->context->layout = 'auth';
 	</div>
 
 	<div class="auth-demo-info">
-		<small class="text-muted">
+		<small>
 			<i class="fas fa-info-circle"></i>
 			Demo accounts: <strong>demo/demo123</strong>
 		</small>

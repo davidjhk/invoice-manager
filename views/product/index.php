@@ -96,7 +96,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'class' => 'font-weight-bold text-decoration-none'
                                 ]) ?>
                                 <?php if ($product->description): ?>
-                                    <br><small class="text-muted"><?= Html::encode($product->description) ?></small>
+                                    <?php
+                                    $truncatedDescription = mb_strlen($product->description) > 80 
+                                        ? mb_substr($product->description, 0, 80) . '...'
+                                        : $product->description;
+                                    ?>
+                                    <br><small class="text-muted" title="<?= Html::encode($product->description) ?>">
+                                        <?= Html::encode($truncatedDescription) ?>
+                                    </small>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -229,6 +236,25 @@ $this->registerCss("
     
     .btn-group-sm > .btn:last-child {
         margin-right: 0;
+    }
+    
+    /* Limit Name column width */
+    .table td:first-child {
+        max-width: 300px;
+        width: 300px;
+    }
+    
+    .table th:first-child {
+        max-width: 300px;
+        width: 300px;
+    }
+    
+    /* Ensure text wraps properly */
+    .table td:first-child small {
+        display: block;
+        word-wrap: break-word;
+        line-height: 1.2;
+        margin-top: 2px;
     }
 ");
 
