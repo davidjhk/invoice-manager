@@ -53,13 +53,16 @@ if [ -n "$(git status --porcelain)" ]; then
         # 백업 디렉토리 생성
         BACKUP_DIR="backups/local_changes_$(date +%Y%m%d_%H%M%S)"
         sudo mkdir -p "$BACKUP_DIR"
-        sudo chown $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR"
+        sudo chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR"
         
         # 수정된 파일 백업
         git diff --name-only | while read file; do
             if [ -f "$file" ]; then
-                sudo mkdir -p "$BACKUP_DIR/$(dirname "$file")"
-                cp "$file" "$BACKUP_DIR/$file"
+                mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+                cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
+                    echo "⚠️  백업 실패: $file (권한 문제)"
+                    sudo cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || true
+                }
             fi
         done
         
@@ -71,12 +74,21 @@ if [ -n "$(git status --porcelain)" ]; then
             fi
             
             if [ -f "$file" ]; then
-                sudo mkdir -p "$BACKUP_DIR/$(dirname "$file")"
-                cp "$file" "$BACKUP_DIR/$file"
+                mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+                cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
+                    echo "⚠️  백업 실패: $file (권한 문제)"
+                    sudo cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || true
+                }
             elif [ -d "$file" ]; then
-                cp -r "$file" "$BACKUP_DIR/$file"
+                cp -r "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
+                    echo "⚠️  백업 실패: $file (권한 문제)"
+                    sudo cp -r "$file" "$BACKUP_DIR/$file" 2>/dev/null || true
+                }
             fi
         done
+        
+        # 백업 디렉토리 권한 최종 설정
+        sudo chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR" 2>/dev/null || true
         
         echo "✅ 백업 완료: $BACKUP_DIR"
         
