@@ -8,231 +8,716 @@ use app\models\Customer;
 
 /** @var yii\web\View $this */
 
-$this->title = 'Invoice Manager Dashboard';
+$this->title = (Yii::$app->params['siteName'] ?? 'Invoice Manager') . ' Dashboard';
 
 // Get company and statistics
-$company = Company::getDefault();
-if ($company) {
-    $totalInvoices = Invoice::find()->where(['company_id' => $company->id])->count();
-    $draftInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'draft'])->count();
-    $paidInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->count();
-    $totalAmount = Invoice::find()->where(['company_id' => $company->id])->sum('total_amount') ?: 0;
-    $paidAmount = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->sum('total_amount') ?: 0;
-    $pendingAmount = $totalAmount - $paidAmount;
-    $totalCustomers = Customer::find()->where(['company_id' => $company->id])->count();
-    
-    // Recent invoices
-    $recentInvoices = Invoice::find()
-        ->where(['company_id' => $company->id])
-        ->with(['customer'])
-        ->orderBy(['created_at' => SORT_DESC])
-        ->limit(5)
-        ->all();
-} else {
-    $totalInvoices = $draftInvoices = $paidInvoices = $totalCustomers = 0;
-    $totalAmount = $paidAmount = $pendingAmount = 0;
-    $recentInvoices = [];
+$company = Company::getCurrent();
+if (!$company) {
+    // Redirect to company selection if no company is selected
+    return Yii::$app->response->redirect(['company/select']);
 }
+
+$totalInvoices = Invoice::find()->where(['company_id' => $company->id])->count();
+$draftInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'draft'])->count();
+$paidInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->count();
+$sentInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'sent'])->count();
+$totalAmount = Invoice::find()->where(['company_id' => $company->id])->sum('total_amount') ?: 0;
+$paidAmount = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->sum('total_amount') ?: 0;
+$pendingAmount = $totalAmount - $paidAmount;
+$totalCustomers = Customer::find()->where(['company_id' => $company->id])->count();
+
+// Recent invoices
+$recentInvoices = Invoice::find()
+    ->where(['company_id' => $company->id])
+    ->with(['customer'])
+    ->orderBy(['created_at' => SORT_DESC])
+    ->limit(5)
+    ->all();
+
+// Calculate conversion rates
+$conversionRate = $totalInvoices > 0 ? round(($paidInvoices / $totalInvoices) * 100, 1) : 0;
+$averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 ?>
-<div class="site-index">
 
-	<div class="jumbotron text-center bg-transparent"
-		style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
-		<h1 class="display-4">Invoice Manager</h1>
-		<p class="lead">Professional invoice management system</p>
-		<?= Html::a('Create New Invoice', ['/invoice/create'], ['class' => 'btn btn-light']) ?>
-	</div>
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-info">
+                <h1 class="dashboard-title">Dashboard</h1>
+                <p class="dashboard-subtitle">Welcome back, <?= Html::encode($company->company_name) ?></p>
+            </div>
+            <div class="header-actions">
+                <?= Html::a('<i class="fas fa-plus mr-2"></i>New Invoice', ['/invoice/create'], [
+                    'class' => 'btn btn-primary btn-lg'
+                ]) ?>
+            </div>
+        </div>
+    </div>
 
-	<?php if ($company): ?>
-	<!-- Statistics Cards -->
-	<div class="row mb-4">
-		<div class="col-md-3">
-			<div class="card text-center border-0 shadow-sm">
-				<div class="card-body">
-					<div class="display-4 text-primary"><?= $totalInvoices ?></div>
-					<h6 class="card-title text-muted">Total Invoices</h6>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-3">
-			<div class="card text-center border-0 shadow-sm">
-				<div class="card-body">
-					<div class="display-4 text-warning"><?= $draftInvoices ?></div>
-					<h6 class="card-title text-muted">Draft Invoices</h6>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-3">
-			<div class="card text-center border-0 shadow-sm">
-				<div class="card-body">
-					<div class="display-4 text-success"><?= $paidInvoices ?></div>
-					<h6 class="card-title text-muted">Paid Invoices</h6>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-3">
-			<div class="card text-center border-0 shadow-sm">
-				<div class="card-body">
-					<div class="display-4 text-info"><?= $totalCustomers ?></div>
-					<h6 class="card-title text-muted">Customers</h6>
-				</div>
-			</div>
-		</div>
-	</div>
+    <!-- Key Performance Indicators -->
+    <div class="kpi-grid">
+        <div class="kpi-card revenue-card">
+            <div class="kpi-header">
+                <div class="kpi-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="kpi-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+            <div class="kpi-body">
+                <h3 class="kpi-value"><?= $company->formatAmount($totalAmount) ?></h3>
+                <p class="kpi-label">Total Revenue</p>
+                <small class="kpi-detail">Average: <?= $company->formatAmount($averageInvoiceValue) ?> per invoice</small>
+            </div>
+        </div>
 
-	<!-- Revenue Overview -->
-	<div class="row mb-4">
-		<div class="col-md-4">
-			<div class="card border-0 shadow-sm">
-				<div class="card-body text-center">
-					<h5 class="card-title">Total Revenue</h5>
-					<div class="display-5 text-primary"><?= $company->formatAmount($totalAmount) ?></div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="card border-0 shadow-sm">
-				<div class="card-body text-center">
-					<h5 class="card-title">Paid Amount</h5>
-					<div class="display-5 text-success"><?= $company->formatAmount($paidAmount) ?></div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="card border-0 shadow-sm">
-				<div class="card-body text-center">
-					<h5 class="card-title">Pending Amount</h5>
-					<div class="display-5 text-warning"><?= $company->formatAmount($pendingAmount) ?></div>
-				</div>
-			</div>
-		</div>
-	</div>
+        <div class="kpi-card paid-card">
+            <div class="kpi-header">
+                <div class="kpi-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="kpi-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+            <div class="kpi-body">
+                <h3 class="kpi-value"><?= $company->formatAmount($paidAmount) ?></h3>
+                <p class="kpi-label">Paid Amount</p>
+                <small class="kpi-detail"><?= $conversionRate ?>% collection rate</small>
+            </div>
+        </div>
 
-	<div class="row">
-		<!-- Recent Invoices -->
-		<div class="col-lg-8">
-			<div class="card border-0 shadow-sm">
-				<div class="card-header d-flex justify-content-between align-items-center">
-					<h5 class="card-title mb-0">Recent Invoices</h5>
-					<?= Html::a('View All', ['/invoice/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
-				</div>
-				<div class="card-body">
-					<?php if (!empty($recentInvoices)): ?>
-					<div class="table-responsive">
-						<table class="table table-hover">
-							<thead>
-								<tr>
-									<th>Invoice #</th>
-									<th>Customer</th>
-									<th>Amount</th>
-									<th>Status</th>
-									<th>Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php foreach ($recentInvoices as $invoice): ?>
-								<tr>
-									<td>
-										<?= Html::a($invoice->invoice_number, ['/invoice/view', 'id' => $invoice->id], [
-                                                    'class' => 'text-decoration-none font-weight-bold'
-                                                ]) ?>
-									</td>
-									<td><?= Html::encode($invoice->customer->customer_name) ?></td>
-									<td><?= $invoice->formatAmount($invoice->total_amount) ?></td>
-									<td>
-										<span class="badge badge-<?= $invoice->getStatusClass() ?>">
-											<?= $invoice->getStatusLabel() ?>
-										</span>
-									</td>
-									<td><?= Yii::$app->formatter->asDate($invoice->invoice_date) ?></td>
-								</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					</div>
-					<?php else: ?>
-					<div class="text-center py-4">
-						<i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
-						<h5>No Invoices Yet</h5>
-						<p class="text-muted">Get started by creating your first invoice.</p>
-						<?= Html::a('Create Invoice', ['/invoice/create'], ['class' => 'btn btn-primary']) ?>
-					</div>
-					<?php endif; ?>
-				</div>
-			</div>
-		</div>
+        <div class="kpi-card pending-card">
+            <div class="kpi-header">
+                <div class="kpi-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="kpi-trend <?= $pendingAmount > 0 ? 'warning' : 'neutral' ?>">
+                    <i class="fas fa-<?= $pendingAmount > 0 ? 'exclamation-triangle' : 'minus' ?>"></i>
+                </div>
+            </div>
+            <div class="kpi-body">
+                <h3 class="kpi-value"><?= $company->formatAmount($pendingAmount) ?></h3>
+                <p class="kpi-label">Pending Amount</p>
+                <small class="kpi-detail"><?= $sentInvoices ?> invoices awaiting payment</small>
+            </div>
+        </div>
 
-		<!-- Quick Actions -->
-		<div class="col-lg-4">
-			<div class="card border-0 shadow-sm">
-				<div class="card-header">
-					<h5 class="card-title mb-0">Quick Actions</h5>
-				</div>
-				<div class="card-body">
-					<div class="d-grid gap-2">
-						<?= Html::a('<i class="fas fa-plus mr-2"></i>Create Invoice', ['/invoice/create'], [
-                            'class' => 'btn btn-primary btn-block mb-2'
-                        ]) ?>
+        <div class="kpi-card customers-card">
+            <div class="kpi-header">
+                <div class="kpi-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="kpi-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+            <div class="kpi-body">
+                <h3 class="kpi-value"><?= $totalCustomers ?></h3>
+                <p class="kpi-label">Active Customers</p>
+                <small class="kpi-detail"><?= $totalCustomers > 0 ? round($totalInvoices / $totalCustomers, 1) : 0 ?> avg invoices per customer</small>
+            </div>
+        </div>
+    </div>
 
-						<?= Html::a('<i class="fas fa-users mr-2"></i>Manage Customers', ['/customer/index'], [
-                            'class' => 'btn btn-outline-primary btn-block mb-2'
-                        ]) ?>
+    <!-- Invoice Status Overview -->
+    <div class="status-overview">
+        <div class="status-header">
+            <h2 class="section-title">Invoice Status</h2>
+            <div class="status-actions">
+                <?= Html::a('View All Invoices', ['/invoice/index'], ['class' => 'btn btn-outline-primary']) ?>
+            </div>
+        </div>
+        <div class="status-cards">
+            <div class="status-card draft-status">
+                <div class="status-number"><?= $draftInvoices ?></div>
+                <div class="status-label">Draft</div>
+                <div class="status-action">
+                    <?= Html::a('Review', ['/invoice/index', 'status' => 'draft'], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+                </div>
+            </div>
+            <div class="status-card sent-status">
+                <div class="status-number"><?= $sentInvoices ?></div>
+                <div class="status-label">Sent</div>
+                <div class="status-action">
+                    <?= Html::a('Follow Up', ['/invoice/index', 'status' => 'sent'], ['class' => 'btn btn-sm btn-outline-warning']) ?>
+                </div>
+            </div>
+            <div class="status-card paid-status">
+                <div class="status-number"><?= $paidInvoices ?></div>
+                <div class="status-label">Paid</div>
+                <div class="status-action">
+                    <?= Html::a('View', ['/invoice/index', 'status' => 'paid'], ['class' => 'btn btn-sm btn-outline-success']) ?>
+                </div>
+            </div>
+        </div>
+    </div>
 
-						<?= Html::a('<i class="fas fa-cog mr-2"></i>Company Settings', ['/company/settings'], [
-                            'class' => 'btn btn-outline-secondary btn-block mb-2'
-                        ]) ?>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Recent Invoices -->
+        <div class="content-section recent-invoices">
+            <div class="section-header">
+                <h2 class="section-title">Recent Invoices</h2>
+                <?= Html::a('View All', ['/invoice/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
+            </div>
+            <div class="section-body">
+                <?php if (!empty($recentInvoices)): ?>
+                    <div class="invoices-list">
+                        <?php foreach ($recentInvoices as $invoice): ?>
+                        <div class="invoice-item">
+                            <div class="invoice-info">
+                                <div class="invoice-number">
+                                    <?= Html::a($invoice->invoice_number, ['/invoice/view', 'id' => $invoice->id], [
+                                        'class' => 'invoice-link'
+                                    ]) ?>
+                                </div>
+                                <div class="invoice-customer">
+                                    <?= Html::encode($invoice->customer->customer_name) ?>
+                                </div>
+                                <div class="invoice-date">
+                                    <?= Yii::$app->formatter->asDate($invoice->invoice_date) ?>
+                                </div>
+                            </div>
+                            <div class="invoice-amount">
+                                <?= $invoice->formatAmount($invoice->total_amount) ?>
+                            </div>
+                            <div class="invoice-status">
+                                <span class="status-badge status-<?= $invoice->status ?>">
+                                    <?= $invoice->getStatusLabel() ?>
+                                </span>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-file-invoice fa-3x"></i>
+                        <h3>No Invoices Yet</h3>
+                        <p>Get started by creating your first invoice.</p>
+                        <?= Html::a('Create Invoice', ['/invoice/create'], ['class' => 'btn btn-primary']) ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
-						<?= Html::a('<i class="fas fa-download mr-2"></i>Export Data', ['/company/backup'], [
-                            'class' => 'btn btn-outline-info btn-block',
-                            'target' => '_blank'
-                        ]) ?>
-					</div>
-				</div>
-			</div>
-
-			<!-- Company Info -->
-			<div class="card border-0 shadow-sm mt-3">
-				<div class="card-header">
-					<h6 class="card-title mb-0">Company Information</h6>
-				</div>
-				<div class="card-body">
-					<strong><?= Html::encode($company->company_name) ?></strong><br>
-					<small class="text-muted">
-						<?= nl2br(Html::encode($company->company_address)) ?>
-					</small>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<?php else: ?>
-	<!-- No Company Setup -->
-	<div class="alert alert-warning text-center">
-		<h4>Setup Required</h4>
-		<p>Please configure your company settings to get started.</p>
-		<?= Html::a('Setup Company', ['/company/settings'], ['class' => 'btn btn-warning']) ?>
-	</div>
-	<?php endif; ?>
-
+        <!-- Quick Actions -->
+        <div class="content-section quick-actions">
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="section-body">
+                <div class="actions-grid">
+                    <?= Html::a('<i class="fas fa-file-invoice"></i><span>Create Invoice</span>', ['/invoice/create'], [
+                        'class' => 'action-card primary-action'
+                    ]) ?>
+                    <?= Html::a('<i class="fas fa-file-alt"></i><span>Create Estimate</span>', ['/estimate/create'], [
+                        'class' => 'action-card secondary-action'
+                    ]) ?>
+                    <?= Html::a('<i class="fas fa-user-plus"></i><span>Add Customer</span>', ['/customer/create'], [
+                        'class' => 'action-card secondary-action'
+                    ]) ?>
+                    <?= Html::a('<i class="fas fa-box"></i><span>Add Product</span>', ['/product/create'], [
+                        'class' => 'action-card secondary-action'
+                    ]) ?>
+                    <?= Html::a('<i class="fas fa-users"></i><span>Manage Customers</span>', ['/customer/index'], [
+                        'class' => 'action-card tertiary-action'
+                    ]) ?>
+                    <?= Html::a('<i class="fas fa-cog"></i><span>Settings</span>', ['/company/settings'], [
+                        'class' => 'action-card tertiary-action'
+                    ]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<?php
-$this->registerCss("
-    .display-5 {
-        font-size: 2rem;
-        font-weight: 300;
+<style>
+/* Dashboard Styles */
+.dashboard-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.dashboard-subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.header-actions .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.header-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* KPI Grid */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+}
+
+.revenue-card .kpi-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.paid-card .kpi-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.pending-card .kpi-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.customers-card .kpi-icon {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.kpi-trend {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.kpi-trend.positive {
+    background: #dcfce7;
+    color: #059669;
+}
+
+.kpi-trend.warning {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.kpi-trend.neutral {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.kpi-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.kpi-detail {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Status Overview */
+.status-overview {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.status-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.status-card {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.status-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.status-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.status-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.draft-status .status-number {
+    color: #6b7280;
+}
+
+.sent-status .status-number {
+    color: #f59e0b;
+}
+
+.paid-status .status-number {
+    color: #10b981;
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.content-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Recent Invoices */
+.invoices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.invoice-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.invoice-item:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+}
+
+.invoice-info {
+    flex: 1;
+}
+
+.invoice-number {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.invoice-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.invoice-link:hover {
+    text-decoration: underline;
+}
+
+.invoice-customer {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.invoice-date {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.invoice-amount {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-right: 1rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-draft {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-sent {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-paid {
+    background: #dcfce7;
+    color: #059669;
+}
+
+.status-printed {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+/* Quick Actions */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 100px;
+}
+
+.action-card i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.action-card span {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.primary-action {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+}
+
+.primary-action:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.secondary-action {
+    background: #f8fafc;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.secondary-action:hover {
+    background: #e2e8f0;
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.tertiary-action {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.tertiary-action:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+/* Dark Mode */
+.dark-mode .kpi-card,
+.dark-mode .status-overview,
+.dark-mode .content-section {
+    background: #374151;
+    border-color: #4b5563;
+}
+
+.dark-mode .invoice-item {
+    border-color: #4b5563;
+}
+
+.dark-mode .invoice-item:hover {
+    background: #4b5563;
+    border-color: #6b7280;
+}
+
+.dark-mode .secondary-action {
+    background: #4b5563;
+    border-color: #6b7280;
+}
+
+.dark-mode .secondary-action:hover {
+    background: #6b7280;
+}
+
+.dark-mode .tertiary-action {
+    border-color: #6b7280;
+}
+
+.dark-mode .tertiary-action:hover {
+    background: #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 0 0.5rem;
     }
     
-    .card {
-        transition: transform 0.2s;
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
     }
     
-    .card:hover {
-        transform: translateY(-2px);
+    .kpi-grid {
+        grid-template-columns: 1fr;
     }
     
-    .jumbotron {
-        margin-bottom: 2rem;
+    .status-cards {
+        grid-template-columns: 1fr;
     }
-");
-?>
+    
+    .invoice-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .invoice-amount {
+        margin-right: 0;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

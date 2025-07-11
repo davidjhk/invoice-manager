@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\web\UploadedFile;
+use yii\web\BadRequestHttpException;
 
 /**
  * CompanyController implements the CRUD actions for Company model.
@@ -35,36 +36,79 @@ class CompanyController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
+                    'set-current' => ['GET', 'POST'], // Allow both GET and POST
                 ],
             ],
         ];
     }
 
     /**
-     * Displays company settings.
+     * {@inheritdoc}
+     */
+    public function beforeAction($action)
+    {
+        // Disable CSRF validation for AJAX requests to set-current action
+        if ($action->id === 'set-current' && Yii::$app->request->isAjax) {
+            $this->enableCsrfValidation = false;
+        }
+        
+        return parent::beforeAction($action);
+    }
+
+    /**
+     * Company selection page
      *
      * @return string
      */
-    public function actionSettings()
+    public function actionSelect()
     {
-        $model = Company::getDefault();
+        $companies = Company::findForCurrentUser()->all();
         
-        if (!$model) {
-            // Create default company if none exists
-            $model = new Company();
-            $model->company_name = 'Company Name';
-            $model->company_address = 'Company Address';
-            $model->company_phone = 'Company Phone';
-            $model->company_email = 'example@example.com';
-            $model->sender_email = 'example@example.com';
-            $model->tax_rate = 10.00;
-            $model->currency = 'USD';
-            $model->invoice_prefix = 'INV';
-            $model->due_date_days = 30;
-            $model->is_active = true;
-            $model->save();
+        if (empty($companies)) {
+            // If user has no companies, create a default one
+            $company = new Company();
+            $company->company_name = Yii::$app->user->identity->getDisplayName() . "'s Company";
+            $company->company_email = Yii::$app->user->identity->email;
+            $company->sender_email = Yii::$app->user->identity->email;
+            $company->sender_name = Yii::$app->user->identity->getDisplayName();
+            $company->user_id = Yii::$app->user->id;
+            
+            if ($company->save()) {
+                $companies = [$company];
+            }
         }
+        
+        return $this->render('select', [
+            'companies' => $companies,
+        ]);
+    }
 
+    /**
+     * Create a new company
+     *
+     * @return string|Response
+     */
+    public function actionCreate()
+    {
+        // Check if user can create more companies
+        $user = Yii::$app->user->identity;
+        if (!$user->canCreateMoreCompanies()) {
+            Yii::$app->session->setFlash('error', 'You have reached your maximum number of companies (' . $user->max_companies . '). Please upgrade your account or contact support.');
+            return $this->redirect(['select']);
+        }
+        
+        $model = new Company();
+        $model->user_id = Yii::$app->user->id;
+        
+        // Set default values explicitly
+        $model->tax_rate = 10.00;
+        $model->currency = 'USD';
+        $model->invoice_prefix = 'INV';
+        $model->estimate_prefix = 'EST';
+        $model->due_date_days = 30;
+        $model->estimate_validity_days = 30;
+        $model->is_active = true;
+        
         if ($model->load(Yii::$app->request->post())) {
             // Handle logo upload
             $logoFile = UploadedFile::getInstance($model, 'logo_upload');
@@ -74,6 +118,198 @@ class CompanyController extends Controller
                 // Create directory if it doesn't exist
                 if (!is_dir($uploadPath)) {
                     mkdir($uploadPath, 0755, true);
+                }
+                
+                // Generate unique filename
+                $filename = uniqid() . '.' . $logoFile->extension;
+                $filePath = $uploadPath . $filename;
+                
+                if ($logoFile->saveAs($filePath)) {
+                    $model->logo_path = '/uploads/logos/' . $filename;
+                    $model->logo_filename = $logoFile->name;
+                }
+            }
+            
+            if ($model->save()) {
+                // Set this as the current company
+                Yii::$app->session->set('current_company_id', $model->id);
+                Yii::$app->session->setFlash('success', 'New company created successfully.');
+                return $this->redirect(['site/index']);
+            } else {
+                // Log validation errors for debugging
+                Yii::error('Company creation failed: ' . json_encode($model->errors), 'app');
+            }
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Set current company in session
+     *
+     * @param int $id
+     * @return Response
+     */
+    public function actionSetCurrent($id = null)
+    {
+        // Log request details for debugging
+        Yii::info('SetCurrent action called with ID: ' . $id, 'app');
+        Yii::info('POST data: ' . json_encode(Yii::$app->request->post()), 'app');
+        Yii::info('Is AJAX: ' . (Yii::$app->request->isAjax ? 'Yes' : 'No'), 'app');
+        
+        try {
+            // Get ID from POST if not in URL
+            if ($id === null) {
+                $id = Yii::$app->request->post('id');
+            }
+            
+            if (!$id) {
+                if (Yii::$app->request->isAjax) {
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return [
+                        'success' => false,
+                        'message' => 'Company ID is required.',
+                        'debug' => [
+                            'post_data' => Yii::$app->request->post(),
+                            'url_id' => $id,
+                        ]
+                    ];
+                }
+                throw new BadRequestHttpException('Company ID is required.');
+            }
+            
+            // Enhanced security: Verify company belongs to current user
+            $company = Company::findForCurrentUser()->where(['id' => $id])->one();
+            
+            if (!$company) {
+                // Log unauthorized access attempt
+                Yii::warning('Unauthorized access attempt: User ID ' . Yii::$app->user->id . ' attempted to access company ID ' . $id, 'security');
+                
+                if (Yii::$app->request->isAjax) {
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return [
+                        'success' => false,
+                        'message' => 'Access denied. You do not have permission to access this company.',
+                        'debug' => [
+                            'requested_id' => $id,
+                            'user_id' => Yii::$app->user->id,
+                            'user_companies' => Company::findForCurrentUser()->select('id, company_name')->asArray()->all()
+                        ]
+                    ];
+                }
+                
+                // Set flash message for non-AJAX requests
+                Yii::$app->session->setFlash('error', 'Access denied. You do not have permission to access this company.');
+                
+                // Redirect to company selection page instead of throwing exception
+                return $this->redirect(['company/select']);
+            }
+            
+            // Additional verification: Double-check user_id matches
+            if ($company->user_id !== Yii::$app->user->id) {
+                Yii::warning('Security violation: Company user_id mismatch. Expected: ' . Yii::$app->user->id . ', Got: ' . $company->user_id, 'security');
+                
+                if (Yii::$app->request->isAjax) {
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return [
+                        'success' => false,
+                        'message' => 'Access denied. Security violation detected.',
+                    ];
+                }
+                
+                Yii::$app->session->setFlash('error', 'Access denied. Security violation detected.');
+                return $this->redirect(['company/select']);
+            }
+            
+            Yii::$app->session->set('current_company_id', $company->id);
+            
+            // Log successful company switch
+            Yii::info('User ' . Yii::$app->user->id . ' switched to company ' . $company->id . ' (' . $company->company_name . ')', 'app');
+            
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'success' => true,
+                    'company' => [
+                        'id' => $company->id,
+                        'name' => $company->company_name,
+                    ]
+                ];
+            }
+            
+            return $this->redirect(['site/index']);
+            
+        } catch (\Exception $e) {
+            Yii::error('Error in SetCurrent: ' . $e->getMessage() . ' - ' . $e->getTraceAsString(), 'app');
+            
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'success' => false,
+                    'message' => 'An error occurred: ' . $e->getMessage(),
+                    'debug' => [
+                        'exception_class' => get_class($e),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]
+                ];
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Displays company settings.
+     *
+     * @return string
+     */
+    public function actionSettings()
+    {
+        $model = Company::getCurrent();
+        
+        if (!$model) {
+            return $this->redirect(['company/select']);
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+            // Debug: Log POST data
+            \Yii::error('POST Data: ' . print_r(Yii::$app->request->post(), true), __METHOD__);
+            \Yii::error('Model attributes after load: ' . print_r($model->attributes, true), __METHOD__);
+            
+            // Handle logo upload
+            $logoFile = UploadedFile::getInstance($model, 'logo_upload');
+            \Yii::error('Logo file instance: ' . ($logoFile ? 'Found' : 'Not found'), __METHOD__);
+            if ($logoFile) {
+                \Yii::error('Logo file details: ' . print_r(['name' => $logoFile->name, 'size' => $logoFile->size, 'type' => $logoFile->type, 'extension' => $logoFile->extension], true), __METHOD__);
+                $uploadPath = Yii::getAlias('@webroot/uploads/logos/');
+                
+                // Create directory if it doesn't exist
+                if (!is_dir($uploadPath)) {
+                    if (!mkdir($uploadPath, 0755, true)) {
+                        Yii::$app->session->setFlash('error', 'Failed to create upload directory.');
+                        return $this->render('settings', ['model' => $model]);
+                    }
+                }
+                
+                // Check if directory is writable
+                if (!is_writable($uploadPath)) {
+                    Yii::$app->session->setFlash('error', 'Upload directory is not writable.');
+                    return $this->render('settings', ['model' => $model]);
+                }
+                
+                // Validate file type
+                $allowedTypes = ['png', 'jpg', 'jpeg', 'gif'];
+                if (!in_array(strtolower($logoFile->extension), $allowedTypes)) {
+                    Yii::$app->session->setFlash('error', 'Invalid file type. Please upload PNG, JPG, JPEG, or GIF files only.');
+                    return $this->render('settings', ['model' => $model]);
+                }
+                
+                // Validate file size (2MB limit)
+                if ($logoFile->size > 2 * 1024 * 1024) {
+                    Yii::$app->session->setFlash('error', 'File size too large. Please upload files smaller than 2MB.');
+                    return $this->render('settings', ['model' => $model]);
                 }
                 
                 // Delete old logo if exists
@@ -88,12 +324,27 @@ class CompanyController extends Controller
                 if ($logoFile->saveAs($filePath)) {
                     $model->logo_path = '/uploads/logos/' . $filename;
                     $model->logo_filename = $logoFile->name;
+                    
+                    // Verify file was saved correctly
+                    if (!file_exists($filePath)) {
+                        Yii::$app->session->setFlash('error', 'Failed to save uploaded file.');
+                        return $this->render('settings', ['model' => $model]);
+                    }
+                    
+                    Yii::$app->session->setFlash('success', 'Logo uploaded successfully.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'Failed to save uploaded file. Please try again.');
+                    return $this->render('settings', ['model' => $model]);
                 }
             }
             
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Company settings updated successfully.');
                 return $this->redirect(['settings']);
+            } else {
+                // Debug: Log validation errors
+                \Yii::error('Model validation errors: ' . print_r($model->errors, true), __METHOD__);
+                Yii::$app->session->setFlash('error', 'Failed to save settings: ' . implode(', ', $model->getFirstErrors()));
             }
         }
 
@@ -111,7 +362,7 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model || empty($model->smtp2go_api_key)) {
             return [
                 'success' => false,
@@ -187,6 +438,78 @@ class CompanyController extends Controller
     }
 
     /**
+     * Get current company info via AJAX
+     *
+     * @return Response
+     */
+    public function actionGetCurrent()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $companyId = Yii::$app->session->get('current_company_id');
+        if (!$companyId) {
+            $company = Company::findForCurrentUser()->one();
+            if ($company) {
+                Yii::$app->session->set('current_company_id', $company->id);
+                $companyId = $company->id;
+            }
+        }
+        
+        if ($companyId) {
+            $company = Company::findForCurrentUser()->where(['id' => $companyId])->one();
+            if ($company) {
+                return [
+                    'success' => true,
+                    'company' => [
+                        'id' => $company->id,
+                        'name' => $company->company_name,
+                        'email' => $company->company_email,
+                        'address' => $company->company_address,
+                        'phone' => $company->company_phone,
+                        'currency' => $company->currency,
+                        'currency_symbol' => $company->getCurrencySymbol(),
+                        'tax_rate' => $company->tax_rate,
+                        'invoice_prefix' => $company->invoice_prefix,
+                        'estimate_prefix' => $company->estimate_prefix,
+                        'due_date_days' => $company->due_date_days,
+                        'estimate_validity_days' => $company->estimate_validity_days,
+                        'logo_url' => $company->getLogoUrl(),
+                    ]
+                ];
+            }
+        }
+        
+        return [
+            'success' => false,
+            'message' => 'No company selected'
+        ];
+    }
+
+    /**
+     * Get user's companies list
+     *
+     * @return Response
+     */
+    public function actionGetList()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $companies = Company::findForCurrentUser()->all();
+        
+        return [
+            'success' => true,
+            'companies' => array_map(function($company) {
+                return [
+                    'id' => $company->id,
+                    'name' => $company->company_name,
+                    'email' => $company->company_email,
+                    'is_current' => $company->id == Yii::$app->session->get('current_company_id'),
+                ];
+            }, $companies)
+        ];
+    }
+
+    /**
      * Get company data as JSON
      *
      * @return Response
@@ -195,7 +518,9 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $companyId = Yii::$app->session->get('current_company_id');
+        $model = Company::findForCurrentUser()->where(['id' => $companyId])->one();
+        
         if (!$model) {
             return ['error' => 'Company not found'];
         }
@@ -223,7 +548,7 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model) {
             return ['error' => 'Company not found'];
         }
@@ -242,7 +567,7 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model) {
             return [
                 'success' => false,
@@ -278,7 +603,7 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model) {
             return ['error' => 'Company not found'];
         }
@@ -335,7 +660,7 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model) {
             return [
                 'success' => false,
@@ -375,7 +700,7 @@ class CompanyController extends Controller
      */
     public function actionBackup()
     {
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model) {
             throw new NotFoundHttpException('Company not found.');
         }
@@ -405,7 +730,7 @@ class CompanyController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = Company::getDefault();
+        $model = Company::getCurrent();
         if (!$model) {
             return [
                 'success' => false,
@@ -413,13 +738,17 @@ class CompanyController extends Controller
             ];
         }
 
+        \Yii::error('Delete logo attempt for company: ' . $model->id . ', has logo: ' . ($model->hasLogo() ? 'Yes' : 'No') . ', logo_path: ' . $model->logo_path, __METHOD__);
+
         if ($model->deleteLogo() && $model->save()) {
+            \Yii::error('Logo deleted successfully for company: ' . $model->id, __METHOD__);
             return [
                 'success' => true,
                 'message' => 'Logo deleted successfully.',
             ];
         }
 
+        \Yii::error('Failed to delete logo for company: ' . $model->id . ', errors: ' . print_r($model->errors, true), __METHOD__);
         return [
             'success' => false,
             'message' => 'Failed to delete logo.',

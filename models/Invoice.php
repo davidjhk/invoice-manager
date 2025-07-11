@@ -47,6 +47,7 @@ use yii\behaviors\TimestampBehavior;
 class Invoice extends ActiveRecord
 {
     const STATUS_DRAFT = 'draft';
+    const STATUS_PRINTED = 'printed';
     const STATUS_SENT = 'sent';
     const STATUS_PARTIAL = 'partial';
     const STATUS_PAID = 'paid';
@@ -97,7 +98,7 @@ class Invoice extends ActiveRecord
             [['status'], 'string', 'max' => 20],
             [['currency'], 'string', 'max' => 10],
             [['invoice_number'], 'unique'],
-            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_SENT, self::STATUS_PAID, self::STATUS_CANCELLED]],
+            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_PAID, self::STATUS_CANCELLED]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
@@ -192,6 +193,7 @@ class Invoice extends ActiveRecord
     {
         return [
             self::STATUS_DRAFT => 'Draft',
+            self::STATUS_PRINTED => 'Printed',
             self::STATUS_SENT => 'Sent',
             self::STATUS_PARTIAL => 'Partially Paid',
             self::STATUS_PAID => 'Paid',
@@ -219,6 +221,7 @@ class Invoice extends ActiveRecord
     {
         $classes = [
             self::STATUS_DRAFT => 'secondary',
+            self::STATUS_PRINTED => 'primary',
             self::STATUS_SENT => 'info',
             self::STATUS_PARTIAL => 'warning',
             self::STATUS_PAID => 'success',
@@ -310,7 +313,7 @@ class Invoice extends ActiveRecord
      */
     public function isEditable()
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SENT]);
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT]);
     }
 
     /**
@@ -499,7 +502,7 @@ class Invoice extends ActiveRecord
      */
     public function canReceivePayment()
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SENT, self::STATUS_PARTIAL]) && 
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_PARTIAL]) && 
                $this->getRemainingBalance() > 0;
     }
 
@@ -571,5 +574,29 @@ class Invoice extends ActiveRecord
             Yii::error('Failed to duplicate invoice: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Mark invoice as printed
+     * 
+     * @return bool
+     */
+    public function markAsPrinted()
+    {
+        if ($this->status === self::STATUS_DRAFT) {
+            $this->status = self::STATUS_PRINTED;
+            return $this->save(false);
+        }
+        return true;
+    }
+
+    /**
+     * Check if invoice can be edited
+     * 
+     * @return bool
+     */
+    public function canEdit()
+    {
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED]);
     }
 }

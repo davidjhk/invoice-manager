@@ -14,7 +14,13 @@ $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="estimate-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <div>
+            <?= Html::a('View Estimate', ['view', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
+            <?= Html::a('Back to Estimates', ['index'], ['class' => 'btn btn-secondary']) ?>
+        </div>
+    </div>
 
     <?= $this->render('_form', [
         'model' => $model,

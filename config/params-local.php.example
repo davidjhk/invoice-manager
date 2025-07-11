@@ -1,0 +1,10 @@
+<?php
+
+return [
+    'adminEmail' => 'admin@example.com',
+    'supportEmail' => 'support@example.com',
+    'senderEmail' => 'noreply@example.com',
+    'senderName' => 'KIMS',
+    'user.passwordResetTokenExpire' => 3600 * 24, // 24 hours
+    'siteName' => 'Invoice Manager', // Site title displayed in header
+];

@@ -27,11 +27,15 @@ use yii\behaviors\TimestampBehavior;
  * @property int $due_date_days
  * @property int $estimate_validity_days
  * @property bool $is_active
+ * @property bool $dark_mode
+ * @property bool $use_cjk_font
+ * @property int|null $user_id
  * @property string $created_at
  * @property string $updated_at
  *
  * @property Customer[] $customers
  * @property Invoice[] $invoices
+ * @property User $user
  */
 class Company extends ActiveRecord
 {
@@ -74,8 +78,12 @@ class Company extends ActiveRecord
             [['company_name'], 'required'],
             [['company_address'], 'string'],
             [['tax_rate'], 'number', 'min' => 0, 'max' => 100],
-            [['due_date_days', 'estimate_validity_days'], 'integer', 'min' => 1],
-            [['is_active'], 'boolean'],
+            [['due_date_days', 'estimate_validity_days', 'user_id'], 'integer', 'min' => 1],
+            [['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => 'id'],
+            [['is_active', 'dark_mode', 'use_cjk_font'], 'boolean'],
+            [['dark_mode', 'use_cjk_font'], 'filter', 'filter' => function($value) {
+                return $value ? 1 : 0;
+            }],
             [['created_at', 'updated_at'], 'safe'],
             [['company_name'], 'string', 'max' => 255],
             [['company_phone'], 'string', 'max' => 50],
@@ -86,6 +94,20 @@ class Company extends ActiveRecord
             [['logo_path', 'logo_filename'], 'string', 'max' => 500],
             [['logo_upload'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg, gif', 'maxSize' => 2 * 1024 * 1024],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
+            
+            // Set default values
+            [['tax_rate'], 'default', 'value' => 10.00],
+            [['currency'], 'default', 'value' => 'USD'],
+            [['invoice_prefix'], 'default', 'value' => 'INV'],
+            [['estimate_prefix'], 'default', 'value' => 'EST'],
+            [['due_date_days'], 'default', 'value' => 30],
+            [['estimate_validity_days'], 'default', 'value' => 30],
+            [['is_active'], 'default', 'value' => true],
+            [['dark_mode'], 'default', 'value' => false],
+            [['use_cjk_font'], 'default', 'value' => false],
+            
+            // Custom validation for company count limit
+            [['user_id'], 'validateCompanyLimit'],
         ];
     }
 
@@ -114,6 +136,9 @@ class Company extends ActiveRecord
             'due_date_days' => 'Due Date Days',
             'estimate_validity_days' => 'Estimate Validity Days',
             'is_active' => 'Is Active',
+            'dark_mode' => 'Dark Mode',
+            'use_cjk_font' => 'Use CJK Fonts for PDF',
+            'user_id' => 'Owner',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -140,13 +165,62 @@ class Company extends ActiveRecord
     }
 
     /**
-     * Get the default company
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    /**
+     * Get the default company for current user
      *
      * @return Company|null
      */
     public static function getDefault()
     {
+        $userId = Yii::$app->user->id;
+        if ($userId) {
+            return static::find()->where(['user_id' => $userId, 'is_active' => true])->one();
+        }
         return static::find()->where(['is_active' => true])->one();
+    }
+
+    /**
+     * Get the current selected company from session
+     *
+     * @return Company|null
+     */
+    public static function getCurrent()
+    {
+        $companyId = Yii::$app->session->get('current_company_id');
+        if ($companyId) {
+            return static::findForCurrentUser()->where(['id' => $companyId])->one();
+        }
+        
+        // If no company is selected, get the first company for the user
+        $company = static::findForCurrentUser()->one();
+        if ($company) {
+            Yii::$app->session->set('current_company_id', $company->id);
+        }
+        
+        return $company;
+    }
+
+    /**
+     * Get companies for current user
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public static function findForCurrentUser()
+    {
+        $userId = Yii::$app->user->id;
+        if ($userId) {
+            return static::find()->where(['user_id' => $userId, 'is_active' => true]);
+        }
+        return static::find()->where(['0' => '1']); // Return empty result if no user
     }
 
     /**
@@ -287,7 +361,7 @@ class Company extends ActiveRecord
      */
     public function getLogoUrl()
     {
-        if (!empty($this->logo_path) && file_exists(Yii::getAlias('@webroot') . $this->logo_path)) {
+        if (!empty($this->logo_path)) {
             return Yii::getAlias('@web') . $this->logo_path;
         }
         return null;
@@ -313,7 +387,7 @@ class Company extends ActiveRecord
      */
     public function hasLogo()
     {
-        return !empty($this->logo_path) && file_exists(Yii::getAlias('@webroot') . $this->logo_path);
+        return !empty($this->logo_path);
     }
 
     /**
@@ -325,13 +399,42 @@ class Company extends ActiveRecord
     {
         if ($this->hasLogo()) {
             $logoPath = Yii::getAlias('@webroot') . $this->logo_path;
+            // Try to delete the physical file if it exists locally
             if (file_exists($logoPath)) {
                 unlink($logoPath);
             }
+            // Always clear the database fields regardless of file existence
             $this->logo_path = null;
             $this->logo_filename = null;
             return true;
         }
         return false;
+    }
+
+    /**
+     * Validate company count limit for user
+     *
+     * @param string $attribute
+     * @param mixed $params
+     */
+    public function validateCompanyLimit($attribute, $params)
+    {
+        if (!$this->isNewRecord) {
+            return; // Only validate on new records
+        }
+        
+        if (!$this->user_id) {
+            return; // Skip if no user_id
+        }
+        
+        $user = User::findOne($this->user_id);
+        if (!$user) {
+            $this->addError($attribute, 'User not found.');
+            return;
+        }
+        
+        if (!$user->canCreateMoreCompanies()) {
+            $this->addError($attribute, 'You have reached your maximum number of companies (' . $user->max_companies . '). Please upgrade your account or contact support.');
+        }
     }
 }

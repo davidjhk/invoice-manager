@@ -49,6 +49,7 @@ use yii\behaviors\TimestampBehavior;
 class Estimate extends ActiveRecord
 {
     const STATUS_DRAFT = 'draft';
+    const STATUS_PRINTED = 'printed';
     const STATUS_SENT = 'sent';
     const STATUS_ACCEPTED = 'accepted';
     const STATUS_REJECTED = 'rejected';
@@ -97,7 +98,7 @@ class Estimate extends ActiveRecord
             [['currency'], 'string', 'max' => 10],
             [['tracking_number', 'shipping_method', 'terms'], 'string', 'max' => 100],
             [['estimate_number'], 'unique'],
-            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED]],
+            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['discount_type'], 'in', 'range' => ['percentage', 'fixed']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
@@ -194,6 +195,7 @@ class Estimate extends ActiveRecord
     {
         return [
             self::STATUS_DRAFT => 'Draft',
+            self::STATUS_PRINTED => 'Printed',
             self::STATUS_SENT => 'Sent',
             self::STATUS_ACCEPTED => 'Accepted',
             self::STATUS_REJECTED => 'Rejected',
@@ -221,6 +223,7 @@ class Estimate extends ActiveRecord
     {
         $classes = [
             self::STATUS_DRAFT => 'secondary',
+            self::STATUS_PRINTED => 'primary',
             self::STATUS_SENT => 'info',
             self::STATUS_ACCEPTED => 'success',
             self::STATUS_REJECTED => 'danger',
@@ -297,15 +300,6 @@ class Estimate extends ActiveRecord
         return $this->expiry_date && $this->expiry_date < date('Y-m-d') && $this->status !== self::STATUS_ACCEPTED;
     }
 
-    /**
-     * Check if estimate can be converted to invoice
-     *
-     * @return bool
-     */
-    public function canConvertToInvoice()
-    {
-        return !$this->converted_to_invoice && $this->status === self::STATUS_ACCEPTED;
-    }
 
     /**
      * Convert estimate to invoice
@@ -314,7 +308,7 @@ class Estimate extends ActiveRecord
      */
     public function convertToInvoice()
     {
-        if (!$this->canConvertToInvoice()) {
+        if (!$this->canConvertToInvoice() || $this->converted_to_invoice) {
             return null;
         }
 
@@ -432,5 +426,39 @@ class Estimate extends ActiveRecord
         }
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * Mark estimate as printed
+     * 
+     * @return bool
+     */
+    public function markAsPrinted()
+    {
+        if ($this->status === self::STATUS_DRAFT) {
+            $this->status = self::STATUS_PRINTED;
+            return $this->save(false);
+        }
+        return true;
+    }
+
+    /**
+     * Check if estimate can be edited
+     * 
+     * @return bool
+     */
+    public function canEdit()
+    {
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED]);
+    }
+
+    /**
+     * Check if estimate can be converted to invoice
+     * 
+     * @return bool
+     */
+    public function canConvertToInvoice()
+    {
+        return in_array($this->status, [self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED]);
     }
 }

@@ -47,9 +47,9 @@ class CustomerController extends Controller
      */
     public function actionIndex()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $searchTerm = Yii::$app->request->get('search', '');
@@ -100,9 +100,9 @@ class CustomerController extends Controller
      */
     public function actionCreate()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $model = new Customer();
@@ -198,7 +198,7 @@ class CustomerController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
             return ['success' => false, 'message' => 'Default company not found.'];
         }
@@ -239,7 +239,7 @@ class CustomerController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         
         $term = Yii::$app->request->get('term', '');
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         
         if (!$company || empty($term)) {
             return [];
@@ -303,9 +303,9 @@ class CustomerController extends Controller
      */
     public function actionExport()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $customers = Customer::findActiveByCompany($company->id)->all();
@@ -354,6 +354,7 @@ class CustomerController extends Controller
     /**
      * Finds the Customer model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     * Also ensures the customer belongs to the current company.
      *
      * @param int $id ID
      * @return Customer the loaded model
@@ -361,7 +362,13 @@ class CustomerController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Customer::findOne(['id' => $id])) !== null) {
+        $company = Company::getCurrent();
+        if (!$company) {
+            throw new NotFoundHttpException('No company selected.');
+        }
+        
+        $model = Customer::findOne(['id' => $id, 'company_id' => $company->id]);
+        if ($model !== null) {
             return $model;
         }
 

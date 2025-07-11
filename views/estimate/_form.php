@@ -52,13 +52,21 @@ $this->registerJsVar('estimateConfig', [
 
 	<?php $form = ActiveForm::begin([
         'id' => 'estimate-form',
+        'options' => ['class' => 'needs-validation', 'novalidate' => true],
+        'fieldConfig' => [
+            'options' => ['class' => 'form-group'],
+            'inputOptions' => ['class' => 'form-control'],
+            'labelOptions' => ['class' => 'form-label font-weight-bold'],
+        ],
     ]); ?>
 
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">ESTIMATE</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-file-invoice mr-2"></i>ESTIMATE
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
@@ -105,7 +113,9 @@ $this->registerJsVar('estimateConfig', [
 		<div class="col-lg-4">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">Details</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-info-circle mr-2"></i>Details
+					</h5>
 				</div>
 				<div class="card-body">
 					<?= $form->field($model, 'estimate_number')->textInput(['maxlength' => true]) ?>
@@ -119,12 +129,35 @@ $this->registerJsVar('estimateConfig', [
 					<?= $form->field($model, 'expiry_date')->input('date') ?>
 				</div>
 			</div>
+
+			<!-- Help Information -->
+			<div class="card mt-3">
+				<div class="card-header">
+					<h6 class="card-title mb-0">
+						<i class="fas fa-question-circle mr-2"></i>Estimate Help
+					</h6>
+				</div>
+				<div class="card-body">
+					<div class="alert alert-info">
+						<small>
+							<strong>Estimate Number:</strong> Unique identifier for this estimate.<br><br>
+							<strong>Terms:</strong> Payment terms for when estimate becomes invoice.<br><br>
+							<strong>Estimate Date:</strong> Date when estimate is created.<br><br>
+							<strong>Expiry Date:</strong> When estimate expires automatically calculated from terms.<br><br>
+							<strong>Items:</strong> Add products/services with quantity and rate.<br><br>
+							<strong>Convert:</strong> Convert approved estimates to invoices.
+						</small>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
 	<div class="card card-default mt-4">
 		<div class="card-header">
-			<h3 class="card-title">Items</h3>
+			<h5 class="card-title mb-0">
+				<i class="fas fa-list mr-2"></i>Items
+			</h5>
 		</div>
 		<div class="card-body">
 			<div class="table-responsive">
@@ -155,7 +188,9 @@ $this->registerJsVar('estimateConfig', [
 		<div class="col-lg-6">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">Notes</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-comment mr-2"></i>Notes
+					</h5>
 				</div>
 				<div class="card-body">
 					<?= $form->field($model, 'customer_notes')->textarea(['rows' => 3, 'placeholder' => 'e.g. This estimate is valid for 30 days.'])->label('Note to Customer') ?>
@@ -167,7 +202,9 @@ $this->registerJsVar('estimateConfig', [
 		<div class="col-lg-6">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">Totals</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-calculator mr-2"></i>Totals
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="totals-grid">
@@ -210,6 +247,16 @@ $this->registerJsVar('estimateConfig', [
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+	// --- FORM VALIDATION ---
+	const form = document.getElementById('estimate-form');
+	form.addEventListener('submit', function(e) {
+		if (!form.checkValidity()) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		form.classList.add('was-validated');
+	});
+
 	// --- CONFIGURATION ---
 	const config = window.estimateConfig || {};
 	const customerDataUrl = config.customerDataUrl;

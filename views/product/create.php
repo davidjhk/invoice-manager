@@ -12,7 +12,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <?= Html::a('Back to Products', ['index'], ['class' => 'btn btn-secondary']) ?>
+    </div>
 
     <?= $this->render('_form', [
         'model' => $model,

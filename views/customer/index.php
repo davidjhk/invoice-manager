@@ -16,7 +16,17 @@ $this->params['breadcrumbs'][] = $this->title;
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
-        <?= Html::a('<i class="fas fa-user-plus mr-1"></i>Add Customer', ['create'], ['class' => 'btn btn-success', 'encode' => false]) ?>
+        <div>
+            <?= Html::a('<i class="fas fa-download mr-1"></i>Export CSV', ['export'], [
+                'class' => 'btn btn-outline-info mr-2',
+                'target' => '_blank',
+                'encode' => false
+            ]) ?>
+            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>Add Customer', ['create'], [
+                'class' => 'btn btn-success',
+                'encode' => false
+            ]) ?>
+        </div>
     </div>
 
     <div class="row mb-3">
@@ -34,12 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             <?= Html::endForm() ?>
         </div>
-        <div class="col-md-6 text-right">
-            <?= Html::a('<i class="fas fa-download mr-1"></i>Export CSV', ['export'], [
-                'class' => 'btn btn-outline-info',
-                'target' => '_blank',
-                'encode' => false
-            ]) ?>
+        <div class="col-md-6">
+            <!-- Export button moved to header -->
         </div>
     </div>
 

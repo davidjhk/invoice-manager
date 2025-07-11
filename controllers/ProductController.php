@@ -47,9 +47,9 @@ class ProductController extends Controller
      */
     public function actionIndex()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $searchTerm = Yii::$app->request->get('search', '');
@@ -109,9 +109,9 @@ class ProductController extends Controller
      */
     public function actionCreate()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $model = new Product();
@@ -206,7 +206,7 @@ class ProductController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         
         $term = Yii::$app->request->get('term', '');
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         
         if (!$company || empty($term)) {
             return [];
@@ -278,7 +278,7 @@ class ProductController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
             return ['success' => false, 'message' => 'Default company not found.'];
         }
@@ -327,9 +327,9 @@ class ProductController extends Controller
      */
     public function actionExport()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $products = Product::findActiveByCompany($company->id)->all();
@@ -384,6 +384,7 @@ class ProductController extends Controller
     /**
      * Finds the Product model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     * Also ensures the product belongs to the current company.
      *
      * @param int $id ID
      * @return Product the loaded model
@@ -391,7 +392,13 @@ class ProductController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Product::findOne(['id' => $id])) !== null) {
+        $company = Company::getCurrent();
+        if (!$company) {
+            throw new NotFoundHttpException('No company selected.');
+        }
+        
+        $model = Product::findOne(['id' => $id, 'company_id' => $company->id]);
+        if ($model !== null) {
             return $model;
         }
 

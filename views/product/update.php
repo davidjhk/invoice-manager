@@ -13,7 +13,13 @@ $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="product-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <div>
+            <?= Html::a('View Product', ['view', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
+            <?= Html::a('Back to Products', ['index'], ['class' => 'btn btn-secondary']) ?>
+        </div>
+    </div>
 
     <?= $this->render('_form', [
         'model' => $model,

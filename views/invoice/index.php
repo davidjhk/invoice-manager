@@ -18,7 +18,17 @@ $this->params['breadcrumbs'][] = $this->title;
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
-        <?= Html::a('<i class="fas fa-plus mr-1"></i>New Invoice', ['create'], ['class' => 'btn btn-success', 'encode' => false]) ?>
+        <div>
+            <?= Html::a('<i class="fas fa-download mr-1"></i>Export', ['export'], [
+                'class' => 'btn btn-outline-info mr-2',
+                'target' => '_blank',
+                'encode' => false
+            ]) ?>
+            <?= Html::a('<i class="fas fa-plus mr-1"></i>New Invoice', ['create'], [
+                'class' => 'btn btn-success',
+                'encode' => false
+            ]) ?>
+        </div>
     </div>
 
     <div class="row mb-3">

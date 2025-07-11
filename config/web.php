@@ -35,6 +35,10 @@ $config = [
             // 'useFileTransport' to false and configure transport
             // for the mailer to send real emails.
             'useFileTransport' => true,
+            'messageConfig' => [
+                'charset' => 'UTF-8',
+                'from' => [$params['senderEmail'] => $params['senderName']],
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -56,6 +60,9 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
 			'rules' => [
+				'invoice-app' => 'site/invoice-app',
+				'request-password-reset' => 'site/request-password-reset',
+				'reset-password/<token:.+>' => 'site/reset-password',
 				'<controller:\w+>/<action:\w+>' => '<controller>/<action>',
 				'<controller:\w+>/<id:\d+>' => '<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',

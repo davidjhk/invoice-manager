@@ -18,7 +18,7 @@ use app\models\Product;
         'fieldConfig' => [
             'options' => ['class' => 'form-group'],
             'inputOptions' => ['class' => 'form-control'],
-            'labelOptions' => ['class' => 'form-label'],
+            'labelOptions' => ['class' => 'form-label font-weight-bold'],
         ],
     ]); ?>
 
@@ -29,7 +29,9 @@ use app\models\Product;
 			<!-- Basic Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Basic Information</h6>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-info-circle mr-2"></i>Basic Information
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
@@ -57,7 +59,9 @@ use app\models\Product;
 			<!-- Pricing Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Pricing & Cost</h6>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-dollar-sign mr-2"></i>Pricing & Cost
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
@@ -117,7 +121,9 @@ use app\models\Product;
 			<!-- Settings -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Settings</h6>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-cog mr-2"></i>Settings
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="form-check mb-3">
@@ -145,13 +151,37 @@ use app\models\Product;
 			<!-- Company Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Company</h6>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-building mr-2"></i>Company
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="form-group">
 						<label class="form-label">Company</label>
 						<input type="text" class="form-control" value="<?= Html::encode($company->company_name) ?>"
 							readonly>
+					</div>
+				</div>
+			</div>
+
+			<!-- Help Information -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h6 class="card-title mb-0">
+						<i class="fas fa-question-circle mr-2"></i>Product Help
+					</h6>
+				</div>
+				<div class="card-body">
+					<div class="alert alert-info">
+						<small>
+							<strong>Name:</strong> Product or service name for identification.<br><br>
+							<strong>Type:</strong> Product or Service classification.<br><br>
+							<strong>Category:</strong> Group products for better organization.<br><br>
+							<strong>SKU:</strong> Stock Keeping Unit for inventory tracking.<br><br>
+							<strong>Price:</strong> Selling price charged to customers.<br><br>
+							<strong>Cost:</strong> Your cost for profit margin calculation.<br><br>
+							<strong>Taxable:</strong> Whether sales tax applies to this item.
+						</small>
 					</div>
 				</div>
 			</div>

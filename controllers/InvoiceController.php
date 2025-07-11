@@ -54,9 +54,9 @@ class InvoiceController extends Controller
      */
     public function actionIndex()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $searchTerm = Yii::$app->request->get('search', '');
@@ -140,9 +140,9 @@ class InvoiceController extends Controller
      */
     public function actionCreate()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('Default company not found.');
+            return $this->redirect(['company/select']);
         }
 
         $model = new Invoice();
@@ -322,6 +322,9 @@ class InvoiceController extends Controller
     {
         $model = $this->findModel($id);
         
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
+        
         // Generate and output PDF
         return PdfGenerator::generateInvoicePdf($model, 'D');
     }
@@ -336,6 +339,9 @@ class InvoiceController extends Controller
     public function actionPrint($id)
     {
         $model = $this->findModel($id);
+        
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
         
         // Generate PDF using PdfGenerator
         return PdfGenerator::generateInvoicePdf($model, 'D');
@@ -484,7 +490,7 @@ class InvoiceController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         
         $term = Yii::$app->request->get('term', '');
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         
         if (!$company || empty($term)) {
             return [];
@@ -552,6 +558,7 @@ class InvoiceController extends Controller
     /**
      * Finds the Invoice model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     * Also ensures the invoice belongs to the current company.
      *
      * @param int $id ID
      * @return Invoice the loaded model
@@ -559,7 +566,17 @@ class InvoiceController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Invoice::find()->where(['id' => $id])->with(['invoiceItems'])->one()) !== null) {
+        $company = Company::getCurrent();
+        if (!$company) {
+            throw new NotFoundHttpException('No company selected.');
+        }
+        
+        $model = Invoice::find()
+            ->where(['id' => $id, 'company_id' => $company->id])
+            ->with(['invoiceItems'])
+            ->one();
+            
+        if ($model !== null) {
             return $model;
         }
 
@@ -688,5 +705,68 @@ class InvoiceController extends Controller
             'outstandingInvoices' => $outstandingInvoices,
             'startInvoice' => $startInvoice,
         ]);
+    }
+
+    /**
+     * Export invoices to CSV
+     *
+     * @return Response
+     */
+    public function actionExport()
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $invoices = Invoice::find()
+            ->where(['company_id' => $company->id])
+            ->with(['customer'])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+
+        // Set response headers for CSV download
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        Yii::$app->response->headers->add('Content-Type', 'text/csv; charset=utf-8');
+        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="invoices.csv"');
+
+        // Create CSV content
+        $output = fopen('php://output', 'w');
+        
+        // Add BOM for UTF-8
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        // Add headers
+        fputcsv($output, [
+            'Invoice Number',
+            'Customer',
+            'Invoice Date',
+            'Due Date',
+            'Status',
+            'Total Amount',
+            'Paid Amount',
+            'Balance Due',
+            'Currency',
+            'Created At'
+        ]);
+
+        // Add data
+        foreach ($invoices as $invoice) {
+            fputcsv($output, [
+                $invoice->invoice_number,
+                $invoice->customer->customer_name,
+                $invoice->invoice_date,
+                $invoice->due_date,
+                $invoice->getStatusLabel(),
+                $invoice->total_amount,
+                $invoice->getTotalPaidAmount(),
+                $invoice->getRemainingBalance(),
+                $invoice->currency,
+                $invoice->created_at,
+            ]);
+        }
+
+        fclose($output);
+        return Yii::$app->response;
     }
 }

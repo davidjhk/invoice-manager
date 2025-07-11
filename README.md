@@ -1,4 +1,4 @@
-# Yii2 Invoice Manager 서버 설정 가이드
+# Invoice Manager 서버 설정 가이드
 
 이 가이드는 Yii2 기반 Invoice Manager를 신규 서버에 설정하기 위한 과정을 설명합니다.
 

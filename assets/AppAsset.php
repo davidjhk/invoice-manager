@@ -22,10 +22,8 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-        'https://code.jquery.com/ui/1.13.2/themes/ui-lightness/jquery-ui.css',
     ];
     public $js = [
-        'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

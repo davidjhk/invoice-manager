@@ -54,16 +54,41 @@ class EstimateController extends Controller
      */
     public function actionIndex()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('No active company found.');
+            return $this->redirect(['company/select']);
+        }
+
+        $searchTerm = Yii::$app->request->get('search', '');
+        $statusFilter = Yii::$app->request->get('status', '');
+
+        $query = Estimate::find()
+            ->where(['company_id' => $company->id])
+            ->with(['customer', 'estimateItems'])
+            ->orderBy(['estimate_number' => SORT_DESC]);
+
+        // Apply search filter
+        if (!empty($searchTerm)) {
+            $query->joinWith(['customer'])
+                ->andWhere(['or',
+                    ['like', 'estimate_number', $searchTerm],
+                    ['like', 'jdosa_customers.customer_name', $searchTerm],
+                    ['like', 'notes', $searchTerm],
+                ]);
+        }
+
+        // Apply status filter
+        if (!empty($statusFilter)) {
+            if ($statusFilter === 'expired') {
+                $query->andWhere(['status' => 'sent'])
+                    ->andWhere(['<', 'expiry_date', date('Y-m-d')]);
+            } else {
+                $query->andWhere(['status' => $statusFilter]);
+            }
         }
 
         $dataProvider = new ActiveDataProvider([
-            'query' => Estimate::find()
-                ->where(['company_id' => $company->id])
-                ->with(['customer', 'estimateItems'])
-                ->orderBy(['estimate_number' => SORT_DESC]),
+            'query' => $query,
             'pagination' => [
                 'pageSize' => 20,
             ],
@@ -72,6 +97,8 @@ class EstimateController extends Controller
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'company' => $company,
+            'searchTerm' => $searchTerm,
+            'statusFilter' => $statusFilter,
         ]);
     }
 
@@ -99,9 +126,9 @@ class EstimateController extends Controller
      */
     public function actionCreate()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('No active company found.');
+            return $this->redirect(['company/select']);
         }
 
         $model = new Estimate();
@@ -378,6 +405,9 @@ class EstimateController extends Controller
     {
         $model = $this->findModel($id);
         
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
+        
         // Generate PDF using PdfGenerator
         return PdfGenerator::generateEstimatePdf($model, 'D');
     }
@@ -443,6 +473,9 @@ class EstimateController extends Controller
     public function actionDownloadPdf($id)
     {
         $model = $this->findModel($id);
+        
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
         
         // Generate PDF using PdfGenerator
         return PdfGenerator::generateEstimatePdf($model, 'D');
@@ -516,9 +549,9 @@ class EstimateController extends Controller
      */
     public function actionExport()
     {
-        $company = Company::getDefault();
+        $company = Company::getCurrent();
         if (!$company) {
-            throw new NotFoundHttpException('No active company found.');
+            return $this->redirect(['company/select']);
         }
 
         $estimates = Estimate::find()
@@ -573,6 +606,7 @@ class EstimateController extends Controller
     /**
      * Finds the Estimate model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     * Also ensures the estimate belongs to the current company.
      *
      * @param int $id ID
      * @return Estimate the loaded model
@@ -580,7 +614,13 @@ class EstimateController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Estimate::findOne(['id' => $id])) !== null) {
+        $company = Company::getCurrent();
+        if (!$company) {
+            throw new NotFoundHttpException('No company selected.');
+        }
+        
+        $model = Estimate::findOne(['id' => $id, 'company_id' => $company->id]);
+        if ($model !== null) {
             return $model;
         }
 

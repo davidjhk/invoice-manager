@@ -52,13 +52,21 @@ $this->registerJsVar('invoiceConfig', [
 
 	<?php $form = ActiveForm::begin([
         'id' => 'invoice-form',
+        'options' => ['class' => 'needs-validation', 'novalidate' => true],
+        'fieldConfig' => [
+            'options' => ['class' => 'form-group'],
+            'inputOptions' => ['class' => 'form-control'],
+            'labelOptions' => ['class' => 'form-label font-weight-bold'],
+        ],
     ]); ?>
 
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">INVOICE</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-file-invoice mr-2"></i>INVOICE
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
@@ -105,7 +113,9 @@ $this->registerJsVar('invoiceConfig', [
 		<div class="col-lg-4">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">Details</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-info-circle mr-2"></i>Details
+					</h5>
 				</div>
 				<div class="card-body">
 					<?= $form->field($model, 'invoice_number')->textInput(['maxlength' => true]) ?>
@@ -119,12 +129,35 @@ $this->registerJsVar('invoiceConfig', [
 					<?= $form->field($model, 'due_date')->input('date') ?>
 				</div>
 			</div>
+
+			<!-- Help Information -->
+			<div class="card mt-3">
+				<div class="card-header">
+					<h6 class="card-title mb-0">
+						<i class="fas fa-question-circle mr-2"></i>Invoice Help
+					</h6>
+				</div>
+				<div class="card-body">
+					<div class="alert alert-info">
+						<small>
+							<strong>Invoice Number:</strong> Unique identifier for this invoice.<br><br>
+							<strong>Terms:</strong> Payment terms that determine due date.<br><br>
+							<strong>Invoice Date:</strong> Date when invoice is issued.<br><br>
+							<strong>Due Date:</strong> Payment deadline automatically calculated from terms.<br><br>
+							<strong>Items:</strong> Add products/services with quantity and rate.<br><br>
+							<strong>Tax:</strong> Check items that are taxable for automatic calculation.
+						</small>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
 	<div class="card card-default mt-4">
 		<div class="card-header">
-			<h3 class="card-title">Items</h3>
+			<h5 class="card-title mb-0">
+				<i class="fas fa-list mr-2"></i>Items
+			</h5>
 		</div>
 		<div class="card-body">
 			<div class="table-responsive">
@@ -155,7 +188,9 @@ $this->registerJsVar('invoiceConfig', [
 		<div class="col-lg-6">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">Notes & Payment</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-comment mr-2"></i>Notes & Payment
+					</h5>
 				</div>
 				<div class="card-body">
 					<?= $form->field($model, 'customer_notes')->textarea(['rows' => 3, 'placeholder' => 'Thank you for your business.'])->label('Note to Customer') ?>
@@ -167,7 +202,9 @@ $this->registerJsVar('invoiceConfig', [
 		<div class="col-lg-6">
 			<div class="card card-default">
 				<div class="card-header">
-					<h3 class="card-title">Totals</h3>
+					<h5 class="card-title mb-0">
+						<i class="fas fa-calculator mr-2"></i>Totals
+					</h5>
 				</div>
 				<div class="card-body">
 					<div class="totals-grid">
@@ -223,6 +260,16 @@ $this->registerJsVar('invoiceConfig', [
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+	// --- FORM VALIDATION ---
+	const form = document.getElementById('invoice-form');
+	form.addEventListener('submit', function(e) {
+		if (!form.checkValidity()) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		form.classList.add('was-validated');
+	});
+
 	// --- CONFIGURATION ---
 	const config = window.invoiceConfig || {};
 	const customerDataUrl = config.customerDataUrl;
