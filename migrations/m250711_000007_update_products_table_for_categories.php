@@ -12,21 +12,25 @@ class m250711_000007_update_products_table_for_categories extends Migration
      */
     public function safeUp()
     {
-        // Add category_id column
-        $this->addColumn('{{%jdosa_products}}', 'category_id', $this->integer()->after('type'));
-        
-        // Add foreign key for category_id
-        $this->addForeignKey(
-            'fk-products-category_id',
-            '{{%jdosa_products}}',
-            'category_id',
-            '{{%jdosa_product_categories}}',
-            'id',
-            'SET NULL'
-        );
+        // Check if category_id column already exists
+        $tableSchema = $this->db->getTableSchema('{{%jdosa_products}}');
+        if (!isset($tableSchema->columns['category_id'])) {
+            // Add category_id column
+            $this->addColumn('{{%jdosa_products}}', 'category_id', $this->integer()->after('type'));
+            
+            // Add foreign key for category_id
+            $this->addForeignKey(
+                'fk-products-category_id',
+                '{{%jdosa_products}}',
+                'category_id',
+                '{{%jdosa_product_categories}}',
+                'id',
+                'SET NULL'
+            );
 
-        // Migrate existing category data
-        $this->migrateExistingCategories();
+            // Migrate existing category data
+            $this->migrateExistingCategories();
+        }
 
         // Keep the old category column for now (we'll remove it later after verification)
         // $this->dropColumn('{{%jdosa_products}}', 'category');
