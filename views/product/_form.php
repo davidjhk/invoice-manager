@@ -239,18 +239,16 @@ $this->registerJs("
     calculateMargin();
     
     // Handle collapse icon rotation
-    $(document).ready(function() {
-        $('[data-toggle="collapse"]').on('click', function() {
-            const target = $(this).attr('data-target');
-            const icon = $(this).find('.collapse-icon');
-            
-            $(target).on('shown.bs.collapse', function() {
-                icon.attr('aria-expanded', 'true');
-            });
-            
-            $(target).on('hidden.bs.collapse', function() {
-                icon.attr('aria-expanded', 'false');
-            });
+    $('[data-toggle=\"collapse\"]').on('click', function() {
+        const target = $(this).attr('data-target');
+        const icon = $(this).find('.collapse-icon');
+        
+        $(target).on('shown.bs.collapse', function() {
+            icon.attr('aria-expanded', 'true');
+        });
+        
+        $(target).on('hidden.bs.collapse', function() {
+            icon.attr('aria-expanded', 'false');
         });
     });
 ");
