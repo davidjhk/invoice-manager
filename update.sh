@@ -23,28 +23,25 @@ fi
 
 # 백업 생성 (선택사항)
 echo "기존 설정 파일 백업 중..."
-sudo mkdir -p backups
-sudo chown $CURRENT_USER:$CURRENT_USER backups/
+mkdir -p backups 2>/dev/null || true
 cp -f config/db.php backups/db.php.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 cp -f config/web.php backups/web.php.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 cp -f web/.htaccess backups/.htaccess.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
 # Git 권한 임시 변경
 echo "Git 권한 설정 중..."
-sudo chown -R $CURRENT_USER:$CURRENT_USER .git/ || {
-    echo "❌ Git 권한 변경 실패. sudo 권한을 확인해주세요."
-    exit 1
+chown -R $CURRENT_USER:$CURRENT_USER .git/ 2>/dev/null || {
+    echo "⚠️  Git 권한 변경 실패 (관리자 권한 없음). 계속 진행합니다..."
 }
 
 # 권한 문제 감지 및 해결
 echo "권한 문제 감지 중..."
 if ! git status >/dev/null 2>&1; then
     echo "⚠️  Git 권한 문제 감지. 전체 파일 권한을 수정합니다..."
-    sudo chown -R $CURRENT_USER:$CURRENT_USER . || {
-        echo "❌ 전체 권한 변경 실패. 관리자 권한을 확인해주세요."
-        exit 1
+    chown -R $CURRENT_USER:$CURRENT_USER . 2>/dev/null || {
+        echo "⚠️  전체 권한 변경 실패 (관리자 권한 없음). 계속 진행합니다..."
     }
-    echo "✅ 전체 권한 수정 완료"
+    echo "✅ 권한 수정 시도 완료"
 fi
 
 # 변경사항 확인
@@ -63,8 +60,7 @@ if [ -n "$(git status --porcelain)" ]; then
         
         # 백업 디렉토리 생성
         BACKUP_DIR="backups/local_changes_$(date +%Y%m%d_%H%M%S)"
-        sudo mkdir -p "$BACKUP_DIR"
-        sudo chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR"
+        mkdir -p "$BACKUP_DIR"
         
         # 수정된 파일 백업
         git diff --name-only | while read file; do
@@ -72,7 +68,6 @@ if [ -n "$(git status --porcelain)" ]; then
                 mkdir -p "$BACKUP_DIR/$(dirname "$file")"
                 cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
                     echo "⚠️  백업 실패: $file (권한 문제)"
-                    sudo cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || true
                 }
             fi
         done
@@ -88,18 +83,16 @@ if [ -n "$(git status --porcelain)" ]; then
                 mkdir -p "$BACKUP_DIR/$(dirname "$file")"
                 cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
                     echo "⚠️  백업 실패: $file (권한 문제)"
-                    sudo cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || true
                 }
             elif [ -d "$file" ]; then
                 cp -r "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
                     echo "⚠️  백업 실패: $file (권한 문제)"
-                    sudo cp -r "$file" "$BACKUP_DIR/$file" 2>/dev/null || true
                 }
             fi
         done
         
         # 백업 디렉토리 권한 최종 설정
-        sudo chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR" 2>/dev/null || true
+        chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR" 2>/dev/null || true
         
         echo "✅ 백업 완료: $BACKUP_DIR"
         
@@ -218,15 +211,14 @@ fi
 
 # 권한 복원
 echo "권한 복원 중..."
-sudo chown -R daemon:daemon . || {
-    echo "❌ 권한 복원 실패."
-    exit 1
+chown -R daemon:daemon . 2>/dev/null || {
+    echo "⚠️  권한 복원 실패 (관리자 권한 없음). 건너뜁니다..."
 }
 
-sudo chmod -R 755 .
-sudo chmod -R 777 runtime/ 2>/dev/null || true
-sudo chmod -R 777 web/assets/ 2>/dev/null || true
-sudo chmod -R 777 web/uploads/ 2>/dev/null || true
+chmod -R 755 . 2>/dev/null || true
+chmod -R 777 runtime/ 2>/dev/null || true
+chmod -R 777 web/assets/ 2>/dev/null || true
+chmod -R 777 web/uploads/ 2>/dev/null || true
 
 # 스태시 복원 (있는 경우)
 if git stash list | grep -q "Auto stash before update"; then
