@@ -204,9 +204,9 @@ if ! git pull origin main 2>/dev/null; then
     echo "Git pull 재시도 중..."
     if ! git pull origin main; then
         echo "⚠️  Git pull 여전히 실패. 충돌 해결을 시도합니다..."
-    
-    # 충돌 유형 확인
-    if git status 2>/dev/null | grep -q "untracked working tree files"; then
+        
+        # 충돌 유형 확인
+        if git status 2>/dev/null | grep -q "untracked working tree files"; then
         echo "📋 Untracked 파일 충돌 감지"
         
         # 충돌 파일 임시 제거
@@ -230,10 +230,11 @@ if ! git pull origin main 2>/dev/null; then
             echo "❌ Git pull 실패. 네트워크 연결을 확인해주세요."
             exit 1
         fi
-    else
-        echo "❌ Git pull 실패. 다른 문제가 있을 수 있습니다."
-        git status
-        exit 1
+        else
+            echo "❌ Git pull 실패. 다른 문제가 있을 수 있습니다."
+            git status
+            exit 1
+        fi
     fi
 else
     echo "✅ Git pull 성공"
