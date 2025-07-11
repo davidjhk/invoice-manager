@@ -23,6 +23,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $auth_key
  * @property string|null $password_reset_token
  * @property int $max_companies
+ * @property string $role
  * @property string $created_at
  * @property string $updated_at
  *
@@ -79,12 +80,18 @@ class User extends ActiveRecord implements IdentityInterface
                 return $model->login_type === self::LOGIN_TYPE_LOCAL;
             }],
             [['password'], 'required', 'when' => function($model) {
-                return $model->login_type === self::LOGIN_TYPE_LOCAL && $model->isNewRecord;
+                return ($model->login_type === self::LOGIN_TYPE_LOCAL && $model->isNewRecord) || 
+                       $model->scenario === 'create';
             }],
             [['password'], 'string', 'min' => 6],
+            [['password_repeat'], 'required', 'on' => 'create'],
+            [['password_repeat'], 'compare', 'compareAttribute' => 'password', 'on' => 'create'],
             [['is_active', 'email_verified'], 'boolean'],
             [['max_companies'], 'integer', 'min' => 1, 'max' => 100],
             [['max_companies'], 'default', 'value' => 1],
+            [['role'], 'string'],
+            [['role'], 'in', 'range' => ['admin', 'user', 'demo']],
+            [['role'], 'default', 'value' => 'user'],
             [['created_at', 'updated_at'], 'safe'],
             [['username'], 'string', 'max' => 50],
             [['username'], 'unique'],
@@ -97,8 +104,20 @@ class User extends ActiveRecord implements IdentityInterface
             [['google_id'], 'unique'],
             [['avatar_url'], 'string', 'max' => 500],
             [['login_type'], 'in', 'range' => [self::LOGIN_TYPE_LOCAL, self::LOGIN_TYPE_GOOGLE]],
+            [['login_type'], 'default', 'value' => self::LOGIN_TYPE_LOCAL],
             [['auth_key'], 'string', 'max' => 32],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['create'] = ['username', 'email', 'password', 'password_repeat', 'full_name', 'role', 'max_companies', 'is_active'];
+        $scenarios['update'] = ['username', 'email', 'password', 'full_name', 'role', 'max_companies', 'is_active'];
+        return $scenarios;
     }
 
     /**
@@ -113,6 +132,7 @@ class User extends ActiveRecord implements IdentityInterface
             'password' => 'Password',
             'password_repeat' => 'Confirm Password',
             'password_hash' => 'Password Hash',
+            'role' => 'Role',
             'full_name' => 'Full Name',
             'google_id' => 'Google ID',
             'avatar_url' => 'Avatar URL',
@@ -379,6 +399,71 @@ class User extends ActiveRecord implements IdentityInterface
     public function getRemainingCompanySlots()
     {
         return max(0, $this->max_companies - $this->getCompanyCount());
+    }
+
+    /**
+     * Check if user is admin
+     *
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is demo
+     *
+     * @return bool
+     */
+    public function isDemo()
+    {
+        return $this->role === 'demo';
+    }
+
+    /**
+     * Check if user is regular user
+     *
+     * @return bool
+     */
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
+
+    /**
+     * Get role options for dropdown
+     *
+     * @return array
+     */
+    public static function getRoleOptions()
+    {
+        return [
+            'user' => 'User',
+            'admin' => 'Admin',
+            'demo' => 'Demo',
+        ];
+    }
+
+    /**
+     * Get role label
+     *
+     * @return string
+     */
+    public function getRoleLabel()
+    {
+        $options = self::getRoleOptions();
+        return $options[$this->role] ?? 'Unknown';
+    }
+
+    /**
+     * Get status label
+     *
+     * @return string
+     */
+    public function getStatusLabel()
+    {
+        return $this->is_active ? 'Active' : 'Inactive';
     }
 
     /**

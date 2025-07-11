@@ -11,8 +11,10 @@ use app\models\LoginForm;
 use app\models\SignupForm;
 use app\models\PasswordResetRequestForm;
 use app\models\ResetPasswordForm;
+use app\models\ChangePasswordForm;
 use app\models\User;
 use app\models\Company;
+use app\models\AdminSettings;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\httpclient\Client;
@@ -27,10 +29,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'index', 'check-auth', 'invoice-app'],
+                'only' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password'],
                 'rules' => [
                     [
-                        'actions' => ['logout', 'index', 'check-auth', 'invoice-app'],
+                        'actions' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -110,6 +112,12 @@ class SiteController extends Controller
     {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
+        }
+        
+        // Check if signup is allowed
+        if (!AdminSettings::isSignupAllowed()) {
+            Yii::$app->session->setFlash('error', 'New user registration is currently disabled.');
+            return $this->redirect(['site/login']);
         }
 
         $model = new SignupForm();
@@ -336,5 +344,24 @@ class SiteController extends Controller
             Yii::$app->session->setFlash('error', 'Google authentication failed. Please try again.');
             return $this->redirect(['site/login']);
         }
+    }
+
+    /**
+     * Change password action.
+     *
+     * @return Response|string
+     */
+    public function actionChangePassword()
+    {
+        $model = new ChangePasswordForm(Yii::$app->user->identity);
+        
+        if ($model->load(Yii::$app->request->post()) && $model->changePassword()) {
+            Yii::$app->session->setFlash('success', 'Password changed successfully.');
+            return $this->redirect(['site/index']);
+        }
+        
+        return $this->render('change-password', [
+            'model' => $model,
+        ]);
     }
 }

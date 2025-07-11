@@ -229,16 +229,48 @@ AppAsset::register($this);
 		border: 1px solid rgba(229, 231, 235, 0.8) !important;
 		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 		backdrop-filter: blur(10px) !important;
+		position: absolute !important;
+		top: 100% !important;
+		left: 0 !important;
+		z-index: 1000 !important;
+		display: none !important;
+		min-width: 200px !important;
+		padding: 0.5rem 0 !important;
+		margin: 0.125rem 0 0 !important;
+		border-radius: 0.5rem !important;
+		opacity: 0 !important;
+		transform: translateY(-10px) !important;
+		transition: all 0.2s ease !important;
+	}
+
+	body:not(.dark-mode) .main-navbar .dropdown-menu.show {
+		display: block !important;
+		opacity: 1 !important;
+		transform: translateY(0) !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .dropdown-item {
 		color: #374151 !important;
+		display: block !important;
+		width: 100% !important;
+		padding: 0.5rem 1rem !important;
+		clear: both !important;
+		font-weight: 400 !important;
+		text-align: inherit !important;
+		white-space: nowrap !important;
+		background: transparent !important;
+		border: 0 !important;
+		text-decoration: none !important;
+		font-size: 0.875rem !important;
+		line-height: 1.5 !important;
+		transition: all 0.15s ease !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .dropdown-item:hover,
 	body:not(.dark-mode) .main-navbar .dropdown-item:focus {
 		background: rgba(249, 250, 251, 0.8) !important;
 		color: #4f46e5 !important;
+		text-decoration: none !important;
 	}
 
 	/* Top Bar Dropdown Styles */
@@ -323,6 +355,56 @@ AppAsset::register($this);
 
 	body.dark-mode .top-bar .dropdown-divider {
 		border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+	}
+
+	/* Dark mode main navbar dropdown */
+	body.dark-mode .main-navbar .dropdown-menu {
+		background: rgba(31, 41, 55, 0.95) !important;
+		border: 1px solid rgba(75, 85, 99, 0.8) !important;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+		backdrop-filter: blur(10px) !important;
+		position: absolute !important;
+		top: 100% !important;
+		left: 0 !important;
+		z-index: 1000 !important;
+		display: none !important;
+		min-width: 200px !important;
+		padding: 0.5rem 0 !important;
+		margin: 0.125rem 0 0 !important;
+		border-radius: 0.5rem !important;
+		opacity: 0 !important;
+		transform: translateY(-10px) !important;
+		transition: all 0.2s ease !important;
+	}
+
+	body.dark-mode .main-navbar .dropdown-menu.show {
+		display: block !important;
+		opacity: 1 !important;
+		transform: translateY(0) !important;
+	}
+
+	body.dark-mode .main-navbar .dropdown-item {
+		color: #d1d5db !important;
+		display: block !important;
+		width: 100% !important;
+		padding: 0.5rem 1rem !important;
+		clear: both !important;
+		font-weight: 400 !important;
+		text-align: inherit !important;
+		white-space: nowrap !important;
+		background: transparent !important;
+		border: 0 !important;
+		text-decoration: none !important;
+		font-size: 0.875rem !important;
+		line-height: 1.5 !important;
+		transition: all 0.15s ease !important;
+	}
+
+	body.dark-mode .main-navbar .dropdown-item:hover,
+	body.dark-mode .main-navbar .dropdown-item:focus {
+		background: rgba(99, 102, 241, 0.2) !important;
+		color: #a5b4fc !important;
+		text-decoration: none !important;
 	}
 	</style>
 
@@ -411,6 +493,16 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 									class="fas fa-user-circle mr-1"></i><?= Yii::$app->user->identity->getDisplayName() ?>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
+								<?php if (Yii::$app->user->identity->isDemo()): ?>
+								<li><?= Html::a('<i class="fas fa-user-check mr-2"></i>Demo Dashboard', ['/demo/index'], ['class' => 'dropdown-item']) ?></li>
+								<li><?= Html::a('<i class="fas fa-refresh mr-2"></i>Reset Demo Data', ['/demo/reset-demo-data'], ['class' => 'dropdown-item text-danger', 'data' => ['confirm' => 'Are you sure you want to reset all demo data?', 'method' => 'post']]) ?></li>
+								<?php else: ?>
+								<li><?= Html::a('<i class="fas fa-key mr-2"></i>Change Password', ['/site/change-password'], ['class' => 'dropdown-item']) ?></li>
+								<?php endif; ?>
+								<?php if (Yii::$app->user->identity->isAdmin()): ?>
+								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>Admin Panel', ['/admin/index'], ['class' => 'dropdown-item']) ?></li>
+								<?php endif; ?>
+								<li><hr class="dropdown-divider"></li>
 								<li>
 									<?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
 									<?= Html::submitButton('<i class="fas fa-sign-out-alt mr-2"></i>Logout', ['class' => 'dropdown-item logout-btn']) ?>
@@ -432,7 +524,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 					<?php
 					// Main navigation items
 					$mainNavItems = [
-						['label' => 'Dashboard', 'url' => ['/site/index']],
+						['label' => 'Dashboard', 'url' => Yii::$app->user->identity->isDemo() ? ['/demo/index'] : ['/site/index']],
 						['label' => 'Invoices', 'url' => ['/invoice/index']],
 						['label' => 'Estimates', 'url' => ['/estimate/index']],
 						['label' => 'Customers', 'url' => ['/customer/index']],
@@ -441,7 +533,8 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 					
 					// Render navigation items directly
 					foreach ($mainNavItems as $item) {
-						$active = (Yii::$app->controller->id === 'site' && Yii::$app->controller->action->id === 'index' && $item['label'] === 'Dashboard') ||
+						$active = (((Yii::$app->controller->id === 'site' && Yii::$app->controller->action->id === 'index') || 
+								   (Yii::$app->controller->id === 'demo' && Yii::$app->controller->action->id === 'index')) && $item['label'] === 'Dashboard') ||
 								  (Yii::$app->controller->id === 'invoice' && $item['label'] === 'Invoices') ||
 								  (Yii::$app->controller->id === 'estimate' && $item['label'] === 'Estimates') ||
 								  (Yii::$app->controller->id === 'customer' && $item['label'] === 'Customers') ||
@@ -454,8 +547,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 
 					<!-- Create Dropdown -->
 					<div class="dropdown">
-						<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
-							aria-expanded="false">
+						<a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
 							<i class="fas fa-plus mr-1"></i>Create
 						</a>
 						<div class="dropdown-menu">
@@ -524,6 +616,10 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 	$(document).ready(function() {
 		// Run debug function
 		debugDropdowns();
+		
+		// Debug main navbar dropdowns
+		console.log('Main navbar dropdown toggles found:', $('.main-navbar .dropdown-toggle').length);
+		console.log('Main navbar dropdown menus found:', $('.main-navbar .dropdown-menu').length);
 
 		// Initialize Bootstrap 4 dropdowns
 		try {
@@ -594,16 +690,27 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 
 		// Enhanced dropdown behavior for main navigation
 		$('.main-navbar .dropdown-toggle').on('click', function(e) {
+			console.log('=== Main navbar dropdown clicked ===');
 			e.preventDefault();
 			e.stopPropagation();
 
+			var $toggle = $(this);
+			var $dropdown = $toggle.closest('.dropdown');
+			var $menu = $toggle.next('.dropdown-menu');
+
+			console.log('Toggle found:', $toggle.length);
+			console.log('Dropdown found:', $dropdown.length);
+			console.log('Menu found:', $menu.length);
+
 			// Close all other dropdowns
-			$('.main-navbar .dropdown').not($(this).parent()).removeClass('show');
-			$('.main-navbar .dropdown-menu').not($(this).next()).removeClass('show');
+			$('.main-navbar .dropdown').not($dropdown).removeClass('show');
+			$('.main-navbar .dropdown-menu').not($menu).removeClass('show');
 
 			// Toggle current dropdown
-			$(this).parent().toggleClass('show');
-			$(this).next('.dropdown-menu').toggleClass('show');
+			$dropdown.toggleClass('show');
+			$menu.toggleClass('show');
+			
+			console.log('Menu has show class:', $menu.hasClass('show'));
 		});
 
 		// Close dropdown when clicking outside
