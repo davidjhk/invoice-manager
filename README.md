@@ -1,543 +1,310 @@
-# Invoice Manager 서버 설정 가이드
+# Invoice Manager - Yii2 기반 인보이스 관리 시스템
 
-이 가이드는 Yii2 기반 Invoice Manager를 신규 서버에 설정하기 위한 과정을 설명합니다.
+현대적인 Yii2 프레임워크를 기반으로 한 멀티유저 인보이스 관리 시스템입니다.
+
+## 주요 특징
+
+### 🏢 멀티유저 지원
+- **관리자 시스템**: 완전한 사용자 관리 및 시스템 설정
+- **일반 사용자**: 개인 회사 및 인보이스 관리
+- **데모 사용자**: 제한된 기능으로 시스템 체험 가능
+
+### 📊 핵심 기능
+- **인보이스 관리**: 생성, 편집, PDF 생성, 이메일 발송
+- **견적서 관리**: 견적서 생성 및 인보이스 변환
+- **고객 관리**: 고객 정보 및 연락처 관리
+- **제품 관리**: 제품/서비스 카탈로그 관리
+- **회사 설정**: 회사 정보, 로고, 이메일 설정
+
+### 💌 이메일 시스템
+- **Symfony Mailer**: 최신 이메일 전송 시스템
+- **파일 기반 전송**: 개발 환경에서 이메일 파일 저장
+- **SMTP2GO 통합**: 프로덕션 환경에서 안정적인 이메일 전송
+
+### 🎨 사용자 인터페이스
+- **반응형 디자인**: 모든 디바이스에서 완벽 호환
+- **다크모드 지원**: 라이트/다크 모드 전환 가능
+- **플로팅 네비게이션**: 스크롤 고정 네비게이션 바
+- **현대적 UI**: Bootstrap 4 기반 세련된 디자인
 
 ## 시스템 요구사항
 
-- PHP 7.4 이상 (PHP 8.1 권장)
-- MySQL 5.7 이상 또는 MariaDB 10.2 이상
-- Composer
-- Apache 또는 Nginx 웹서버
-- Git
+- **PHP**: 8.1 이상 (권장)
+- **데이터베이스**: MySQL 5.7+ 또는 MariaDB 10.2+
+- **웹서버**: Apache 2.4+ 또는 Nginx 1.18+
+- **Composer**: PHP 의존성 관리
+- **Git**: 소스 코드 관리
 
-## 1. 서버 환경 준비
+## 설치 방법
 
-### Ubuntu/Debian 시스템의 경우:
-
+### 1. 프로젝트 클론
 ```bash
-# 시스템 업데이트
-sudo apt update && sudo apt upgrade -y
-
-# PHP 및 필요한 확장 설치
-sudo apt install -y php8.1 php8.1-cli php8.1-fpm php8.1-mysql php8.1-xml php8.1-mbstring php8.1-curl php8.1-zip php8.1-gd php8.1-intl php8.1-bcmath
-
-# MySQL 설치
-sudo apt install -y mysql-server
-
-# Apache 또는 Nginx 설치
-sudo apt install -y apache2
-# 또는
-sudo apt install -y nginx
-
-# Git 설치
-sudo apt install -y git
-
-# Composer 설치
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-sudo chmod +x /usr/local/bin/composer
+git clone https://github.com/davidjhk/invoice-manager.git
+cd invoice-manager
 ```
 
-### CentOS/RHEL 시스템의 경우:
-
+### 2. 의존성 설치
 ```bash
-# EPEL 및 Remi 저장소 추가
-sudo yum install -y epel-release
-sudo yum install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
-
-# PHP 8.1 활성화 및 설치
-sudo yum module enable php:remi-8.1 -y
-sudo yum install -y php php-cli php-fpm php-mysql php-xml php-mbstring php-curl php-zip php-gd php-intl php-bcmath
-
-# MySQL 설치
-sudo yum install -y mysql-server
-
-# Apache 설치
-sudo yum install -y httpd
-
-# Git 설치
-sudo yum install -y git
-
-# Composer 설치
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-sudo chmod +x /usr/local/bin/composer
+composer install
 ```
 
-## 2. 데이터베이스 설정
-
+### 3. 데이터베이스 설정
 ```bash
-# MySQL 서비스 시작 및 활성화
-sudo systemctl start mysql
-sudo systemctl enable mysql
-
-# MySQL 보안 설정
-sudo mysql_secure_installation
-
-# MySQL 접속
+# 데이터베이스 생성
 mysql -u root -p
 ```
 
-MySQL 콘솔에서 다음 명령 실행:
-
 ```sql
--- 데이터베이스 생성
 CREATE DATABASE invoice_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- 사용자 생성 및 권한 부여
-CREATE USER 'invoice_user'@'localhost' IDENTIFIED BY 'strong_password_here';
+CREATE USER 'invoice_user'@'localhost' IDENTIFIED BY 'your_password';
 GRANT ALL PRIVILEGES ON invoice_manager.* TO 'invoice_user'@'localhost';
 FLUSH PRIVILEGES;
-
--- 종료
-EXIT;
 ```
 
-**참고:** 현재 시스템에서는 `bitnami_wordpress` 데이터베이스와 `bn_wordpress` 사용자를 사용하고 있습니다.
-
-## 3. Yii2 프로젝트 설정
-
-**기존 프로젝트 사용:** 이미 완성된 Yii2 Invoice Manager 프로젝트를 사용합니다.
-
-```bash
-# 프로젝트 디렉토리로 이동 (예: /opt/bitnami/apps)
-cd /opt/bitnami/apps
-
-# Git에서 프로젝트 클론
-git clone https://github.com/davidjhk/invoice-manager invoice-manager
-
-# 프로젝트 디렉토리로 이동
-cd invoice-manager
-
-# Composer 의존성 설치
-composer install
-
-# 웹서버 사용자에게 권한 부여
-sudo chown -R daemon:daemon /opt/bitnami/apps/invoice-manager
-sudo chmod -R 755 /opt/bitnami/apps/invoice-manager
-```
-
-## 4. Yii2 설정
-
-### 로컬 설정 파일 생성:
-
-프로젝트에는 로컬 환경별 설정을 위한 예제 파일들이 포함되어 있습니다. 다음 파일들을 복사하여 로컬 설정을 생성하세요:
-
-```bash
-# 데이터베이스 설정 파일 복사
-cp config/db-local.php.example config/db-local.php
-
-# 사용자 파라미터 설정 파일 복사
-cp config/params-local.php.example config/params-local.php
-```
-
-### 데이터베이스 연결 설정:
-
-```bash
-# 데이터베이스 설정 파일 편집
-nano config/db-local.php
-```
-
-다음 내용으로 수정:
+### 4. 설정 파일 수정
+`config/db.php` 파일에서 데이터베이스 연결 정보 수정:
 
 ```php
-<?php
-
 return [
     'class' => 'yii\db\Connection',
     'dsn' => 'mysql:host=localhost;dbname=invoice_manager',
     'username' => 'invoice_user',
-    'password' => 'strong_password_here',
+    'password' => 'your_password',
     'charset' => 'utf8mb4',
 ];
 ```
 
-### 사용자 파라미터 설정:
-
+### 5. 데이터베이스 마이그레이션
 ```bash
-# 사용자 파라미터 설정 파일 편집
-nano config/params-local.php
+./yii migrate
 ```
 
-다음 내용으로 수정:
+### 6. 웹서버 설정
+DocumentRoot를 `web/` 디렉토리로 설정하고 URL 리라이팅 활성화
 
-```php
-<?php
-
-return [
-    'users' => [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin123',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-    ],
-];
-```
-
-**참고:** 이메일 설정(`senderEmail`, `senderName`, `bccEmail`)은 더 이상 params-local.php에서 관리하지 않습니다. 이제 Company 데이터베이스 테이블에서 관리되며, 웹 인터페이스의 회사 설정 페이지(`/company/settings`)에서 설정할 수 있습니다.
-
-### 쿠키 검증 키 설정:
-
+### 7. 파일 권한 설정
 ```bash
-# 설정 파일 편집
-nano config/web.php
+# 웹서버 사용자 권한 설정
+sudo chown -R daemon:daemon /path/to/invoice-manager
+sudo chmod -R 755 /path/to/invoice-manager
+sudo chmod -R 777 /path/to/invoice-manager/runtime
+sudo chmod -R 777 /path/to/invoice-manager/web/assets
+sudo chmod -R 777 /path/to/invoice-manager/web/uploads
+
+# Git 업데이트를 위한 권한 설정
+sudo chgrp -R daemon /path/to/invoice-manager/.git
+sudo chmod -R g+w /path/to/invoice-manager/.git
+
+# 현재 사용자를 daemon 그룹에 추가
+sudo usermod -a -G daemon $(whoami)
 ```
 
-`cookieValidationKey`를 랜덤 문자열로 설정:
+## 사용자 계정
 
-```php
-'cookieValidationKey' => 'your-secret-key-here-32-characters-long',
-```
+### 기본 계정
+시스템에는 다음 기본 계정들이 제공됩니다:
 
-### SMTP2GO API 설정:
+#### 관리자 계정
+- **사용자명**: `admin`
+- **비밀번호**: `admin123`
+- **권한**: 전체 시스템 관리, 사용자 관리, 시스템 설정
 
-이 애플리케이션은 이메일 발송을 위해 SMTP2GO API를 사용합니다. 인보이스 및 견적서 이메일 발송을 위해 SMTP2GO API 키가 필요합니다.
+#### 데모 계정
+- **사용자명**: `demo`
+- **비밀번호**: `admin123`
+- **권한**: 제한된 기능, 데모 데이터 관리
 
-#### SMTP2GO API 키 생성 방법:
+### 계정 유형
 
-1. **SMTP2GO 계정 생성:**
+#### 🔧 관리자 (Admin)
+- 전체 시스템 관리
+- 사용자 계정 관리
+- 사용자 비밀번호 재설정
+- 회원가입 기능 활성화/비활성화
+- 시스템 설정 관리
 
-   - [SMTP2GO 웹사이트](https://www.smtp2go.com/)에 접속
-   - 무료 계정 생성 (월 1,000통 무료)
+#### 👤 일반 사용자 (User)
+- 개인 회사 관리
+- 인보이스 및 견적서 관리
+- 고객 및 제품 관리
+- 비밀번호 변경
 
-2. **API 키 생성:**
+#### 🎭 데모 사용자 (Demo)
+- 시스템 체험 및 테스트
+- 제한된 기능 사용
+- 데모 데이터 초기화 가능
+- 비밀번호 변경 불가
 
-   ```
-   1. SMTP2GO 대시보드 로그인
-   2. 좌측 메뉴에서 "Sending" → "API Keys" 선택
-   3. "Add API Key" 버튼 클릭
-   4. API 키 설명 입력 (예: "Invoice Manager")
-   5. "Permissions" 탭을 눌러  권한 설정: 전체 선택
-   6. "Add API Key" 버튼 클릭
-   7. 생성된 API 키 복사 (한 번만 표시됨)
-   ```
+## 핵심 기능 상세
 
-3. **도메인 인증 (권장):**
+### 📋 인보이스 관리
+- **생성 및 편집**: 직관적인 인터페이스로 인보이스 작성
+- **PDF 생성**: 전문적인 PDF 인보이스 생성
+- **이메일 발송**: 고객에게 직접 이메일 전송
+- **상태 관리**: 초안, 발송, 결제 완료 등 상태 추적
+- **번호 자동 생성**: 커스터마이즈 가능한 인보이스 번호
 
-   ```
-   1. "Sending" → "Verified Senders" 선택
-   2. "Add Sender Domain" 버튼 클릭
-   3. 사용할 도메인 입력 (예: yourdomain.com)
-   4. DNS 설정에 제공된 SPF, DKIM 레코드 추가
-   5. 도메인 인증 완료 후 해당 도메인 이메일 사용 가능
-   ```
+### 📄 견적서 관리
+- **견적서 생성**: 고객용 견적서 작성
+- **인보이스 변환**: 승인된 견적서를 인보이스로 변환
+- **유효기간 관리**: 견적서 유효기간 설정
+- **PDF 생성**: 견적서 PDF 다운로드
 
-4. **API 키 및 이메일 설정:**
-   - 애플리케이션 설치 후 웹 인터페이스에서 회사 설정(`/company/settings`) 페이지로 이동
-   - "Email Settings" 섹션에서 다음 정보 입력:
-     - **SMTP2GO API Key**: 생성된 API 키 입력
-     - **Sender Email**: 이메일 발송 시 "보낸 사람" 주소
-     - **Sender Name**: 이메일 발송 시 "보낸 사람" 이름 (선택사항)
-     - **BCC Email**: 모든 발송 이메일의 숨은 참조 주소 (선택사항)
-   - 설정 저장
+### 👥 고객 관리
+- **고객 정보**: 연락처, 주소, 결제 조건 관리
+- **고객 히스토리**: 과거 인보이스 및 견적서 기록
+- **빠른 검색**: 고객 이름, 이메일로 빠른 검색
 
-**참고:**
+### 📦 제품 관리
+- **제품 카탈로그**: 제품/서비스 목록 관리
+- **가격 설정**: 제품별 가격 및 설명 설정
+- **인보이스 연동**: 제품 선택으로 빠른 인보이스 작성
 
-- 모든 이메일 설정은 Company 데이터베이스에서 관리되므로 웹 인터페이스를 통해 설정해야 합니다.
-- 도메인 인증 없이도 사용 가능하지만, 이메일 전송률과 신뢰도 향상을 위해 도메인 인증을 권장합니다.
-- Sender Name이 설정되지 않은 경우 회사명이 사용됩니다.
-- BCC Email이 설정된 경우 모든 인보이스 및 견적서 이메일이 해당 주소로 복사됩니다.
+### 🏢 회사 설정
+- **회사 정보**: 회사명, 주소, 연락처 관리
+- **로고 업로드**: 회사 로고 업로드 및 관리
+- **이메일 설정**: 발송자 정보 및 이메일 설정
+- **인보이스 설정**: 번호 형식, 결제 조건, 세율 설정
 
-## 5. 데이터베이스 마이그레이션 실행
+## 관리자 기능
 
-**새로운 통합 마이그레이션 파일 사용:**
+### 👑 사용자 관리
+- **사용자 목록**: 모든 사용자 조회 및 관리
+- **사용자 생성**: 새 사용자 계정 생성
+- **사용자 편집**: 사용자 정보 수정
+- **비밀번호 재설정**: 사용자 비밀번호 관리
+- **계정 활성화/비활성화**: 사용자 계정 상태 관리
 
+### ⚙️ 시스템 설정
+- **회원가입 제어**: 신규 회원가입 허용/차단
+- **시스템 파라미터**: 전체 시스템 설정 관리
+
+## 기술 스택
+
+### 🚀 백엔드
+- **Yii2 Framework**: 최신 PHP MVC 프레임워크
+- **MySQL**: 안정적인 데이터베이스 시스템
+- **Symfony Mailer**: 현대적인 이메일 전송 시스템
+- **TCPDF**: PDF 생성 라이브러리
+
+### 🎨 프론트엔드
+- **Bootstrap 4**: 반응형 CSS 프레임워크
+- **jQuery**: JavaScript 라이브러리
+- **Font Awesome**: 아이콘 라이브러리
+- **Custom CSS**: 맞춤형 스타일링
+
+## 데이터베이스 구조
+
+### 테이블 목록
+- `jdosa_users` - 사용자 계정 정보
+- `jdosa_companies` - 회사 정보 및 설정
+- `jdosa_customers` - 고객 정보
+- `jdosa_products` - 제품/서비스 정보
+- `jdosa_invoices` - 인보이스 데이터
+- `jdosa_invoice_items` - 인보이스 항목
+- `jdosa_estimates` - 견적서 데이터
+- `jdosa_estimate_items` - 견적서 항목
+- `jdosa_admin_settings` - 관리자 시스템 설정
+
+## 보안 기능
+
+### 🔒 인증 및 권한
+- **Yii2 인증**: 프레임워크 내장 인증 시스템
+- **역할 기반 접근**: 관리자/사용자/데모 역할 분리
+- **세션 관리**: 안전한 세션 관리
+- **CSRF 보호**: 크로스 사이트 요청 위조 방지
+
+### 🛡️ 데이터 보안
+- **데이터 검증**: 모든 입력 데이터 유효성 검사
+- **SQL 인젝션 방지**: ORM 기반 안전한 데이터베이스 쿼리
+- **파일 업로드 보안**: 안전한 파일 업로드 처리
+
+## 개발 환경
+
+### 디버깅
+- **Yii2 Debug Bar**: 개발 환경에서 상세 디버깅 정보
+- **로그 시스템**: 체계적인 로그 관리
+- **오류 추적**: 상세한 오류 정보 제공
+
+### 개발 도구
+- **Gii**: 코드 생성 도구 (개발 환경)
+- **Migration**: 데이터베이스 스키마 관리
+- **Asset Management**: 정적 자원 관리
+
+## 시스템 업데이트
+
+### 🔄 업데이트 방법
+
+#### 자동 업데이트 스크립트 (권장)
 ```bash
-# 마이그레이션 실행 (모든 테이블 생성)
+# 프로젝트 디렉토리에서 실행
+./update.sh
+```
+
+#### 수동 업데이트
+```bash
+# Git 권한 임시 변경
+sudo chown -R $(whoami):$(whoami) .git/
+
+# 최신 코드 가져오기
+git pull
+
+# 의존성 업데이트
+composer install --no-dev --optimize-autoloader
+
+# 데이터베이스 마이그레이션
 ./yii migrate
 
-# 마이그레이션 실행 확인
-./yii migrate/history
+# 권한 복원
+sudo chown -R daemon:daemon .
+sudo chmod -R 755 .
+sudo chmod -R 777 runtime/ web/assets/ web/uploads/
 ```
 
-**포함된 테이블:**
+### ⚠️ 권한 문제 해결
+`git pull` 실행 시 "Permission denied" 오류가 발생하는 경우:
 
-- `jdosa_companies` - 회사 정보 및 설정
-- `jdosa_customers` - 고객 정보 및 연락처
-- `jdosa_products` - 제품/서비스 정보
-- `jdosa_invoices` - 인보이스 정보 (배송, 할인, 결제 조건 등)
-- `jdosa_invoice_items` - 인보이스 항목
-- `jdosa_estimates` - 견적서 정보
-- `jdosa_estimate_items` - 견적서 항목
-- `jdosa_payments` - 결제 정보
-
-## 6. 웹서버 설정
-
-### Apache 설정:
-
+#### 방법 1: 그룹 권한 설정 (권장)
 ```bash
-# 가상 호스트 설정 파일 생성
-sudo nano /etc/apache2/sites-available/invoice-manager.conf
+# 현재 사용자를 daemon 그룹에 추가
+sudo usermod -a -G daemon $(whoami)
+
+# Git 디렉토리 그룹 권한 설정
+sudo chgrp -R daemon .git/
+sudo chmod -R g+w .git/
+
+# 안전한 디렉토리로 등록
+git config --global --add safe.directory $(pwd)
+
+# 그룹 변경사항 적용 (로그아웃 후 재로그인 또는)
+newgrp daemon
 ```
 
-다음 내용 추가:
-
-```apache
-<VirtualHost *:80>
-    ServerName invoice-manager.yourdomain.com
-    DocumentRoot /opt/bitnami/apps/jdosa/invoice-manager/web
-
-    <Directory /opt/bitnami/apps/jdosa/invoice-manager/web>
-        RewriteEngine on
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule . index.php
-
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/invoice-manager_error.log
-    CustomLog ${APACHE_LOG_DIR}/invoice-manager_access.log combined
-</VirtualHost>
-```
-
+#### 방법 2: 임시 권한 변경 (즉시 사용)
 ```bash
-# 사이트 활성화
-sudo a2ensite invoice-manager.conf
-sudo a2enmod rewrite
-sudo systemctl reload apache2
+# Git 권한 임시 변경
+sudo chown -R $(whoami):$(whoami) .git/
+
+# Git pull 실행
+git pull
+
+# 권한 복원
+sudo chown -R daemon:daemon .
 ```
 
-### Nginx 설정:
+## 지원 및 문의
 
-```bash
-# 가상 호스트 설정 파일 생성
-sudo nano /etc/nginx/sites-available/invoice-manager
-```
+### 🐛 버그 리포트
+GitHub Issues를 통해 버그 리포트나 기능 요청을 제출해주세요.
 
-다음 내용 추가:
+### 📖 문서
+- [Yii2 공식 문서](https://www.yiiframework.com/doc/guide/2.0/en)
+- [Bootstrap 4 문서](https://getbootstrap.com/docs/4.6/getting-started/introduction/)
 
-```nginx
-server {
-    listen 80;
-    server_name invoice-manager.yourdomain.com;
-    root /var/www/html/invoice-manager/web;
-    index index.php index.html;
+## 라이선스
 
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-    }
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
 
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
+---
 
-    location ~ /\.(ht|svn|git) {
-        deny all;
-    }
-}
-```
-
-```bash
-# 사이트 활성화
-sudo ln -s /etc/nginx/sites-available/invoice-manager /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-## 7. PHP-FPM 설정 (Nginx 사용시)
-
-```bash
-# PHP-FPM 시작 및 활성화
-sudo systemctl start php8.1-fpm
-sudo systemctl enable php8.1-fpm
-
-# PHP 설정 최적화
-sudo nano /etc/php/8.1/fpm/pool.d/www.conf
-```
-
-다음 설정들을 확인/수정:
-
-```ini
-user = daemon
-group = daemon
-listen = /var/run/php/php8.1-fpm.sock
-listen.owner = daemon
-listen.group = daemon
-```
-
-## 8. 보안 설정
-
-```bash
-# 파일 권한 재설정
-sudo chown -R daemon:daemon /opt/bitnami/apps/invoice-manager
-sudo find /opt/bitnami/apps/jdosa/invoice-manager -type f -exec chmod 644 {} \;
-sudo find /opt/bitnami/apps/jdosa/invoice-manager -type d -exec chmod 755 {} \;
-sudo chmod -R 777 /opt/bitnami/apps/jdosa/invoice-manager/runtime
-sudo chmod -R 777 /opt/bitnami/apps/jdosa/invoice-manager/web/assets
-
-# 방화벽 설정 (필요한 경우)
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 22/tcp
-sudo ufw enable
-```
-
-## 9. SSL 인증서 설정 (Let's Encrypt)
-
-```bash
-# Certbot 설치
-sudo apt install certbot python3-certbot-apache  # Apache용
-# 또는
-sudo apt install certbot python3-certbot-nginx   # Nginx용
-
-# SSL 인증서 발급
-sudo certbot --apache -d invoice-manager.yourdomain.com  # Apache용
-# 또는
-sudo certbot --nginx -d invoice-manager.yourdomain.com   # Nginx용
-
-# 자동 갱신 설정
-sudo crontab -e
-```
-
-크론탭에 다음 라인 추가:
-
-```cron
-0 12 * * * /usr/bin/certbot renew --quiet
-```
-
-## 10. 추가 Composer 패키지 설치
-
-```bash
-# 프로젝트 디렉토리에서
-cd /opt/bitnami/apps/invoice-manager
-
-# PDF 생성을 위한 패키지 (이미 설치됨)
-composer require tecnickcom/tcpdf
-
-# 이메일 발송을 위한 패키지 (이미 설치됨)
-composer require swiftmailer/swiftmailer
-
-# 날짜 처리를 위한 패키지 (이미 설치됨)
-composer require nesbot/carbon
-```
-
-**참고:** 현재 프로젝트에는 이미 필요한 패키지들이 설치되어 있습니다.
-
-## 11. 서비스 시작 및 상태 확인
-
-```bash
-# 모든 서비스 시작
-sudo systemctl start mysql
-sudo systemctl start apache2  # 또는 nginx
-sudo systemctl start php8.1-fpm  # Nginx 사용시
-
-# 서비스 자동 시작 설정
-sudo systemctl enable mysql
-sudo systemctl enable apache2  # 또는 nginx
-sudo systemctl enable php8.1-fpm  # Nginx 사용시
-
-# 서비스 상태 확인
-sudo systemctl status mysql
-sudo systemctl status apache2  # 또는 nginx
-sudo systemctl status php8.1-fpm  # Nginx 사용시
-```
-
-## 12. 테스트 및 확인
-
-```bash
-# 브라우저에서 접속 테스트
-curl -I http://invoice-manager.yourdomain.com
-
-# 데이터베이스 연결 테스트
-./yii migrate/history
-
-# 로그 확인
-tail -f runtime/logs/app.log
-```
-
-## 문제 해결
-
-### 일반적인 문제들:
-
-1. **권한 문제**: `sudo chmod -R 777 runtime web/assets`
-2. **데이터베이스 연결 오류**: `config/db-local.php` 설정 확인
-3. **웹서버 403 오류**: 가상 호스트 설정 및 DocumentRoot 확인
-4. **PHP 오류**: `/var/log/apache2/error.log` 또는 `/var/log/nginx/error.log` 확인
-
-### 로그 파일 위치:
-
-- Apache: `/var/log/apache2/`
-- Nginx: `/var/log/nginx/`
-- PHP-FPM: `/var/log/php8.1-fpm.log`
-- MySQL: `/var/log/mysql/`
-- Yii2 App: `runtime/logs/app.log`
-
-## 애플리케이션 특징
-
-### 주요 기능:
-
-1. **회사 관리** - 회사 정보, 로고, 이메일 설정
-2. **고객 관리** - 고객 정보, 연락처, 결제 조건
-3. **제품 관리** - 제품/서비스 정보, 가격 설정
-4. **인보이스 관리** - 인보이스 생성, 편집, 발송
-5. **견적서 관리** - 견적서 생성, 인보이스 변환
-6. **결제 관리** - 결제 기록 관리
-7. **PDF 생성** - 인보이스/견적서 PDF 생성
-8. **이메일 발송** - SMTP2GO API 및 SwiftMailer 지원
-
-### 접근 URL:
-
-- 메인 대시보드: `/`
-- 인보이스 관리: `/invoice`
-- 견적서 관리: `/estimate`
-- 로그인: `/site/login`
-- 회사 설정: `/company/settings`
-- 고객 관리: `/customer`
-- 제품 관리: `/product`
-
-### 기본 로그인:
-
-- 사용자명: `admin` / 비밀번호: `admin123`
-- 비밀번호 변경은 `config/params-local.php` 파일의 `users` 섹션에서 변경할 수 있습니다.
-
-### 비밀번호 변경 방법:
-
-1. `config/params-local.php` 파일을 편집합니다:
-
-   ```bash
-   nano config/params-local.php
-   ```
-
-2. `users` 섹션에서 원하는 사용자의 `password` 값을 변경합니다:
-
-   ```php
-   'users' => [
-       '100' => [
-           'id' => '100',
-           'username' => 'admin',
-           'password' => 'your_new_password_here',  // 이 부분을 변경
-           'authKey' => 'test100key',
-           'accessToken' => '100-token',
-       ],
-   ],
-   ```
-
-3. 추가 사용자를 생성하려면 새로운 배열 요소를 추가합니다:
-   ```php
-   'users' => [
-       '100' => [
-           'id' => '100',
-           'username' => 'admin',
-           'password' => 'admin123',
-           'authKey' => 'test100key',
-           'accessToken' => '100-token',
-       ],
-       '101' => [
-           'id' => '101',
-           'username' => 'user2',
-           'password' => 'user2_password',
-           'authKey' => 'test101key',
-           'accessToken' => '101-token',
-       ],
-   ],
-   ```
-
-이제 Yii2 기반 Invoice Manager가 완전히 설정되었습니다.
+**Invoice Manager** - 효율적이고 현대적인 인보이스 관리 솔루션
