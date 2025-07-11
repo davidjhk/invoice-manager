@@ -363,6 +363,9 @@
 		font-weight: 500 !important;
 		transition: all 0.2s ease !important;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+		padding: 0.5rem 1rem !important;
+		font-size: 0.875rem !important;
+		line-height: 1.2 !important;
 	}
 
 	.btn:hover {
@@ -375,13 +378,39 @@
 		border: none !important;
 		border-radius: var(--radius-md) !important;
 		font-weight: 500 !important;
-		padding: 0.75rem 1.5rem !important;
+		padding: 0.5rem 1rem !important;
+		font-size: 0.875rem !important;
 		transition: all 0.2s ease !important;
 	}
 
 	.btn-primary:hover {
 		transform: translateY(-1px) !important;
 		box-shadow: var(--shadow-md) !important;
+	}
+
+	/* Button group consistency */
+	.btn-group .btn {
+		margin-right: 0.25rem !important;
+	}
+
+	.btn-group .btn:last-child {
+		margin-right: 0 !important;
+	}
+
+	/* Action button groups */
+	.action-buttons {
+		display: flex !important;
+		gap: 0.5rem !important;
+		align-items: center !important;
+		justify-content: flex-end !important;
+		flex-wrap: wrap !important;
+	}
+
+	.action-buttons .btn {
+		padding: 0.5rem 1rem !important;
+		font-size: 0.875rem !important;
+		min-width: auto !important;
+		white-space: nowrap !important;
 	}
 
 	/* Mobile Responsive Design */
@@ -433,6 +462,26 @@
 
 		.dropdown-menu {
 			min-width: 180px !important;
+		}
+
+		/* Mobile button adjustments */
+		.btn {
+			padding: 0.4rem 0.8rem !important;
+			font-size: 0.8125rem !important;
+		}
+
+		.btn-sm {
+			padding: 0.3rem 0.6rem !important;
+			font-size: 0.75rem !important;
+		}
+
+		.action-buttons {
+			gap: 0.375rem !important;
+		}
+
+		.action-buttons .btn {
+			padding: 0.4rem 0.8rem !important;
+			font-size: 0.8125rem !important;
 		}
 	}
 
@@ -534,11 +583,30 @@
 		font-weight: 500 !important;
 		transition: all 0.2s ease !important;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+		padding: 0.5rem 1rem !important;
+		font-size: 0.875rem !important;
+		line-height: 1.2 !important;
 	}
 
 	body.dark-mode .btn:hover {
 		transform: translateY(-1px) !important;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+	}
+
+	/* Dark mode action buttons */
+	body.dark-mode .action-buttons {
+		display: flex !important;
+		gap: 0.5rem !important;
+		align-items: center !important;
+		justify-content: flex-end !important;
+		flex-wrap: wrap !important;
+	}
+
+	body.dark-mode .action-buttons .btn {
+		padding: 0.5rem 1rem !important;
+		font-size: 0.875rem !important;
+		min-width: auto !important;
+		white-space: nowrap !important;
 	}
 
 	body.dark-mode .btn-primary {
@@ -712,9 +780,10 @@
 
 	/* Dark mode small buttons */
 	body.dark-mode .btn-sm {
-		font-size: 0.875rem !important;
+		font-size: 0.8125rem !important;
 		padding: 0.375rem 0.75rem !important;
 		border-radius: var(--radius-sm) !important;
+		line-height: 1.2 !important;
 	}
 
 	/* Dark mode button groups */
@@ -739,6 +808,21 @@
 
 	body.dark-mode .btn-group .btn:not(:first-child):not(:last-child) {
 		border-radius: 0 !important;
+	}
+
+	/* Dark mode table action buttons */
+	body.dark-mode .table .btn-group .btn {
+		padding: 0.25rem 0.5rem !important;
+		font-size: 0.75rem !important;
+		line-height: 1.2 !important;
+		min-width: auto !important;
+	}
+
+	body.dark-mode .btn-group-sm>.btn {
+		padding: 0.25rem 0.5rem !important;
+		font-size: 0.75rem !important;
+		line-height: 1.2 !important;
+		border-radius: var(--radius-sm) !important;
 	}
 
 	/* Dark mode button focus states */
@@ -1063,17 +1147,25 @@
 		}
 	}
 
+	/* Small buttons consistent sizing */
+	.btn-sm {
+		padding: 0.375rem 0.75rem !important;
+		font-size: 0.8125rem !important;
+		line-height: 1.2 !important;
+		border-radius: var(--radius-sm) !important;
+	}
+
 	/* Filter buttons consistent sizing */
 	.btn-group .btn-sm,
 	.btn-group .btn.btn-sm {
-		min-width: 80px !important;
-		padding: 0.25rem 0.75rem !important;
-		font-size: 0.875rem !important;
-		line-height: 1.5 !important;
+		min-width: 70px !important;
+		padding: 0.375rem 0.75rem !important;
+		font-size: 0.8125rem !important;
+		line-height: 1.2 !important;
 		text-align: center !important;
 		white-space: nowrap !important;
 		border-width: 1px !important;
-		font-weight: 400 !important;
+		font-weight: 500 !important;
 	}
 
 	/* Ensure all button variants have same sizing */
@@ -1089,23 +1181,57 @@
 	.btn-group .btn-outline-warning.btn-sm,
 	.btn-group .btn-danger.btn-sm,
 	.btn-group .btn-outline-danger.btn-sm {
-		min-width: 80px !important;
-		padding: 0.25rem 0.75rem !important;
-		font-size: 0.875rem !important;
-		line-height: 1.5 !important;
+		min-width: 70px !important;
+		padding: 0.375rem 0.75rem !important;
+		font-size: 0.8125rem !important;
+		line-height: 1.2 !important;
 		text-align: center !important;
 		white-space: nowrap !important;
 		border-width: 1px !important;
-		font-weight: 400 !important;
+		font-weight: 500 !important;
 	}
 
 	/* Action buttons consistent sizing */
 	.btn-group-sm>.btn {
-		margin-right: 2px;
+		margin-right: 0.125rem;
+		padding: 0.25rem 0.5rem !important;
+		font-size: 0.75rem !important;
+		line-height: 1.2 !important;
+		border-radius: var(--radius-sm) !important;
 	}
 
 	.btn-group-sm>.btn:last-child {
 		margin-right: 0;
+	}
+
+	/* Table action buttons */
+	.table .btn-group .btn {
+		padding: 0.25rem 0.5rem !important;
+		font-size: 0.75rem !important;
+		line-height: 1.2 !important;
+		min-width: auto !important;
+	}
+
+	/* Collapsible help sections */
+	.collapse-icon {
+		transition: transform 0.2s ease;
+	}
+
+	.collapse-icon[aria-expanded="true"] {
+		transform: rotate(180deg);
+	}
+
+	.card-header[data-toggle="collapse"] {
+		transition: background-color 0.2s ease;
+	}
+
+	.card-header[data-toggle="collapse"]:hover {
+		background-color: rgba(0, 0, 0, 0.05);
+	}
+
+	/* Dark mode collapsible sections */
+	body.dark-mode .card-header[data-toggle="collapse"]:hover {
+		background-color: rgba(255, 255, 255, 0.05);
 	}
 
 	/* Print Styles */

@@ -61,7 +61,7 @@ $this->registerJsVar('estimateConfig', [
     ]); ?>
 
 	<div class="row">
-		<div class="col-lg-8">
+		<div class="col-lg-7">
 			<div class="card card-default">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
@@ -110,7 +110,7 @@ $this->registerJsVar('estimateConfig', [
 			</div>
 		</div>
 
-		<div class="col-lg-4">
+		<div class="col-lg-5">
 			<div class="card card-default">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
@@ -118,35 +118,44 @@ $this->registerJsVar('estimateConfig', [
 					</h5>
 				</div>
 				<div class="card-body">
-					<?= $form->field($model, 'estimate_number')->textInput(['maxlength' => true]) ?>
-					<?= $form->field($model, 'terms')->dropDownList([
-                        'Net 15' => 'Net 15',
-                        'Net 30' => 'Net 30',
-                        'Net 60' => 'Net 60',
-                        'Due on receipt' => 'Due on receipt'
-                    ], ['prompt' => 'Select terms']) ?>
-					<?= $form->field($model, 'estimate_date')->input('date') ?>
-					<?= $form->field($model, 'expiry_date')->input('date') ?>
+					<div class="row">
+						<div class="col-md-6">
+							<?= $form->field($model, 'estimate_number')->textInput(['maxlength' => true]) ?>
+							<?= $form->field($model, 'estimate_date')->input('date') ?>
+						</div>
+						<div class="col-md-6">
+							<?= $form->field($model, 'terms')->dropDownList([
+                                'Net 15' => 'Net 15',
+                                'Net 30' => 'Net 30',
+                                'Net 60' => 'Net 60',
+                                'Due on receipt' => 'Due on receipt'
+                            ], ['prompt' => 'Select terms']) ?>
+							<?= $form->field($model, 'expiry_date')->input('date') ?>
+						</div>
+					</div>
 				</div>
 			</div>
 
 			<!-- Help Information -->
 			<div class="card mt-3">
-				<div class="card-header">
-					<h6 class="card-title mb-0">
-						<i class="fas fa-question-circle mr-2"></i>Estimate Help
+				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#estimate-help-collapse" aria-expanded="false">
+					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+						<span><i class="fas fa-question-circle mr-2"></i>Estimate Help</span>
+						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h6>
 				</div>
-				<div class="card-body">
-					<div class="alert alert-info">
-						<small>
-							<strong>Estimate Number:</strong> Unique identifier for this estimate.<br><br>
-							<strong>Terms:</strong> Payment terms for when estimate becomes invoice.<br><br>
-							<strong>Estimate Date:</strong> Date when estimate is created.<br><br>
-							<strong>Expiry Date:</strong> When estimate expires automatically calculated from terms.<br><br>
-							<strong>Items:</strong> Add products/services with quantity and rate.<br><br>
-							<strong>Convert:</strong> Convert approved estimates to invoices.
-						</small>
+				<div class="collapse" id="estimate-help-collapse">
+					<div class="card-body py-2">
+						<div class="alert alert-info py-2 mb-0">
+							<small>
+								<strong>Estimate Number:</strong> Unique identifier for this estimate.<br>
+								<strong>Terms:</strong> Payment terms for when estimate becomes invoice.<br>
+								<strong>Estimate Date:</strong> Date when estimate is created.<br>
+								<strong>Expiry Date:</strong> When estimate expires automatically calculated from terms.<br>
+								<strong>Items:</strong> Add products/services with quantity and rate.<br>
+								<strong>Convert:</strong> Convert approved estimates to invoices.
+							</small>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -569,6 +578,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			currency: 'USD'
 		}).format(amount);
 	}
+
+	// Handle collapse icon rotation
+	$(document).ready(function() {
+		$('[data-toggle="collapse"]').on('click', function() {
+			const target = $(this).attr('data-target');
+			const icon = $(this).find('.collapse-icon');
+			
+			$(target).on('shown.bs.collapse', function() {
+				icon.attr('aria-expanded', 'true');
+			});
+			
+			$(target).on('hidden.bs.collapse', function() {
+				icon.attr('aria-expanded', 'false');
+			});
+		});
+	});
 });
 </script>
 <style>

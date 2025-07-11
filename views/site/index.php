@@ -47,9 +47,9 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
                 <h1 class="dashboard-title">Dashboard</h1>
                 <p class="dashboard-subtitle">Welcome back, <?= Html::encode($company->company_name) ?></p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions action-buttons">
                 <?= Html::a('<i class="fas fa-plus mr-2"></i>New Invoice', ['/invoice/create'], [
-                    'class' => 'btn btn-primary btn-lg'
+                    'class' => 'btn btn-primary'
                 ]) ?>
             </div>
         </div>

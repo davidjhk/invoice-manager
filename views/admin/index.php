@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="admin-index">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
-        <div class="btn-group">
+        <div class="action-buttons">
             <?= Html::a('<i class="fas fa-user-plus mr-2"></i>Create User', ['create-user'], ['class' => 'btn btn-success']) ?>
             <?= Html::a('<i class="fas fa-cog mr-2"></i>Settings', ['settings'], ['class' => 'btn btn-outline-primary']) ?>
             <?= Html::a('<i class="fas fa-users mr-2"></i>Manage Users', ['users'], ['class' => 'btn btn-outline-primary']) ?>

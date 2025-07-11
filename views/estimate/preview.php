@@ -16,33 +16,33 @@ $this->params['breadcrumbs'][] = 'Preview';
 
 	<div class="d-flex justify-content-between align-items-center mb-4 print-hidden">
 		<h1><?= Html::encode($this->title) ?></h1>
-		<div class="btn-group" role="group">
+		<div class="action-buttons">
 			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>Download PDF', ['download-pdf', 'id' => $model->id], [
-                'class' => 'btn btn-primary preview-btn',
+                'class' => 'btn btn-primary',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
 
 			<?= Html::a('<i class="fas fa-print mr-1"></i>Print', '#', [
-                'class' => 'btn btn-info preview-btn',
+                'class' => 'btn btn-info',
                 'onclick' => 'window.print(); return false;',
                 'encode' => false
             ]) ?>
 
 			<?php if ($model->status === \app\models\Estimate::STATUS_DRAFT): ?>
 			<?= Html::a('<i class="fas fa-envelope mr-1"></i>Send Email', ['send-email', 'id' => $model->id], [
-                    'class' => 'btn btn-success preview-btn',
+                    'class' => 'btn btn-success',
                     'encode' => false
                 ]) ?>
 			<?php endif; ?>
 
 			<?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], [
-                    'class' => 'btn btn-secondary preview-btn',
+                    'class' => 'btn btn-secondary',
                     'encode' => false
                 ]) ?>
 
 			<?= Html::a('<i class="fas fa-arrow-left mr-1"></i>Back', ['view', 'id' => $model->id], [
-                'class' => 'btn btn-outline-secondary preview-btn',
+                'class' => 'btn btn-outline-secondary',
                 'encode' => false
             ]) ?>
 		</div>
@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = 'Preview';
 <?php
 $this->registerCss("
     @media print {
-        .btn-group, .breadcrumb, .navbar, .footer {
+        .action-buttons, .breadcrumb, .navbar, .footer {
             display: none !important;
         }
         
@@ -80,18 +80,6 @@ $this->registerCss("
         background: #f8f9fa;
         padding: 20px;
         border-radius: 8px;
-    }
-    
-    .preview-btn {
-        min-width: 120px;
-        padding: 8px 16px;
-        font-size: 14px;
-        height: 38px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        white-space: nowrap;
     }
 ");
 ?>

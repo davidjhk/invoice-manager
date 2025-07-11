@@ -16,9 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
-        <div>
+        <div class="action-buttons">
             <?= Html::a('<i class="fas fa-download mr-1"></i>Export CSV', ['export'], [
-                'class' => 'btn btn-outline-info mr-2',
+                'class' => 'btn btn-outline-info',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
