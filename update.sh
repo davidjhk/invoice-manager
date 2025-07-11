@@ -94,41 +94,60 @@ if [ -n "$(git status --porcelain)" ]; then
         
         # 백업 디렉토리 생성
         BACKUP_DIR="backups/local_changes_$(date +%Y%m%d_%H%M%S)"
-        mkdir -p "$BACKUP_DIR"
-        
-        # 수정된 파일 백업
-        git diff --name-only | while read file; do
-            if [ -f "$file" ]; then
-                mkdir -p "$BACKUP_DIR/$(dirname "$file")"
-                cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
-                    echo "⚠️  백업 실패: $file (권한 문제)"
-                }
+        if ! mkdir -p "$BACKUP_DIR" 2>/dev/null; then
+            echo "⚠️  백업 디렉토리 생성 권한 문제. 권한을 수정합니다..."
+            if command -v sudo >/dev/null 2>&1; then
+                sudo mkdir -p "$BACKUP_DIR" && sudo chown -R $CURRENT_USER:$CURRENT_USER backups/
+                if [ ! -d "$BACKUP_DIR" ]; then
+                    echo "❌ 백업 디렉토리 생성 실패. 전체 권한을 수정합니다..."
+                    sudo chown -R $CURRENT_USER:$CURRENT_USER .
+                    mkdir -p "$BACKUP_DIR"
+                fi
+            else
+                echo "❌ sudo 권한이 없어 백업을 건너뜁니다."
+                echo "변경사항을 스태시로 백업합니다..."
+                git stash push -m "Auto stash before update $(date)"
+                echo "✅ Git 스태시로 백업 완료"
+                SKIP_BACKUP=true
             fi
-        done
+        fi
         
-        # 새로운 파일들 백업 (backups 디렉토리 제외)
-        git status --porcelain | grep "^??" | cut -c4- | while read file; do
-            # backups 디렉토리는 제외
-            if [[ "$file" == backups/* ]]; then
-                continue
-            fi
+        # 파일 백업 (SKIP_BACKUP이 설정되지 않은 경우에만)
+        if [ "$SKIP_BACKUP" != "true" ]; then
+            # 수정된 파일 백업
+            git diff --name-only | while read file; do
+                if [ -f "$file" ]; then
+                    mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+                    cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
+                        echo "⚠️  백업 실패: $file (권한 문제)"
+                    }
+                fi
+            done
             
-            if [ -f "$file" ]; then
-                mkdir -p "$BACKUP_DIR/$(dirname "$file")"
-                cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
-                    echo "⚠️  백업 실패: $file (권한 문제)"
-                }
-            elif [ -d "$file" ]; then
-                cp -r "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
-                    echo "⚠️  백업 실패: $file (권한 문제)"
-                }
-            fi
-        done
-        
-        # 백업 디렉토리 권한 최종 설정
-        chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR" 2>/dev/null || true
-        
-        echo "✅ 백업 완료: $BACKUP_DIR"
+            # 새로운 파일들 백업 (backups 디렉토리 제외)
+            git status --porcelain | grep "^??" | cut -c4- | while read file; do
+                # backups 디렉토리는 제외
+                if [[ "$file" == backups/* ]]; then
+                    continue
+                fi
+                
+                if [ -f "$file" ]; then
+                    mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+                    cp "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
+                        echo "⚠️  백업 실패: $file (권한 문제)"
+                    }
+                elif [ -d "$file" ]; then
+                    cp -r "$file" "$BACKUP_DIR/$file" 2>/dev/null || {
+                        echo "⚠️  백업 실패: $file (권한 문제)"
+                    }
+                fi
+            done
+            
+            # 백업 디렉토리 권한 최종 설정
+            chown -R $CURRENT_USER:$CURRENT_USER "$BACKUP_DIR" 2>/dev/null || true
+            
+            echo "✅ 파일 백업 완료: $BACKUP_DIR"
+        fi
         
         # 변경사항 스태시
         git stash push -m "Auto stash before update $(date)"
