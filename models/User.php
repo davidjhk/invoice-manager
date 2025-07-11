@@ -362,6 +362,28 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Get current company ID (from session or default)
+     *
+     * @return int|null
+     */
+    public function getCompanyId()
+    {
+        // First try to get from session
+        $companyId = Yii::$app->session->get('current_company_id');
+        if ($companyId) {
+            // Verify this company belongs to the user
+            $company = $this->getCompanies()->where(['id' => $companyId, 'is_active' => true])->one();
+            if ($company) {
+                return $companyId;
+            }
+        }
+        
+        // Fall back to default company
+        $defaultCompany = $this->getDefaultCompany();
+        return $defaultCompany ? $defaultCompany->id : null;
+    }
+
+    /**
      * Get user's display name
      *
      * @return string

@@ -90,11 +90,14 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="form-group mt-4">
-        <?= Html::submitButton($model->isNewRecord ? 'Create Category' : 'Update Category', [
-            'class' => 'btn btn-success'
+        <?= Html::submitButton(
+            ($model->isNewRecord ? '<i class="fas fa-plus mr-1"></i>Create Category' : '<i class="fas fa-save mr-1"></i>Update Category'), [
+            'class' => 'btn btn-success',
+            'encode' => false
         ]) ?>
-        <?= Html::a('Cancel', $model->isNewRecord ? ['index'] : ['view', 'id' => $model->id], [
-            'class' => 'btn btn-secondary'
+        <?= Html::a('<i class="fas fa-times mr-1"></i>Cancel', $model->isNewRecord ? ['index'] : ['view', 'id' => $model->id], [
+            'class' => 'btn btn-outline-secondary',
+            'encode' => false
         ]) ?>
     </div>
 

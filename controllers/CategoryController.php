@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\ProductCategory;
 use app\models\User;
+use app\models\Company;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -154,6 +155,46 @@ class CategoryController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Create category via AJAX
+     *
+     * @return Response
+     */
+    public function actionCreateAjax()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $user = Yii::$app->user->identity;
+        $companyId = $user instanceof User ? $user->getCompanyId() : null;
+
+        if (!$companyId) {
+            return ['success' => false, 'message' => 'Company not found.'];
+        }
+
+        $model = new ProductCategory();
+        $model->company_id = $companyId;
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return [
+                'success' => true,
+                'category' => [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'description' => $model->description,
+                    'is_active' => $model->is_active,
+                    'sort_order' => $model->sort_order,
+                ],
+                'message' => 'Category created successfully.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'errors' => $model->errors,
+            'message' => 'Failed to create category.',
+        ];
     }
 
     /**

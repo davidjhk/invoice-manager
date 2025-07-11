@@ -25,16 +25,24 @@ $productsDataProvider = new ActiveDataProvider([
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], [
+                'class' => 'btn btn-secondary',
+                'encode' => false
+            ]) ?>
+            <?= Html::a('<i class="fas fa-trash mr-1"></i>Delete', ['delete', 'id' => $model->id], [
                 'class' => 'btn btn-danger' . ($model->canDelete() ? '' : ' disabled'),
                 'title' => $model->canDelete() ? 'Delete' : 'Cannot delete - category is in use',
+                'data-toggle' => 'tooltip',
+                'encode' => false,
                 'data' => $model->canDelete() ? [
                     'confirm' => 'Are you sure you want to delete this category?',
                     'method' => 'post',
                 ] : [],
             ]) ?>
-            <?= Html::a('Back to Categories', ['index'], ['class' => 'btn btn-secondary']) ?>
+            <?= Html::a('<i class="fas fa-arrow-left mr-1"></i>Back to Categories', ['index'], [
+                'class' => 'btn btn-outline-secondary',
+                'encode' => false
+            ]) ?>
         </div>
     </div>
 
@@ -140,14 +148,18 @@ $productsDataProvider = new ActiveDataProvider([
                         'buttons' => [
                             'view' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-eye"></i>', $url, [
-                                    'class' => 'btn btn-sm btn-outline-info',
+                                    'class' => 'btn btn-sm btn-outline-primary',
                                     'title' => 'View Product',
+                                    'data-toggle' => 'tooltip',
+                                    'encode' => false
                                 ]);
                             },
                             'update' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-edit"></i>', $url, [
-                                    'class' => 'btn btn-sm btn-outline-primary',
-                                    'title' => 'Update Product',
+                                    'class' => 'btn btn-sm btn-outline-secondary',
+                                    'title' => 'Edit Product',
+                                    'data-toggle' => 'tooltip',
+                                    'encode' => false
                                 ]);
                             },
                         ],
@@ -161,3 +173,9 @@ $productsDataProvider = new ActiveDataProvider([
     <?php endif; ?>
 
 </div>
+
+<?php
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+?>

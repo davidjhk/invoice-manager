@@ -15,8 +15,14 @@ $this->params['breadcrumbs'][] = 'Update';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('View Category', ['view', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
-            <?= Html::a('Back to Categories', ['index'], ['class' => 'btn btn-secondary']) ?>
+            <?= Html::a('<i class="fas fa-eye mr-1"></i>View Category', ['view', 'id' => $model->id], [
+                'class' => 'btn btn-info',
+                'encode' => false
+            ]) ?>
+            <?= Html::a('<i class="fas fa-arrow-left mr-1"></i>Back to Categories', ['index'], [
+                'class' => 'btn btn-outline-secondary',
+                'encode' => false
+            ]) ?>
         </div>
     </div>
 

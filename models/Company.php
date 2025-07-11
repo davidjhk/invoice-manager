@@ -437,4 +437,34 @@ class Company extends ActiveRecord
             $this->addError($attribute, 'You have reached your maximum number of companies (' . $user->max_companies . '). Please upgrade your account or contact support.');
         }
     }
+
+    /**
+     * After save event - create default category for new companies
+     *
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        // Create default category for new companies
+        if ($insert) {
+            $this->createDefaultCategory();
+        }
+    }
+
+    /**
+     * Create default General category for this company
+     */
+    private function createDefaultCategory()
+    {
+        $category = new \app\models\ProductCategory();
+        $category->company_id = $this->id;
+        $category->name = 'General';
+        $category->description = null;
+        $category->is_active = true;
+        $category->sort_order = 1;
+        $category->save();
+    }
 }

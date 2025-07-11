@@ -46,7 +46,24 @@ use app\models\ProductCategory;
 
 					<div class="row">
 						<div class="col-md-6">
-							<?= $form->field($model, 'category_id')->dropDownList(ProductCategory::getCategoryOptions($company->id), ['prompt' => 'Select Category']) ?>
+							<div class="form-group">
+								<?= Html::label('Category', 'product-category_id', ['class' => 'form-label font-weight-bold']) ?>
+								<div class="input-group">
+									<?= Html::dropDownList('Product[category_id]', $model->category_id, ProductCategory::getCategoryOptions($company->id), [
+										'class' => 'form-control',
+										'prompt' => 'Select Category',
+										'id' => 'product-category_id'
+									]) ?>
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#categoryModal" title="Add New Category">
+											<i class="fas fa-plus"></i>
+										</button>
+										<a href="<?= \yii\helpers\Url::to(['/category/index']) ?>" class="btn btn-outline-info" title="Manage Categories">
+											<i class="fas fa-cog"></i>
+										</a>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div class="col-md-6">
 							<?= $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
@@ -179,7 +196,7 @@ use app\models\ProductCategory;
 							<small>
 								<strong>Name:</strong> Product or service name for identification.<br>
 								<strong>Type:</strong> Product or Service classification.<br>
-								<strong>Category:</strong> Select from your company's product categories.<br>
+								<strong>Category:</strong> Select from categories or add new ones using the + button.<br>
 								<strong>SKU:</strong> Stock Keeping Unit for inventory tracking.<br>
 								<strong>Price:</strong> Selling price charged to customers.<br>
 								<strong>Cost:</strong> Your cost for profit margin calculation.<br>
@@ -205,6 +222,52 @@ use app\models\ProductCategory;
 
 	<?php ActiveForm::end(); ?>
 
+</div>
+
+<!-- Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="categoryModalLabel">
+					<i class="fas fa-tag mr-2"></i>Add New Category
+				</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form id="categoryForm">
+					<input type="hidden" id="modal-company-id" value="<?= $company->id ?>">
+					
+					<div class="form-group">
+						<label for="modal-category-name" class="form-label font-weight-bold">Category Name</label>
+						<input type="text" class="form-control" id="modal-category-name" required maxlength="100" placeholder="Enter category name">
+					</div>
+					
+					<div class="form-group">
+						<label for="modal-category-description" class="form-label font-weight-bold">Description (Optional)</label>
+						<textarea class="form-control" id="modal-category-description" rows="2" placeholder="Optional description for this category"></textarea>
+					</div>
+					
+					<div class="form-check">
+						<input type="checkbox" class="form-check-input" id="modal-category-active" checked>
+						<label class="form-check-label" for="modal-category-active">
+							Category is active
+						</label>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+					<i class="fas fa-times mr-1"></i>Cancel
+				</button>
+				<button type="button" class="btn btn-success" id="saveCategoryBtn">
+					<i class="fas fa-plus mr-1"></i>Add Category
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <?php
@@ -238,6 +301,73 @@ $this->registerJs("
     
     // Calculate initial margin
     calculateMargin();
+    
+    // Category Modal functionality
+    $('#saveCategoryBtn').on('click', function() {
+        var name = $('#modal-category-name').val().trim();
+        var description = $('#modal-category-description').val().trim();
+        var isActive = $('#modal-category-active').is(':checked');
+        var companyId = $('#modal-company-id').val();
+        
+        if (!name) {
+            alert('Please enter a category name.');
+            return;
+        }
+        
+        // Disable button and show loading
+        var button = $(this);
+        var originalText = button.html();
+        button.html('<i class=\"fas fa-spinner fa-spin mr-1\"></i>Adding...').prop('disabled', true);
+        
+        $.ajax({
+            url: '" . \yii\helpers\Url::to(['/category/create-ajax']) . "',
+            type: 'POST',
+            data: {
+                'ProductCategory[name]': name,
+                'ProductCategory[description]': description,
+                'ProductCategory[is_active]': isActive ? 1 : 0,
+                'ProductCategory[company_id]': companyId,
+                '_csrf': $('meta[name=csrf-token]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Add new option to dropdown
+                    var option = new Option(response.category.name, response.category.id, false, true);
+                    $('#product-category_id').append(option);
+                    
+                    // Clear form
+                    $('#modal-category-name').val('');
+                    $('#modal-category-description').val('');
+                    $('#modal-category-active').prop('checked', true);
+                    
+                    // Close modal
+                    $('#categoryModal').modal('hide');
+                    
+                    // Show success message
+                    alert('Category \"' + response.category.name + '\" has been added successfully!');
+                } else {
+                    alert('Error: ' + (response.message || 'Failed to create category.'));
+                }
+            },
+            error: function() {
+                alert('Error: Failed to create category. Please try again.');
+            },
+            complete: function() {
+                // Restore button
+                button.html(originalText).prop('disabled', false);
+            }
+        });
+    });
+    
+    // Clear modal when it's closed
+    $('#categoryModal').on('hidden.bs.modal', function() {
+        $('#modal-category-name').val('');
+        $('#modal-category-description').val('');
+        $('#modal-category-active').prop('checked', true);
+    });
+    
+    // Initialize tooltips
+    $('[title]').tooltip();
     
     // Collapse functionality is handled by collapse-helper.js
 ");

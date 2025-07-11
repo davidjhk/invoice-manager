@@ -65,25 +65,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\grid\ActionColumn',
                 'headerOptions' => ['style' => 'width: 120px'],
                 'contentOptions' => ['class' => 'text-center'],
-                'template' => '{view} {update} {delete}',
+                'template' => '<div class="btn-group btn-group-sm" role="group">{view} {update} {delete}</div>',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         return Html::a('<i class="fas fa-eye"></i>', $url, [
-                            'class' => 'btn btn-sm btn-outline-info',
+                            'class' => 'btn btn-outline-primary',
                             'title' => 'View',
+                            'data-toggle' => 'tooltip',
+                            'encode' => false
                         ]);
                     },
                     'update' => function ($url, $model, $key) {
                         return Html::a('<i class="fas fa-edit"></i>', $url, [
-                            'class' => 'btn btn-sm btn-outline-primary',
-                            'title' => 'Update',
+                            'class' => 'btn btn-outline-secondary',
+                            'title' => 'Edit',
+                            'data-toggle' => 'tooltip',
+                            'encode' => false
                         ]);
                     },
                     'delete' => function ($url, $model, $key) {
                         $disabled = !$model->canDelete();
                         return Html::a('<i class="fas fa-trash"></i>', $url, [
-                            'class' => 'btn btn-sm btn-outline-danger' . ($disabled ? ' disabled' : ''),
+                            'class' => 'btn btn-outline-danger' . ($disabled ? ' disabled' : ''),
                             'title' => $disabled ? 'Cannot delete - category is in use' : 'Delete',
+                            'data-toggle' => 'tooltip',
+                            'encode' => false,
                             'data' => $disabled ? [] : [
                                 'confirm' => 'Are you sure you want to delete this category?',
                                 'method' => 'post',
@@ -106,3 +112,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <strong>Tip:</strong> Categories help organize your products and services. You can reorder categories by changing their sort order.
     Categories that are assigned to products cannot be deleted.
 </div>
+
+<?php
+$this->registerCss("
+    .btn-group-sm > .btn {
+        margin-right: 2px;
+    }
+    
+    .btn-group-sm > .btn:last-child {
+        margin-right: 0;
+    }
+");
+
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+?>
