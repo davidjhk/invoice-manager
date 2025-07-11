@@ -46,7 +46,41 @@ fi
 
 # 변경사항 확인
 echo "변경사항 확인 중..."
-git fetch origin
+if ! git fetch origin 2>/dev/null; then
+    echo "⚠️  Git 권한 문제 감지. 자동으로 권한을 수정합니다..."
+    
+    # sudo 사용 가능 여부 확인
+    if command -v sudo >/dev/null 2>&1; then
+        echo "Git 디렉토리 권한 수정 중..."
+        if sudo chown -R $CURRENT_USER:$CURRENT_USER .git/ 2>/dev/null; then
+            echo "✅ Git 디렉토리 권한 수정 완료"
+        else
+            echo "전체 프로젝트 권한 수정 중..."
+            if sudo chown -R $CURRENT_USER:$CURRENT_USER . 2>/dev/null; then
+                echo "✅ 전체 프로젝트 권한 수정 완료"
+            else
+                echo "❌ 권한 수정 실패. 다음 명령어를 직접 실행해주세요:"
+                echo "   sudo chown -R $CURRENT_USER:$CURRENT_USER ."
+                exit 1
+            fi
+        fi
+        
+        # 권한 수정 후 다시 fetch 시도
+        echo "Git fetch 재시도 중..."
+        if git fetch origin; then
+            echo "✅ Git fetch 성공!"
+        else
+            echo "❌ Git fetch 여전히 실패. Git 저장소 상태를 확인해주세요."
+            exit 1
+        fi
+    else
+        echo "❌ sudo 명령어가 없습니다. 관리자에게 다음 명령어 실행을 요청하세요:"
+        echo "   sudo chown -R $CURRENT_USER:$CURRENT_USER ."
+        exit 1
+    fi
+else
+    echo "✅ Git fetch 성공!"
+fi
 
 # 로컬 변경사항이 있는지 확인
 if [ -n "$(git status --porcelain)" ]; then
