@@ -100,8 +100,8 @@ EXIT;
 **기존 프로젝트 사용:** 이미 완성된 Yii2 Invoice Manager 프로젝트를 사용합니다.
 
 ```bash
-# 프로젝트 디렉토리로 이동 (예: /var/www/html)
-cd /var/www/html
+# 프로젝트 디렉토리로 이동 (예: /opt/bitnami/apps)
+cd /opt/bitnami/apps
 
 # Git에서 프로젝트 클론
 git clone https://github.com/davidjhk/invoice-manager invoice-manager
@@ -113,8 +113,8 @@ cd invoice-manager
 composer install
 
 # 웹서버 사용자에게 권한 부여
-sudo chown -R www-data:www-data /var/www/html/invoice-manager
-sudo chmod -R 755 /var/www/html/invoice-manager
+sudo chown -R daemon:daemon /opt/bitnami/apps/invoice-manager
+sudo chmod -R 755 /opt/bitnami/apps/invoice-manager
 ```
 
 ## 4. Yii2 설정
@@ -356,22 +356,22 @@ sudo nano /etc/php/8.1/fpm/pool.d/www.conf
 다음 설정들을 확인/수정:
 
 ```ini
-user = www-data
-group = www-data
+user = daemon
+group = daemon
 listen = /var/run/php/php8.1-fpm.sock
-listen.owner = www-data
-listen.group = www-data
+listen.owner = daemon
+listen.group = daemon
 ```
 
 ## 8. 보안 설정
 
 ```bash
 # 파일 권한 재설정
-sudo chown -R www-data:www-data /var/www/html/invoice-manager
-sudo find /home/bitnami/apps/jdosa/invoice-manager -type f -exec chmod 644 {} \;
-sudo find /home/bitnami/apps/jdosa/invoice-manager -type d -exec chmod 755 {} \;
-sudo chmod -R 777 /home/bitnami/apps/jdosa/invoice-manager/runtime
-sudo chmod -R 777 /home/bitnami/apps/jdosa/invoice-manager/web/assets
+sudo chown -R daemon:daemon /opt/bitnami/apps/invoice-manager
+sudo find /opt/bitnami/apps/jdosa/invoice-manager -type f -exec chmod 644 {} \;
+sudo find /opt/bitnami/apps/jdosa/invoice-manager -type d -exec chmod 755 {} \;
+sudo chmod -R 777 /opt/bitnami/apps/jdosa/invoice-manager/runtime
+sudo chmod -R 777 /opt/bitnami/apps/jdosa/invoice-manager/web/assets
 
 # 방화벽 설정 (필요한 경우)
 sudo ufw allow 80/tcp
@@ -407,7 +407,7 @@ sudo crontab -e
 
 ```bash
 # 프로젝트 디렉토리에서
-cd /var/www/html/invoice-manager
+cd /opt/bitnami/apps/invoice-manager
 
 # PDF 생성을 위한 패키지 (이미 설치됨)
 composer require tecnickcom/tcpdf
