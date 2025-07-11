@@ -27,6 +27,7 @@ sudo mkdir -p backups
 sudo chown $CURRENT_USER:$CURRENT_USER backups/
 cp -f config/db.php backups/db.php.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 cp -f config/web.php backups/web.php.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+cp -f web/.htaccess backups/.htaccess.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
 # Git 권한 임시 변경
 echo "Git 권한 설정 중..."
@@ -171,6 +172,17 @@ fi
 echo "캐시 정리 중..."
 rm -rf runtime/cache/* 2>/dev/null || true
 rm -rf web/assets/* 2>/dev/null || true
+
+# .htaccess 복원 (백업이 있는 경우)
+echo "로컬 설정 복원 중..."
+LATEST_HTACCESS_BACKUP=$(ls -t backups/.htaccess.* 2>/dev/null | head -1)
+if [ -n "$LATEST_HTACCESS_BACKUP" ]; then
+    echo "최신 .htaccess 백업 복원: $LATEST_HTACCESS_BACKUP"
+    cp "$LATEST_HTACCESS_BACKUP" web/.htaccess
+    echo "✅ .htaccess 복원 완료"
+else
+    echo "ℹ️  .htaccess 백업을 찾을 수 없습니다."
+fi
 
 # 완료 메시지
 echo ""

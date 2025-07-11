@@ -92,6 +92,46 @@ return [
 
 DocumentRoot를 `web/` 디렉토리로 설정하고 URL 리라이팅 활성화
 
+#### Apache .htaccess 설정 옵션
+
+프로젝트는 3가지 `.htaccess` 설정을 제공합니다:
+
+**기본 설정 (현재 사용 중)**
+```bash
+# 단순한 Yii2 라우팅만 제공
+web/.htaccess
+```
+
+**고급 설정 (보안 강화)**
+```bash
+# 고급 보안 및 성능 최적화 설정으로 교체
+cp web/.htaccess.advanced web/.htaccess
+```
+
+**단순 설정 (문제 해결용)**
+```bash
+# 최소한의 설정 (문제 발생 시 사용)
+cp web/.htaccess.simple web/.htaccess
+```
+
+**고급 설정 기능:**
+- 🔒 보안 헤더 추가 (XSS, 클릭재킹 방지)
+- 🚫 민감한 파일 접근 차단
+- 📁 디렉토리 브라우징 방지
+- 🗜️ 파일 압축 (성능 향상)
+- ⚡ 브라우저 캐싱 (로딩 속도 향상)
+
+**필요 Apache 모듈:**
+- `mod_headers` (보안 헤더)
+- `mod_deflate` (압축)
+- `mod_expires` (캐싱)
+
+**모듈 활성화:**
+```bash
+sudo a2enmod headers deflate expires
+sudo systemctl restart apache2
+```
+
 ### 7. 파일 권한 설정
 
 ```bash
@@ -273,6 +313,15 @@ sudo usermod -a -G daemon $(whoami)
 ./update.sh
 ```
 
+**업데이트 스크립트 주요 기능:**
+- ✅ 자동 백업 생성 (설정 파일 보존)
+- ✅ Git 권한 자동 관리
+- ✅ Composer 의존성 자동 업데이트
+- ✅ 데이터베이스 마이그레이션 자동 실행
+- ✅ 로컬 설정 파일 자동 복원 (.htaccess 등)
+- ✅ 캐시 자동 정리
+- ✅ 권한 자동 복원
+
 #### 수동 업데이트
 
 ```bash
@@ -366,6 +415,36 @@ git reset --hard HEAD
 git clean -fd
 git pull
 ```
+
+### 🔧 로컬 설정 보존
+
+#### .htaccess 설정 보존
+
+**문제**: 업데이트 후 `.htaccess.advanced` 설정이 기본 설정으로 되돌아감
+
+**해결**: `update.sh` 스크립트가 자동으로 처리
+
+```bash
+# .htaccess.advanced 설정 적용
+cp web/.htaccess.advanced web/.htaccess
+
+# 업데이트 실행 (설정이 자동으로 보존됨)
+./update.sh
+```
+
+**자동 보존 과정:**
+1. 업데이트 전: 현재 `.htaccess` 자동 백업
+2. Git Pull: 원격 저장소 파일로 덮어쓰기
+3. 업데이트 후: 백업된 `.htaccess` 자동 복원
+
+#### 기타 로컬 설정 보존
+
+**자동 백업 파일들:**
+- `config/db.php` - 데이터베이스 설정
+- `config/web.php` - 웹 애플리케이션 설정
+- `web/.htaccess` - Apache 설정
+
+**백업 위치:** `backups/` 디렉토리
 
 ### 🔧 Composer 문제 해결
 
