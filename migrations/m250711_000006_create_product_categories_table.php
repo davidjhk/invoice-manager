@@ -80,17 +80,6 @@ class m250711_000006_create_product_categories_table extends Migration
 
         $defaultCategories = [
             'General',
-            'Consulting',
-            'Software',
-            'Hardware',
-            'Installation',
-            'Development',
-            'Maintenance',
-            'Website',
-            'Hosting',
-            'Training',
-            'Support',
-            'Other',
         ];
 
         foreach ($companies as $company) {
