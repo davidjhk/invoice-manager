@@ -12,9 +12,17 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="btn-group">
+            <?= Html::a('<i class="fas fa-user-plus mr-2"></i>Create User', ['create-user'], ['class' => 'btn btn-success']) ?>
             <?= Html::a('<i class="fas fa-cog mr-2"></i>Settings', ['settings'], ['class' => 'btn btn-outline-primary']) ?>
             <?= Html::a('<i class="fas fa-users mr-2"></i>Manage Users', ['users'], ['class' => 'btn btn-outline-primary']) ?>
         </div>
+    </div>
+
+    <div class="alert alert-info mb-4">
+        <i class="fas fa-info-circle mr-2"></i>
+        <strong>Account Creation:</strong> Users can only be created by administrators. 
+        The public signup feature has been disabled for security. 
+        Use the "Create User" button to add new accounts to the system.
     </div>
 
     <div class="row">

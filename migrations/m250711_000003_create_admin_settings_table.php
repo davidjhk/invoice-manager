@@ -24,7 +24,7 @@ class m250711_000003_create_admin_settings_table extends Migration
         // Insert default settings
         $this->insert('{{%admin_settings}}', [
             'setting_key' => 'allow_signup',
-            'setting_value' => '1',
+            'setting_value' => '0',
             'description' => 'Allow new user registration (1 = enabled, 0 = disabled)',
         ]);
 
@@ -38,6 +38,36 @@ class m250711_000003_create_admin_settings_table extends Migration
             'setting_key' => 'site_maintenance',
             'setting_value' => '0',
             'description' => 'Site maintenance mode (1 = enabled, 0 = disabled)',
+        ]);
+
+        $this->insert('{{%admin_settings}}', [
+            'setting_key' => 'password_min_length',
+            'setting_value' => '6',
+            'description' => 'Minimum password length requirement',
+        ]);
+
+        $this->insert('{{%admin_settings}}', [
+            'setting_key' => 'session_timeout',
+            'setting_value' => '3600',
+            'description' => 'Session timeout in seconds',
+        ]);
+
+        $this->insert('{{%admin_settings}}', [
+            'setting_key' => 'email_notifications',
+            'setting_value' => '1',
+            'description' => 'Enable email notifications',
+        ]);
+
+        $this->insert('{{%admin_settings}}', [
+            'setting_key' => 'backup_enabled',
+            'setting_value' => '1',
+            'description' => 'Enable automatic backups',
+        ]);
+
+        $this->insert('{{%admin_settings}}', [
+            'setting_key' => 'max_companies_per_user',
+            'setting_value' => '5',
+            'description' => 'Maximum companies per user',
         ]);
     }
 

@@ -126,8 +126,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     
                     <h6>Role</h6>
                     <p class="text-muted small">
-                        <strong>Admin:</strong> Full system access<br>
-                        <strong>User:</strong> Standard user access
+                        <strong>Admin:</strong> Full system access, can manage users<br>
+                        <strong>User:</strong> Standard user access, can manage invoices<br>
+                        <strong>Demo:</strong> Limited access for demonstration
                     </p>
                     
                     <h6>Max Companies</h6>

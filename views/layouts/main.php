@@ -107,11 +107,14 @@ AppAsset::register($this);
 		display: inline-block !important;
 		position: relative !important;
 		overflow: hidden !important;
+		/* 일정한 높이 설정 */
+		line-height: 1.25 !important;
+		vertical-align: middle !important;
 		/* Liquid Glass Style - 기본 상태 */
 		background: rgba(75, 85, 99, 0.1) !important;
 		border: 1px solid rgba(156, 163, 175, 0.2) !important;
 		backdrop-filter: blur(8px) !important;
-		box-shadow: 
+		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.1),
 			0 1px 2px rgba(0, 0, 0, 0.06),
 			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
@@ -134,14 +137,15 @@ AppAsset::register($this);
 	}
 
 	body .main-navbar .navbar-nav .nav-link:hover {
-		color: white !important;
+		color: #ffffff !important;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 		text-decoration: none !important;
 		transform: translateY(-2px) !important;
 		/* Liquid Glass Style - 호버 상태 */
 		background: rgba(75, 85, 99, 0.25) !important;
 		border: 1px solid rgba(156, 163, 175, 0.4) !important;
 		backdrop-filter: blur(12px) !important;
-		box-shadow: 
+		box-shadow:
 			0 8px 25px -5px rgba(0, 0, 0, 0.15),
 			0 10px 10px -5px rgba(0, 0, 0, 0.1),
 			inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -149,14 +153,15 @@ AppAsset::register($this);
 	}
 
 	body .main-navbar .navbar-nav .nav-link.active {
-		background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-		font-weight: 600 !important;
-		color: white !important;
+		background: linear-gradient(135deg, #5b52f0 0%, #8b4aff 100%) !important;
+		font-weight: 700 !important;
+		color: #ffffff !important;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 		/* Liquid Glass Style - 활성 상태 강화 */
 		border: 2px solid rgba(79, 70, 229, 0.8) !important;
 		backdrop-filter: blur(20px) !important;
 		transform: translateY(-1px) !important;
-		box-shadow: 
+		box-shadow:
 			0 12px 30px -8px rgba(79, 70, 229, 0.5),
 			0 8px 16px -4px rgba(79, 70, 229, 0.3),
 			inset 0 1px 0 rgba(255, 255, 255, 0.4),
@@ -166,7 +171,7 @@ AppAsset::register($this);
 
 	body .main-navbar .navbar-nav .nav-link.active::before {
 		width: 100% !important;
-		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
 	}
 
 	/* 활성 상태 펄스 효과 */
@@ -185,8 +190,15 @@ AppAsset::register($this);
 	}
 
 	@keyframes activeGlow {
-		0% { opacity: 0.5; transform: scale(1); }
-		100% { opacity: 0.8; transform: scale(1.02); }
+		0% {
+			opacity: 0.5;
+			transform: scale(1);
+		}
+
+		100% {
+			opacity: 0.8;
+			transform: scale(1.02);
+		}
 	}
 
 	/* Dropdown styles */
@@ -207,14 +219,24 @@ AppAsset::register($this);
 		display: inline-block !important;
 		position: relative !important;
 		overflow: hidden !important;
+		/* 일정한 높이 설정 */
+		line-height: 1.25 !important;
+		vertical-align: middle !important;
 		/* Liquid Glass Style - 드롭다운 기본 상태 */
 		background: rgba(75, 85, 99, 0.1) !important;
 		border: 1px solid rgba(156, 163, 175, 0.2) !important;
 		backdrop-filter: blur(8px) !important;
-		box-shadow: 
+		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.1),
 			0 1px 2px rgba(0, 0, 0, 0.06),
 			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+	}
+
+	/* 아이콘 높이 조정 */
+	body .main-navbar .dropdown .nav-link i {
+		vertical-align: middle !important;
+		line-height: 1 !important;
+		font-size: 0.875rem !important;
 	}
 
 	body .main-navbar .dropdown .nav-link::before {
@@ -234,14 +256,15 @@ AppAsset::register($this);
 	}
 
 	body .main-navbar .dropdown .nav-link:hover {
-		color: white !important;
+		color: #ffffff !important;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 		text-decoration: none !important;
 		transform: translateY(-2px) !important;
 		/* Liquid Glass Style - 드롭다운 호버 상태 */
 		background: rgba(75, 85, 99, 0.25) !important;
 		border: 1px solid rgba(156, 163, 175, 0.4) !important;
 		backdrop-filter: blur(12px) !important;
-		box-shadow: 
+		box-shadow:
 			0 8px 25px -5px rgba(0, 0, 0, 0.15),
 			0 10px 10px -5px rgba(0, 0, 0, 0.1),
 			inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -261,7 +284,7 @@ AppAsset::register($this);
 		background: rgba(31, 41, 55, 0.15) !important;
 		border: 1px solid rgba(75, 85, 99, 0.3) !important;
 		backdrop-filter: blur(10px) !important;
-		box-shadow: 
+		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.2),
 			0 1px 2px rgba(0, 0, 0, 0.1),
 			inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
@@ -272,7 +295,7 @@ AppAsset::register($this);
 		background: rgba(31, 41, 55, 0.3) !important;
 		border: 1px solid rgba(75, 85, 99, 0.5) !important;
 		backdrop-filter: blur(15px) !important;
-		box-shadow: 
+		box-shadow:
 			0 8px 25px -5px rgba(0, 0, 0, 0.25),
 			0 10px 10px -5px rgba(0, 0, 0, 0.15),
 			inset 0 1px 0 rgba(255, 255, 255, 0.1),
@@ -280,11 +303,14 @@ AppAsset::register($this);
 	}
 
 	body.dark-mode .main-navbar .navbar-nav .nav-link.active {
+		color: #ffffff !important;
+		font-weight: 700 !important;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
 		/* Liquid Glass Style - 다크모드 활성 상태 강화 */
 		border: 2px solid rgba(79, 70, 229, 0.9) !important;
 		backdrop-filter: blur(25px) !important;
 		transform: translateY(-1px) !important;
-		box-shadow: 
+		box-shadow:
 			0 12px 30px -8px rgba(79, 70, 229, 0.6),
 			0 8px 16px -4px rgba(79, 70, 229, 0.4),
 			inset 0 1px 0 rgba(255, 255, 255, 0.3),
@@ -298,7 +324,7 @@ AppAsset::register($this);
 		background: rgba(31, 41, 55, 0.15) !important;
 		border: 1px solid rgba(75, 85, 99, 0.3) !important;
 		backdrop-filter: blur(10px) !important;
-		box-shadow: 
+		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.2),
 			0 1px 2px rgba(0, 0, 0, 0.1),
 			inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
@@ -309,7 +335,7 @@ AppAsset::register($this);
 		background: rgba(31, 41, 55, 0.3) !important;
 		border: 1px solid rgba(75, 85, 99, 0.5) !important;
 		backdrop-filter: blur(15px) !important;
-		box-shadow: 
+		box-shadow:
 			0 8px 25px -5px rgba(0, 0, 0, 0.25),
 			0 10px 10px -5px rgba(0, 0, 0, 0.15),
 			inset 0 1px 0 rgba(255, 255, 255, 0.1),
@@ -330,7 +356,7 @@ AppAsset::register($this);
 		background: rgba(255, 255, 255, 0.2) !important;
 		border: 1px solid rgba(229, 231, 235, 0.4) !important;
 		backdrop-filter: blur(10px) !important;
-		box-shadow: 
+		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.05),
 			0 1px 2px rgba(0, 0, 0, 0.03),
 			inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
@@ -341,7 +367,7 @@ AppAsset::register($this);
 		background: rgba(255, 255, 255, 0.4) !important;
 		border: 1px solid rgba(229, 231, 235, 0.6) !important;
 		backdrop-filter: blur(15px) !important;
-		box-shadow: 
+		box-shadow:
 			0 8px 25px -5px rgba(0, 0, 0, 0.1),
 			0 10px 10px -5px rgba(0, 0, 0, 0.05),
 			inset 0 1px 0 rgba(255, 255, 255, 0.5),
@@ -355,7 +381,7 @@ AppAsset::register($this);
 		background: rgba(255, 255, 255, 0.2) !important;
 		border: 1px solid rgba(229, 231, 235, 0.4) !important;
 		backdrop-filter: blur(10px) !important;
-		box-shadow: 
+		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.05),
 			0 1px 2px rgba(0, 0, 0, 0.03),
 			inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
@@ -366,7 +392,7 @@ AppAsset::register($this);
 		background: rgba(255, 255, 255, 0.4) !important;
 		border: 1px solid rgba(229, 231, 235, 0.6) !important;
 		backdrop-filter: blur(15px) !important;
-		box-shadow: 
+		box-shadow:
 			0 8px 25px -5px rgba(0, 0, 0, 0.1),
 			0 10px 10px -5px rgba(0, 0, 0, 0.05),
 			inset 0 1px 0 rgba(255, 255, 255, 0.5),
@@ -374,26 +400,30 @@ AppAsset::register($this);
 	}
 
 	body:not(.dark-mode) .main-navbar .navbar-nav .nav-link.active {
-		color: white !important;
-		font-weight: 600 !important;
+		color: #1f2937 !important;
+		font-weight: 700 !important;
+		text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
 		/* Liquid Glass Style - 라이트모드 활성 상태 강화 */
+		background: rgba(255, 255, 255, 0.9) !important;
 		border: 2px solid rgba(79, 70, 229, 0.7) !important;
 		backdrop-filter: blur(25px) !important;
 		transform: translateY(-1px) !important;
-		box-shadow: 
+		box-shadow:
 			0 12px 30px -8px rgba(79, 70, 229, 0.4),
 			0 8px 16px -4px rgba(79, 70, 229, 0.25),
-			inset 0 1px 0 rgba(255, 255, 255, 0.5),
+			inset 0 1px 0 rgba(255, 255, 255, 0.9),
 			inset 0 -1px 0 rgba(0, 0, 0, 0.05),
 			0 0 0 1px rgba(79, 70, 229, 0.15) !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .navbar-nav .nav-link:hover {
-		color: white !important;
+		color: #ffffff !important;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 	}
 
 	body:not(.dark-mode) .main-navbar .dropdown .nav-link:hover {
-		color: white !important;
+		color: #ffffff !important;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 	}
 
 	/* Light mode dropdown menu */
@@ -667,15 +697,21 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
 								<?php if (Yii::$app->user->identity->isDemo()): ?>
-								<li><?= Html::a('<i class="fas fa-user-check mr-2"></i>Demo Dashboard', ['/demo/index'], ['class' => 'dropdown-item']) ?></li>
-								<li><?= Html::a('<i class="fas fa-refresh mr-2"></i>Reset Demo Data', ['/demo/reset-demo-data'], ['class' => 'dropdown-item text-danger', 'data' => ['confirm' => 'Are you sure you want to reset all demo data?', 'method' => 'post']]) ?></li>
+								<li><?= Html::a('<i class="fas fa-user-check mr-2"></i>Demo Dashboard', ['/demo/index'], ['class' => 'dropdown-item']) ?>
+								</li>
+								<li><?= Html::a('<i class="fas fa-refresh mr-2"></i>Reset Demo Data', ['/demo/reset-demo-data'], ['class' => 'dropdown-item text-danger', 'data' => ['confirm' => 'Are you sure you want to reset all demo data?', 'method' => 'post']]) ?>
+								</li>
 								<?php else: ?>
-								<li><?= Html::a('<i class="fas fa-key mr-2"></i>Change Password', ['/site/change-password'], ['class' => 'dropdown-item']) ?></li>
+								<li><?= Html::a('<i class="fas fa-key mr-2"></i>Change Password', ['/site/change-password'], ['class' => 'dropdown-item']) ?>
+								</li>
 								<?php endif; ?>
 								<?php if (Yii::$app->user->identity->isAdmin()): ?>
-								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>Admin Panel', ['/admin/index'], ['class' => 'dropdown-item']) ?></li>
+								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>Admin Panel', ['/admin/index'], ['class' => 'dropdown-item']) ?>
+								</li>
 								<?php endif; ?>
-								<li><hr class="dropdown-divider"></li>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
 								<li>
 									<?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
 									<?= Html::submitButton('<i class="fas fa-sign-out-alt mr-2"></i>Logout', ['class' => 'dropdown-item logout-btn']) ?>
@@ -789,7 +825,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 	$(document).ready(function() {
 		// Run debug function
 		debugDropdowns();
-		
+
 		// Debug main navbar dropdowns
 		console.log('Main navbar dropdown toggles found:', $('.main-navbar .dropdown-toggle').length);
 		console.log('Main navbar dropdown menus found:', $('.main-navbar .dropdown-menu').length);
@@ -882,7 +918,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 			// Toggle current dropdown
 			$dropdown.toggleClass('show');
 			$menu.toggleClass('show');
-			
+
 			console.log('Menu has show class:', $menu.hasClass('show'));
 		});
 

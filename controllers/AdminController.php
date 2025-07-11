@@ -71,25 +71,34 @@ class AdminController extends Controller
      */
     public function actionSettings()
     {
-        $settings = AdminSettings::find()->all();
-        
-        if (Yii::$app->request->isPost) {
-            $post = Yii::$app->request->post();
+        try {
+            $settings = AdminSettings::find()->all();
             
-            foreach ($settings as $setting) {
-                if (isset($post[$setting->setting_key])) {
-                    $setting->setting_value = $post[$setting->setting_key];
-                    $setting->save();
+            if (Yii::$app->request->isPost) {
+                $post = Yii::$app->request->post();
+                
+                foreach ($settings as $setting) {
+                    if (isset($post[$setting->setting_key])) {
+                        $setting->setting_value = $post[$setting->setting_key];
+                        $setting->save();
+                    }
                 }
+                
+                Yii::$app->session->setFlash('success', 'Settings updated successfully.');
+                return $this->redirect(['settings']);
             }
-            
-            Yii::$app->session->setFlash('success', 'Settings updated successfully.');
-            return $this->redirect(['settings']);
-        }
 
-        return $this->render('settings', [
-            'settings' => $settings,
-        ]);
+            return $this->render('settings', [
+                'settings' => $settings,
+            ]);
+        } catch (\Exception $e) {
+            // Admin settings table doesn't exist
+            Yii::$app->session->setFlash('error', 'Admin settings table is missing. Please run the migration or create the table manually.');
+            
+            return $this->render('settings-error', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
