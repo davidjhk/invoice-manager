@@ -15,6 +15,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $description
  * @property string $type
  * @property string|null $category
+ * @property int|null $category_id
  * @property string|null $sku
  * @property string $unit
  * @property float $price
@@ -25,6 +26,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $updated_at
  *
  * @property Company $company
+ * @property ProductCategory $productCategory
  * @property InvoiceItem[] $invoiceItems
  * @property EstimateItem[] $estimateItems
  */
@@ -75,6 +77,8 @@ class Product extends ActiveRecord
             [['type'], 'string', 'max' => 50],
             [['type'], 'in', 'range' => [self::TYPE_SERVICE, self::TYPE_PRODUCT, self::TYPE_NON_INVENTORY]],
             [['category'], 'string', 'max' => 100],
+            [['category_id'], 'integer'],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProductCategory::class, 'targetAttribute' => ['category_id' => 'id']],
             [['sku'], 'string', 'max' => 100],
             [['unit'], 'string', 'max' => 50],
             [['sku'], 'unique', 'targetAttribute' => ['company_id', 'sku'], 'message' => 'SKU must be unique within the company.'],
@@ -93,7 +97,8 @@ class Product extends ActiveRecord
             'name' => 'Product/Service Name',
             'description' => 'Description',
             'type' => 'Type',
-            'category' => 'Category',
+            'category' => 'Category (Legacy)',
+            'category_id' => 'Category',
             'sku' => 'SKU',
             'unit' => 'Unit',
             'price' => 'Price',
@@ -113,6 +118,16 @@ class Product extends ActiveRecord
     public function getCompany()
     {
         return $this->hasOne(Company::class, ['id' => 'company_id']);
+    }
+
+    /**
+     * Gets query for [[ProductCategory]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductCategory()
+    {
+        return $this->hasOne(ProductCategory::class, ['id' => 'category_id']);
     }
 
     /**
@@ -173,26 +188,26 @@ class Product extends ActiveRecord
     }
 
     /**
-     * Get category options
+     * Get category options for dropdown (dynamic from database)
      *
+     * @param int $companyId
      * @return array
      */
-    public static function getCategoryOptions()
+    public static function getCategoryOptions($companyId = null)
     {
-        return [
-            'General' => 'General',
-            'Consulting' => 'Consulting',
-            'Software' => 'Software',
-            'Hardware' => 'Hardware',
-			'Installation' => 'Installation',
-			'Development' => 'Development',
-            'Maintenance' => 'Maintenance',
-			'Website' => 'Website',
-			'Hosting' => 'Hosting',
-            'Training' => 'Training',
-            'Support' => 'Support',
-            'Other' => 'Other',
-        ];
+        if (!$companyId) {
+            // Try to get from current user's company
+            $user = Yii::$app->user->identity;
+            if ($user && method_exists($user, 'getCompanyId')) {
+                $companyId = $user->getCompanyId();
+            }
+        }
+        
+        if (!$companyId) {
+            return [];
+        }
+        
+        return ProductCategory::getCategoryOptions($companyId);
     }
 
     /**
@@ -215,6 +230,21 @@ class Product extends ActiveRecord
     {
         $units = self::getUnitOptions();
         return isset($units[$this->unit]) ? $units[$this->unit] : $this->unit;
+    }
+
+    /**
+     * Get category label
+     *
+     * @return string
+     */
+    public function getCategoryLabel()
+    {
+        if ($this->productCategory) {
+            return $this->productCategory->name;
+        }
+        
+        // Fallback to legacy category field
+        return $this->category ?: 'Uncategorized';
     }
 
     /**
@@ -272,12 +302,14 @@ class Product extends ActiveRecord
     public static function search($term, $companyId)
     {
         return static::find()
-            ->where(['company_id' => $companyId, 'is_active' => true])
+            ->joinWith('productCategory')
+            ->where(['jdosa_products.company_id' => $companyId, 'jdosa_products.is_active' => true])
             ->andWhere(['or',
-                ['like', 'name', $term],
-                ['like', 'description', $term],
-                ['like', 'sku', $term],
-                ['like', 'category', $term],
+                ['like', 'jdosa_products.name', $term],
+                ['like', 'jdosa_products.description', $term],
+                ['like', 'jdosa_products.sku', $term],
+                ['like', 'jdosa_products.category', $term], // Legacy category field
+                ['like', 'jdosa_product_categories.name', $term], // New category table
             ]);
     }
 

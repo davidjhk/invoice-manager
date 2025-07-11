@@ -738,6 +738,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 						['label' => 'Estimates', 'url' => ['/estimate/index']],
 						['label' => 'Customers', 'url' => ['/customer/index']],
 						['label' => 'Products', 'url' => ['/product/index']],
+						['label' => 'Categories', 'url' => ['/category/index']],
 					];
 					
 					// Render navigation items directly
@@ -747,7 +748,8 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 								  (Yii::$app->controller->id === 'invoice' && $item['label'] === 'Invoices') ||
 								  (Yii::$app->controller->id === 'estimate' && $item['label'] === 'Estimates') ||
 								  (Yii::$app->controller->id === 'customer' && $item['label'] === 'Customers') ||
-								  (Yii::$app->controller->id === 'product' && $item['label'] === 'Products');
+								  (Yii::$app->controller->id === 'product' && $item['label'] === 'Products') ||
+								  (Yii::$app->controller->id === 'category' && $item['label'] === 'Categories');
 						
 						$activeClass = $active ? ' active' : '';
 						echo Html::a($item['label'], $item['url'], ['class' => 'nav-link' . $activeClass]);
@@ -764,6 +766,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 							<?= Html::a('<i class="fas fa-file-alt mr-2"></i>New Estimate', ['/estimate/create'], ['class' => 'dropdown-item']) ?>
 							<?= Html::a('<i class="fas fa-users mr-2"></i>New Customer', ['/customer/create'], ['class' => 'dropdown-item']) ?>
 							<?= Html::a('<i class="fas fa-box mr-2"></i>New Product', ['/product/create'], ['class' => 'dropdown-item']) ?>
+							<?= Html::a('<i class="fas fa-tag mr-2"></i>New Category', ['/category/create'], ['class' => 'dropdown-item']) ?>
 						</div>
 					</div>
 				</div>
@@ -939,6 +942,9 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 		});
 	});
 	</script>
+	
+	<!-- Collapse Helper Script -->
+	<script src="<?= Yii::$app->request->baseUrl ?>/js/collapse-helper.js?v=<?= time() ?>"></script>
 </body>
 
 </html>

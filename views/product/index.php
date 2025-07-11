@@ -122,8 +122,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </span>
                             </td>
                             <td>
-                                <?php if ($product->category): ?>
-                                    <?= Html::encode($product->category) ?>
+                                <?php if ($product->getCategoryLabel()): ?>
+                                    <?= Html::encode($product->getCategoryLabel()) ?>
                                 <?php else: ?>
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>

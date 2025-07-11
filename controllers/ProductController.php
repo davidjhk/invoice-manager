@@ -59,11 +59,13 @@ class ProductController extends Controller
         $query = Product::find()->where(['company_id' => $company->id]);
 
         if (!empty($searchTerm)) {
+            $query->joinWith('productCategory');
             $query->andWhere(['or',
                 ['like', 'name', $searchTerm],
                 ['like', 'description', $searchTerm],
                 ['like', 'sku', $searchTerm],
-                ['like', 'category', $searchTerm],
+                ['like', 'category', $searchTerm], // Keep old category for backward compatibility
+                ['like', 'product_categories.name', $searchTerm], // New category search
             ]);
         }
 
@@ -72,7 +74,12 @@ class ProductController extends Controller
         }
 
         if (!empty($categoryFilter)) {
-            $query->andWhere(['category' => $categoryFilter]);
+            // Support both old category field and new category_id
+            if (is_numeric($categoryFilter)) {
+                $query->andWhere(['category_id' => $categoryFilter]);
+            } else {
+                $query->andWhere(['category' => $categoryFilter]);
+            }
         }
 
         $products = $query->orderBy(['name' => SORT_ASC])->all();
@@ -227,7 +234,8 @@ class ProductController extends Controller
                 'cost' => $product->cost,
                 'is_taxable' => $product->is_taxable,
                 'type' => $product->type,
-                'category' => $product->category,
+                'category' => $product->getCategoryLabel(), // Use new category system
+                'category_id' => $product->category_id, // Provide category_id for new system
                 'formatted_price' => $product->getFormattedPrice(),
                 'full_description' => $product->getFullDescription(),
             ];
@@ -261,7 +269,8 @@ class ProductController extends Controller
                 'cost' => $model->cost,
                 'is_taxable' => $model->is_taxable,
                 'type' => $model->type,
-                'category' => $model->category,
+                'category' => $model->getCategoryLabel(), // Use new category system
+                'category_id' => $model->category_id, // Provide category_id for new system
                 'formatted_price' => $model->getFormattedPrice(),
                 'full_description' => $model->getFullDescription(),
                 'display_name' => $model->getDisplayName(),
@@ -305,7 +314,8 @@ class ProductController extends Controller
                     'cost' => $model->cost,
                     'is_taxable' => $model->is_taxable,
                     'type' => $model->type,
-                    'category' => $model->category,
+                    'category' => $model->getCategoryLabel(), // Use new category system
+                    'category_id' => $model->category_id, // Provide category_id for new system
                     'display_name' => $model->getDisplayName(),
                     'formatted_price' => $model->getFormattedPrice(),
                 ],
@@ -365,7 +375,7 @@ class ProductController extends Controller
                 $product->name,
                 $product->description,
                 $product->getTypeLabel(),
-                $product->category,
+                $product->getCategoryLabel(),
                 $product->sku,
                 $product->getUnitLabel(),
                 number_format($product->price, 2),

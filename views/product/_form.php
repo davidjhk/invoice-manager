@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use app\models\Product;
+use app\models\ProductCategory;
 
 /** @var yii\web\View $this */
 /** @var app\models\Product $model */
@@ -45,7 +46,7 @@ use app\models\Product;
 
 					<div class="row">
 						<div class="col-md-6">
-							<?= $form->field($model, 'category')->dropDownList(Product::getCategoryOptions(), ['prompt' => 'Select Category']) ?>
+							<?= $form->field($model, 'category_id')->dropDownList(ProductCategory::getCategoryOptions($company->id), ['prompt' => 'Select Category']) ?>
 						</div>
 						<div class="col-md-6">
 							<?= $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
@@ -166,7 +167,7 @@ use app\models\Product;
 
 			<!-- Help Information -->
 			<div class="card mb-4">
-				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#product-help-collapse" aria-expanded="false">
+				<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true" data-target="#product-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
 						<span><i class="fas fa-question-circle mr-2"></i>Product Help</span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
@@ -178,7 +179,7 @@ use app\models\Product;
 							<small>
 								<strong>Name:</strong> Product or service name for identification.<br>
 								<strong>Type:</strong> Product or Service classification.<br>
-								<strong>Category:</strong> Group products for better organization.<br>
+								<strong>Category:</strong> Select from your company's product categories.<br>
 								<strong>SKU:</strong> Stock Keeping Unit for inventory tracking.<br>
 								<strong>Price:</strong> Selling price charged to customers.<br>
 								<strong>Cost:</strong> Your cost for profit margin calculation.<br>
@@ -238,18 +239,6 @@ $this->registerJs("
     // Calculate initial margin
     calculateMargin();
     
-    // Handle collapse icon rotation
-    $('[data-toggle=\"collapse\"]').on('click', function() {
-        const target = $(this).attr('data-target');
-        const icon = $(this).find('.collapse-icon');
-        
-        $(target).on('shown.bs.collapse', function() {
-            icon.attr('aria-expanded', 'true');
-        });
-        
-        $(target).on('hidden.bs.collapse', function() {
-            icon.attr('aria-expanded', 'false');
-        });
-    });
+    // Collapse functionality is handled by collapse-helper.js
 ");
 ?>
