@@ -687,17 +687,43 @@ AppAsset::register($this);
 		}
 	});
 
-	// Handle window resize
-	window.addEventListener('resize', function() {
-		var overlay = document.querySelector('.mobile-nav-overlay');
-		var hamburger = document.querySelector('.mobile-hamburger');
+	// --- START RESPONSIVE LAYOUT REWRITE ---
 
-		if (window.innerWidth > 768 && overlay && hamburger && overlay.classList.contains('active')) {
-			toggleMobileMenu();
-		} else if (window.innerWidth <= 768) {
-			setupMobileLayout();
+	// Function to remove mobile-specific elements and restore desktop view
+	function destroyMobileLayout() {
+		var mobileHeader = document.querySelector('.mobile-header');
+		if (mobileHeader) {
+			console.log('Destroying mobile layout.');
+			mobileHeader.remove();
 		}
-	});
+
+		// Restore display of original language switchers so Bootstrap classes can work
+		var existingLangSwitchers = document.querySelectorAll('.simple-language-switcher, .language-switcher');
+		existingLangSwitchers.forEach(function(switcher) {
+			switcher.style.display = ''; // Reset inline style
+		});
+	}
+
+	// Central handler for responsive layout changes
+	function handleLayoutChange() {
+		if (window.innerWidth <= 768) {
+			// We are on a mobile-sized screen
+			setupMobileLayout();
+		} else {
+			// We are on a desktop-sized screen
+			destroyMobileLayout();
+
+			// If mobile menu is open, close it
+			var overlay = document.querySelector('.mobile-nav-overlay');
+			var hamburger = document.querySelector('.mobile-hamburger');
+			if (overlay && hamburger && overlay.classList.contains('active')) {
+				toggleMobileMenu();
+			}
+		}
+	}
+
+	// Handle window resize events
+	window.addEventListener('resize', handleLayoutChange);
 
 	// Mobile dropdown toggle functionality
 	function toggleMobileDropdown(dropdownToggle) {
@@ -720,10 +746,8 @@ AppAsset::register($this);
 
 	// Auto-close mobile menu when clicking nav links
 	document.addEventListener('DOMContentLoaded', function() {
-		// Setup mobile layout immediately if on mobile
-		if (window.innerWidth <= 768) {
-			setupMobileLayout();
-		}
+		// Set initial layout based on window size
+		handleLayoutChange();
 
 		// Add click handlers to mobile nav links
 		document.querySelectorAll('.mobile-nav-menu .nav-link:not(.dropdown-toggle)').forEach(function(link) {
@@ -803,25 +827,44 @@ AppAsset::register($this);
 		langDropdown.className = 'mobile-lang-dropdown';
 
 		// Create all language options (including current language for mobile)
-		var allLanguages = [
-			{code: 'en-US', name: '🇺🇸 English', url: '/site/change-language?language=en-US'},
-			{code: 'es-ES', name: '🇪🇸 Español', url: '/site/change-language?language=es-ES'}, 
-			{code: 'ko-KR', name: '🇰🇷 한국어', url: '/site/change-language?language=ko-KR'},
-			{code: 'zh-CN', name: '🇨🇳 简体中文', url: '/site/change-language?language=zh-CN'},
-			{code: 'zh-TW', name: '🇹🇼 繁體中文', url: '/site/change-language?language=zh-TW'}
+		var allLanguages = [{
+				code: 'en-US',
+				name: '🇺🇸 English',
+				url: '/site/change-language?language=en-US'
+			},
+			{
+				code: 'es-ES',
+				name: '🇪🇸 Español',
+				url: '/site/change-language?language=es-ES'
+			},
+			{
+				code: 'ko-KR',
+				name: '🇰🇷 한국어',
+				url: '/site/change-language?language=ko-KR'
+			},
+			{
+				code: 'zh-CN',
+				name: '🇨🇳 简体中文',
+				url: '/site/change-language?language=zh-CN'
+			},
+			{
+				code: 'zh-TW',
+				name: '🇹🇼 繁體中文',
+				url: '/site/change-language?language=zh-TW'
+			}
 		];
-		
+
 		// Get current language from HTML lang attribute or default to en-US
 		var currentLang = document.documentElement.lang || 'en-US';
-		
+
 		// Add all language options to mobile dropdown
 		allLanguages.forEach(function(lang) {
 			var langLink = document.createElement('a');
 			langLink.href = lang.url;
 			langLink.textContent = lang.name;
-			
+
 			// Mark current language
-			if (lang.code === currentLang || 
+			if (lang.code === currentLang ||
 				(currentLang === 'en' && lang.code === 'en-US') ||
 				(currentLang === 'es' && lang.code === 'es-ES') ||
 				(currentLang === 'ko' && lang.code === 'ko-KR') ||
@@ -829,7 +872,7 @@ AppAsset::register($this);
 				(currentLang === 'zh-TW' && lang.code === 'zh-TW')) {
 				langLink.className = 'current';
 			}
-			
+
 			langDropdown.appendChild(langLink);
 		});
 
@@ -865,21 +908,22 @@ AppAsset::register($this);
 	<!-- Mobile Responsive CSS -->
 	<style>
 	/* ===== MOBILE RESPONSIVE STYLES ===== */
-	
+
 	/* Mobile Utility Classes */
 	@media (max-width: 768px) {
+
 		/* Hide elements completely on mobile */
 		.mobile-hidden {
 			display: none !important;
 		}
-		
+
 		/* Hide text but keep element structure and icons */
 		.mobile-hide-text {
 			font-size: 0 !important;
 			text-indent: -9999px !important;
 			color: transparent !important;
 		}
-		
+
 		/* Show icons even when text is hidden */
 		.mobile-hide-text .fa,
 		.mobile-hide-text .fas,
@@ -891,14 +935,14 @@ AppAsset::register($this);
 			color: inherit !important;
 			display: inline !important;
 		}
-		
+
 		/* Icon-only mode - hide text, keep icons */
 		.mobile-icon-only {
 			overflow: hidden !important;
 			text-indent: -9999px !important;
 			white-space: nowrap !important;
 		}
-		
+
 		.mobile-icon-only .fa,
 		.mobile-icon-only .fas,
 		.mobile-icon-only .far,
@@ -908,39 +952,39 @@ AppAsset::register($this);
 			float: left !important;
 			margin-right: 0 !important;
 		}
-		
+
 		/* Compact mode - reduce spacing */
 		.mobile-compact {
 			padding: 0.25rem 0.5rem !important;
 			margin: 0.125rem !important;
 			font-size: 0.875rem !important;
 		}
-		
+
 		/* Full width on mobile */
 		.mobile-full-width {
 			width: 100% !important;
 			display: block !important;
 		}
 	}
-	
+
 	/* Desktop - restore normal appearance */
 	@media (min-width: 769px) {
 		.mobile-hidden {
 			display: inherit !important;
 		}
-		
+
 		.mobile-hide-text {
 			font-size: inherit !important;
 			text-indent: 0 !important;
 			color: inherit !important;
 		}
-		
+
 		.mobile-icon-only {
 			overflow: visible !important;
 			text-indent: 0 !important;
 			white-space: normal !important;
 		}
-		
+
 		.mobile-icon-only .fa,
 		.mobile-icon-only .fas,
 		.mobile-icon-only .far,
@@ -949,13 +993,13 @@ AppAsset::register($this);
 			float: none !important;
 			margin-right: 0.5rem !important;
 		}
-		
+
 		.mobile-compact {
 			padding: inherit !important;
 			margin: inherit !important;
 			font-size: inherit !important;
 		}
-		
+
 		.mobile-full-width {
 			width: auto !important;
 			display: inline !important;
@@ -1122,7 +1166,7 @@ AppAsset::register($this);
 			background: rgba(99, 102, 241, 0.1) !important;
 			color: #4f46e5 !important;
 		}
-		
+
 		.mobile-lang-dropdown a.current {
 			background: rgba(99, 102, 241, 0.2) !important;
 			color: #4f46e5 !important;
@@ -1447,12 +1491,7 @@ AppAsset::register($this);
 			white-space: nowrap !important;
 		}
 
-		/* Company button mobile */
-		.company-btn {
-			max-width: 120px !important;
-			overflow: hidden !important;
-			text-overflow: ellipsis !important;
-		}
+		
 
 		.simple-language-switcher .simple-lang-menu,
 		.language-switcher .dropdown-menu {
@@ -1596,7 +1635,7 @@ AppAsset::register($this);
 		}
 
 		main {
-			margin-top: 160px !important;
+			margin-top: 0px !important;
 			padding-top: 0 !important;
 		}
 	}
@@ -1706,7 +1745,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 			<div class="container">
 				<div class="d-flex justify-content-between align-items-center">
 					<div class="brand-title">
-						<?= Html::a(Yii::$app->params['siteName'] ?? 'Invoice Manager', Yii::$app->homeUrl, ['class' => 'brand-link']) ?>
+						<?= Html::a(Yii::$app->params['siteName'] ?? 'Invoice Manager', Yii::$app->user->isGuest || !Yii::$app->user->identity->isDemo() ? Yii::$app->homeUrl : ['/demo/index'], ['class' => 'brand-link']) ?>
 					</div>
 					<div class="user-menu d-flex align-items-center">
 						<?php if (Yii::$app->user->isGuest): ?>
@@ -1722,33 +1761,36 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 							?>
 
 						<!-- Language Switcher -->
-						<div class="mr-3">
+						<div class="mr-3 d-none d-md-block">
+							<?= \app\widgets\LanguageSwitcher::widget() ?>
+						</div>
+						<div class="mr-3 d-md-none">
 							<?= \app\widgets\SimpleLanguageSwitcher::widget() ?>
 						</div>
 
 
-						<!-- Company Dropdown -->
-						<?php if ($currentCompany): ?>
-						<div class="dropdown mr-3">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle company-btn" type="button"
-								data-toggle="dropdown" aria-expanded="false">
-								<i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
-							</button>
-							<ul class="dropdown-menu">
-								<li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
-								</li>
-								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
-								</li>
-								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
-								<li>
-									<hr class="dropdown-divider">
-								</li>
-								<li><?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/nav', 'Add New Company'), ['/company/create'], ['class' => 'dropdown-item']) ?>
-								</li>
-								<?php endif; ?>
-							</ul>
-						</div>
-						<?php endif; ?>
+						                        <!-- Company Dropdown -->
+                        <?php if ($currentCompany): ?>
+                        <div class="dropdown mr-3">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle company-btn" type="button"
+                                data-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
+                                </li>
+                                <li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
+                                </li>
+                                <?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/nav', 'Add New Company'), ['/company/create'], ['class' => 'dropdown-item']) ?>
+                                </li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                        <?php endif; ?>
 
 						<!-- User Dropdown -->
 						<div class="dropdown">

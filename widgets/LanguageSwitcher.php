@@ -20,7 +20,7 @@ class LanguageSwitcher extends Widget
     /**
      * @var string The CSS class for the dropdown button
      */
-    public $buttonClass = 'btn btn-outline-secondary dropdown-toggle';
+    public $buttonClass = 'btn btn-outline-light btn-sm dropdown-toggle company-btn';
     
     /**
      * @var string The CSS class for the dropdown menu
@@ -231,6 +231,14 @@ class LanguageSwitcher extends Widget
             
             body.dark-mode .language-switcher .dropdown-divider {
                 border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+
+            /* Styles for company-btn, applied to language switcher */
+            .language-switcher .company-btn {
+                max-width: 120px !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
             }
         ");
         

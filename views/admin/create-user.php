@@ -83,18 +83,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="custom-control custom-switch">
-                            <?= Html::activeCheckbox($model, 'is_active', [
-                                'class' => 'custom-control-input',
-                                'id' => 'is_active',
-                                'checked' => true,
-                            ]) ?>
-                            <label class="custom-control-label" for="is_active">
-                                <strong>Active User</strong>
-                            </label>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <?= $form->field($model, 'is_active', [
+                                'template' => '<div class="form-group"><div class="custom-control custom-switch">{input}<label class="custom-control-label" for="is_active"><strong>Active User</strong></label></div><small class="form-text text-muted">Inactive users cannot log in to the system.</small>{error}</div>',
+                            ])->checkbox(['class' => 'custom-control-input', 'id' => 'is_active'], false) ?>
                         </div>
-                        <small class="form-text text-muted">Inactive users cannot log in to the system.</small>
                     </div>
 
                     <div class="form-group">

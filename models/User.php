@@ -44,6 +44,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public $password_repeat;
 
+    public function init()
+    {
+        parent::init();
+        if ($this->isNewRecord) {
+            $this->is_active = true;
+        }
+    }
+
     /**
      * {@inheritdoc}
      */

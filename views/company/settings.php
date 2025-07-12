@@ -72,7 +72,8 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 					<div class="card-body">
 						<?php if ($model->hasLogo()): ?>
 						<div class="current-logo mb-3">
-							<label class="form-label font-weight-bold"><?= Yii::t('app/company', 'Current Logo') ?></label>
+							<label
+								class="form-label font-weight-bold"><?= Yii::t('app/company', 'Current Logo') ?></label>
 							<div class="logo-preview">
 								<img src="<?= $model->getLogoUrl() ?>" alt="Company Logo" class="img-thumbnail"
 									style="max-height: 150px;">
@@ -90,12 +91,14 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 						<?php endif; ?>
 
 						<div class="form-group">
-							<label class="form-label font-weight-bold"><?= Yii::t('app/company', 'Upload New Logo') ?></label>
+							<label
+								class="form-label font-weight-bold"><?= Yii::t('app/company', 'Upload New Logo') ?></label>
 							<div class="logo-upload-area" id="logo-upload-area">
 								<div class="upload-content">
 									<i class="fas fa-cloud-upload-alt upload-icon"></i>
 									<div class="upload-text">
-										<strong><?= Yii::t('app/company', 'Click to upload') ?></strong> <?= Yii::t('app/company', 'or drag and drop') ?>
+										<strong><?= Yii::t('app/company', 'Click to upload') ?></strong>
+										<?= Yii::t('app/company', 'or drag and drop') ?>
 									</div>
 									<div class="upload-hint">
 										<?= Yii::t('app/company', 'PNG, JPG, JPEG, GIF up to 2MB') ?>
@@ -145,11 +148,11 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 						<?= Yii::t('app/company', 'Select your preferred language for the interface') ?>
 					</small>
 				</div>
-				
+
 				<div class="alert alert-info">
 					<small>
 						<i class="fas fa-info-circle mr-1"></i>
-						<strong><?= Yii::t('app', 'Information') ?>:</strong> 
+						<strong><?= Yii::t('app', 'Information') ?>:</strong>
 						<?= Yii::t('app/company', 'Changing the language will update the interface immediately after saving settings.') ?>
 						<br>
 						<strong><?= Yii::t('app', 'Available Languages') ?>:</strong>
@@ -275,7 +278,8 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 					</div>
 					<div class="col-md-6">
 						<div class="form-group">
-							<label class="font-weight-bold"><?= Yii::t('app/company', 'Use CJK Fonts for PDF') ?></label>
+							<label
+								class="font-weight-bold"><?= Yii::t('app/company', 'Use CJK Fonts for PDF') ?></label>
 							<div class="custom-control custom-switch">
 								<input type="hidden" name="Company[use_cjk_font]" value="0">
 								<input type="checkbox" class="custom-control-input" id="cjk-font-switch"
@@ -362,16 +366,22 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('app/company', 'Save Settings'), ['class' => 'btn btn-success']) ?>
-		<?= Html::button(Yii::t('app/company', 'Reset to Defaults'), [
-            'class' => 'btn btn-outline-warning',
-            'id' => 'reset-defaults-btn',
-            'data-confirm' => Yii::t('app/company', 'Are you sure you want to reset all settings to default values?')
-        ]) ?>
-		<?= Html::a(Yii::t('app/company', 'Export Backup'), ['/company/backup'], [
-            'class' => 'btn btn-outline-info',
-            'target' => '_blank'
-        ]) ?>
+		<div class="row align-items-center">
+			<div class="col-md-6">
+				<?= Html::submitButton(Yii::t('app/company', 'Save Settings'), ['class' => 'btn btn-success btn-block']) ?>
+			</div>
+			<div class="col-md-6 d-flex justify-content-end">
+				<?= Html::button(Yii::t('app/company', 'Reset to Defaults'), [
+                    'class' => 'btn btn-outline-warning mobile-hidden',
+                    'id' => 'reset-defaults-btn',
+                    'data-confirm' => Yii::t('app/company', 'Are you sure you want to reset all settings to default values?')
+                ]) ?>
+				<?= Html::a(Yii::t('app/company', 'Export Backup'), ['/company/backup'], [
+                    'class' => 'btn btn-outline-info ml-2 mobile-hidden',
+                    'target' => '_blank'
+                ]) ?>
+			</div>
+		</div>
 	</div>
 
 	<?php ActiveForm::end(); ?>
@@ -479,8 +489,10 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
-				<button type="button" class="btn btn-primary" id="send-test-email"><?= Yii::t('app/company', 'Send Test Email') ?></button>
+				<button type="button" class="btn btn-secondary"
+					data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
+				<button type="button" class="btn btn-primary"
+					id="send-test-email"><?= Yii::t('app/company', 'Send Test Email') ?></button>
 			</div>
 		</div>
 	</div>
