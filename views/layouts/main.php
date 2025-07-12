@@ -38,6 +38,9 @@ AppAsset::register($this);
 		document.write('<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"><\/script>');
 	}
 	</script>
+	<!-- jQuery UI -->
+	<script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.css">
 	<script>
 	// Check if Bootstrap is loaded, if not load from CDN
 	if (typeof bootstrap === 'undefined') {

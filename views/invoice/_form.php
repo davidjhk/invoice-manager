@@ -386,9 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			document.getElementById('invoice-ship_to_address').value = '';
 		});
 
-		$(itemsTbody).on('focus', '.product-input:not(.ui-autocomplete-input)', function() {
-			initializeProductAutocomplete($(this));
-		});
+		
 	}
 
 	// --- CORE FUNCTIONS ---
@@ -412,6 +410,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		itemsTbody.appendChild(newRow);
 		calculateRowAmount(newRow);
+
+		// Initialize autocomplete for the newly added product input
+		const newProductInput = newRow.querySelector('.product-input');
+		if (newProductInput) {
+			initializeProductAutocomplete($(newProductInput));
+		}
 	}
 
 	function updateRowNumbers() {

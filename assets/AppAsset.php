@@ -24,9 +24,11 @@ class AppAsset extends AssetBundle
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
     ];
     public $js = [
+        'js/collapse-helper.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap4\BootstrapAsset',
+        'yii\jui\JuiAsset',
     ];
 }
