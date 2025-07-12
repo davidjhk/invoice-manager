@@ -142,4 +142,22 @@ return [
     'Are you sure you want to {action}?' => 'Are you sure you want to {action}?',
     'Delete User' => 'Delete User',
     'Are you sure you want to delete this user?' => 'Are you sure you want to delete this user?',
+
+    // Dashboard
+    'Total Revenue' => 'Total Revenue',
+    'Paid Amount' => 'Paid Amount',
+    'Pending Amount' => 'Pending Amount',
+    'Active Customers' => 'Active Customers',
+    'Average: {amount} per invoice' => 'Average: {amount} per invoice',
+    '{rate}% collection rate' => '{rate}% collection rate',
+    '{count} invoices awaiting payment' => '{count} invoices awaiting payment',
+    '{avg} avg invoices per customer' => '{avg} avg invoices per customer',
+    'Recent {item}' => 'Recent {item}',
+    'View All' => 'View All',
+    'No {item} Yet' => 'No {item} Yet',
+    'Get started by creating your first invoice' => 'Get started by creating your first invoice',
+    'Review' => 'Review',
+    'Follow Up' => 'Follow Up',
+    'Add {item}' => 'Add {item}',
+    'Manage {item}' => 'Manage {item}',
 ];

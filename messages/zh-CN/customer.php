@@ -40,6 +40,7 @@ return [
     'Suspended' => '暂停',
     
     // Actions
+    'Add Customer' => '添加客户',
     'Save' => '保存',
     'Edit' => '编辑',
     'Delete' => '删除',

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Layout Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .responsive-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .device-frame {
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .device-screen {
+            background: white;
+            height: 600px;
+            overflow-y: auto;
+        }
+        .device-label {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .test-content {
+            padding: 10px;
+            font-size: 14px;
+        }
+        .mobile-nav-demo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hamburger-demo {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .hamburger-demo .bar {
+            width: 20px;
+            height: 2px;
+            background: white;
+            margin: 2px 0;
+            transition: 0.3s;
+        }
+        .nav-menu-demo {
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 20px;
+            display: none;
+        }
+        .nav-menu-demo.active {
+            display: block;
+        }
+        .nav-item-demo {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        @media (max-width: 480px) {
+            .responsive-test {
+                grid-template-columns: 1fr;
+            }
+            .device-frame {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h1>📱 Mobile Layout Test</h1>
+        <p>이 페이지는 모바일 반응형 레이아웃이 잘 작동하는지 테스트하기 위한 페이지입니다.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>📐 Responsive Breakpoints Test</h2>
+        <div class="responsive-test">
+            <div>
+                <div class="device-label">📱 Mobile (320px-768px)</div>
+                <div class="device-frame" style="width: 320px;">
+                    <div class="device-screen">
+                        <div class="mobile-nav-demo">
+                            <div>Invoice Manager</div>
+                            <div class="hamburger-demo" onclick="toggleDemo(this)">
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                            </div>
+                        </div>
+                        <div class="nav-menu-demo">
+                            <div class="nav-item-demo">📊 Dashboard</div>
+                            <div class="nav-item-demo">🧾 Invoices</div>
+                            <div class="nav-item-demo">📋 Estimates</div>
+                            <div class="nav-item-demo">👥 Customers</div>
+                            <div class="nav-item-demo">📦 Products</div>
+                        </div>
+                        <div class="test-content">
+                            <h3>Mobile Features:</h3>
+                            <ul>
+                                <li>✅ Hamburger menu</li>
+                                <li>✅ Touch-friendly buttons</li>
+                                <li>✅ Responsive layout</li>
+                                <li>✅ Mobile navigation</li>
+                                <li>✅ Compact design</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="device-label">📱 Tablet (768px-992px)</div>
+                <div class="device-frame" style="width: 480px;">
+                    <div class="device-screen">
+                        <div class="mobile-nav-demo">
+                            <div>Invoice Manager</div>
+                            <div style="font-size: 14px;">🌐 한국어 ▼</div>
+                        </div>
+                        <div class="test-content">
+                            <h3>Tablet Features:</h3>
+                            <ul>
+                                <li>✅ Medium-sized layout</li>
+                                <li>✅ Optimized spacing</li>
+                                <li>✅ Touch interactions</li>
+                                <li>✅ Landscape support</li>
+                            </ul>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px;">
+                                    <strong>Form Fields</strong><br>
+                                    <input type="text" placeholder="Company Name" style="width: 100%; padding: 8px; margin-top: 5px;">
+                                </div>
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px;">
+                                    <strong>Buttons</strong><br>
+                                    <button style="padding: 10px 20px; margin-top: 5px;">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="device-label">🖥️ Desktop (992px+)</div>
+                <div class="device-frame" style="width: 600px;">
+                    <div class="device-screen">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>Invoice Manager</div>
+                                <div style="display: flex; gap: 15px; font-size: 14px;">
+                                    <span>📊 Dashboard</span>
+                                    <span>🧾 Invoices</span>
+                                    <span>📋 Estimates</span>
+                                    <span>👥 Customers</span>
+                                    <span>📦 Products</span>
+                                    <span>🌐 한국어 ▼</span>
+                                    <span>👤 Admin ▼</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-content">
+                            <h3>Desktop Features:</h3>
+                            <ul>
+                                <li>✅ Full horizontal navigation</li>
+                                <li>✅ No hamburger menu</li>
+                                <li>✅ Desktop layout</li>
+                                <li>✅ Multi-column content</li>
+                            </ul>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px;">
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px;">Card 1</div>
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px;">Card 2</div>
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px;">Card 3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Instructions</h2>
+        <ol>
+            <li>브라우저 창 크기를 조절하여 반응형 동작 확인</li>
+            <li>개발자 도구에서 모바일 디바이스 시뮬레이션</li>
+            <li>실제 모바일 기기에서 테스트</li>
+            <li>햄버거 메뉴 클릭/터치 테스트</li>
+            <li>언어 전환 드롭다운 테스트</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Checklist</h2>
+        <ul style="list-style: none; padding: 0;">
+            <li>☑️ 뷰포트 메타 태그 설정</li>
+            <li>☑️ 모바일 메뉴 토글 구현</li>
+            <li>☑️ 반응형 브레이크포인트 설정</li>
+            <li>☑️ 터치 친화적 버튼 크기</li>
+            <li>☑️ 모바일 네비게이션 스타일</li>
+            <li>☑️ 언어 선택기 모바일 최적화</li>
+            <li>☑️ Footer 모바일 최적화</li>
+            <li>☑️ 접근성 개선</li>
+        </ul>
+    </div>
+
+    <script>
+        function toggleDemo(hamburger) {
+            const menu = hamburger.closest('.device-screen').querySelector('.nav-menu-demo');
+            const bars = hamburger.querySelectorAll('.bar');
+            
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            
+            bars.forEach((bar, index) => {
+                if (hamburger.classList.contains('active')) {
+                    if (index === 0) bar.style.transform = 'rotate(45deg) translate(5px, 5px)';
+                    else if (index === 1) bar.style.opacity = '0';
+                    else if (index === 2) bar.style.transform = 'rotate(-45deg) translate(7px, -6px)';
+                } else {
+                    bar.style.transform = '';
+                    bar.style.opacity = '';
+                }
+            });
+        }
+
+        // Responsive test
+        function updateResponsiveInfo() {
+            const width = window.innerWidth;
+            let deviceType = '';
+            
+            if (width < 576) deviceType = 'Small Mobile';
+            else if (width < 768) deviceType = 'Mobile';
+            else if (width < 992) deviceType = 'Tablet';
+            else deviceType = 'Desktop';
+            
+            document.title = `Mobile Test - ${deviceType} (${width}px)`;
+        }
+
+        window.addEventListener('resize', updateResponsiveInfo);
+        updateResponsiveInfo();
+    </script>
+</body>
+</html>

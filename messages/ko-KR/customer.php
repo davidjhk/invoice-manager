@@ -40,6 +40,7 @@ return [
     'Suspended' => '중단됨',
     
     // Actions
+    'Add Customer' => '고객 추가',
     'Save' => '저장',
     'Edit' => '수정',
     'Delete' => '삭제',

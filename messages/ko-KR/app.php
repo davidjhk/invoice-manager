@@ -183,4 +183,22 @@ return [
     'Users can only be created by administrators' => '사용자는 관리자만 생성할 수 있습니다',
     'The public signup feature has been disabled for security' => '보안을 위해 공개 가입 기능이 비활성화되었습니다',
     'Use the "Create User" button to add new accounts to the system' => '"사용자 생성" 버튼을 사용하여 시스템에 새 계정을 추가하세요',
+
+    // Dashboard
+    'Total Revenue' => '총 매출',
+    'Paid Amount' => '지급된 금액',
+    'Pending Amount' => '대기중인 금액',
+    'Active Customers' => '활성 고객',
+    'Average: {amount} per invoice' => '평균: 인보이스당 {amount}',
+    '{rate}% collection rate' => '{rate}% 회수율',
+    '{count} invoices awaiting payment' => '{count}개의 인보이스가 결제를 기다리고 있습니다',
+    '{avg} avg invoices per customer' => '고객당 평균 {avg}개의 인보이스',
+    'Recent {item}' => '최근 {item}',
+    'View All' => '모두 보기',
+    'No {item} Yet' => '아직 {item}이(가) 없습니다',
+    'Get started by creating your first invoice' => '첫 인보이스를 작성하여 시작하세요',
+    'Review' => '검토',
+    'Follow Up' => '후속 조치',
+    'Add {item}' => '{item} 추가',
+    'Manage {item}' => '{item} 관리',
 ];

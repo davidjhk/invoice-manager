@@ -135,4 +135,22 @@ return [
     'Are you sure you want to {action}?' => '您確定要{action}嗎？',
     'Delete User' => '刪除用戶',
     'Are you sure you want to delete this user?' => '您確定要刪除此用戶嗎？',
+
+    // Dashboard
+    'Total Revenue' => '總收入',
+    'Paid Amount' => '已付金額',
+    'Pending Amount' => '待付金額',
+    'Active Customers' => '活躍客戶',
+    'Average: {amount} per invoice' => '平均：每張發票 {amount}',
+    '{rate}% collection rate' => '{rate}% 收款率',
+    '{count} invoices awaiting payment' => '{count} 張發票等待付款',
+    '{avg} avg invoices per customer' => '每個客戶平均 {avg} 張發票',
+    'Recent {item}' => '最近的 {item}',
+    'View All' => '查看全部',
+    'No {item} Yet' => '尚無 {item}',
+    'Get started by creating your first invoice' => '從建立第一張發票開始',
+    'Review' => '審查',
+    'Follow Up' => '跟進',
+    'Add {item}' => '新增 {item}',
+    'Manage {item}' => '管理 {item}',
 ];

@@ -627,7 +627,1062 @@ AppAsset::register($this);
 	if (typeof pagespeed === 'undefined') {
 		window.pagespeed = {};
 	}
+
+	/* ===== MOBILE RESPONSIVE IMPROVEMENTS - COMPLETE REWRITE ===== */
+
+	// Mobile menu toggle functionality - rewritten
+	function toggleMobileMenu() {
+		console.log('toggleMobileMenu called');
+		var overlay = document.querySelector('.mobile-nav-overlay');
+		var hamburger = document.querySelector('.mobile-hamburger');
+
+		if (overlay && hamburger) {
+			if (overlay.classList.contains('active')) {
+				// Close menu
+				overlay.classList.remove('active');
+				hamburger.classList.remove('active');
+				document.body.style.overflow = '';
+			} else {
+				// Open menu
+				overlay.classList.add('active');
+				hamburger.classList.add('active');
+				document.body.style.overflow = 'hidden';
+			}
+
+			// Animate hamburger lines
+			var spans = hamburger.querySelectorAll('span');
+			if (hamburger.classList.contains('active')) {
+				spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+				spans[1].style.opacity = '0';
+				spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+			} else {
+				spans[0].style.transform = '';
+				spans[1].style.opacity = '';
+				spans[2].style.transform = '';
+			}
+		}
+	}
+
+	// Handle clicks outside menu to close it
+	document.addEventListener('click', function(e) {
+		// Close language dropdown if clicking outside
+		var langDropdowns = document.querySelectorAll('.mobile-lang-dropdown.show');
+		langDropdowns.forEach(function(dropdown) {
+			var langIcon = dropdown.previousElementSibling;
+			if (!dropdown.contains(e.target) && !langIcon.contains(e.target)) {
+				dropdown.classList.remove('show');
+			}
+		});
+
+		// Close mobile menu if clicking outside
+		var overlay = document.querySelector('.mobile-nav-overlay');
+		var hamburger = document.querySelector('.mobile-hamburger');
+		var mobileNavMenu = document.querySelector('.mobile-nav-menu');
+
+		if (overlay && hamburger && overlay.classList.contains('active')) {
+			// If clicked outside the mobile nav menu or on hamburger, close menu
+			if (!mobileNavMenu.contains(e.target) && !hamburger.contains(e.target)) {
+				toggleMobileMenu();
+			}
+		}
+	});
+
+	// Handle window resize
+	window.addEventListener('resize', function() {
+		var overlay = document.querySelector('.mobile-nav-overlay');
+		var hamburger = document.querySelector('.mobile-hamburger');
+
+		if (window.innerWidth > 768 && overlay && hamburger && overlay.classList.contains('active')) {
+			toggleMobileMenu();
+		} else if (window.innerWidth <= 768) {
+			setupMobileLayout();
+		}
+	});
+
+	// Mobile dropdown toggle functionality
+	function toggleMobileDropdown(dropdownToggle) {
+		console.log('toggleMobileDropdown called');
+		var dropdown = dropdownToggle.closest('.dropdown');
+		var menu = dropdown.querySelector('.dropdown-menu');
+
+		if (menu) {
+			// Close other dropdowns first
+			document.querySelectorAll('.mobile-nav-menu .dropdown-menu').forEach(function(otherMenu) {
+				if (otherMenu !== menu) {
+					otherMenu.classList.remove('show');
+				}
+			});
+
+			// Toggle current dropdown
+			menu.classList.toggle('show');
+		}
+	}
+
+	// Auto-close mobile menu when clicking nav links
+	document.addEventListener('DOMContentLoaded', function() {
+		// Setup mobile layout immediately if on mobile
+		if (window.innerWidth <= 768) {
+			setupMobileLayout();
+		}
+
+		// Add click handlers to mobile nav links
+		document.querySelectorAll('.mobile-nav-menu .nav-link:not(.dropdown-toggle)').forEach(function(link) {
+			link.addEventListener('click', function() {
+				// Close mobile menu after clicking a link
+				var overlay = document.querySelector('.mobile-nav-overlay');
+				var hamburger = document.querySelector('.mobile-hamburger');
+
+				if (overlay && hamburger && overlay.classList.contains('active')) {
+					setTimeout(function() {
+						toggleMobileMenu();
+					}, 200); // Small delay for better UX
+				}
+			});
+		});
+
+		// Add click handlers to mobile dropdown items
+		document.querySelectorAll('.mobile-nav-menu .dropdown-item').forEach(function(item) {
+			item.addEventListener('click', function() {
+				// Close mobile menu after clicking a dropdown item
+				var overlay = document.querySelector('.mobile-nav-overlay');
+				var hamburger = document.querySelector('.mobile-hamburger');
+
+				if (overlay && hamburger && overlay.classList.contains('active')) {
+					setTimeout(function() {
+						toggleMobileMenu();
+					}, 200);
+				}
+			});
+		});
+
+		console.log('Mobile navigation initialized');
+	});
+
+	// Mobile layout setup function
+	function setupMobileLayout() {
+		console.log('Setting up mobile layout');
+
+		// Get the top bar container
+		var container = document.querySelector('.top-bar .container');
+		if (!container) return;
+
+		// Check if mobile header already exists
+		if (document.querySelector('.mobile-header')) return;
+
+		// Hide existing language switchers and hamburger menu explicitly
+		var existingLangSwitchers = document.querySelectorAll('.simple-language-switcher, .language-switcher');
+		existingLangSwitchers.forEach(function(switcher) {
+			switcher.style.display = 'none';
+		});
+
+		// Hide existing hamburger menu elements have been removed from HTML
+
+		// Create mobile header structure
+		var mobileHeader = document.createElement('div');
+		mobileHeader.className = 'mobile-header';
+
+		// Create language icon container (left)
+		var langContainer = document.createElement('div');
+		langContainer.style.position = 'relative';
+
+		var langIcon = document.createElement('div');
+		langIcon.className = 'mobile-lang-icon';
+		langIcon.innerHTML = '🌐';
+		langIcon.setAttribute('role', 'button');
+		langIcon.setAttribute('aria-label', 'Select language');
+		langIcon.onclick = function(e) {
+			e.stopPropagation();
+			var dropdown = langContainer.querySelector('.mobile-lang-dropdown');
+			if (dropdown) {
+				dropdown.classList.toggle('show');
+			}
+		};
+
+		// Create language dropdown
+		var langDropdown = document.createElement('div');
+		langDropdown.className = 'mobile-lang-dropdown';
+
+		// Create all language options (including current language for mobile)
+		var allLanguages = [
+			{code: 'en-US', name: '🇺🇸 English', url: '/site/change-language?language=en-US'},
+			{code: 'es-ES', name: '🇪🇸 Español', url: '/site/change-language?language=es-ES'}, 
+			{code: 'ko-KR', name: '🇰🇷 한국어', url: '/site/change-language?language=ko-KR'},
+			{code: 'zh-CN', name: '🇨🇳 简体中文', url: '/site/change-language?language=zh-CN'},
+			{code: 'zh-TW', name: '🇹🇼 繁體中文', url: '/site/change-language?language=zh-TW'}
+		];
+		
+		// Get current language from HTML lang attribute or default to en-US
+		var currentLang = document.documentElement.lang || 'en-US';
+		
+		// Add all language options to mobile dropdown
+		allLanguages.forEach(function(lang) {
+			var langLink = document.createElement('a');
+			langLink.href = lang.url;
+			langLink.textContent = lang.name;
+			
+			// Mark current language
+			if (lang.code === currentLang || 
+				(currentLang === 'en' && lang.code === 'en-US') ||
+				(currentLang === 'es' && lang.code === 'es-ES') ||
+				(currentLang === 'ko' && lang.code === 'ko-KR') ||
+				(currentLang === 'zh-CN' && lang.code === 'zh-CN') ||
+				(currentLang === 'zh-TW' && lang.code === 'zh-TW')) {
+				langLink.className = 'current';
+			}
+			
+			langDropdown.appendChild(langLink);
+		});
+
+		langContainer.appendChild(langIcon);
+		langContainer.appendChild(langDropdown);
+
+		// Create title (center)
+		var titleLink = document.createElement('a');
+		titleLink.className = 'mobile-title';
+		titleLink.href = '<?= Yii::$app->homeUrl ?>';
+		titleLink.textContent = '<?= Html::encode(Yii::$app->params['siteName'] ?? 'Invoice Manager') ?>';
+
+		// Create hamburger menu (right)
+		var hamburger = document.createElement('div');
+		hamburger.className = 'mobile-hamburger';
+		hamburger.setAttribute('role', 'button');
+		hamburger.setAttribute('aria-label', 'Toggle menu');
+		hamburger.innerHTML = '<span></span><span></span><span></span>';
+		hamburger.onclick = toggleMobileMenu;
+
+		// Append elements to mobile header
+		mobileHeader.appendChild(langContainer);
+		mobileHeader.appendChild(titleLink);
+		mobileHeader.appendChild(hamburger);
+
+		// Add mobile header to container
+		container.appendChild(mobileHeader);
+
+		console.log('Mobile layout setup complete');
+	}
 	</script>
+
+	<!-- Mobile Responsive CSS -->
+	<style>
+	/* ===== MOBILE RESPONSIVE STYLES ===== */
+	
+	/* Mobile Utility Classes */
+	@media (max-width: 768px) {
+		/* Hide elements completely on mobile */
+		.mobile-hidden {
+			display: none !important;
+		}
+		
+		/* Hide text but keep element structure and icons */
+		.mobile-hide-text {
+			font-size: 0 !important;
+			text-indent: -9999px !important;
+			color: transparent !important;
+		}
+		
+		/* Show icons even when text is hidden */
+		.mobile-hide-text .fa,
+		.mobile-hide-text .fas,
+		.mobile-hide-text .far,
+		.mobile-hide-text .fab,
+		.mobile-hide-text i {
+			font-size: 1rem !important;
+			text-indent: 0 !important;
+			color: inherit !important;
+			display: inline !important;
+		}
+		
+		/* Icon-only mode - hide text, keep icons */
+		.mobile-icon-only {
+			overflow: hidden !important;
+			text-indent: -9999px !important;
+			white-space: nowrap !important;
+		}
+		
+		.mobile-icon-only .fa,
+		.mobile-icon-only .fas,
+		.mobile-icon-only .far,
+		.mobile-icon-only .fab,
+		.mobile-icon-only i {
+			text-indent: 0 !important;
+			float: left !important;
+			margin-right: 0 !important;
+		}
+		
+		/* Compact mode - reduce spacing */
+		.mobile-compact {
+			padding: 0.25rem 0.5rem !important;
+			margin: 0.125rem !important;
+			font-size: 0.875rem !important;
+		}
+		
+		/* Full width on mobile */
+		.mobile-full-width {
+			width: 100% !important;
+			display: block !important;
+		}
+	}
+	
+	/* Desktop - restore normal appearance */
+	@media (min-width: 769px) {
+		.mobile-hidden {
+			display: inherit !important;
+		}
+		
+		.mobile-hide-text {
+			font-size: inherit !important;
+			text-indent: 0 !important;
+			color: inherit !important;
+		}
+		
+		.mobile-icon-only {
+			overflow: visible !important;
+			text-indent: 0 !important;
+			white-space: normal !important;
+		}
+		
+		.mobile-icon-only .fa,
+		.mobile-icon-only .fas,
+		.mobile-icon-only .far,
+		.mobile-icon-only .fab,
+		.mobile-icon-only i {
+			float: none !important;
+			margin-right: 0.5rem !important;
+		}
+		
+		.mobile-compact {
+			padding: inherit !important;
+			margin: inherit !important;
+			font-size: inherit !important;
+		}
+		
+		.mobile-full-width {
+			width: auto !important;
+			display: inline !important;
+		}
+	}
+
+	/* Simple Mobile Layout */
+	@media (max-width: 768px) {
+
+		/* Container */
+		.container {
+			padding-left: 15px !important;
+			padding-right: 15px !important;
+		}
+
+		/* Mobile Top Bar */
+		.top-bar {
+			padding: 0.75rem 0 !important;
+		}
+
+		.top-bar .container {
+			padding: 0 15px !important;
+		}
+
+		/* Keep flex layout but modify it */
+		.top-bar .d-flex {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			position: relative !important;
+		}
+
+		/* Title centered */
+		.brand-title {
+			flex: 1 !important;
+			text-align: center !important;
+			font-size: 1.2rem !important;
+			font-weight: 700 !important;
+			margin: 0 !important;
+		}
+
+		.brand-link {
+			color: #ffffff !important;
+			text-decoration: none !important;
+			text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+		}
+
+		/* Hide desktop elements but keep container structure */
+		.top-bar .d-flex .brand-title,
+		.top-bar .d-flex .user-menu,
+
+		/* Hide original language switchers */
+		.simple-language-switcher,
+		.language-switcher {
+			display: none !important;
+		}
+
+		/* Mobile Header Layout */
+		.mobile-header {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			width: 100% !important;
+			position: relative !important;
+		}
+
+		/* Language Icon - Left */
+		.mobile-lang-icon {
+			width: 40px !important;
+			height: 40px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			background: rgba(255, 255, 255, 0.1) !important;
+			border: 1px solid rgba(255, 255, 255, 0.2) !important;
+			border-radius: 0.5rem !important;
+			cursor: pointer !important;
+			font-size: 1.2rem !important;
+			position: relative !important;
+			transition: all 0.3s ease !important;
+		}
+
+		.mobile-lang-icon:hover {
+			background: rgba(255, 255, 255, 0.2) !important;
+			border-color: rgba(255, 255, 255, 0.3) !important;
+		}
+
+		/* Title - Center */
+		.mobile-title {
+			position: absolute !important;
+			left: 50% !important;
+			transform: translateX(-50%) !important;
+			text-align: center !important;
+			font-size: 1.1rem !important;
+			font-weight: 700 !important;
+			color: #ffffff !important;
+			text-decoration: none !important;
+			text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+			white-space: nowrap !important;
+		}
+
+		/* Hamburger Menu - Right */
+		.mobile-hamburger {
+			width: 40px !important;
+			height: 40px !important;
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: center !important;
+			justify-content: center !important;
+			background: rgba(255, 255, 255, 0.1) !important;
+			border: 1px solid rgba(255, 255, 255, 0.2) !important;
+			border-radius: 0.5rem !important;
+			cursor: pointer !important;
+			transition: all 0.3s ease !important;
+			gap: 3px !important;
+		}
+
+		.mobile-hamburger:hover {
+			background: rgba(255, 255, 255, 0.2) !important;
+			border-color: rgba(255, 255, 255, 0.3) !important;
+		}
+
+		.mobile-hamburger.active {
+			background: rgba(99, 102, 241, 0.9) !important;
+			border-color: rgba(99, 102, 241, 0.8) !important;
+		}
+
+		.mobile-hamburger span {
+			display: block !important;
+			width: 20px !important;
+			height: 2px !important;
+			background: #ffffff !important;
+			transition: all 0.3s ease !important;
+		}
+
+		/* Language Dropdown - Positioned under icon */
+		.mobile-lang-dropdown {
+			position: absolute !important;
+			top: 100% !important;
+			left: 0 !important;
+			margin-top: 0.5rem !important;
+			background: rgba(255, 255, 255, 0.98) !important;
+			border: 1px solid rgba(99, 102, 241, 0.3) !important;
+			border-radius: 0.5rem !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+			min-width: 150px !important;
+			display: none !important;
+			z-index: 1070 !important;
+		}
+
+		.mobile-lang-dropdown.show {
+			display: block !important;
+		}
+
+		.mobile-lang-dropdown a {
+			display: block !important;
+			padding: 0.5rem 1rem !important;
+			color: #374151 !important;
+			text-decoration: none !important;
+			transition: all 0.2s ease !important;
+		}
+
+		.mobile-lang-dropdown a:hover {
+			background: rgba(99, 102, 241, 0.1) !important;
+			color: #4f46e5 !important;
+		}
+		
+		.mobile-lang-dropdown a.current {
+			background: rgba(99, 102, 241, 0.2) !important;
+			color: #4f46e5 !important;
+			font-weight: 600 !important;
+		}
+
+
+
+		/* Mobile menu toggle button - improved design */
+		.mobile-hamburger {
+			display: flex !important;
+			flex-direction: column !important;
+			justify-content: center !important;
+			align-items: center !important;
+			width: 40px !important;
+			height: 40px !important;
+			background: rgba(255, 255, 255, 0.15) !important;
+			border: 1px solid rgba(255, 255, 255, 0.25) !important;
+			border-radius: 0.6rem !important;
+			cursor: pointer !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			margin-left: 0.3rem !important;
+			flex-shrink: 0 !important;
+			z-index: 1060 !important;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+			backdrop-filter: blur(10px) !important;
+		}
+
+		.mobile-hamburger:hover {
+			background: rgba(255, 255, 255, 0.25) !important;
+			border-color: rgba(255, 255, 255, 0.4) !important;
+			transform: scale(1.05) !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+		}
+
+		.mobile-hamburger.active {
+			background: rgba(99, 102, 241, 0.9) !important;
+			border-color: rgba(99, 102, 241, 0.8) !important;
+			box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+		}
+
+		.mobile-hamburger .bar {
+			width: 22px !important;
+			height: 2.5px !important;
+			background: #e5e7eb !important;
+			margin: 2.5px 0 !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			border-radius: 2px !important;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+		}
+
+		.mobile-hamburger.active .bar {
+			background: #ffffff !important;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+		}
+
+		/* HIDE DESKTOP NAVIGATION COMPLETELY ON MOBILE */
+		.main-navbar {
+			display: none !important;
+		}
+
+		/* Mobile navigation overlay - completely transparent background */
+		.mobile-nav-overlay {
+			position: fixed !important;
+			top: 70px !important;
+			left: 0 !important;
+			right: 0 !important;
+			bottom: 0 !important;
+			background: transparent !important;
+			backdrop-filter: none !important;
+			z-index: 1055 !important;
+			display: none !important;
+			padding-top: 1rem !important;
+			overflow-y: auto !important;
+			opacity: 0 !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			transform: translateY(-10px) scale(0.98) !important;
+			border-top: none !important;
+		}
+
+		.mobile-nav-overlay.active {
+			display: block !important;
+			opacity: 1 !important;
+			transform: translateY(0) scale(1) !important;
+		}
+
+		.mobile-nav-menu {
+			padding: 1.5rem 1rem !important;
+			max-width: 320px !important;
+			margin: 0 auto !important;
+			position: relative !important;
+			z-index: 1060 !important;
+		}
+
+		.mobile-nav-menu .nav-link {
+			display: block !important;
+			padding: 0.9rem 1.2rem !important;
+			margin: 0.4rem 0 !important;
+			width: 100% !important;
+			text-align: center !important;
+			border-radius: 0.75rem !important;
+			border: 1px solid rgba(99, 102, 241, 0.3) !important;
+			font-weight: 500 !important;
+			letter-spacing: 0.025em !important;
+			color: #1f2937 !important;
+			text-decoration: none !important;
+			background: rgba(255, 255, 255, 0.95) !important;
+			backdrop-filter: blur(10px) !important;
+			transition: all 0.3s ease !important;
+			font-size: 1rem !important;
+			min-height: 50px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+		}
+
+		.mobile-nav-menu .nav-link:hover,
+		.mobile-nav-menu .nav-link:active {
+			color: #ffffff !important;
+			background: rgba(99, 102, 241, 0.95) !important;
+			border-color: rgba(99, 102, 241, 0.8) !important;
+			transform: translateY(-2px) !important;
+			box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+		}
+
+		.mobile-nav-menu .dropdown {
+			width: 100% !important;
+			margin: 0.5rem 0 !important;
+		}
+
+		.mobile-nav-menu .dropdown-menu {
+			position: static !important;
+			float: none !important;
+			width: 100% !important;
+			margin: 0.5rem 0 !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+			background: rgba(248, 250, 252, 0.95) !important;
+			border: 1px solid rgba(99, 102, 241, 0.2) !important;
+			border-radius: 0.5rem !important;
+			padding: 0.5rem !important;
+			display: none !important;
+			backdrop-filter: blur(10px) !important;
+		}
+
+		.mobile-nav-menu .dropdown-menu.show {
+			display: block !important;
+		}
+
+		.mobile-nav-menu .dropdown-item {
+			padding: 0.75rem 1rem !important;
+			color: #374151 !important;
+			border-radius: 0.375rem !important;
+			margin: 0.25rem 0 !important;
+			transition: all 0.3s ease !important;
+			background: transparent !important;
+		}
+
+		.mobile-nav-menu .dropdown-item:hover {
+			background: rgba(99, 102, 241, 0.1) !important;
+			color: #4f46e5 !important;
+		}
+
+		/* Mobile navigation extras */
+		.mobile-nav-divider {
+			height: 1px !important;
+			background: rgba(156, 163, 175, 0.3) !important;
+			margin: 1rem 0 !important;
+		}
+
+		.mobile-nav-logout {
+			margin-top: 1rem !important;
+			padding-top: 1rem !important;
+			border-top: 1px solid rgba(156, 163, 175, 0.3) !important;
+		}
+
+		.mobile-nav-logout .logout-btn {
+			display: block !important;
+			padding: 0.9rem 1.2rem !important;
+			margin: 0 !important;
+			width: 100% !important;
+			text-align: center !important;
+			border-radius: 0.75rem !important;
+			border: 1px solid rgba(220, 38, 38, 0.3) !important;
+			font-weight: 500 !important;
+			letter-spacing: 0.025em !important;
+			color: #dc2626 !important;
+			text-decoration: none !important;
+			background: rgba(254, 226, 226, 0.95) !important;
+			backdrop-filter: blur(10px) !important;
+			transition: all 0.3s ease !important;
+			font-size: 1rem !important;
+			min-height: 50px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15) !important;
+			cursor: pointer !important;
+		}
+
+		.mobile-nav-logout .logout-btn:hover {
+			color: #ffffff !important;
+			background: rgba(220, 38, 38, 0.9) !important;
+			border-color: rgba(220, 38, 38, 0.8) !important;
+			transform: translateY(-1px) !important;
+			box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3) !important;
+		}
+
+		/* Content area mobile adjustments */
+		main {
+			margin-top: 80px !important;
+			padding-top: 0.5rem !important;
+		}
+
+		/* Remove excessive top spacing */
+		body {
+			padding-top: 0 !important;
+			margin-top: 0 !important;
+		}
+
+		/* Breadcrumbs mobile */
+		.breadcrumb {
+			font-size: 0.875rem !important;
+			padding: 0.5rem 0 !important;
+			margin-bottom: 1rem !important;
+		}
+
+		/* Form mobile optimization */
+		.form-group {
+			margin-bottom: 1rem !important;
+		}
+
+		.btn {
+			font-size: 0.875rem !important;
+			padding: 0.5rem 1rem !important;
+		}
+
+		/* Table mobile optimization */
+		.table-responsive {
+			border: none !important;
+		}
+
+		.table {
+			font-size: 0.875rem !important;
+		}
+
+		.table th,
+		.table td {
+			padding: 0.5rem !important;
+			vertical-align: middle !important;
+		}
+
+		/* Card mobile optimization */
+		.card {
+			margin-bottom: 1rem !important;
+			border-radius: 0.75rem !important;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+		}
+
+		.card-header {
+			padding: 0.75rem 1rem !important;
+			border-radius: 0.75rem 0.75rem 0 0 !important;
+		}
+
+		.card-body {
+			padding: 1rem !important;
+		}
+
+		/* Dashboard cards mobile styling */
+		.dashboard-card {
+			margin-bottom: 1.25rem !important;
+		}
+
+		.dashboard-card .card-body {
+			text-align: center !important;
+			padding: 1.5rem 1rem !important;
+		}
+
+		/* Statistics display mobile */
+		.stats-number {
+			font-size: 2rem !important;
+			font-weight: 700 !important;
+			line-height: 1.2 !important;
+		}
+
+		.stats-label {
+			font-size: 0.875rem !important;
+			opacity: 0.8 !important;
+			margin-top: 0.5rem !important;
+		}
+
+		/* Button group mobile */
+		.btn-group {
+			flex-wrap: wrap !important;
+		}
+
+		.btn-group .btn {
+			margin: 0.25rem !important;
+		}
+
+		/* Dropdown menu mobile improvements */
+		.dropdown-menu {
+			font-size: 0.875rem !important;
+		}
+
+		.dropdown-item {
+			padding: 0.5rem 1rem !important;
+		}
+
+		/* Language switcher mobile */
+		.simple-language-switcher .simple-lang-button,
+		.language-switcher .dropdown-toggle {
+			font-size: 0.75rem !important;
+			padding: 0.4rem 0.6rem !important;
+			white-space: nowrap !important;
+		}
+
+		/* User menu buttons mobile */
+		.user-menu .btn {
+			font-size: 0.75rem !important;
+			padding: 0.4rem 0.6rem !important;
+			white-space: nowrap !important;
+		}
+
+		/* Company button mobile */
+		.company-btn {
+			max-width: 120px !important;
+			overflow: hidden !important;
+			text-overflow: ellipsis !important;
+		}
+
+		.simple-language-switcher .simple-lang-menu,
+		.language-switcher .dropdown-menu {
+			min-width: 180px !important;
+			font-size: 0.875rem !important;
+		}
+
+		/* Footer mobile optimization */
+		.footer {
+			padding: 1rem 0 !important;
+		}
+
+		.footer .container {
+			text-align: center !important;
+		}
+
+		.footer .float-left,
+		.footer .float-right {
+			float: none !important;
+			display: block !important;
+			margin: 0.25rem 0 !important;
+			font-size: 0.875rem !important;
+		}
+	}
+
+	/* Large mobile devices (landscape phones, 576px and up) */
+	@media (min-width: 576px) and (max-width: 767.98px) {
+		.brand-title {
+			font-size: 1.2rem !important;
+		}
+
+		.main-navbar .nav-link {
+			padding: 0.75rem 1.25rem !important;
+		}
+	}
+
+	/* Small mobile devices (portrait phones, less than 576px) */
+	@media (max-width: 575.98px) {
+		.container {
+			padding-left: 10px !important;
+			padding-right: 10px !important;
+		}
+
+		.brand-title {
+			font-size: 1rem !important;
+			margin: 0 8px !important;
+		}
+
+		.user-menu .btn {
+			font-size: 0.7rem !important;
+			padding: 0.3rem 0.4rem !important;
+			min-width: 36px !important;
+			height: 36px !important;
+		}
+
+		/* Compact layout for small screens */
+		.user-menu {
+			gap: 0.15rem !important;
+		}
+
+		.user-menu .btn,
+		.user-menu .dropdown-toggle {
+			width: 36px !important;
+			height: 36px !important;
+		}
+
+		.mobile-hamburger {
+			width: 36px !important;
+			height: 36px !important;
+		}
+
+		/* Even smaller hamburger menu */
+		.mobile-hamburger {
+			width: 36px !important;
+			height: 36px !important;
+		}
+
+		.mobile-hamburger .bar {
+			width: 18px !important;
+		}
+
+		.main-navbar .nav-link {
+			padding: 0.875rem 1rem !important;
+			font-size: 0.9rem !important;
+		}
+
+		.table {
+			font-size: 0.75rem !important;
+		}
+
+		.btn-sm {
+			font-size: 0.75rem !important;
+			padding: 0.375rem 0.75rem !important;
+		}
+
+		/* Stack form elements */
+		.form-row .col-md-6,
+		.form-row .col-md-4,
+		.form-row .col-md-3 {
+			margin-bottom: 0.5rem !important;
+		}
+
+		/* Reduce card padding */
+		.card-body {
+			padding: 0.75rem !important;
+		}
+
+		/* Smaller buttons on mobile */
+		.btn-group .btn {
+			font-size: 0.75rem !important;
+			padding: 0.375rem 0.5rem !important;
+		}
+	}
+
+	/* Hide mobile menu toggle on desktop */
+	@media (min-width: 769px) {
+
+		.mobile-nav-overlay {
+			display: none !important;
+		}
+
+		/* Show desktop navigation */
+		.main-navbar {
+			display: block !important;
+		}
+	}
+
+	/* Additional mobile breakpoint for larger screens */
+	@media (min-width: 992px) {
+
+		/* Reset main navbar positioning for desktop */
+		.main-navbar {
+			position: fixed !important;
+			top: 80px !important;
+			left: 0 !important;
+			right: 0 !important;
+			z-index: 1030 !important;
+			padding: 1rem 0 !important;
+			background: transparent !important;
+			width: 100% !important;
+		}
+
+		main {
+			margin-top: 160px !important;
+			padding-top: 0 !important;
+		}
+	}
+
+	/* Dark mode mobile adjustments */
+	body.dark-mode .mobile-hamburger {
+		background: rgba(255, 255, 255, 0.15) !important;
+		border-color: rgba(255, 255, 255, 0.25) !important;
+	}
+
+	body.dark-mode .mobile-hamburger:hover {
+		background: rgba(255, 255, 255, 0.25) !important;
+		border-color: rgba(255, 255, 255, 0.35) !important;
+	}
+
+	body.dark-mode .mobile-hamburger .bar {
+		background: #e5e7eb !important;
+	}
+
+	body.dark-mode .main-navbar .navbar-nav {
+		background: rgba(17, 24, 39, 0.98) !important;
+		border-top-color: rgba(75, 85, 99, 0.5) !important;
+	}
+
+	/* Accessibility improvements */
+	@media (prefers-reduced-motion: reduce) {
+
+		.mobile-hamburger .bar,
+		.main-navbar .navbar-nav,
+		.nav-link {
+			transition: none !important;
+		}
+	}
+
+	/* High contrast mode support */
+	@media (prefers-contrast: high) {
+		.main-navbar .nav-link {
+			border-width: 2px !important;
+		}
+
+		.mobile-hamburger {
+			border-width: 2px !important;
+		}
+	}
+
+	/* Touch-friendly improvements */
+	@media (hover: none) and (pointer: coarse) {
+
+		/* Increase touch targets for better mobile interaction */
+		.btn,
+		.nav-link,
+		.dropdown-item,
+		.mobile-hamburger {
+			min-height: 44px !important;
+			display: flex !important;
+			align-items: center !important;
+		}
+
+		/* Better touch feedback */
+		.nav-link:active,
+		.btn:active,
+		.dropdown-item:active {
+			background: rgba(99, 102, 241, 0.3) !important;
+			transform: scale(0.98) !important;
+		}
+
+		/* Remove hover effects on touch devices */
+		.nav-link:hover,
+		.btn:hover {
+			transform: none !important;
+		}
+	}
+
+	/* Orientation changes */
+	@media screen and (orientation: landscape) and (max-height: 480px) {
+		.main-navbar .navbar-nav {
+			max-height: 300px !important;
+			overflow-y: auto !important;
+		}
+
+		.mobile-hamburger {
+			width: 35px !important;
+			height: 35px !important;
+		}
+	}
+	</style>
 </head>
 
 <?php
@@ -726,8 +1781,10 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 								</li>
 							</ul>
 						</div>
+
 						<?php endif; ?>
 					</div>
+
 				</div>
 			</div>
 		</div>
@@ -782,6 +1839,63 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 				</div>
 			</div>
 		</nav>
+
+		<!-- Mobile Navigation Overlay -->
+		<div class="mobile-nav-overlay">
+			<div class="mobile-nav-menu">
+				<?php
+				// Mobile navigation items
+				foreach ($mainNavItems as $item) {
+					$active = (((Yii::$app->controller->id === 'site' && Yii::$app->controller->action->id === 'index') || 
+							   (Yii::$app->controller->id === 'demo' && Yii::$app->controller->action->id === 'index')) && $item['label'] === $dashboardLabel) ||
+							  (Yii::$app->controller->id === 'invoice' && $item['label'] === $invoicesLabel) ||
+							  (Yii::$app->controller->id === 'estimate' && $item['label'] === $estimatesLabel) ||
+							  (Yii::$app->controller->id === 'customer' && $item['label'] === $customersLabel) ||
+							  (Yii::$app->controller->id === 'product' && $item['label'] === $productsLabel);
+					
+					$activeClass = $active ? ' active' : '';
+					echo Html::a($item['label'], $item['url'], ['class' => 'nav-link mobile-nav-link' . $activeClass]);
+				}
+				?>
+
+				<!-- Mobile Create Dropdown -->
+				<div class="dropdown">
+					<a class="nav-link mobile-nav-link dropdown-toggle" href="#"
+						onclick="toggleMobileDropdown(this); return false;" role="button" aria-expanded="false">
+						<i class="fas fa-plus mr-1"></i><?= Yii::t('app/nav', 'Create') ?>
+					</a>
+					<div class="dropdown-menu">
+						<?= Html::a('<i class="fas fa-file-invoice mr-2"></i>' . Yii::t('app/nav', 'New Invoice'), ['/invoice/create'], ['class' => 'dropdown-item']) ?>
+						<?= Html::a('<i class="fas fa-file-alt mr-2"></i>' . Yii::t('app/nav', 'New Estimate'), ['/estimate/create'], ['class' => 'dropdown-item']) ?>
+						<?= Html::a('<i class="fas fa-users mr-2"></i>' . Yii::t('app/nav', 'New Customer'), ['/customer/create'], ['class' => 'dropdown-item']) ?>
+						<?= Html::a('<i class="fas fa-box mr-2"></i>' . Yii::t('app/nav', 'New Product'), ['/product/create'], ['class' => 'dropdown-item']) ?>
+					</div>
+				</div>
+
+				<!-- Divider -->
+				<div class="mobile-nav-divider"></div>
+
+				<!-- Settings Menu -->
+				<?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'nav-link mobile-nav-link']) ?>
+
+				<!-- Change Password (for non-demo users) -->
+				<?php if (!Yii::$app->user->identity->isDemo()): ?>
+				<?= Html::a('<i class="fas fa-key mr-2"></i>' . Yii::t('app/nav', 'Change Password'), ['/site/change-password'], ['class' => 'nav-link mobile-nav-link']) ?>
+				<?php endif; ?>
+
+				<!-- Admin Panel (for admin users) -->
+				<?php if (Yii::$app->user->identity->isAdmin()): ?>
+				<?= Html::a('<i class="fas fa-shield-alt mr-2"></i>' . Yii::t('app/nav', 'Admin Panel'), ['/admin/index'], ['class' => 'nav-link mobile-nav-link']) ?>
+				<?php endif; ?>
+
+				<!-- Logout -->
+				<div class="mobile-nav-logout">
+					<?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
+					<?= Html::submitButton('<i class="fas fa-sign-out-alt mr-2"></i>' . Yii::t('app/nav', 'Logout'), ['class' => 'nav-link mobile-nav-link logout-btn']) ?>
+					<?= Html::endForm() ?>
+				</div>
+			</div>
+		</div>
 		<?php endif; ?>
 	</header>
 
@@ -854,39 +1968,40 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 		}
 
 		// Test all possible event handlers for top bar dropdowns (excluding language switcher)
-		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').off('click').on('click', function(e) {
-			console.log('=== Top bar dropdown clicked ===');
-			console.log('Target element:', this);
-			console.log('Element text:', $(this).text().trim());
+		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').off('click').on('click',
+			function(e) {
+				console.log('=== Top bar dropdown clicked ===');
+				console.log('Target element:', this);
+				console.log('Element text:', $(this).text().trim());
 
-			e.preventDefault();
-			e.stopPropagation();
+				e.preventDefault();
+				e.stopPropagation();
 
-			var $button = $(this);
-			var $dropdown = $button.closest('.dropdown');
-			var $menu = $dropdown.find('.dropdown-menu');
+				var $button = $(this);
+				var $dropdown = $button.closest('.dropdown');
+				var $menu = $dropdown.find('.dropdown-menu');
 
-			console.log('Dropdown container:', $dropdown.length);
-			console.log('Menu element:', $menu.length);
+				console.log('Dropdown container:', $dropdown.length);
+				console.log('Menu element:', $menu.length);
 
-			// Close all other dropdowns first
-			$('.top-bar .dropdown').not($dropdown).removeClass('show');
-			$('.top-bar .dropdown-menu').not($menu).removeClass('show');
+				// Close all other dropdowns first
+				$('.top-bar .dropdown').not($dropdown).removeClass('show');
+				$('.top-bar .dropdown-menu').not($menu).removeClass('show');
 
-			// Toggle current dropdown
-			var isOpen = $dropdown.hasClass('show');
-			console.log('Current state - isOpen:', isOpen);
+				// Toggle current dropdown
+				var isOpen = $dropdown.hasClass('show');
+				console.log('Current state - isOpen:', isOpen);
 
-			if (isOpen) {
-				$dropdown.removeClass('show');
-				$menu.removeClass('show');
-				console.log('Dropdown closed');
-			} else {
-				$dropdown.addClass('show');
-				$menu.addClass('show');
-				console.log('Dropdown opened');
-			}
-		});
+				if (isOpen) {
+					$dropdown.removeClass('show');
+					$menu.removeClass('show');
+					console.log('Dropdown closed');
+				} else {
+					$dropdown.addClass('show');
+					$menu.addClass('show');
+					console.log('Dropdown opened');
+				}
+			});
 
 		// Alternative event binding methods (excluding language switcher)
 		$('.top-bar').on('click', '.dropdown-toggle:not(.language-switcher .dropdown-toggle)', function(e) {

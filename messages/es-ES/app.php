@@ -142,4 +142,22 @@ return [
     'Are you sure you want to {action}?' => '¿Estás seguro de que quieres {action}?',
     'Delete User' => 'Eliminar Usuario',
     'Are you sure you want to delete this user?' => '¿Estás seguro de que quieres eliminar este usuario?',
+
+    // Dashboard
+    'Total Revenue' => 'Ingresos Totales',
+    'Paid Amount' => 'Cantidad Pagada',
+    'Pending Amount' => 'Cantidad Pendiente',
+    'Active Customers' => 'Clientes Activos',
+    'Average: {amount} per invoice' => 'Promedio: {amount} por factura',
+    '{rate}% collection rate' => '{rate}% tasa de cobro',
+    '{count} invoices awaiting payment' => '{count} facturas pendientes de pago',
+    '{avg} avg invoices per customer' => '{avg} facturas promedio por cliente',
+    'Recent {item}' => '{item} Recientes',
+    'View All' => 'Ver Todos',
+    'No {item} Yet' => 'Aún no hay {item}',
+    'Get started by creating your first invoice' => 'Comienza creando tu primera factura',
+    'Review' => 'Revisar',
+    'Follow Up' => 'Seguimiento',
+    'Add {item}' => 'Añadir {item}',
+    'Manage {item}' => 'Gestionar {item}',
 ];
