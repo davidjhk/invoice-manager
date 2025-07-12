@@ -1491,7 +1491,7 @@ AppAsset::register($this);
 			white-space: nowrap !important;
 		}
 
-		
+
 
 		.simple-language-switcher .simple-lang-menu,
 		.language-switcher .dropdown-menu {
@@ -1635,7 +1635,7 @@ AppAsset::register($this);
 		}
 
 		main {
-			margin-top: 0px !important;
+			margin-top: 20px !important;
 			padding-top: 0 !important;
 		}
 	}
@@ -1769,28 +1769,28 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 						</div>
 
 
-						                        <!-- Company Dropdown -->
-                        <?php if ($currentCompany): ?>
-                        <div class="dropdown mr-3">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle company-btn" type="button"
-                                data-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
-                                </li>
-                                <li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
-                                </li>
-                                <?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/nav', 'Add New Company'), ['/company/create'], ['class' => 'dropdown-item']) ?>
-                                </li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                        <?php endif; ?>
+						<!-- Company Dropdown -->
+						<?php if ($currentCompany): ?>
+						<div class="dropdown mr-3">
+							<button class="btn btn-outline-light btn-sm dropdown-toggle company-btn" type="button"
+								data-toggle="dropdown" aria-expanded="false">
+								<i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
+							</button>
+							<ul class="dropdown-menu">
+								<li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
+								</li>
+								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
+								</li>
+								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
+								<li><?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/nav', 'Add New Company'), ['/company/create'], ['class' => 'dropdown-item']) ?>
+								</li>
+								<?php endif; ?>
+							</ul>
+						</div>
+						<?php endif; ?>
 
 						<!-- User Dropdown -->
 						<div class="dropdown">
