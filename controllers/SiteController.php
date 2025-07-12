@@ -29,8 +29,12 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password'],
+                'only' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password', 'change-language'],
                 'rules' => [
+                    [
+                        'actions' => ['change-language'],
+                        'allow' => true,
+                    ],
                     [
                         'actions' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password'],
                         'allow' => true,

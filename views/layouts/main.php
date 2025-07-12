@@ -668,10 +668,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 
 						<!-- Language Switcher -->
 						<div class="mr-3">
-							<?= \app\widgets\LanguageSwitcher::widget([
-								'buttonClass' => 'btn btn-outline-light btn-sm dropdown-toggle',
-								'showNativeNames' => true
-							]) ?>
+							<?= \app\widgets\SimpleLanguageSwitcher::widget() ?>
 						</div>
 
 

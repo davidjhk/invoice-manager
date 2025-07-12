@@ -29,6 +29,7 @@ use yii\behaviors\TimestampBehavior;
  * @property bool $is_active
  * @property bool $dark_mode
  * @property bool $use_cjk_font
+ * @property string $language
  * @property int|null $user_id
  * @property string $created_at
  * @property string $updated_at

@@ -98,9 +98,8 @@ class LanguageSwitcher extends Widget
                      ($this->showNativeNames ? $currentLangConfig['native'] : $currentLangConfig['name']);
         
         $html .= Html::button($buttonText, [
-            'class' => $this->buttonClass,
+            'class' => $this->buttonClass . ' language-dropdown-toggle',
             'type' => 'button',
-            'data-toggle' => 'dropdown',
             'aria-haspopup' => 'true',
             'aria-expanded' => 'false',
             'id' => 'language-switcher-btn'
@@ -236,44 +235,101 @@ class LanguageSwitcher extends Widget
         ");
         
         $view->registerJs("
-            // Handle Bootstrap dropdown initialization
-            if (typeof bootstrap !== 'undefined') {
-                try {
-                    // Initialize Bootstrap 5 dropdowns
-                    var dropdownElementList = [].slice.call(document.querySelectorAll('.language-switcher .dropdown-toggle'))
-                    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-                        return new bootstrap.Dropdown(dropdownToggleEl)
-                    })
-                } catch(e) {
-                    // Fallback to Bootstrap 4/jQuery
-                    $('.language-switcher .dropdown-toggle').dropdown();
-                }
-            } else {
-                // jQuery Bootstrap 4 fallback
-                $('.language-switcher .dropdown-toggle').dropdown();
-            }
-            
-            // Handle language switching
-            $('.language-switcher .dropdown-item').on('click', function(e) {
-                if (!$(this).hasClass('active')) {
-                    e.preventDefault();
-                    var language = $(this).data('language');
-                    var \$button = $('.language-switcher .dropdown-toggle');
+            // Wait for DOM and dependencies
+            $(document).ready(function() {
+                setTimeout(function() {
+                    console.log('=== Language Switcher Debug ===');
+                    console.log('jQuery version:', $.fn.jquery);
+                    console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
                     
-                    // Show loading state
-                    var originalButtonText = \$button.html();
-                    \$button.html('<i class=\"fas fa-spinner fa-spin\"></i> Loading...');
+                    // Find elements
+                    var languageDropdown = $('.language-switcher');
+                    var dropdownToggle = $('.language-dropdown-toggle');
+                    var dropdownMenu = languageDropdown.find('.dropdown-menu');
                     
-                    // Make AJAX request to change language
-                    $.post($(this).attr('href'), {}, function() {
-                        // Reload page to apply language changes
-                        window.location.reload();
-                    }).fail(function() {
-                        // Restore original text on failure
-                        \$button.html(originalButtonText);
-                        alert('Failed to change language. Please try again.');
+                    console.log('Elements found:', {
+                        dropdown: languageDropdown.length,
+                        toggle: dropdownToggle.length,
+                        menu: dropdownMenu.length
                     });
-                }
+                    
+                    if (dropdownToggle.length === 0) {
+                        console.error('Language dropdown toggle not found!');
+                        return;
+                    }
+                    
+                    if (dropdownMenu.length === 0) {
+                        console.error('Language dropdown menu not found!');
+                        return;
+                    }
+                    
+                    // Remove any existing handlers
+                    dropdownToggle.off('click.languageSwitcher');
+                    
+                    // Add click handler with namespace
+                    dropdownToggle.on('click.languageSwitcher', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('Language dropdown clicked!');
+                        
+                        // Close all other dropdowns
+                        $('.dropdown-menu').not(dropdownMenu).removeClass('show');
+                        $('.dropdown-toggle').not(dropdownToggle).attr('aria-expanded', 'false');
+                        
+                        // Toggle this dropdown
+                        var isOpen = dropdownMenu.hasClass('show');
+                        if (isOpen) {
+                            dropdownMenu.removeClass('show');
+                            dropdownToggle.attr('aria-expanded', 'false');
+                            console.log('Dropdown closed');
+                        } else {
+                            dropdownMenu.addClass('show');
+                            dropdownToggle.attr('aria-expanded', 'true');
+                            console.log('Dropdown opened');
+                        }
+                    });
+                    
+                    // Close dropdown when clicking outside
+                    $(document).off('click.languageDropdown').on('click.languageDropdown', function(e) {
+                        if (!languageDropdown.is(e.target) && languageDropdown.has(e.target).length === 0) {
+                            dropdownMenu.removeClass('show');
+                            dropdownToggle.attr('aria-expanded', 'false');
+                        }
+                    });
+                    
+                    // Close on escape
+                    $(document).off('keydown.languageDropdown').on('keydown.languageDropdown', function(e) {
+                        if (e.keyCode === 27) { // Escape key
+                            dropdownMenu.removeClass('show');
+                            dropdownToggle.attr('aria-expanded', 'false');
+                        }
+                    });
+                    
+                    // Handle language switching
+                    $('.language-switcher .dropdown-item').off('click.languageSwitch').on('click.languageSwitch', function(e) {
+                        if (!$(this).hasClass('active')) {
+                            e.preventDefault();
+                            var language = $(this).data('language');
+                            var url = $(this).attr('href');
+                            
+                            console.log('Language change:', language, url);
+                            
+                            // Show loading state
+                            var originalText = dropdownToggle.html();
+                            dropdownToggle.html('<i class=\"fas fa-spinner fa-spin\"></i> Loading...');
+                            
+                            // Close dropdown
+                            dropdownMenu.removeClass('show');
+                            dropdownToggle.attr('aria-expanded', 'false');
+                            
+                            // Simple redirect instead of AJAX for better reliability
+                            window.location.href = url;
+                        }
+                    });
+                    
+                    console.log('Language Switcher initialized successfully');
+                }, 500); // Small delay to ensure everything is loaded
             });
         ");
     }
