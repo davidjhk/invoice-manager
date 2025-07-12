@@ -260,7 +260,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 /* Compact KPI Overview */
 .kpi-overview {
 	margin-bottom: 1.5rem;
-	background: white;
+	background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
 	border-radius: 8px;
 	border: 1px solid var(--border-color);
 	overflow: hidden;
@@ -357,13 +357,24 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 }
 
 .status-card {
-	background: white;
 	border: 1px solid var(--border-color);
 	border-radius: 8px;
 	padding: 1rem;
 	text-align: center;
 	cursor: pointer;
 	transition: all 0.2s ease;
+}
+
+.draft-card {
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.sent-card {
+	background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+}
+
+.paid-card {
+	background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
 }
 
 .status-card:hover {
@@ -409,7 +420,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 
 /* Recent Section */
 .recent-section {
-	background: white;
+	background: linear-gradient(135deg, #fefbf3 0%, #f9f6ec 100%);
 	border: 1px solid var(--border-color);
 	border-radius: 8px;
 	padding: 1rem;
@@ -427,8 +438,14 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 .section-header h3 {
 	font-size: 1.1rem;
 	font-weight: 600;
-	color: var(--text-primary);
+	color: white !important;
 	margin: 0;
+	padding: 0.75rem 1rem;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: var(--radius-md);
+	display: inline-block;
+	min-width: 150px;
+	text-align: center;
 }
 
 .btn-link {
@@ -525,19 +542,33 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 
 /* Right Column Sections */
 .dashboard-right>div {
-	background: white;
 	border: 1px solid var(--border-color);
 	border-radius: 8px;
 	padding: 1rem;
 }
 
+.quick-actions {
+	background: linear-gradient(135deg, #fdf4ff 0%, #f3e8ff 100%);
+}
+
+.quick-stats {
+	background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+}
+
+.management-links {
+	background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
 .dashboard-right h3 {
 	font-size: 1.1rem;
 	font-weight: 600;
-	color: var(--text-primary);
+	color: white !important;
 	margin: 0 0 1rem 0;
-	padding-bottom: 0.5rem;
-	border-bottom: 1px solid var(--border-color);
+	padding: 0.75rem 1rem;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: var(--radius-md);
+	text-align: center;
+	border-bottom: none;
 }
 
 /* Quick Actions */
@@ -665,12 +696,51 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 }
 
 /* Dark Mode */
-.dark-mode .kpi-overview,
-.dark-mode .status-card,
-.dark-mode .recent-section,
-.dark-mode .dashboard-right>div {
-	background: #374151;
+.dark-mode .kpi-overview {
+	background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 	border-color: #4b5563;
+}
+
+.dark-mode .status-card {
+	border-color: #4b5563;
+}
+
+.dark-mode .draft-card {
+	background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+}
+
+.dark-mode .sent-card {
+	background: linear-gradient(135deg, #422006 0%, #451a03 100%);
+}
+
+.dark-mode .paid-card {
+	background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+}
+
+.dark-mode .recent-section {
+	background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+	border-color: #4b5563;
+}
+
+.dark-mode .quick-actions {
+	background: linear-gradient(135deg, #2d1b69 0%, #3730a3 100%);
+	border-color: #4b5563;
+}
+
+.dark-mode .quick-stats {
+	background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+	border-color: #4b5563;
+}
+
+.dark-mode .management-links {
+	background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+	border-color: #4b5563;
+}
+
+.dark-mode .dashboard-right h3,
+.dark-mode .section-header h3 {
+	background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+	color: white !important;
 }
 
 .dark-mode .kpi-item:hover,

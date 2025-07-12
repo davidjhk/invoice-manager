@@ -5,8 +5,8 @@
   --accent-color: #10b981;
   --text-primary: #1f2937;
   --text-secondary: #6b7280;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
+  --bg-primary: #fefbf3;
+  --bg-secondary: #f5f1e8;
   --border-color: #e5e7eb;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -371,6 +371,79 @@ main.flex-shrink-0 .container {
   transform: translateY(-2px);
 }
 
+/* Card Headers with Point Colors */
+.card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border-bottom: none !important;
+  padding: 1rem 1.25rem !important;
+  margin-bottom: 0 !important;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+  font-weight: 600 !important;
+}
+
+.card-header h1,
+.card-header h2, 
+.card-header h3,
+.card-header h4,
+.card-header h5,
+.card-header h6 {
+  color: white !important;
+  margin: 0 !important;
+  font-weight: 600 !important;
+}
+
+/* Alternative card header colors */
+.card-header.bg-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.card-header.bg-info {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+}
+
+.card-header.bg-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+}
+
+.card-header.bg-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+}
+
+.card-header.bg-secondary {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+}
+
+/* Section Headers */
+.section-header h3,
+.section-header h4 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  padding: 0.75rem 1rem !important;
+  margin: 0 !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  min-width: 200px !important;
+  text-align: center !important;
+}
+
+/* Table Headers */
+.table thead th {
+  background: #667eea !important;
+  color: white !important;
+  border-color: #667eea !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.table-responsive .table thead th {
+  background: #667eea !important;
+  color: white !important;
+  border-color: #667eea !important;
+}
+
 /* Base button styles for consistency */
 .btn {
   border-radius: var(--radius-md) !important;
@@ -558,7 +631,6 @@ body.dark-mode h6 {
 /* Dark mode backgrounds */
 body.dark-mode .card,
 body.dark-mode .card-body,
-body.dark-mode .card-header,
 body.dark-mode .table,
 body.dark-mode .modal-content,
 body.dark-mode .modal-header,
@@ -570,6 +642,53 @@ body.dark-mode .alert {
   background-color: var(--bg-primary) !important;
   color: var(--text-primary) !important;
   border-color: var(--border-color) !important;
+}
+
+/* Dark mode card headers - keep the gradient colors but with darker tones */
+body.dark-mode .card-header {
+  background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%) !important;
+  color: white !important;
+  border-bottom: none !important;
+}
+
+body.dark-mode .card-header.bg-success {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+}
+
+body.dark-mode .card-header.bg-info {
+  background: linear-gradient(135deg, #0e7490 0%, #155e75 100%) !important;
+}
+
+body.dark-mode .card-header.bg-warning {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%) !important;
+}
+
+body.dark-mode .card-header.bg-danger {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+}
+
+body.dark-mode .card-header.bg-secondary {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%) !important;
+}
+
+/* Dark mode section headers */
+body.dark-mode .section-header h3,
+body.dark-mode .section-header h4 {
+  background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%) !important;
+  color: white !important;
+}
+
+/* Dark mode table headers */
+body.dark-mode .table thead th {
+  background: #4c51bf !important;
+  color: white !important;
+  border-color: #4c51bf !important;
+}
+
+body.dark-mode .table-responsive .table thead th {
+  background: #4c51bf !important;
+  color: white !important;
+  border-color: #4c51bf !important;
 }
 
 /* Dark mode secondary backgrounds */
