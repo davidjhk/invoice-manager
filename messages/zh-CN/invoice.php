@@ -150,4 +150,11 @@ return [
     'Payment History' => '付款历史',
     'Summary' => '摘要',
     'Paid' => '已付款',
+    
+    // Preview page translations
+    'Invoice Preview' => '发票预览',
+    'Preview' => '预览',
+    'Download PDF' => '下载PDF',
+    'Print' => '打印',
+    'Send Email' => '发送邮件',
 ];

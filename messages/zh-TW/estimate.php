@@ -143,4 +143,11 @@ return [
     'Internal notes for your team.' => '給您團隊的內部備註。',
     'Memo (Internal)' => '備忘錄（內部）',
     'This estimate has been converted to invoice' => '此估價單已轉換為發票',
+    
+    // Preview page translations
+    'Estimate Preview' => '報價單預覽',
+    'Preview' => '預覽',
+    'Download PDF' => '下載PDF',
+    'Print' => '列印',
+    'Send Email' => '發送郵件',
 ];

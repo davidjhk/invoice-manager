@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 /** @var app\models\Invoice[] $invoices */
 
 $this->title = $model->customer_name;
-$this->params['breadcrumbs'][] = ['label' => 'Customers', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app/customer', 'Customers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="customer-view">
@@ -17,28 +17,28 @@ $this->params['breadcrumbs'][] = $this->title;
         <h1>
             <?= Html::encode($this->title) ?>
             <?php if ($model->is_active): ?>
-                <span class="badge badge-success ml-2">Active</span>
+                <span class="badge badge-success ml-2"><?= Yii::t('app', 'Active') ?></span>
             <?php else: ?>
-                <span class="badge badge-secondary ml-2">Inactive</span>
+                <span class="badge badge-secondary ml-2"><?= Yii::t('app', 'Inactive') ?></span>
             <?php endif; ?>
         </h1>
         <div class="btn-group" role="group">
-            <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a(Yii::t('app', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
             
-            <?= Html::a('Create Invoice', ['/invoice/create', 'customer_id' => $model->id], [
+            <?= Html::a(Yii::t('app/customer', 'Create Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
                 'class' => 'btn btn-success'
             ]) ?>
             
             <?php if ($model->is_active): ?>
-                <?= Html::a('Deactivate', ['toggle-status', 'id' => $model->id], [
+                <?= Html::a(Yii::t('app/customer', 'Deactivate'), ['toggle-status', 'id' => $model->id], [
                     'class' => 'btn btn-warning',
                     'data' => [
-                        'confirm' => 'Are you sure you want to deactivate this customer?',
+                        'confirm' => Yii::t('app/customer', 'Are you sure you want to deactivate this customer?'),
                         'method' => 'post',
                     ],
                 ]) ?>
             <?php else: ?>
-                <?= Html::a('Activate', ['toggle-status', 'id' => $model->id], [
+                <?= Html::a(Yii::t('app/customer', 'Activate'), ['toggle-status', 'id' => $model->id], [
                     'class' => 'btn btn-success',
                     'data' => [
                         'method' => 'post',
@@ -47,10 +47,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php endif; ?>
             
             <?php if ($model->getInvoicesCount() == 0): ?>
-                <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+                <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
-                        'confirm' => 'Are you sure you want to delete this customer?',
+                        'confirm' => Yii::t('app/customer', 'Are you sure you want to delete this customer?'),
                         'method' => 'post',
                     ],
                 ]) ?>
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <!-- Customer Details -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Customer Information</h5>
+                    <h5 class="card-title mb-0"><?= Yii::t('app/customer', 'Customer Information') ?></h5>
                 </div>
                 <div class="card-body">
                     <?= DetailView::widget([
@@ -72,36 +72,36 @@ $this->params['breadcrumbs'][] = $this->title;
                             'customer_name',
                             [
                                 'attribute' => 'contact_name',
-                                'value' => $model->contact_name ?: 'Not provided',
+                                'value' => $model->contact_name ?: Yii::t('app/customer', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'customer_phone',
-                                'value' => $model->customer_phone ?: 'Not provided',
+                                'value' => $model->customer_phone ?: Yii::t('app/customer', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'customer_email',
                                 'format' => 'email',
-                                'value' => $model->customer_email ?: 'Not provided',
+                                'value' => $model->customer_email ?: Yii::t('app/customer', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'customer_address',
                                 'format' => 'ntext',
-                                'value' => $model->customer_address ?: 'Not provided',
+                                'value' => $model->customer_address ?: Yii::t('app/customer', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'billing_address',
                                 'format' => 'ntext',
-                                'value' => $model->billing_address ?: 'Not provided',
+                                'value' => $model->billing_address ?: Yii::t('app/customer', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'shipping_address',
                                 'format' => 'ntext',  
-                                'value' => $model->shipping_address ?: 'Not provided',
+                                'value' => $model->shipping_address ?: Yii::t('app/customer', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'is_active',
                                 'value' => function($model) {
-                                    return Html::tag('span', $model->is_active ? 'Active' : 'Inactive', [
+                                    return Html::tag('span', $model->is_active ? Yii::t('app', 'Active') : Yii::t('app', 'Inactive'), [
                                         'class' => 'badge badge-' . ($model->is_active ? 'success' : 'secondary')
                                     ]);
                                 },
@@ -121,14 +121,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <!-- Statistics -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Statistics</h5>
+                    <h5 class="card-title mb-0"><?= Yii::t('app/customer', 'Statistics') ?></h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <div class="display-4 text-primary"><?= $model->getInvoicesCount() ?></div>
-                                <h6 class="text-muted">Total Invoices</h6>
+                                <h6 class="text-muted"><?= Yii::t('app/customer', 'Total Invoices') ?></h6>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -136,14 +136,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class="display-4 text-success">
                                     <?= $model->company->formatAmount($model->getTotalAmount()) ?>
                                 </div>
-                                <h6 class="text-muted">Total Amount</h6>
+                                <h6 class="text-muted"><?= Yii::t('app/customer', 'Total Amount') ?></h6>
                             </div>
                         </div>
                     </div>
                     
                     <?php if ($model->customer_email): ?>
                         <div class="text-center">
-                            <?= Html::a('Send Email', 'mailto:' . $model->customer_email, [
+                            <?= Html::a(Yii::t('app/customer', 'Send Email'), 'mailto:' . $model->customer_email, [
                                 'class' => 'btn btn-outline-primary'
                             ]) ?>
                         </div>
@@ -155,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php if ($model->customer_phone || $model->customer_email): ?>
             <div class="card">
                 <div class="card-header">
-                    <h6 class="card-title mb-0">Quick Contact</h6>
+                    <h6 class="card-title mb-0"><?= Yii::t('app/customer', 'Quick Contact') ?></h6>
                 </div>
                 <div class="card-body">
                     <?php if ($model->customer_phone): ?>
@@ -184,8 +184,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- Customer Invoices -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Customer Invoices</h5>
-            <?= Html::a('Create New Invoice', ['/invoice/create', 'customer_id' => $model->id], [
+            <h5 class="card-title mb-0"><?= Yii::t('app/customer', 'Customer Invoices') ?></h5>
+            <?= Html::a(Yii::t('app/customer', 'Create New Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
                 'class' => 'btn btn-success btn-sm'
             ]) ?>
         </div>
@@ -195,12 +195,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Invoice #</th>
-                                <th>Date</th>
-                                <th>Due Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th><?= Yii::t('app/customer', 'Invoice #') ?></th>
+                                <th><?= Yii::t('app', 'Date') ?></th>
+                                <th><?= Yii::t('app', 'Due date') ?></th>
+                                <th><?= Yii::t('app', 'Amount') ?></th>
+                                <th><?= Yii::t('app', 'Status') ?></th>
+                                <th><?= Yii::t('app', 'Actions') ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -239,12 +239,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <div class="btn-group btn-group-sm">
                                             <?= Html::a('<i class="fas fa-eye"></i>', ['/invoice/view', 'id' => $invoice->id], [
                                                 'class' => 'btn btn-outline-primary',
-                                                'title' => 'View Invoice'
+                                                'title' => Yii::t('app/customer', 'View Invoice')
                                             ]) ?>
                                             
                                             <?= Html::a('<i class="fas fa-file-pdf"></i>', ['/invoice/preview', 'id' => $invoice->id], [
                                                 'class' => 'btn btn-outline-info',
-                                                'title' => 'Preview PDF',
+                                                'title' => Yii::t('app/customer', 'Preview PDF'),
                                                 'target' => '_blank'
                                             ]) ?>
                                         </div>
@@ -257,9 +257,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php else: ?>
                 <div class="text-center py-4">
                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
-                    <h5>No Invoices</h5>
-                    <p class="text-muted">This customer doesn't have any invoices yet.</p>
-                    <?= Html::a('Create First Invoice', ['/invoice/create', 'customer_id' => $model->id], [
+                    <h5><?= Yii::t('app/customer', 'No Invoices') ?></h5>
+                    <p class="text-muted"><?= Yii::t('app/customer', 'This customer doesn\'t have any invoices yet.') ?></p>
+                    <?= Html::a(Yii::t('app/customer', 'Create First Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
                         'class' => 'btn btn-primary'
                     ]) ?>
                 </div>

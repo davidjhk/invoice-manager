@@ -113,4 +113,23 @@ return [
     'Activate' => '활성화',
     'Deactivate' => '비활성화',
     'Are you sure you want to deactivate this customer?' => '이 고객을 비활성화하시겠습니까?',
+    
+    // Customer view page
+    'Create Invoice' => '인보이스 생성',
+    'Are you sure you want to delete this customer?' => '이 고객을 삭제하시겠습니까?',
+    'Customer Information' => '고객 정보',
+    'Not provided' => '제공되지 않음',
+    'Statistics' => '통계',
+    'Total Invoices' => '총 인보이스',
+    'Total Amount' => '총 금액',
+    'Send Email' => '이메일 보내기',
+    'Quick Contact' => '빠른 연락',
+    'Customer Invoices' => '고객 인보이스',
+    'Create New Invoice' => '새 인보이스 생성',
+    'Invoice #' => '인보이스 #',
+    'View Invoice' => '인보이스 보기',
+    'Preview PDF' => 'PDF 미리보기',
+    'No Invoices' => '인보이스 없음',
+    'This customer doesn\'t have any invoices yet.' => '이 고객은 아직 인보이스가 없습니다.',
+    'Create First Invoice' => '첫 번째 인보이스 생성',
 ];

@@ -113,4 +113,20 @@ return [
     'Activate' => '激活',
     'Deactivate' => '取消激活',
     'Are you sure you want to deactivate this customer?' => '您确定要取消激活此客户吗？',
+    
+    // Customer view page
+    'Not provided' => '未提供',
+    'Statistics' => '统计',
+    'Total Invoices' => '总发票数',
+    'Total Amount' => '总金额',
+    'Send Email' => '发送邮件',
+    'Quick Contact' => '快速联系',
+    'Customer Invoices' => '客户发票',
+    'Create New Invoice' => '创建新发票',
+    'Invoice #' => '发票 #',
+    'View Invoice' => '查看发票',
+    'Preview PDF' => 'PDF预览',
+    'No Invoices' => '无发票',
+    'This customer doesn\'t have any invoices yet.' => '此客户尚无任何发票。',
+    'Create First Invoice' => '创建第一张发票',
 ];

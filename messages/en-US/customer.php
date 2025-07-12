@@ -113,4 +113,20 @@ return [
     'Activate' => 'Activate',
     'Deactivate' => 'Deactivate',
     'Are you sure you want to deactivate this customer?' => 'Are you sure you want to deactivate this customer?',
+    
+    // Customer view page
+    'Not provided' => 'Not provided',
+    'Statistics' => 'Statistics',
+    'Total Invoices' => 'Total Invoices',
+    'Total Amount' => 'Total Amount',
+    'Send Email' => 'Send Email',
+    'Quick Contact' => 'Quick Contact',
+    'Customer Invoices' => 'Customer Invoices',
+    'Create New Invoice' => 'Create New Invoice',
+    'Invoice #' => 'Invoice #',
+    'View Invoice' => 'View Invoice',
+    'Preview PDF' => 'Preview PDF',
+    'No Invoices' => 'No Invoices',
+    'This customer doesn\'t have any invoices yet.' => 'This customer doesn\'t have any invoices yet.',
+    'Create First Invoice' => 'Create First Invoice',
 ];

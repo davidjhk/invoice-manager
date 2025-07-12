@@ -143,4 +143,11 @@ return [
     'Internal notes for your team.' => '팀을 위한 내부 메모입니다.',
     'Memo (Internal)' => '메모 (내부용)',
     'This estimate has been converted to invoice' => '이 견적서가 인보이스로 변환되었습니다',
+    
+    // Preview page translations
+    'Estimate Preview' => '견적서 미리보기',
+    'Preview' => '미리보기',
+    'Download PDF' => 'PDF 다운로드',
+    'Print' => '인쇄',
+    'Send Email' => '이메일 보내기',
 ];

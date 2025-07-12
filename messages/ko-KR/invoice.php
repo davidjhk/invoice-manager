@@ -150,4 +150,11 @@ return [
     'Payment History' => '결제 내역',
     'Summary' => '요약',
     'Paid' => '결제완료',
+    
+    // Preview page translations
+    'Invoice Preview' => '인보이스 미리보기',
+    'Preview' => '미리보기',
+    'Download PDF' => 'PDF 다운로드',
+    'Print' => '인쇄',
+    'Send Email' => '이메일 보내기',
 ];

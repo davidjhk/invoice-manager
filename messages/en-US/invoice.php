@@ -150,4 +150,11 @@ return [
     'Payment History' => 'Payment History',
     'Summary' => 'Summary',
     'Paid' => 'Paid',
+    
+    // Preview page translations
+    'Invoice Preview' => 'Invoice Preview',
+    'Preview' => 'Preview',
+    'Download PDF' => 'Download PDF',
+    'Print' => 'Print',
+    'Send Email' => 'Send Email',
 ];

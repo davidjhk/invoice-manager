@@ -143,4 +143,7 @@ return [
     'Internal notes for your team.' => 'Notas internas para su equipo.',
     'Memo (Internal)' => 'Memo (Interno)',
     'This estimate has been converted to invoice' => 'Este presupuesto ha sido convertido a factura',
+    
+    // Preview page translations
+    'Preview' => 'Vista Previa',
 ];

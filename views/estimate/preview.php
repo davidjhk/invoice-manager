@@ -6,10 +6,10 @@ use app\components\PdfGenerator;
 /** @var yii\web\View $this */
 /** @var app\models\Estimate $model */
 
-$this->title = 'Estimate Preview: ' . $model->estimate_number;
-$this->params['breadcrumbs'][] = ['label' => 'Estimates', 'url' => ['index']];
+$this->title = Yii::t('app/estimate', 'Estimate Preview') . ': ' . $model->estimate_number;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app/estimate', 'Estimates'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->estimate_number, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Preview';
+$this->params['breadcrumbs'][] = Yii::t('app/estimate', 'Preview');
 ?>
 
 <div class="estimate-preview">
@@ -17,31 +17,31 @@ $this->params['breadcrumbs'][] = 'Preview';
 	<div class="d-flex justify-content-between align-items-center mb-4 print-hidden">
 		<h1><?= Html::encode($this->title) ?></h1>
 		<div class="action-buttons">
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>Download PDF', ['download-pdf', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Download PDF'), ['download-pdf', 'id' => $model->id], [
                 'class' => 'btn btn-primary',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
 
-			<?= Html::a('<i class="fas fa-print mr-1"></i>Print', '#', [
+			<?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/estimate', 'Print'), '#', [
                 'class' => 'btn btn-info',
                 'onclick' => 'window.print(); return false;',
                 'encode' => false
             ]) ?>
 
 			<?php if ($model->status === \app\models\Estimate::STATUS_DRAFT): ?>
-			<?= Html::a('<i class="fas fa-envelope mr-1"></i>Send Email', ['send-email', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), ['send-email', 'id' => $model->id], [
                     'class' => 'btn btn-success',
                     'encode' => false
                 ]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], [
                     'class' => 'btn btn-secondary',
                     'encode' => false
                 ]) ?>
 
-			<?= Html::a('<i class="fas fa-arrow-left mr-1"></i>Back', ['view', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-arrow-left mr-1"></i>' . Yii::t('app', 'Back'), ['view', 'id' => $model->id], [
                 'class' => 'btn btn-outline-secondary',
                 'encode' => false
             ]) ?>

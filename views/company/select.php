@@ -6,14 +6,14 @@
 use yii\bootstrap4\Html;
 use yii\bootstrap4\ActiveForm;
 
-$this->title = 'Select Company';
+$this->title = Yii::t('app/company', 'Select Company');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="company-select">
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p class="lead">Please select a company to continue:</p>
+	<p class="lead"><?= Yii::t('app/company', 'Please select a company to continue') ?>:</p>
 
 	<div class="row">
 		<?php foreach ($companies as $company): ?>
@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						<?= Html::encode($company->company_email) ?><br>
 						<?= Html::encode($company->company_phone) ?>
 					</p>
-					<?= Html::a('Select', ['company/set-current', 'id' => $company->id], [
+					<?= Html::a(Yii::t('app/company', 'Select'), ['company/set-current', 'id' => $company->id], [
                             'class' => 'btn btn-primary btn-select-company',
                             'data-company-id' => $company->id,
                             'data-company-name' => $company->company_name,
@@ -44,14 +44,14 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="mt-4">
 		<div class="card">
 			<div class="card-body text-center">
-				<h5 class="card-title">Create New Company</h5>
+				<h5 class="card-title"><?= Yii::t('app/company', 'Create New Company') ?></h5>
 				<p class="card-text text-muted">
-					Start managing invoices for a new business or client.
+					<?= Yii::t('app/company', 'Start managing invoices for a new business or client') ?>.
 					<br><small class="text-info">
-						You can create <?= Yii::$app->user->identity->getRemainingCompanySlots() ?> more companies.
+						<?= Yii::t('app/company', 'You can create {count} more companies', ['count' => Yii::$app->user->identity->getRemainingCompanySlots()]) ?>.
 					</small>
 				</p>
-				<?= Html::a('Add New Company', ['company/create'], [
+				<?= Html::a(Yii::t('app/company', 'Add New Company'), ['company/create'], [
                     'class' => 'btn btn-success btn-lg'
                 ]) ?>
 			</div>
@@ -61,12 +61,12 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="mt-4">
 		<div class="card">
 			<div class="card-body text-center">
-				<h5 class="card-title">Company Limit Reached</h5>
+				<h5 class="card-title"><?= Yii::t('app/company', 'Company Limit Reached') ?></h5>
 				<p class="card-text text-muted">
-					You have reached your maximum number of companies (<?= Yii::$app->user->identity->max_companies ?>).
-					<br>Please upgrade your account or contact support to create more companies.
+					<?= Yii::t('app/company', 'You have reached your maximum number of companies ({max})', ['max' => Yii::$app->user->identity->max_companies]) ?>.
+					<br><?= Yii::t('app/company', 'Please upgrade your account or contact support to create more companies') ?>.
 				</p>
-				<button class="btn btn-secondary btn-lg" disabled>Add New Company</button>
+				<button class="btn btn-secondary btn-lg" disabled><?= Yii::t('app/company', 'Add New Company') ?></button>
 			</div>
 		</div>
 	</div>
@@ -96,7 +96,7 @@ $this->registerJs("
             console.log('Button clicked, Company ID:', companyId);
             
             // Disable button during request
-            btn.prop('disabled', true).text('Selecting...');
+            btn.prop('disabled', true).text('<?= Yii::t('app/company', 'Selecting...') ?>');
             
             // Simple data without CSRF (disabled in controller for AJAX)
             var postData = {
@@ -118,8 +118,8 @@ $this->registerJs("
                 if (response && response.success) {
                     window.location.href = '" . Url::to(['site/index']) . "';
                 } else {
-                    alert('Error: ' + (response.message || 'Unknown error'));
-                    btn.prop('disabled', false).text('Select');
+                    alert('<?= Yii::t('app', 'Error') ?>: ' + (response.message || '<?= Yii::t('app', 'Unknown error') ?>'));
+                    btn.prop('disabled', false).text('<?= Yii::t('app/company', 'Select') ?>');
                 }
             })
             .fail(function(xhr, status, error) {
@@ -129,8 +129,8 @@ $this->registerJs("
                 console.log('Response:', xhr.responseText);
                 console.log('Status Code:', xhr.status);
                 
-                alert('Request failed. Status: ' + status + ' (' + xhr.status + ')');
-                btn.prop('disabled', false).text('Select');
+                alert('<?= Yii::t('app', 'Request failed') ?>. <?= Yii::t('app', 'Status') ?>: ' + status + ' (' + xhr.status + ')');
+                btn.prop('disabled', false).text('<?= Yii::t('app/company', 'Select') ?>');
             });
         });
     });

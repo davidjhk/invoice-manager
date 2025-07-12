@@ -143,4 +143,11 @@ return [
     'Internal notes for your team.' => 'Internal notes for your team.',
     'Memo (Internal)' => 'Memo (Internal)',
     'This estimate has been converted to invoice' => 'This estimate has been converted to invoice',
+    
+    // Preview page translations
+    'Estimate Preview' => 'Estimate Preview',
+    'Preview' => 'Preview',
+    'Download PDF' => 'Download PDF',
+    'Print' => 'Print',
+    'Send Email' => 'Send Email',
 ];

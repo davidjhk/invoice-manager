@@ -64,7 +64,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 				<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
 					data-target="#company-logo-collapse" aria-expanded="false">
 					<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-						<span><i class="fas fa-image mr-2"></i>Company Logo</span>
+						<span><i class="fas fa-image mr-2"></i><?= Yii::t('app/company', 'Company Logo') ?></span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h5>
 				</div>
@@ -72,15 +72,15 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 					<div class="card-body">
 						<?php if ($model->hasLogo()): ?>
 						<div class="current-logo mb-3">
-							<label class="form-label font-weight-bold">Current Logo</label>
+							<label class="form-label font-weight-bold"><?= Yii::t('app/company', 'Current Logo') ?></label>
 							<div class="logo-preview">
 								<img src="<?= $model->getLogoUrl() ?>" alt="Company Logo" class="img-thumbnail"
 									style="max-height: 150px;">
 								<div class="mt-2">
-									<small class="text-muted">Filename:
+									<small class="text-muted"><?= Yii::t('app/company', 'Filename') ?>:
 										<?= Html::encode($model->logo_filename) ?></small>
 									<br>
-									<?= Html::button('Delete Logo', [
+									<?= Html::button(Yii::t('app/company', 'Delete Logo'), [
                                         'class' => 'btn btn-outline-danger btn-sm mt-1',
                                         'id' => 'delete-logo-btn'
                                     ]) ?>
@@ -90,15 +90,15 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 						<?php endif; ?>
 
 						<div class="form-group">
-							<label class="form-label font-weight-bold">Upload New Logo</label>
+							<label class="form-label font-weight-bold"><?= Yii::t('app/company', 'Upload New Logo') ?></label>
 							<div class="logo-upload-area" id="logo-upload-area">
 								<div class="upload-content">
 									<i class="fas fa-cloud-upload-alt upload-icon"></i>
 									<div class="upload-text">
-										<strong>Click to upload</strong> or drag and drop
+										<strong><?= Yii::t('app/company', 'Click to upload') ?></strong> <?= Yii::t('app/company', 'or drag and drop') ?>
 									</div>
 									<div class="upload-hint">
-										PNG, JPG, JPEG, GIF up to 2MB
+										<?= Yii::t('app/company', 'PNG, JPG, JPEG, GIF up to 2MB') ?>
 									</div>
 								</div>
 								<?= Html::activeFileInput($model, 'logo_upload', [
@@ -110,7 +110,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 						</div>
 
 						<div id="logo-preview" class="mt-3" style="display: none;">
-							<label class="form-label">Preview</label>
+							<label class="form-label"><?= Yii::t('app/company', 'Preview') ?></label>
 							<div>
 								<img id="logo-preview-img" src="#" alt="Logo Preview" class="img-thumbnail"
 									style="max-height: 150px;">
@@ -169,7 +169,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
 			data-target="#invoice-settings-collapse" aria-expanded="false">
 			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-				<span><i class="fas fa-file-invoice mr-2"></i>Invoice Settings</span>
+				<span><i class="fas fa-file-invoice mr-2"></i><?= Yii::t('app/company', 'Invoice Settings') ?></span>
 				<i class="fas fa-chevron-down collapse-icon"></i>
 			</h5>
 		</div>
@@ -191,18 +191,18 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
                         'EUR' => 'EUR (€)',
                         'GBP' => 'GBP (£)',
                         'KRW' => 'KRW (₩)',
-                    ], ['prompt' => 'Select Currency']) ?>
+                    ], ['prompt' => Yii::t('app/company', 'Select Currency')]) ?>
 					</div>
 					<div class="col-md-3">
 						<?= $form->field($model, 'invoice_prefix')->textInput([
                         'maxlength' => true,
-                        'placeholder' => 'INV'
+                        'placeholder' => Yii::t('app/company', 'INV')
                     ]) ?>
 					</div>
 					<div class="col-md-3">
 						<?= $form->field($model, 'estimate_prefix')->textInput([
                         'maxlength' => true,
-                        'placeholder' => 'EST'
+                        'placeholder' => Yii::t('app/company', 'EST')
                     ]) ?>
 					</div>
 					<div class="col-md-3">
@@ -224,19 +224,19 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 				<div class="alert alert-light">
 					<div class="row">
 						<div class="col-md-3">
-							<small><strong>Next Invoice Number:</strong> <span
+							<small><strong><?= Yii::t('app/company', 'Next Invoice Number') ?>:</strong> <span
 									id="next-invoice-number"><?= $model->generateInvoiceNumber() ?></span></small>
 						</div>
 						<div class="col-md-3">
-							<small><strong>Next Estimate Number:</strong> <span
+							<small><strong><?= Yii::t('app/company', 'Next Estimate Number') ?>:</strong> <span
 									id="next-estimate-number"><?= $model->generateEstimateNumber() ?></span></small>
 						</div>
 						<div class="col-md-3">
-							<small><strong>Default Due Date:</strong>
+							<small><strong><?= Yii::t('app/company', 'Default Due Date') ?>:</strong>
 								<?= Yii::$app->formatter->asDate($model->getDefaultDueDate()) ?></small>
 						</div>
 						<div class="col-md-3">
-							<small><strong>Default Estimate Expiry:</strong>
+							<small><strong><?= Yii::t('app/company', 'Default Estimate Expiry') ?>:</strong>
 								<?= Yii::$app->formatter->asDate($model->getDefaultExpiryDate()) ?></small>
 						</div>
 					</div>
@@ -250,7 +250,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
 			data-target="#display-settings-collapse" aria-expanded="false">
 			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-				<span><i class="fas fa-palette mr-2"></i>Display & PDF Settings</span>
+				<span><i class="fas fa-palette mr-2"></i><?= Yii::t('app/company', 'Display & PDF Settings') ?></span>
 				<i class="fas fa-chevron-down collapse-icon"></i>
 			</h5>
 		</div>
@@ -259,33 +259,33 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 				<div class="row">
 					<div class="col-md-6">
 						<div class="form-group">
-							<label class="font-weight-bold">Dark Mode</label>
+							<label class="font-weight-bold"><?= Yii::t('app/company', 'Dark Mode') ?></label>
 							<div class="custom-control custom-switch">
 								<input type="hidden" name="Company[dark_mode]" value="0">
 								<input type="checkbox" class="custom-control-input" id="dark-mode-switch"
 									name="Company[dark_mode]" value="1" <?= $model->dark_mode ? 'checked' : '' ?>>
 								<label class="custom-control-label" for="dark-mode-switch">
-									Enable dark mode theme
+									<?= Yii::t('app/company', 'Enable dark mode theme') ?>
 								</label>
 							</div>
 							<small class="form-text text-muted">
-								Enable dark mode theme for your company's interface
+								<?= Yii::t('app/company', 'Enable dark mode theme for your company\'s interface') ?>
 							</small>
 						</div>
 					</div>
 					<div class="col-md-6">
 						<div class="form-group">
-							<label class="font-weight-bold">Use CJK Fonts for PDF</label>
+							<label class="font-weight-bold"><?= Yii::t('app/company', 'Use CJK Fonts for PDF') ?></label>
 							<div class="custom-control custom-switch">
 								<input type="hidden" name="Company[use_cjk_font]" value="0">
 								<input type="checkbox" class="custom-control-input" id="cjk-font-switch"
 									name="Company[use_cjk_font]" value="1" <?= $model->use_cjk_font ? 'checked' : '' ?>>
 								<label class="custom-control-label" for="cjk-font-switch">
-									Use CJK fonts for PDF generation
+									<?= Yii::t('app/company', 'Use CJK fonts for PDF generation') ?>
 								</label>
 							</div>
 							<small class="form-text text-muted">
-								Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters
+								<?= Yii::t('app/company', 'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters') ?>
 							</small>
 						</div>
 					</div>
@@ -299,7 +299,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
 			data-target="#email-settings-collapse" aria-expanded="false">
 			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-				<span><i class="fas fa-envelope mr-2"></i>Email Settings</span>
+				<span><i class="fas fa-envelope mr-2"></i><?= Yii::t('app/company', 'Email Settings') ?></span>
 				<i class="fas fa-chevron-down collapse-icon"></i>
 			</h5>
 		</div>
@@ -308,9 +308,9 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 				<div class="card mb-4">
 					<div class="card-header d-flex justify-content-between align-items-center">
 						<h5 class="card-title mb-0">
-							<i class="fas fa-envelope mr-2"></i>Email Settings
+							<i class="fas fa-envelope mr-2"></i><?= Yii::t('app/company', 'Email Settings') ?>
 						</h5>
-						<?= Html::button('Test Email', [
+						<?= Html::button(Yii::t('app/company', 'Test Email'), [
                         'class' => 'btn btn-outline-primary btn-sm',
                         'id' => 'test-email-btn',
                         'data-toggle' => 'modal',
@@ -320,22 +320,22 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 					<div class="card-body">
 						<?= $form->field($model, 'smtp2go_api_key')->passwordInput([
                         'maxlength' => true,
-                        'placeholder' => 'Enter your SMTP2GO API key'
+                        'placeholder' => Yii::t('app/company', 'Enter your SMTP2GO API key')
                     ]) ?>
 
 						<?= $form->field($model, 'sender_email')->input('email', [
                         'maxlength' => true,
-                        'placeholder' => 'noreply@yourcompany.com'
+                        'placeholder' => Yii::t('app/company', 'noreply@yourcompany.com')
                     ]) ?>
 
 						<?= $form->field($model, 'sender_name')->textInput([
                         'maxlength' => true,
-                        'placeholder' => 'Your Company Name'
+                        'placeholder' => Yii::t('app/company', 'Your Company Name')
                     ]) ?>
 
 						<?= $form->field($model, 'bcc_email')->input('email', [
                         'maxlength' => true,
-                        'placeholder' => 'admin@yourcompany.com'
+                        'placeholder' => Yii::t('app/company', 'admin@yourcompany.com')
                     ]) ?>
 
 						<div class="alert alert-info">
@@ -362,13 +362,13 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton('Save Settings', ['class' => 'btn btn-success']) ?>
-		<?= Html::button('Reset to Defaults', [
+		<?= Html::submitButton(Yii::t('app/company', 'Save Settings'), ['class' => 'btn btn-success']) ?>
+		<?= Html::button(Yii::t('app/company', 'Reset to Defaults'), [
             'class' => 'btn btn-outline-warning',
             'id' => 'reset-defaults-btn',
-            'data-confirm' => 'Are you sure you want to reset all settings to default values?'
+            'data-confirm' => Yii::t('app/company', 'Are you sure you want to reset all settings to default values?')
         ]) ?>
-		<?= Html::a('Export Backup', ['/company/backup'], [
+		<?= Html::a(Yii::t('app/company', 'Export Backup'), ['/company/backup'], [
             'class' => 'btn btn-outline-info',
             'target' => '_blank'
         ]) ?>
@@ -463,7 +463,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">Test Email Configuration</h5>
+				<h5 class="modal-title"><?= Yii::t('app/company', 'Test Email Configuration') ?></h5>
 				<button type="button" class="close" data-dismiss="modal">
 					<span>&times;</span>
 				</button>
@@ -471,16 +471,16 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 			<div class="modal-body">
 				<form id="test-email-form">
 					<div class="form-group">
-						<label for="test-email">Email Address</label>
+						<label for="test-email"><?= Yii::t('app/company', 'Email Address') ?></label>
 						<input type="email" class="form-control" id="test-email" required
-							placeholder="Enter email to send test message">
+							placeholder="<?= Yii::t('app/company', 'Enter email to send test message') ?>">
 					</div>
 					<div id="test-email-result" class="mt-3" style="display: none;"></div>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" id="send-test-email">Send Test Email</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
+				<button type="button" class="btn btn-primary" id="send-test-email"><?= Yii::t('app/company', 'Send Test Email') ?></button>
 			</div>
 		</div>
 	</div>

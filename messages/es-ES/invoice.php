@@ -150,4 +150,7 @@ return [
     'Payment History' => 'Historial de pagos',
     'Summary' => 'Resumen',
     'Paid' => 'Pagado',
+    
+    // Preview page translations
+    'Preview' => 'Vista Previa',
 ];

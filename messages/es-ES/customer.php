@@ -113,4 +113,19 @@ return [
     'Activate' => 'Activar',
     'Deactivate' => 'Desactivar',
     'Are you sure you want to deactivate this customer?' => '¿Está seguro de que desea desactivar este cliente?',
+    
+    // Customer view page
+    'Not provided' => 'No proporcionado',
+    'Statistics' => 'Estadísticas',
+    'Total Invoices' => 'Total de Facturas',
+    'Total Amount' => 'Cantidad Total',
+    'Send Email' => 'Enviar Correo',
+    'Quick Contact' => 'Contacto Rápido',
+    'Customer Invoices' => 'Facturas del Cliente',
+    'Invoice #' => 'Factura #',
+    'View Invoice' => 'Ver Factura',
+    'Preview PDF' => 'Vista Previa PDF',
+    'No Invoices' => 'Sin Facturas',
+    'This customer doesn\'t have any invoices yet.' => 'Este cliente aún no tiene facturas.',
+    'Create First Invoice' => 'Crear Primera Factura',
 ];
