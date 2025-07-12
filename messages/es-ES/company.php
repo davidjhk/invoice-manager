@@ -1,0 +1,97 @@
+<?php
+/**
+ * Spanish translations for company-related messages
+ */
+return [
+    'Company Settings' => 'Configuración de Empresa',
+    'Company Information' => 'Información de la Empresa',
+    'Company Name' => 'Nombre de la Empresa',
+    'Company Address' => 'Dirección de la Empresa',
+    'Company Phone' => 'Teléfono de la Empresa',
+    'Company Email' => 'Email de la Empresa',
+    'Company Logo' => 'Logo de la Empresa',
+    'Upload New Logo' => 'Cargar Nuevo Logo',
+    'Current Logo' => 'Logo Actual',
+    'Delete Logo' => 'Eliminar Logo',
+    'Filename' => 'Nombre del archivo',
+    'Click to upload' => 'Clic para cargar',
+    'or drag and drop' => 'o arrastrar y soltar',
+    'PNG, JPG, JPEG, GIF up to 2MB' => 'PNG, JPG, JPEG, GIF hasta 2MB',
+    'Preview' => 'Vista previa',
+    
+    // Display & PDF Settings
+    'Display & PDF Settings' => 'Configuración de Visualización y PDF',
+    'Dark Mode' => 'Modo Oscuro',
+    'Enable dark mode theme' => 'Habilitar tema modo oscuro',
+    'Enable dark mode theme for your company\'s interface' => 'Habilitar tema modo oscuro para la interfaz de su empresa',
+    'Use CJK Fonts for PDF' => 'Usar Fuentes CJK para PDF',
+    'Use CJK fonts for PDF generation' => 'Usar fuentes CJK para generar PDF',
+    'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters' => 'Usar fuentes CJK (Chino, Japonés, Coreano) para mejor renderizado de caracteres asiáticos en PDF',
+    
+    // Invoice Settings
+    'Invoice Settings' => 'Configuración de Facturas',
+    'Tax Rate' => 'Tasa de Impuesto',
+    'Select Currency' => 'Seleccionar Moneda',
+    'Invoice Prefix' => 'Prefijo de Factura',
+    'Estimate Prefix' => 'Prefijo de Presupuesto',
+    'Due Date Days' => 'Días de Vencimiento',
+    'Estimate Validity Days' => 'Días de Validez del Presupuesto',
+    'Next Invoice Number' => 'Próximo Número de Factura',
+    'Next Estimate Number' => 'Próximo Número de Presupuesto',
+    'Default Due Date' => 'Fecha de Vencimiento Predeterminada',
+    'Default Estimate Expiry' => 'Vencimiento Predeterminado del Presupuesto',
+    
+    // Email Settings
+    'Email Settings' => 'Configuración de Email',
+    'Test Email' => 'Probar Email',
+    'SMTP2GO API Key' => 'Clave API de SMTP2GO',
+    'Enter your SMTP2GO API key' => 'Ingrese su clave API de SMTP2GO',
+    'Sender Email' => 'Email del Remitente',
+    'noreply@yourcompany.com' => 'noreply@suempresa.com',
+    'Sender Name' => 'Nombre del Remitente',
+    'Your Company Name' => 'Nombre de Su Empresa',
+    'BCC Email' => 'Email BCC',
+    'admin@yourcompany.com' => 'admin@suempresa.com',
+    'To use email functionality, you need to configure SMTP2GO API.' => 'Para usar la funcionalidad de email, necesita configurar la API de SMTP2GO.',
+    'Get your API key here' => 'Obtenga su clave API aquí',
+    'Email Configuration:' => 'Configuración de Email:',
+    'The email address that will appear as "From" in sent emails' => 'La dirección de email que aparecerá como "De" en los emails enviados',
+    'The name that will appear as sender (defaults to company name)' => 'El nombre que aparecerá como remitente (predeterminado: nombre de la empresa)',
+    'Email address to receive blind carbon copy of all sent emails' => 'Dirección de email para recibir copia oculta de todos los emails enviados',
+    
+    // Language Settings
+    'Language Settings' => 'Configuración de Idioma',
+    'Interface Language' => 'Idioma de la Interfaz',
+    'Select your preferred language for the interface' => 'Seleccione su idioma preferido para la interfaz',
+    'English' => 'Inglés',
+    'Spanish' => 'Español',
+    'Korean' => 'Coreano',
+    'Chinese (Simplified)' => 'Chino (Simplificado)',
+    'Chinese (Traditional)' => 'Chino (Tradicional)',
+    
+    // Form actions
+    'Save Settings' => 'Guardar Configuración',
+    'Reset to Defaults' => 'Restablecer Valores Predeterminados',
+    'Export Backup' => 'Exportar Respaldo',
+    'Back to Dashboard' => 'Volver al Panel de Control',
+    'Are you sure you want to reset all settings to default values?' => '¿Está seguro de que desea restablecer toda la configuración a los valores predeterminados?',
+    'Are you sure you want to delete the company logo? This action cannot be undone.' => '¿Está seguro de que desea eliminar el logo de la empresa? Esta acción no se puede deshacer.',
+    
+    // Success/Error messages
+    'Settings saved successfully.' => 'Configuración guardada con éxito.',
+    'Logo uploaded successfully.' => 'Logo cargado con éxito.',
+    'Logo deleted successfully.' => 'Logo eliminado con éxito.',
+    'Failed to save settings.' => 'Error al guardar la configuración.',
+    'Failed to upload logo.' => 'Error al cargar el logo.',
+    'Failed to delete logo.' => 'Error al eliminar el logo.',
+    'File size must be less than 2MB' => 'El tamaño del archivo debe ser menor a 2MB',
+    'Please select a valid image file (PNG, JPG, JPEG, or GIF)' => 'Por favor seleccione un archivo de imagen válido (PNG, JPG, JPEG, o GIF)',
+    'Please select an image file.' => 'Por favor seleccione un archivo de imagen.',
+    'File selected:' => 'Archivo seleccionado:',
+    'Click to change or drag new file' => 'Clic para cambiar o arrastrar nuevo archivo',
+    
+    // Additional messages for language settings
+    'Changing the language will update the interface immediately after saving settings.' => 'Cambiar el idioma actualizará la interfaz inmediatamente después de guardar la configuración.',
+    'Language has been changed to {language}.' => 'El idioma ha sido cambiado a {language}.',
+    'Company settings updated successfully.' => 'Configuración de la empresa actualizada exitosamente.',
+];

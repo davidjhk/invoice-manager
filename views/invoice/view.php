@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /** @var app\models\Invoice $model */
 
 $this->title = $model->invoice_number;
-$this->params['breadcrumbs'][] = ['label' => 'Invoices', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app/invoice', 'Invoices'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="invoice-view">
@@ -21,37 +21,37 @@ $this->params['breadcrumbs'][] = $this->title;
 		</h1>
 		<div class="btn-group" role="group">
 			<?php if ($model->isEditable()): ?>
-			<?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/invoice', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>Preview', ['preview', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/invoice', 'Invoice Preview'), ['preview', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
 
 			<?php if ($model->canBeSent()): ?>
-			<?= Html::a('<i class="fas fa-envelope mr-1"></i>Send Email', ['send-email', 'id' => $model->id], ['class' => 'btn btn-success', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', 'Send Email'), ['send-email', 'id' => $model->id], ['class' => 'btn btn-success', 'encode' => false]) ?>
 			<?php endif; ?>
 
 			<?php if ($model->canReceivePayment()): ?>
-			<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i>Receive Payment', ['receive-payment', 'id' => $model->id], ['class' => 'btn btn-warning', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i>' . Yii::t('app/invoice', 'Receive Payment'), ['receive-payment', 'id' => $model->id], ['class' => 'btn btn-warning', 'encode' => false]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-copy mr-1"></i>Duplicate', ['duplicate', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-copy mr-1"></i>' . Yii::t('app/invoice', 'Duplicate'), ['duplicate', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'data' => [
-                    'confirm' => 'Are you sure you want to duplicate this invoice?',
+                    'confirm' => Yii::t('app/invoice', 'Are you sure you want to duplicate this invoice?'),
                     'method' => 'post',
                 ],
                 'encode' => false
             ]) ?>
 
 			<?php if ($model->isEditable()): ?>
-			<?= Html::a('<i class="fas fa-trash mr-1"></i>Delete', ['delete', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/invoice', 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
-                        'confirm' => 'Are you sure you want to delete this invoice?',
+                        'confirm' => Yii::t('app/invoice', 'Are you sure you want to delete this invoice?'),
                         'method' => 'post',
                     ],
                     'encode' => false
@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Invoice Details -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="card-title mb-0">Invoice Details</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Invoice Details') ?></h5>
 				</div>
 				<div class="card-body">
 					<?= DetailView::widget([
@@ -80,13 +80,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'due_date',
                                 'format' => ['date', 'php:F j, Y'],
                                 'value' => function($model) {
-                                    if (!$model->due_date) return 'Not set';
+                                    if (!$model->due_date) return Yii::t('app/invoice', 'Not set');
                                     
                                     $isOverdue = $model->due_date < date('Y-m-d') && $model->status !== 'paid';
                                     $formatted = Yii::$app->formatter->asDate($model->due_date, 'php:F j, Y');
                                     
                                     if ($isOverdue) {
-                                        return Html::tag('span', $formatted . ' (OVERDUE)', ['class' => 'text-danger font-weight-bold']);
+                                        return Html::tag('span', $formatted . ' (' . Yii::t('app/invoice', 'OVERDUE') . ')', ['class' => 'text-danger font-weight-bold']);
                                     }
                                     
                                     return $formatted;
@@ -112,7 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Customer Details -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="card-title mb-0">Customer Information</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Customer Information') ?></h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
@@ -149,7 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Invoice Items -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="card-title mb-0">Invoice Items</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Invoice Items') ?></h5>
 				</div>
 				<div class="card-body">
 					<?php if (!empty($model->invoiceItems)): ?>
@@ -157,10 +157,10 @@ $this->params['breadcrumbs'][] = $this->title;
 						<table class="table table-striped">
 							<thead>
 								<tr>
-									<th>Description</th>
-									<th class="text-center">Quantity</th>
-									<th class="text-right">Rate</th>
-									<th class="text-right">Amount</th>
+									<th><?= Yii::t('app/invoice', 'Description') ?></th>
+									<th class="text-center"><?= Yii::t('app/invoice', 'Quantity') ?></th>
+									<th class="text-right"><?= Yii::t('app/invoice', 'Price') ?></th>
+									<th class="text-right"><?= Yii::t('app/invoice', 'Amount') ?></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -177,7 +177,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					</div>
 					<?php else: ?>
 					<div class="alert alert-warning">
-						No items found for this invoice.
+						<?= Yii::t('app/invoice', 'No items found for this invoice.') ?>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -188,7 +188,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Company Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="card-title mb-0">From</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'From') ?></h5>
 				</div>
 				<div class="card-body">
 					<strong><?= Html::encode($model->company->company_name) ?></strong>
@@ -207,28 +207,28 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Payment Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="card-title mb-0">Payment Status</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Payment Status') ?></h5>
 				</div>
 				<div class="card-body">
 					<dl class="row mb-0">
-						<dt class="col-sm-6">Invoice Total:</dt>
+						<dt class="col-sm-6"><?= Yii::t('app/invoice', 'Invoice Total') ?>:</dt>
 						<dd class="col-sm-6 text-right">
 							<strong><?= $model->formatAmount($model->total_amount) ?></strong>
 						</dd>
 
-						<dt class="col-sm-6">Amount Paid:</dt>
+						<dt class="col-sm-6"><?= Yii::t('app/invoice', 'Amount Paid') ?>:</dt>
 						<dd class="col-sm-6 text-right text-success">
 							<strong><?= $model->formatAmount($model->getPaidAmount()) ?></strong>
 						</dd>
 
-						<dt class="col-sm-6">Balance Due:</dt>
+						<dt class="col-sm-6"><?= Yii::t('app/invoice', 'Balance Due') ?>:</dt>
 						<dd class="col-sm-6 text-right text-danger">
 							<strong><?= $model->formatAmount($model->getBalance()) ?></strong>
 						</dd>
 					</dl>
 					<?php if ($model->canReceivePayment()): ?>
 					<div class="mt-3">
-						<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i> Receive Payment', ['receive-payment', 'id' => $model->id], ['class' => 'btn btn-warning btn-block', 'encode' => false]) ?>
+						<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i> ' . Yii::t('app/invoice', 'Receive Payment'), ['receive-payment', 'id' => $model->id], ['class' => 'btn btn-warning btn-block', 'encode' => false]) ?>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -238,15 +238,15 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?php if (!empty($model->payments)): ?>
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="card-title mb-0">Payment History</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Payment History') ?></h5>
 				</div>
 				<div class="card-body p-0">
 					<table class="table table-striped table-sm mb-0">
 						<thead>
 							<tr>
-								<th>Date</th>
-								<th>Method</th>
-								<th class="text-right">Amount</th>
+								<th><?= Yii::t('app/invoice', 'Payment Date') ?></th>
+								<th><?= Yii::t('app/invoice', 'Payment Method') ?></th>
+								<th class="text-right"><?= Yii::t('app/invoice', 'Amount') ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -266,32 +266,32 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Totals -->
 			<div class="card">
 				<div class="card-header">
-					<h5 class="card-title mb-0">Summary</h5>
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Summary') ?></h5>
 				</div>
 				<div class="card-body">
 					<table class="table table-sm">
 						<tr>
-							<td>Subtotal:</td>
+							<td><?= Yii::t('app/invoice', 'Subtotal') ?>:</td>
 							<td class="text-right"><?= $model->formatAmount($model->subtotal) ?></td>
 						</tr>
 						<tr>
-							<td>Tax (<?= number_format($model->tax_rate, 1) ?>%):</td>
+							<td><?= Yii::t('app/invoice', 'Tax') ?> (<?= number_format($model->tax_rate, 1) ?>%):</td>
 							<td class="text-right"><?= $model->formatAmount($model->tax_amount) ?></td>
 						</tr>
 						<tr class="table-active font-weight-bold">
-							<td>Total:</td>
+							<td><?= Yii::t('app/invoice', 'Total') ?>:</td>
 							<td class="text-right h5 mb-0"><?= $model->formatAmount($model->total_amount) ?></td>
 						</tr>
 
 						<?php if ($model->getTotalPaidAmount() > 0): ?>
 						<tr class="table-success">
-							<td><strong>Paid:</strong></td>
+							<td><strong><?= Yii::t('app/invoice', 'Paid') ?>:</strong></td>
 							<td class="text-right text-success font-weight-bold">
 								-<?= $model->formatAmount($model->getTotalPaidAmount()) ?>
 							</td>
 						</tr>
 						<tr class="<?= $model->getRemainingBalance() > 0 ? 'table-warning' : 'table-success' ?>">
-							<td><strong>Balance Due:</strong></td>
+							<td><strong><?= Yii::t('app/invoice', 'Balance Due') ?>:</strong></td>
 							<td
 								class="text-right font-weight-bold h5 mb-0 <?= $model->getRemainingBalance() > 0 ? 'text-warning' : 'text-success' ?>">
 								<?= $model->formatAmount($model->getRemainingBalance()) ?>

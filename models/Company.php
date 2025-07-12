@@ -84,6 +84,9 @@ class Company extends ActiveRecord
             [['dark_mode', 'use_cjk_font'], 'filter', 'filter' => function($value) {
                 return $value ? 1 : 0;
             }],
+            [['language'], 'string', 'max' => 10],
+            [['language'], 'in', 'range' => ['en-US', 'es-ES', 'ko-KR', 'zh-CN', 'zh-TW']],
+            [['language'], 'default', 'value' => 'en-US'],
             [['created_at', 'updated_at'], 'safe'],
             [['company_name'], 'string', 'max' => 255],
             [['company_phone'], 'string', 'max' => 50],
@@ -138,6 +141,7 @@ class Company extends ActiveRecord
             'is_active' => 'Is Active',
             'dark_mode' => 'Dark Mode',
             'use_cjk_font' => 'Use CJK Fonts for PDF',
+            'language' => 'Interface Language',
             'user_id' => 'Owner',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -466,5 +470,42 @@ class Company extends ActiveRecord
         $category->is_active = true;
         $category->sort_order = 1;
         $category->save();
+    }
+
+    /**
+     * Get available languages
+     *
+     * @return array
+     */
+    public static function getLanguageOptions()
+    {
+        return [
+            'en-US' => 'English',
+            'es-ES' => 'Español',
+            'ko-KR' => '한국어',
+            'zh-CN' => '简体中文',
+            'zh-TW' => '繁體中文',
+        ];
+    }
+
+    /**
+     * Get current language name
+     *
+     * @return string
+     */
+    public function getLanguageName()
+    {
+        $languages = self::getLanguageOptions();
+        return $languages[$this->language] ?? $languages['en-US'];
+    }
+
+    /**
+     * Apply company language to application
+     */
+    public function applyLanguage()
+    {
+        if ($this->language && $this->language !== Yii::$app->language) {
+            Yii::$app->language = $this->language;
+        }
     }
 }

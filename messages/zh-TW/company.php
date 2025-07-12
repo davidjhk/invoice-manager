@@ -1,0 +1,97 @@
+<?php
+/**
+ * Traditional Chinese translations for company-related messages
+ */
+return [
+    'Company Settings' => '公司設定',
+    'Company Information' => '公司資訊',
+    'Company Name' => '公司名稱',
+    'Company Address' => '公司地址',
+    'Company Phone' => '公司電話',
+    'Company Email' => '公司電子郵件',
+    'Company Logo' => '公司標誌',
+    'Upload New Logo' => '上傳新標誌',
+    'Current Logo' => '目前標誌',
+    'Delete Logo' => '刪除標誌',
+    'Filename' => '檔案名稱',
+    'Click to upload' => '點擊上傳',
+    'or drag and drop' => '或拖曳上傳',
+    'PNG, JPG, JPEG, GIF up to 2MB' => 'PNG、JPG、JPEG、GIF 最大2MB',
+    'Preview' => '預覽',
+    
+    // Display & PDF Settings
+    'Display & PDF Settings' => '顯示和PDF設定',
+    'Dark Mode' => '深色模式',
+    'Enable dark mode theme' => '啟用深色主題',
+    'Enable dark mode theme for your company\'s interface' => '為您的公司介面啟用深色主題',
+    'Use CJK Fonts for PDF' => 'PDF使用中日韓字體',
+    'Use CJK fonts for PDF generation' => 'PDF生成使用中日韓字體',
+    'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters' => '使用中日韓字體以更好地呈現亞洲字符的PDF',
+    
+    // Invoice Settings
+    'Invoice Settings' => '發票設定',
+    'Tax Rate' => '稅率',
+    'Select Currency' => '選擇貨幣',
+    'Invoice Prefix' => '發票前綴',
+    'Estimate Prefix' => '估價單前綴',
+    'Due Date Days' => '到期天數',
+    'Estimate Validity Days' => '估價單有效天數',
+    'Next Invoice Number' => '下一個發票號碼',
+    'Next Estimate Number' => '下一個估價單號碼',
+    'Default Due Date' => '預設到期日期',
+    'Default Estimate Expiry' => '預設估價單到期',
+    
+    // Email Settings
+    'Email Settings' => '電子郵件設定',
+    'Test Email' => '測試電子郵件',
+    'SMTP2GO API Key' => 'SMTP2GO API金鑰',
+    'Enter your SMTP2GO API key' => '輸入您的SMTP2GO API金鑰',
+    'Sender Email' => '寄件者電子郵件',
+    'noreply@yourcompany.com' => 'noreply@yourcompany.com',
+    'Sender Name' => '寄件者姓名',
+    'Your Company Name' => '您的公司名稱',
+    'BCC Email' => '密件副本電子郵件',
+    'admin@yourcompany.com' => 'admin@yourcompany.com',
+    'To use email functionality, you need to configure SMTP2GO API.' => '要使用電子郵件功能，您需要配置SMTP2GO API。',
+    'Get your API key here' => '在此獲取您的API金鑰',
+    'Email Configuration:' => '電子郵件配置：',
+    'The email address that will appear as "From" in sent emails' => '在發送的電子郵件中顯示為"寄件者"的電子郵件地址',
+    'The name that will appear as sender (defaults to company name)' => '顯示為寄件者的姓名（預設為公司名稱）',
+    'Email address to receive blind carbon copy of all sent emails' => '接收所有發送電子郵件密件副本的電子郵件地址',
+    
+    // Language Settings
+    'Language Settings' => '語言設定',
+    'Interface Language' => '介面語言',
+    'Select your preferred language for the interface' => '選擇您的介面偏好語言',
+    'English' => '英語',
+    'Spanish' => '西班牙語',
+    'Korean' => '韓語',
+    'Chinese (Simplified)' => '中文（簡體）',
+    'Chinese (Traditional)' => '中文（繁體）',
+    
+    // Form actions
+    'Save Settings' => '儲存設定',
+    'Reset to Defaults' => '重置為預設值',
+    'Export Backup' => '匯出備份',
+    'Back to Dashboard' => '返回儀表板',
+    'Are you sure you want to reset all settings to default values?' => '您確定要將所有設定重置為預設值嗎？',
+    'Are you sure you want to delete the company logo? This action cannot be undone.' => '您確定要刪除公司標誌嗎？此操作無法復原。',
+    
+    // Success/Error messages
+    'Settings saved successfully.' => '設定儲存成功。',
+    'Logo uploaded successfully.' => '標誌上傳成功。',
+    'Logo deleted successfully.' => '標誌刪除成功。',
+    'Failed to save settings.' => '儲存設定失敗。',
+    'Failed to upload logo.' => '上傳標誌失敗。',
+    'Failed to delete logo.' => '刪除標誌失敗。',
+    'File size must be less than 2MB' => '檔案大小必須小於2MB',
+    'Please select a valid image file (PNG, JPG, JPEG, or GIF)' => '請選擇有效的圖片檔案（PNG、JPG、JPEG或GIF）',
+    'Please select an image file.' => '請選擇圖片檔案。',
+    'File selected:' => '已選擇檔案：',
+    'Click to change or drag new file' => '點擊更改或拖曳新檔案',
+    
+    // Additional messages for language settings
+    'Changing the language will update the interface immediately after saving settings.' => '更改語言將在儲存設定後立即更新介面。',
+    'Language has been changed to {language}.' => '語言已更改為{language}。',
+    'Company settings updated successfully.' => '公司設定更新成功。',
+];

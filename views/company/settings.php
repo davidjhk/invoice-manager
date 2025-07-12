@@ -7,7 +7,7 @@ use yii\helpers\Url;
 /** @var yii\web\View $this */
 /** @var app\models\Company $model */
 
-$this->title = 'Company Settings';
+$this->title = Yii::t('app/company', 'Company Settings');
 $this->params['breadcrumbs'][] = $this->title;
 
 // Register collapse helper JavaScript
@@ -18,7 +18,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1><?= Html::encode($this->title) ?></h1>
-		<?= Html::a('Back to Dashboard', ['/site/index'], ['class' => 'btn btn-secondary']) ?>
+		<?= Html::a(Yii::t('app/company', 'Back to Dashboard'), ['/site/index'], ['class' => 'btn btn-secondary']) ?>
 	</div>
 
 	<?php $form = ActiveForm::begin([
@@ -37,7 +37,7 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 			<div class="card mb-4">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-building mr-2"></i>Company Information
+						<i class="fas fa-building mr-2"></i><?= Yii::t('app/company', 'Company Information') ?>
 					</h5>
 				</div>
 				<div class="card-body">
@@ -117,6 +117,48 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Language Settings -->
+	<div class="card mb-4">
+		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+			data-target="#language-settings-collapse" aria-expanded="false">
+			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+				<span><i class="fas fa-language mr-2"></i><?= Yii::t('app/company', 'Language Settings') ?></span>
+				<i class="fas fa-chevron-down collapse-icon"></i>
+			</h5>
+		</div>
+		<div class="collapse" id="language-settings-collapse">
+			<div class="card-body">
+				<div class="form-group">
+					<?= $form->field($model, 'language')->dropDownList(
+						\app\models\Company::getLanguageOptions(),
+						[
+							'prompt' => Yii::t('app/company', 'Select your preferred language for the interface'),
+							'class' => 'form-control'
+						]
+					)->label(Yii::t('app/company', 'Interface Language')) ?>
+					<small class="form-text text-muted">
+						<?= Yii::t('app/company', 'Select your preferred language for the interface') ?>
+					</small>
+				</div>
+				
+				<div class="alert alert-info">
+					<small>
+						<i class="fas fa-info-circle mr-1"></i>
+						<strong><?= Yii::t('app', 'Information') ?>:</strong> 
+						<?= Yii::t('app/company', 'Changing the language will update the interface immediately after saving settings.') ?>
+						<br>
+						<strong><?= Yii::t('app', 'Available Languages') ?>:</strong>
+						<br>• <?= Yii::t('app/company', 'English') ?> (English)
+						<br>• <?= Yii::t('app/company', 'Spanish') ?> (Español)
+						<br>• <?= Yii::t('app/company', 'Korean') ?> (한국어)
+						<br>• <?= Yii::t('app/company', 'Chinese (Simplified)') ?> (简体中文)
+						<br>• <?= Yii::t('app/company', 'Chinese (Traditional)') ?> (繁體中文)
+					</small>
 				</div>
 			</div>
 		</div>
@@ -686,6 +728,27 @@ $this->registerJs("
     
     $('#cjk-font-switch').on('change', function() {
         console.log('CJK font changed to: ' + $(this).is(':checked'));
+    });
+    
+    // Language change handler
+    $('#company-language').on('change', function() {
+        var selectedLanguage = $(this).val();
+        console.log('Language changed to:', selectedLanguage);
+        
+        // Optionally show a preview message
+        if (selectedLanguage) {
+            var languageNames = {
+                'en-US': 'English',
+                'es-ES': 'Español', 
+                'ko-KR': '한국어',
+                'zh-CN': '简体中文',
+                'zh-TW': '繁體中文'
+            };
+            
+            // Show temporary notification
+            var languageName = languageNames[selectedLanguage] || selectedLanguage;
+            console.log('Selected language name:', languageName);
+        }
     });
     
     // Collapse functionality is handled by collapse-helper.js

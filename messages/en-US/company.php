@@ -1,0 +1,97 @@
+<?php
+/**
+ * English translations for company-related messages
+ */
+return [
+    'Company Settings' => 'Company Settings',
+    'Company Information' => 'Company Information',
+    'Company Name' => 'Company Name',
+    'Company Address' => 'Company Address',
+    'Company Phone' => 'Company Phone',
+    'Company Email' => 'Company Email',
+    'Company Logo' => 'Company Logo',
+    'Upload New Logo' => 'Upload New Logo',
+    'Current Logo' => 'Current Logo',
+    'Delete Logo' => 'Delete Logo',
+    'Filename' => 'Filename',
+    'Click to upload' => 'Click to upload',
+    'or drag and drop' => 'or drag and drop',
+    'PNG, JPG, JPEG, GIF up to 2MB' => 'PNG, JPG, JPEG, GIF up to 2MB',
+    'Preview' => 'Preview',
+    
+    // Display & PDF Settings
+    'Display & PDF Settings' => 'Display & PDF Settings',
+    'Dark Mode' => 'Dark Mode',
+    'Enable dark mode theme' => 'Enable dark mode theme',
+    'Enable dark mode theme for your company\'s interface' => 'Enable dark mode theme for your company\'s interface',
+    'Use CJK Fonts for PDF' => 'Use CJK Fonts for PDF',
+    'Use CJK fonts for PDF generation' => 'Use CJK fonts for PDF generation',
+    'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters' => 'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters',
+    
+    // Invoice Settings
+    'Invoice Settings' => 'Invoice Settings',
+    'Tax Rate' => 'Tax Rate',
+    'Select Currency' => 'Select Currency',
+    'Invoice Prefix' => 'Invoice Prefix',
+    'Estimate Prefix' => 'Estimate Prefix',
+    'Due Date Days' => 'Due Date Days',
+    'Estimate Validity Days' => 'Estimate Validity Days',
+    'Next Invoice Number' => 'Next Invoice Number',
+    'Next Estimate Number' => 'Next Estimate Number',
+    'Default Due Date' => 'Default Due Date',
+    'Default Estimate Expiry' => 'Default Estimate Expiry',
+    
+    // Email Settings
+    'Email Settings' => 'Email Settings',
+    'Test Email' => 'Test Email',
+    'SMTP2GO API Key' => 'SMTP2GO API Key',
+    'Enter your SMTP2GO API key' => 'Enter your SMTP2GO API key',
+    'Sender Email' => 'Sender Email',
+    'noreply@yourcompany.com' => 'noreply@yourcompany.com',
+    'Sender Name' => 'Sender Name',
+    'Your Company Name' => 'Your Company Name',
+    'BCC Email' => 'BCC Email',
+    'admin@yourcompany.com' => 'admin@yourcompany.com',
+    'To use email functionality, you need to configure SMTP2GO API.' => 'To use email functionality, you need to configure SMTP2GO API.',
+    'Get your API key here' => 'Get your API key here',
+    'Email Configuration:' => 'Email Configuration:',
+    'The email address that will appear as "From" in sent emails' => 'The email address that will appear as "From" in sent emails',
+    'The name that will appear as sender (defaults to company name)' => 'The name that will appear as sender (defaults to company name)',
+    'Email address to receive blind carbon copy of all sent emails' => 'Email address to receive blind carbon copy of all sent emails',
+    
+    // Language Settings
+    'Language Settings' => 'Language Settings',
+    'Interface Language' => 'Interface Language',
+    'Select your preferred language for the interface' => 'Select your preferred language for the interface',
+    'English' => 'English',
+    'Spanish' => 'Spanish',
+    'Korean' => 'Korean',
+    'Chinese (Simplified)' => 'Chinese (Simplified)',
+    'Chinese (Traditional)' => 'Chinese (Traditional)',
+    
+    // Form actions
+    'Save Settings' => 'Save Settings',
+    'Reset to Defaults' => 'Reset to Defaults',
+    'Export Backup' => 'Export Backup',
+    'Back to Dashboard' => 'Back to Dashboard',
+    'Are you sure you want to reset all settings to default values?' => 'Are you sure you want to reset all settings to default values?',
+    'Are you sure you want to delete the company logo? This action cannot be undone.' => 'Are you sure you want to delete the company logo? This action cannot be undone.',
+    
+    // Success/Error messages
+    'Settings saved successfully.' => 'Settings saved successfully.',
+    'Logo uploaded successfully.' => 'Logo uploaded successfully.',
+    'Logo deleted successfully.' => 'Logo deleted successfully.',
+    'Failed to save settings.' => 'Failed to save settings.',
+    'Failed to upload logo.' => 'Failed to upload logo.',
+    'Failed to delete logo.' => 'Failed to delete logo.',
+    'File size must be less than 2MB' => 'File size must be less than 2MB',
+    'Please select a valid image file (PNG, JPG, JPEG, or GIF)' => 'Please select a valid image file (PNG, JPG, JPEG, or GIF)',
+    'Please select an image file.' => 'Please select an image file.',
+    'File selected:' => 'File selected:',
+    'Click to change or drag new file' => 'Click to change or drag new file',
+    
+    // Additional messages for language settings
+    'Changing the language will update the interface immediately after saving settings.' => 'Changing the language will update the interface immediately after saving settings.',
+    'Language has been changed to {language}.' => 'Language has been changed to {language}.',
+    'Company settings updated successfully.' => 'Company settings updated successfully.',
+];

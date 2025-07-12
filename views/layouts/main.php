@@ -25,7 +25,9 @@ AppAsset::register($this);
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+		rel="stylesheet">
 
 	<?php $this->head() ?>
 
@@ -653,7 +655,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 					</div>
 					<div class="user-menu d-flex align-items-center">
 						<?php if (Yii::$app->user->isGuest): ?>
-						<?= Html::a('<i class="fas fa-sign-in-alt"></i> Login', ['/site/login'], ['class' => 'btn btn-outline-light btn-sm login-btn']) ?>
+						<?= Html::a('<i class="fas fa-sign-in-alt"></i> ' . Yii::t('app/nav', 'Login'), ['/site/login'], ['class' => 'btn btn-outline-light btn-sm login-btn']) ?>
 						<?php else: ?>
 						<?php
 							// Get current company
@@ -664,6 +666,14 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 							}
 							?>
 
+						<!-- Language Switcher -->
+						<div class="mr-3">
+							<?= \app\widgets\LanguageSwitcher::widget([
+								'buttonClass' => 'btn btn-outline-light btn-sm dropdown-toggle',
+								'showNativeNames' => true
+							]) ?>
+						</div>
+
 
 						<!-- Company Dropdown -->
 						<?php if ($currentCompany): ?>
@@ -673,15 +683,15 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 								<i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
 							</button>
 							<ul class="dropdown-menu">
-								<li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>Switch Company', ['/company/select'], ['class' => 'dropdown-item']) ?>
+								<li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
 								</li>
-								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>Settings', ['/company/settings'], ['class' => 'dropdown-item']) ?>
+								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
 								<li>
 									<hr class="dropdown-divider">
 								</li>
-								<li><?= Html::a('<i class="fas fa-plus mr-2"></i>Add New Company', ['/company/create'], ['class' => 'dropdown-item']) ?>
+								<li><?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/nav', 'Add New Company'), ['/company/create'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php endif; ?>
 							</ul>
@@ -697,16 +707,16 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
 								<?php if (Yii::$app->user->identity->isDemo()): ?>
-								<li><?= Html::a('<i class="fas fa-user-check mr-2"></i>Demo Dashboard', ['/demo/index'], ['class' => 'dropdown-item']) ?>
+								<li><?= Html::a('<i class="fas fa-user-check mr-2"></i>' . Yii::t('app/nav', 'Demo Dashboard'), ['/demo/index'], ['class' => 'dropdown-item']) ?>
 								</li>
-								<li><?= Html::a('<i class="fas fa-refresh mr-2"></i>Reset Demo Data', ['/demo/reset-demo-data'], ['class' => 'dropdown-item text-danger', 'data' => ['confirm' => 'Are you sure you want to reset all demo data?', 'method' => 'post']]) ?>
+								<li><?= Html::a('<i class="fas fa-refresh mr-2"></i>' . Yii::t('app/nav', 'Reset Demo Data'), ['/demo/reset-demo-data'], ['class' => 'dropdown-item text-danger', 'data' => ['confirm' => Yii::t('app/nav', 'Are you sure you want to reset all demo data?'), 'method' => 'post']]) ?>
 								</li>
 								<?php else: ?>
-								<li><?= Html::a('<i class="fas fa-key mr-2"></i>Change Password', ['/site/change-password'], ['class' => 'dropdown-item']) ?>
+								<li><?= Html::a('<i class="fas fa-key mr-2"></i>' . Yii::t('app/nav', 'Change Password'), ['/site/change-password'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php endif; ?>
 								<?php if (Yii::$app->user->identity->isAdmin()): ?>
-								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>Admin Panel', ['/admin/index'], ['class' => 'dropdown-item']) ?>
+								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Admin Panel'), ['/admin/index'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php endif; ?>
 								<li>
@@ -714,7 +724,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 								</li>
 								<li>
 									<?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
-									<?= Html::submitButton('<i class="fas fa-sign-out-alt mr-2"></i>Logout', ['class' => 'dropdown-item logout-btn']) ?>
+									<?= Html::submitButton('<i class="fas fa-sign-out-alt mr-2"></i>' . Yii::t('app/nav', 'Logout'), ['class' => 'dropdown-item logout-btn']) ?>
 									<?= Html::endForm() ?>
 								</li>
 							</ul>
@@ -732,22 +742,28 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 				<div class="navbar-nav mx-auto">
 					<?php
 					// Main navigation items
+					$dashboardLabel = Yii::t('app/nav', 'Dashboard');
+					$invoicesLabel = Yii::t('app/nav', 'Invoices');
+					$estimatesLabel = Yii::t('app/nav', 'Estimates');
+					$customersLabel = Yii::t('app/nav', 'Customers');
+					$productsLabel = Yii::t('app/nav', 'Products');
+					
 					$mainNavItems = [
-						['label' => 'Dashboard', 'url' => Yii::$app->user->identity->isDemo() ? ['/demo/index'] : ['/site/index']],
-						['label' => 'Invoices', 'url' => ['/invoice/index']],
-						['label' => 'Estimates', 'url' => ['/estimate/index']],
-						['label' => 'Customers', 'url' => ['/customer/index']],
-						['label' => 'Products', 'url' => ['/product/index']],
+						['label' => $dashboardLabel, 'url' => Yii::$app->user->identity->isDemo() ? ['/demo/index'] : ['/site/index']],
+						['label' => $invoicesLabel, 'url' => ['/invoice/index']],
+						['label' => $estimatesLabel, 'url' => ['/estimate/index']],
+						['label' => $customersLabel, 'url' => ['/customer/index']],
+						['label' => $productsLabel, 'url' => ['/product/index']],
 					];
 					
 					// Render navigation items directly
 					foreach ($mainNavItems as $item) {
 						$active = (((Yii::$app->controller->id === 'site' && Yii::$app->controller->action->id === 'index') || 
-								   (Yii::$app->controller->id === 'demo' && Yii::$app->controller->action->id === 'index')) && $item['label'] === 'Dashboard') ||
-								  (Yii::$app->controller->id === 'invoice' && $item['label'] === 'Invoices') ||
-								  (Yii::$app->controller->id === 'estimate' && $item['label'] === 'Estimates') ||
-								  (Yii::$app->controller->id === 'customer' && $item['label'] === 'Customers') ||
-								  (Yii::$app->controller->id === 'product' && $item['label'] === 'Products');
+								   (Yii::$app->controller->id === 'demo' && Yii::$app->controller->action->id === 'index')) && $item['label'] === $dashboardLabel) ||
+								  (Yii::$app->controller->id === 'invoice' && $item['label'] === $invoicesLabel) ||
+								  (Yii::$app->controller->id === 'estimate' && $item['label'] === $estimatesLabel) ||
+								  (Yii::$app->controller->id === 'customer' && $item['label'] === $customersLabel) ||
+								  (Yii::$app->controller->id === 'product' && $item['label'] === $productsLabel);
 						
 						$activeClass = $active ? ' active' : '';
 						echo Html::a($item['label'], $item['url'], ['class' => 'nav-link' . $activeClass]);
@@ -757,13 +773,13 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 					<!-- Create Dropdown -->
 					<div class="dropdown">
 						<a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
-							<i class="fas fa-plus mr-1"></i>Create
+							<i class="fas fa-plus mr-1"></i><?= Yii::t('app/nav', 'Create') ?>
 						</a>
 						<div class="dropdown-menu">
-							<?= Html::a('<i class="fas fa-file-invoice mr-2"></i>New Invoice', ['/invoice/create'], ['class' => 'dropdown-item']) ?>
-							<?= Html::a('<i class="fas fa-file-alt mr-2"></i>New Estimate', ['/estimate/create'], ['class' => 'dropdown-item']) ?>
-							<?= Html::a('<i class="fas fa-users mr-2"></i>New Customer', ['/customer/create'], ['class' => 'dropdown-item']) ?>
-							<?= Html::a('<i class="fas fa-box mr-2"></i>New Product', ['/product/create'], ['class' => 'dropdown-item']) ?>
+							<?= Html::a('<i class="fas fa-file-invoice mr-2"></i>' . Yii::t('app/nav', 'New Invoice'), ['/invoice/create'], ['class' => 'dropdown-item']) ?>
+							<?= Html::a('<i class="fas fa-file-alt mr-2"></i>' . Yii::t('app/nav', 'New Estimate'), ['/estimate/create'], ['class' => 'dropdown-item']) ?>
+							<?= Html::a('<i class="fas fa-users mr-2"></i>' . Yii::t('app/nav', 'New Customer'), ['/customer/create'], ['class' => 'dropdown-item']) ?>
+							<?= Html::a('<i class="fas fa-box mr-2"></i>' . Yii::t('app/nav', 'New Product'), ['/product/create'], ['class' => 'dropdown-item']) ?>
 						</div>
 					</div>
 				</div>
@@ -815,6 +831,8 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 		console.log('Top bar dropdowns found:', $('.top-bar .dropdown').length);
 		console.log('Dropdown toggles found:', $('.top-bar .dropdown-toggle').length);
 		console.log('Dropdown menus found:', $('.top-bar .dropdown-menu').length);
+		console.log('Language switcher found:', $('.language-switcher').length);
+		console.log('Language switcher items found:', $('.language-switcher .dropdown-item').length);
 
 		$('.top-bar .dropdown-toggle').each(function(i) {
 			console.log('Dropdown toggle ' + i + ':', $(this).text().trim());
@@ -838,8 +856,8 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 			console.error('Bootstrap dropdown initialization failed:', e);
 		}
 
-		// Test all possible event handlers for top bar dropdowns
-		$('.top-bar .dropdown-toggle').off('click').on('click', function(e) {
+		// Test all possible event handlers for top bar dropdowns (excluding language switcher)
+		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').off('click').on('click', function(e) {
 			console.log('=== Top bar dropdown clicked ===');
 			console.log('Target element:', this);
 			console.log('Element text:', $(this).text().trim());
@@ -873,8 +891,8 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 			}
 		});
 
-		// Alternative event binding methods
-		$('.top-bar').on('click', '.dropdown-toggle', function(e) {
+		// Alternative event binding methods (excluding language switcher)
+		$('.top-bar').on('click', '.dropdown-toggle:not(.language-switcher .dropdown-toggle)', function(e) {
 			console.log('=== Alternative click handler triggered ===');
 			e.preventDefault();
 			e.stopPropagation();
@@ -939,7 +957,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 		});
 	});
 	</script>
-	
+
 	<!-- Collapse Helper Script -->
 	<script src="<?= Yii::$app->request->baseUrl ?>/js/collapse-helper.js?v=<?= time() ?>"></script>
 </body>

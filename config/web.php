@@ -9,11 +9,13 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'app\components\LanguageBootstrap'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'language' => 'en-US',
+    'sourceLanguage' => 'en-US',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -53,9 +55,34 @@ $config = [
                     'categories' => ['app\controllers\*'],
                     'logFile' => '@runtime/logs/controller.log',
                 ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info', 'warning'],
+                    'categories' => ['language'],
+                    'logFile' => '@runtime/logs/language.log',
+                ],
             ],
         ],
         'db' => $db,
+        'i18n' => [
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                    'fileMap' => [
+                        'app' => 'app.php',
+                        'app/error' => 'error.php',
+                        'app/invoice' => 'invoice.php',
+                        'app/customer' => 'customer.php',
+                        'app/product' => 'product.php',
+                        'app/company' => 'company.php',
+                        'app/nav' => 'nav.php',
+                        'app/form' => 'form.php',
+                    ],
+                ],
+            ],
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

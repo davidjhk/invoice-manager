@@ -364,4 +364,53 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+    /**
+     * Change language action
+     * 
+     * @param string $language
+     * @return Response
+     */
+    public function actionChangeLanguage($language = 'en-US')
+    {
+        // Validate language
+        $allowedLanguages = ['en-US', 'es-ES', 'ko-KR', 'zh-CN', 'zh-TW'];
+        if (!in_array($language, $allowedLanguages)) {
+            $language = 'en-US';
+        }
+        
+        // Set session language
+        Yii::$app->session->set('language', $language);
+        
+        // Update user's company language preference if logged in
+        if (!Yii::$app->user->isGuest) {
+            $user = Yii::$app->user->identity;
+            $companyId = Yii::$app->session->get('current_company_id');
+            
+            if ($companyId) {
+                $company = Company::findOne(['id' => $companyId, 'user_id' => $user->id]);
+                if ($company) {
+                    $company->language = $language;
+                    $company->save(false, ['language']);
+                }
+            }
+        }
+        
+        // Set application language
+        Yii::$app->language = $language;
+        
+        // Return JSON response for AJAX requests
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['success' => true, 'language' => $language];
+        }
+        
+        // Redirect back to previous page or home
+        $referrer = Yii::$app->request->referrer;
+        if ($referrer && strpos($referrer, Yii::$app->request->hostInfo) === 0) {
+            return $this->redirect($referrer);
+        }
+        
+        return $this->goHome();
+    }
 }

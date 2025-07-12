@@ -273,10 +273,21 @@ class CompanyController extends Controller
             return $this->redirect(['company/select']);
         }
 
+        $oldLanguage = $model->language; // Store original language before loading POST data
+        
         if ($model->load(Yii::$app->request->post())) {
             // Debug: Log POST data
             \Yii::error('POST Data: ' . print_r(Yii::$app->request->post(), true), __METHOD__);
             \Yii::error('Model attributes after load: ' . print_r($model->attributes, true), __METHOD__);
+            
+            // Handle language change immediately if language was modified
+            $newLanguage = $model->language;
+            if ($oldLanguage !== $newLanguage && $newLanguage) {
+                // Set session language immediately
+                Yii::$app->session->set('language', $newLanguage);
+                // Set application language for immediate effect
+                Yii::$app->language = $newLanguage;
+            }
             
             // Handle logo upload
             $logoFile = UploadedFile::getInstance($model, 'logo_upload');
@@ -339,7 +350,13 @@ class CompanyController extends Controller
             }
             
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', 'Company settings updated successfully.');
+                $successMessage = Yii::t('app/company', 'Company settings updated successfully.');
+                if ($oldLanguage !== $newLanguage && $newLanguage) {
+                    $successMessage .= ' ' . Yii::t('app/company', 'Language has been changed to {language}.', [
+                        'language' => \app\models\Company::getLanguageOptions()[$newLanguage] ?? $newLanguage
+                    ]);
+                }
+                Yii::$app->session->setFlash('success', $successMessage);
                 return $this->redirect(['settings']);
             } else {
                 // Debug: Log validation errors

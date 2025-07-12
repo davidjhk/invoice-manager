@@ -1,0 +1,97 @@
+<?php
+/**
+ * Simplified Chinese translations for company-related messages
+ */
+return [
+    'Company Settings' => '公司设置',
+    'Company Information' => '公司信息',
+    'Company Name' => '公司名称',
+    'Company Address' => '公司地址',
+    'Company Phone' => '公司电话',
+    'Company Email' => '公司邮箱',
+    'Company Logo' => '公司标志',
+    'Upload New Logo' => '上传新标志',
+    'Current Logo' => '当前标志',
+    'Delete Logo' => '删除标志',
+    'Filename' => '文件名',
+    'Click to upload' => '点击上传',
+    'or drag and drop' => '或拖拽上传',
+    'PNG, JPG, JPEG, GIF up to 2MB' => 'PNG, JPG, JPEG, GIF 最大2MB',
+    'Preview' => '预览',
+    
+    // Display & PDF Settings
+    'Display & PDF Settings' => '显示和PDF设置',
+    'Dark Mode' => '深色模式',
+    'Enable dark mode theme' => '启用深色主题',
+    'Enable dark mode theme for your company\'s interface' => '为您的公司界面启用深色主题',
+    'Use CJK Fonts for PDF' => 'PDF使用中日韩字体',
+    'Use CJK fonts for PDF generation' => 'PDF生成使用中日韩字体',
+    'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters' => '使用中日韩字体以更好地渲染亚洲字符的PDF',
+    
+    // Invoice Settings
+    'Invoice Settings' => '发票设置',
+    'Tax Rate' => '税率',
+    'Select Currency' => '选择货币',
+    'Invoice Prefix' => '发票前缀',
+    'Estimate Prefix' => '报价单前缀',
+    'Due Date Days' => '到期天数',
+    'Estimate Validity Days' => '报价单有效天数',
+    'Next Invoice Number' => '下一个发票号码',
+    'Next Estimate Number' => '下一个报价单号码',
+    'Default Due Date' => '默认到期日期',
+    'Default Estimate Expiry' => '默认报价单到期',
+    
+    // Email Settings
+    'Email Settings' => '邮件设置',
+    'Test Email' => '测试邮件',
+    'SMTP2GO API Key' => 'SMTP2GO API密钥',
+    'Enter your SMTP2GO API key' => '输入您的SMTP2GO API密钥',
+    'Sender Email' => '发件人邮箱',
+    'noreply@yourcompany.com' => 'noreply@yourcompany.com',
+    'Sender Name' => '发件人姓名',
+    'Your Company Name' => '您的公司名称',
+    'BCC Email' => '密送邮箱',
+    'admin@yourcompany.com' => 'admin@yourcompany.com',
+    'To use email functionality, you need to configure SMTP2GO API.' => '要使用邮件功能，您需要配置SMTP2GO API。',
+    'Get your API key here' => '在此获取您的API密钥',
+    'Email Configuration:' => '邮件配置：',
+    'The email address that will appear as "From" in sent emails' => '在发送的邮件中显示为"发件人"的邮箱地址',
+    'The name that will appear as sender (defaults to company name)' => '显示为发件人的姓名（默认为公司名称）',
+    'Email address to receive blind carbon copy of all sent emails' => '接收所有发送邮件密送副本的邮箱地址',
+    
+    // Language Settings
+    'Language Settings' => '语言设置',
+    'Interface Language' => '界面语言',
+    'Select your preferred language for the interface' => '选择您的界面首选语言',
+    'English' => '英语',
+    'Spanish' => '西班牙语',
+    'Korean' => '韩语',
+    'Chinese (Simplified)' => '中文（简体）',
+    'Chinese (Traditional)' => '中文（繁体）',
+    
+    // Form actions
+    'Save Settings' => '保存设置',
+    'Reset to Defaults' => '重置为默认值',
+    'Export Backup' => '导出备份',
+    'Back to Dashboard' => '返回仪表板',
+    'Are you sure you want to reset all settings to default values?' => '您确定要将所有设置重置为默认值吗？',
+    'Are you sure you want to delete the company logo? This action cannot be undone.' => '您确定要删除公司标志吗？此操作无法撤销。',
+    
+    // Success/Error messages
+    'Settings saved successfully.' => '设置保存成功。',
+    'Logo uploaded successfully.' => '标志上传成功。',
+    'Logo deleted successfully.' => '标志删除成功。',
+    'Failed to save settings.' => '保存设置失败。',
+    'Failed to upload logo.' => '上传标志失败。',
+    'Failed to delete logo.' => '删除标志失败。',
+    'File size must be less than 2MB' => '文件大小必须小于2MB',
+    'Please select a valid image file (PNG, JPG, JPEG, or GIF)' => '请选择有效的图片文件（PNG、JPG、JPEG或GIF）',
+    'Please select an image file.' => '请选择图片文件。',
+    'File selected:' => '已选择文件：',
+    'Click to change or drag new file' => '点击更改或拖拽新文件',
+    
+    // Additional messages for language settings
+    'Changing the language will update the interface immediately after saving settings.' => '更改语言将在保存设置后立即更新界面。',
+    'Language has been changed to {language}.' => '语言已更改为{language}。',
+    'Company settings updated successfully.' => '公司设置更新成功。',
+];

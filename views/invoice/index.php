@@ -10,7 +10,7 @@ use yii\widgets\LinkPager;
 /** @var string $statusFilter */
 /** @var app\models\Company $company */
 
-$this->title = 'Invoices';
+$this->title = Yii::t('app/invoice', 'Invoices');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -19,12 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-download mr-1"></i>Export', ['export'], [
+            <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export'), ['export'], [
                 'class' => 'btn btn-outline-info',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
-            <?= Html::a('<i class="fas fa-plus mr-1"></i>New Invoice', ['create'], [
+            <?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/invoice', 'Create New Invoice'), ['create'], [
                 'class' => 'btn btn-success',
                 'encode' => false
             ]) ?>
@@ -37,30 +37,30 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="input-group">
                     <?= Html::input('text', 'search', $searchTerm, [
                         'class' => 'form-control',
-                        'placeholder' => 'Search invoices...',
+                        'placeholder' => Yii::t('app/invoice', 'Search invoices...'),
                         'id' => 'searchInput'
                     ]) ?>
                     <div class="input-group-append">
-                        <?= Html::submitButton('<i class="fas fa-search"></i> Search', ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
+                        <?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', 'Search'), ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
                     </div>
                 </div>
             <?= Html::endForm() ?>
         </div>
         <div class="col-md-6 text-right">
             <div class="btn-group" role="group">
-                <?= Html::a('All', ['index'], [
+                <?= Html::a(Yii::t('app/invoice', 'All Statuses'), ['index'], [
                     'class' => 'btn btn-sm ' . (empty($statusFilter) ? 'btn-primary' : 'btn-outline-primary')
                 ]) ?>
-                <?= Html::a('Draft', ['index', 'status' => 'draft'], [
+                <?= Html::a(Yii::t('app/invoice', 'Draft'), ['index', 'status' => 'draft'], [
                     'class' => 'btn btn-sm ' . ($statusFilter === 'draft' ? 'btn-secondary' : 'btn-outline-secondary')
                 ]) ?>
-                <?= Html::a('Sent', ['index', 'status' => 'sent'], [
+                <?= Html::a(Yii::t('app/invoice', 'Sent'), ['index', 'status' => 'sent'], [
                     'class' => 'btn btn-sm ' . ($statusFilter === 'sent' ? 'btn-info' : 'btn-outline-info')
                 ]) ?>
-                <?= Html::a('Paid', ['index', 'status' => 'paid'], [
+                <?= Html::a(Yii::t('app/invoice', 'Paid'), ['index', 'status' => 'paid'], [
                     'class' => 'btn btn-sm ' . ($statusFilter === 'paid' ? 'btn-success' : 'btn-outline-success')
                 ]) ?>
-                <?= Html::a('Overdue', ['index', 'status' => 'overdue'], [
+                <?= Html::a(Yii::t('app/invoice', 'Overdue'), ['index', 'status' => 'overdue'], [
                     'class' => 'btn btn-sm ' . ($statusFilter === 'overdue' ? 'btn-danger' : 'btn-outline-danger')
                 ]) ?>
             </div>
@@ -69,22 +69,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php if ($dataProvider->totalCount == 0): ?>
         <div class="alert alert-info text-center">
-            <h4>No Invoices Found</h4>
-            <p>You haven't created any invoices yet.</p>
-            <?= Html::a('Create Your First Invoice', ['create'], ['class' => 'btn btn-primary']) ?>
+            <h4><?= Yii::t('app/invoice', 'No invoices found') ?></h4>
+            <p><?= Yii::t('app/invoice', 'You haven\'t created any invoices yet.') ?></p>
+            <?= Html::a(Yii::t('app/invoice', 'Create Your First Invoice'), ['create'], ['class' => 'btn btn-primary']) ?>
         </div>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Invoice #</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th>Due Date</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th><?= Yii::t('app/invoice', 'Invoice Number') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Customer') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Invoice Date') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Due Date') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Amount') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Status') ?></th>
+                        <th><?= Yii::t('app', 'Actions') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -124,7 +124,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class="btn-group btn-group-sm" role="group">
                                     <?= Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $invoice->id], [
                                         'class' => 'btn btn-outline-primary',
-                                        'title' => 'View',
+                                        'title' => Yii::t('app/invoice', 'View'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
@@ -132,7 +132,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php if ($invoice->isEditable()): ?>
                                         <?= Html::a('<i class="fas fa-edit"></i>', ['update', 'id' => $invoice->id], [
                                             'class' => 'btn btn-outline-secondary',
-                                            'title' => 'Edit',
+                                            'title' => Yii::t('app/invoice', 'Edit'),
                                             'data-toggle' => 'tooltip',
                                             'encode' => false
                                         ]) ?>
@@ -140,7 +140,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     
                                     <?= Html::a('<i class="fas fa-file-pdf"></i>', ['preview', 'id' => $invoice->id], [
                                         'class' => 'btn btn-outline-info',
-                                        'title' => 'Preview',
+                                        'title' => Yii::t('app/invoice', 'Invoice Preview'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
@@ -148,7 +148,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php if ($invoice->canBeSent()): ?>
                                         <?= Html::a('<i class="fas fa-envelope"></i>', ['send-email', 'id' => $invoice->id], [
                                             'class' => 'btn btn-outline-success',
-                                            'title' => 'Send Email',
+                                            'title' => Yii::t('app/invoice', 'Send Email'),
                                             'data-toggle' => 'tooltip',
                                             'encode' => false
                                         ]) ?>
@@ -157,7 +157,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php if ($invoice->canReceivePayment()): ?>
                                         <?= Html::a('<i class="fas fa-dollar-sign"></i>', ['receive-payment', 'id' => $invoice->id], [
                                             'class' => 'btn btn-outline-warning',
-                                            'title' => 'Receive Payment',
+                                            'title' => Yii::t('app/invoice', 'Receive Payment'),
                                             'data-toggle' => 'tooltip',
                                             'encode' => false
                                         ]) ?>
@@ -165,9 +165,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     
                                     <?= Html::a('<i class="fas fa-copy"></i>', ['duplicate', 'id' => $invoice->id], [
                                         'class' => 'btn btn-outline-info',
-                                        'title' => 'Duplicate',
+                                        'title' => Yii::t('app/invoice', 'Duplicate'),
                                         'data-toggle' => 'tooltip',
-                                        'data-confirm' => 'Are you sure you want to duplicate this invoice?',
+                                        'data-confirm' => Yii::t('app/invoice', 'Are you sure you want to duplicate this invoice?'),
                                         'data-method' => 'post',
                                         'encode' => false
                                     ]) ?>
@@ -175,9 +175,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php if ($invoice->isEditable()): ?>
                                         <?= Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $invoice->id], [
                                             'class' => 'btn btn-outline-danger',
-                                            'title' => 'Delete',
+                                            'title' => Yii::t('app/invoice', 'Delete'),
                                             'data-toggle' => 'tooltip',
-                                            'data-confirm' => 'Are you sure you want to delete this invoice?',
+                                            'data-confirm' => Yii::t('app/invoice', 'Are you sure you want to delete this invoice?'),
                                             'data-method' => 'post',
                                             'encode' => false
                                         ]) ?>
@@ -194,7 +194,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row mt-3">
             <div class="col-md-6">
                 <div class="dataTables_info">
-                    Showing <?= $dataProvider->getCount() ?> of <?= $dataProvider->totalCount ?> invoices
+                    <?= Yii::t('app', 'Showing {count} of {total} {items}', [
+                        'count' => $dataProvider->getCount(),
+                        'total' => $dataProvider->totalCount,
+                        'items' => Yii::t('app/invoice', 'invoices')
+                    ]) ?>
                 </div>
             </div>
             <div class="col-md-6">
@@ -205,10 +209,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'disabledListItemSubTagOptions' => ['class' => 'page-link'],
                     'activePageCssClass' => 'active',
                     'disabledPageCssClass' => 'disabled',
-                    'prevPageLabel' => '&laquo; Previous',
-                    'nextPageLabel' => 'Next &raquo;',
-                    'firstPageLabel' => '&laquo;&laquo; First',
-                    'lastPageLabel' => 'Last &raquo;&raquo;',
+                    'prevPageLabel' => '&laquo; ' . Yii::t('app', 'Previous'),
+                    'nextPageLabel' => Yii::t('app', 'Next') . ' &raquo;',
+                    'firstPageLabel' => '&laquo;&laquo; ' . Yii::t('app', 'First'),
+                    'lastPageLabel' => Yii::t('app', 'Last') . ' &raquo;&raquo;',
                 ]) ?>
             </div>
         </div>
