@@ -47,8 +47,9 @@ class CompanyController extends Controller
      */
     public function beforeAction($action)
     {
-        // Disable CSRF validation for AJAX requests to set-current action
-        if ($action->id === 'set-current' && Yii::$app->request->isAjax) {
+        // Disable CSRF validation for AJAX requests
+        $ajaxActions = ['set-current', 'test-email', 'reset-to-default', 'delete-logo'];
+        if (in_array($action->id, $ajaxActions) && Yii::$app->request->isAjax) {
             $this->enableCsrfValidation = false;
         }
         
@@ -275,9 +276,18 @@ class CompanyController extends Controller
 
         $oldLanguage = $model->language; // Store original language before loading POST data
         
-        if ($model->load(Yii::$app->request->post())) {
-            // Debug: Log POST data
+        // Debug: Check if this is a POST request
+        if (Yii::$app->request->isPost) {
+            \Yii::error('Settings action received POST request at ' . date('Y-m-d H:i:s'), __METHOD__);
             \Yii::error('POST Data: ' . print_r(Yii::$app->request->post(), true), __METHOD__);
+            \Yii::error('FILES Data: ' . print_r($_FILES, true), __METHOD__);
+            \Yii::error('Request Headers: ' . print_r(Yii::$app->request->headers->toArray(), true), __METHOD__);
+        } else {
+            \Yii::error('Settings action received GET request at ' . date('Y-m-d H:i:s'), __METHOD__);
+        }
+        
+        if ($model->load(Yii::$app->request->post())) {
+            \Yii::error('Model loaded POST data successfully', __METHOD__);
             \Yii::error('Model attributes after load: ' . print_r($model->attributes, true), __METHOD__);
             
             // Handle language change immediately if language was modified
@@ -745,30 +755,48 @@ class CompanyController extends Controller
      */
     public function actionDeleteLogo()
     {
+        \Yii::error('Delete logo action called at ' . date('Y-m-d H:i:s'), __METHOD__);
+        
         Yii::$app->response->format = Response::FORMAT_JSON;
         
         $model = Company::getCurrent();
         if (!$model) {
+            \Yii::error('Company not found in delete logo action', __METHOD__);
             return [
                 'success' => false,
                 'message' => 'Company not found.',
             ];
         }
 
-        \Yii::error('Delete logo attempt for company: ' . $model->id . ', has logo: ' . ($model->hasLogo() ? 'Yes' : 'No') . ', logo_path: ' . $model->logo_path, __METHOD__);
+        \Yii::error('Company found: ' . $model->id . ', has logo: ' . ($model->hasLogo() ? 'Yes' : 'No'), __METHOD__);
+        \Yii::error('Logo path before delete: ' . $model->logo_path, __METHOD__);
 
-        if ($model->deleteLogo() && $model->save()) {
-            \Yii::error('Logo deleted successfully for company: ' . $model->id, __METHOD__);
+        // Step 1: Attempt to delete the logo file and unset attributes
+        if (!$model->deleteLogo()) {
+            \Yii::error('deleteLogo() method failed', __METHOD__);
+            return [
+                'success' => false,
+                'message' => 'Failed to delete the logo file. Please check file permissions.',
+            ];
+        }
+
+        \Yii::error('deleteLogo() method succeeded, logo_path after delete: ' . $model->logo_path, __METHOD__);
+
+        // Step 2: Attempt to save the model (to persist the nulled logo_path)
+        if ($model->save()) {
+            \Yii::error('Model saved successfully after logo deletion', __METHOD__);
             return [
                 'success' => true,
                 'message' => 'Logo deleted successfully.',
             ];
+        } else {
+            // If save fails, return validation errors
+            \Yii::error('Model save failed after logo deletion: ' . print_r($model->errors, true), __METHOD__);
+            return [
+                'success' => false,
+                'message' => 'Failed to update the database after deleting the logo.',
+                'errors' => $model->errors,
+            ];
         }
-
-        \Yii::error('Failed to delete logo for company: ' . $model->id . ', errors: ' . print_r($model->errors, true), __METHOD__);
-        return [
-            'success' => false,
-            'message' => 'Failed to delete logo.',
-        ];
     }
 }

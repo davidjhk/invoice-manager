@@ -30,8 +30,8 @@ $totalCustomers = Customer::find()->where(['company_id' => $company->id])->count
 $recentInvoices = Invoice::find()
     ->where(['company_id' => $company->id])
     ->with(['customer'])
-    ->orderBy(['created_at' => SORT_DESC])
-    ->limit(5)
+    ->orderBy(['invoice_number' => SORT_DESC])
+    ->limit(10)
     ->all();
 
 // Calculate conversion rates
@@ -40,201 +40,175 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 ?>
 
 <div class="dashboard-container">
-	<!-- Dashboard Header -->
+	<!-- Compact Header -->
 	<div class="dashboard-header">
 		<div class="header-content">
 			<div class="header-info">
 				<h1 class="dashboard-title"><?= Yii::t('app', 'Dashboard') ?></h1>
-				<p class="dashboard-subtitle">
-					<?= Yii::t('app', 'Welcome back, {company}', ['company' => Html::encode($company->company_name)]) ?>
-				</p>
+				<p class="dashboard-subtitle"><?= Html::encode($company->company_name) ?></p>
 			</div>
-			<div class="header-actions action-buttons">
-				<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/invoice', 'New Invoice'), ['/invoice/create'], [
-                    'class' => 'btn btn-primary'
+			<div class="header-actions">
+				<?= Html::a('<i class="fas fa-plus"></i>' . Yii::t('app/invoice', 'New Invoice'), ['/invoice/create'], [
+                    'class' => 'btn btn-primary btn-sm'
+                ]) ?>
+				<?= Html::a('<i class="fas fa-chart-line"></i>' . Yii::t('app', 'Reports'), ['/invoice/index'], [
+                    'class' => 'btn btn-outline-secondary btn-sm ml-2'
                 ]) ?>
 			</div>
 		</div>
 	</div>
 
-	<!-- Key Performance Indicators -->
-	<div class="kpi-grid mobile-hidden">
-		<div class="kpi-card revenue-card">
-			<div class="kpi-header">
-				<div class="kpi-icon">
-					<i class="fas fa-dollar-sign"></i>
-				</div>
-				<div class="kpi-trend positive">
-					<i class="fas fa-arrow-up"></i>
-				</div>
-			</div>
-			<div class="kpi-body">
-				<h3 class="kpi-value"><?= $company->formatAmount($totalAmount) ?></h3>
-				<p class="kpi-label"><?= Yii::t('app', 'Total Revenue') ?></p>
-				<small
-					class="kpi-detail"><?= Yii::t('app', 'Average: {amount} per invoice', ['amount' => $company->formatAmount($averageInvoiceValue)]) ?></small>
-			</div>
-		</div>
-
-		<div class="kpi-card paid-card">
-			<div class="kpi-header">
-				<div class="kpi-icon">
-					<i class="fas fa-check-circle"></i>
-				</div>
-				<div class="kpi-trend positive">
-					<i class="fas fa-arrow-up"></i>
+	<!-- Compact KPI Overview -->
+	<div class="kpi-overview">
+		<div class="kpi-row">
+			<div class="kpi-item revenue">
+				<div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+				<div class="kpi-content">
+					<div class="kpi-value"><?= $company->formatAmount($totalAmount) ?></div>
+					<div class="kpi-label"><?= Yii::t('app', 'Total Revenue') ?></div>
 				</div>
 			</div>
-			<div class="kpi-body">
-				<h3 class="kpi-value"><?= $company->formatAmount($paidAmount) ?></h3>
-				<p class="kpi-label"><?= Yii::t('app', 'Paid Amount') ?></p>
-				<small
-					class="kpi-detail"><?= Yii::t('app', '{rate}% collection rate', ['rate' => $conversionRate]) ?></small>
-			</div>
-		</div>
-
-		<div class="kpi-card pending-card">
-			<div class="kpi-header">
-				<div class="kpi-icon">
-					<i class="fas fa-clock"></i>
-				</div>
-				<div class="kpi-trend <?= $pendingAmount > 0 ? 'warning' : 'neutral' ?>">
-					<i class="fas fa-<?= $pendingAmount > 0 ? 'exclamation-triangle' : 'minus' ?>"></i>
+			<div class="kpi-item paid">
+				<div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+				<div class="kpi-content">
+					<div class="kpi-value"><?= $company->formatAmount($paidAmount) ?></div>
+					<div class="kpi-label"><?= Yii::t('app', 'Collected') ?> (<?= $conversionRate ?>%)</div>
 				</div>
 			</div>
-			<div class="kpi-body">
-				<h3 class="kpi-value"><?= $company->formatAmount($pendingAmount) ?></h3>
-				<p class="kpi-label"><?= Yii::t('app', 'Pending Amount') ?></p>
-				<small
-					class="kpi-detail"><?= Yii::t('app', '{count} invoices awaiting payment', ['count' => $sentInvoices]) ?></small>
-			</div>
-		</div>
-
-		<div class="kpi-card customers-card">
-			<div class="kpi-header">
-				<div class="kpi-icon">
-					<i class="fas fa-users"></i>
-				</div>
-				<div class="kpi-trend positive">
-					<i class="fas fa-arrow-up"></i>
+			<div class="kpi-item pending">
+				<div class="kpi-icon"><i class="fas fa-clock"></i></div>
+				<div class="kpi-content">
+					<div class="kpi-value"><?= $company->formatAmount($pendingAmount) ?></div>
+					<div class="kpi-label"><?= Yii::t('app', 'Pending') ?> (<?= $sentInvoices ?> invoices)</div>
 				</div>
 			</div>
-			<div class="kpi-body">
-				<h3 class="kpi-value"><?= $totalCustomers ?></h3>
-				<p class="kpi-label"><?= Yii::t('app/customer', 'Active Customers') ?></p>
-				<small
-					class="kpi-detail"><?= Yii::t('app', '{avg} avg invoices per customer', ['avg' => $totalCustomers > 0 ? round($totalInvoices / $totalCustomers, 1) : 0]) ?></small>
-			</div>
-		</div>
-	</div>
-
-	<!-- Invoice Status Overview -->
-	<div class="status-overview mobile-hidden">
-		<div class="status-header">
-			<h2 class="section-title"><?= Yii::t('app/invoice', 'Invoice Status') ?></h2>
-			<div class="status-actions">
-				<?= Html::a(Yii::t('app', 'View All {item}', ['item' => Yii::t('app/invoice', 'Invoices')]), ['/invoice/index'], ['class' => 'btn btn-outline-primary']) ?>
-			</div>
-		</div>
-		<div class="status-cards">
-			<div class="status-card draft-status">
-				<div class="status-number"><?= $draftInvoices ?></div>
-				<div class="status-label"><?= Yii::t('app/invoice', 'Draft') ?></div>
-				<div class="status-action">
-					<?= Html::a(Yii::t('app', 'Review'), ['/invoice/index', 'status' => 'draft'], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
-				</div>
-			</div>
-			<div class="status-card sent-status">
-				<div class="status-number"><?= $sentInvoices ?></div>
-				<div class="status-label"><?= Yii::t('app/invoice', 'Sent') ?></div>
-				<div class="status-action">
-					<?= Html::a(Yii::t('app', 'Follow Up'), ['/invoice/index', 'status' => 'sent'], ['class' => 'btn btn-sm btn-outline-warning']) ?>
-				</div>
-			</div>
-			<div class="status-card paid-status">
-				<div class="status-number"><?= $paidInvoices ?></div>
-				<div class="status-label"><?= Yii::t('app/invoice', 'Paid') ?></div>
-				<div class="status-action">
-					<?= Html::a(Yii::t('app/invoice', 'View'), ['/invoice/index', 'status' => 'paid'], ['class' => 'btn btn-sm btn-outline-success']) ?>
+			<div class="kpi-item customers">
+				<div class="kpi-icon"><i class="fas fa-users"></i></div>
+				<div class="kpi-content">
+					<div class="kpi-value"><?= $totalCustomers ?></div>
+					<div class="kpi-label"><?= Yii::t('app/customer', 'Customers') ?></div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- Main Content Grid -->
-	<div class="content-grid">
-		<!-- Recent Invoices -->
-		<div class="content-section recent-invoices mobile-hidden">
-			<div class="section-header">
-				<h2 class="section-title">
-					<?= Yii::t('app', 'Recent {item}', ['item' => Yii::t('app/invoice', 'Invoices')]) ?></h2>
-				<?= Html::a(Yii::t('app', 'View All'), ['/invoice/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
+	<!-- Main Dashboard Grid -->
+	<div class="dashboard-grid">
+		<!-- Left Column -->
+		<div class="dashboard-left">
+			<!-- Invoice Status Cards -->
+			<div class="status-cards">
+				<div class="status-card draft-card"
+					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'draft']) ?>'">
+					<div class="status-header">
+						<span class="status-count"><?= $draftInvoices ?></span>
+						<span class="status-icon"><i class="fas fa-file-alt"></i></span>
+					</div>
+					<div class="status-label"><?= Yii::t('app/invoice', 'Draft') ?></div>
+				</div>
+				<div class="status-card sent-card"
+					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'sent']) ?>'">
+					<div class="status-header">
+						<span class="status-count"><?= $sentInvoices ?></span>
+						<span class="status-icon"><i class="fas fa-paper-plane"></i></span>
+					</div>
+					<div class="status-label"><?= Yii::t('app/invoice', 'Sent') ?></div>
+				</div>
+				<div class="status-card paid-card"
+					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'paid']) ?>'">
+					<div class="status-header">
+						<span class="status-count"><?= $paidInvoices ?></span>
+						<span class="status-icon"><i class="fas fa-check"></i></span>
+					</div>
+					<div class="status-label"><?= Yii::t('app/invoice', 'Paid') ?></div>
+				</div>
 			</div>
-			<div class="section-body">
-				<?php if (!empty($recentInvoices)): ?>
-				<div class="invoices-list">
+
+			<!-- Recent Invoices Compact -->
+			<div class="recent-section">
+				<div class="section-header">
+					<h3><?= Yii::t('app', 'Recent Invoices') ?></h3>
+					<?= Html::a(Yii::t('app', 'View All'), ['/invoice/index'], ['class' => 'btn-link']) ?>
+				</div>
+				<div class="recent-list">
+					<?php if (!empty($recentInvoices)): ?>
 					<?php foreach ($recentInvoices as $invoice): ?>
-					<div class="invoice-item">
-						<div class="invoice-info">
-							<div class="invoice-number">
-								<?= Html::a($invoice->invoice_number, ['/invoice/view', 'id' => $invoice->id], [
-                                        'class' => 'invoice-link'
-                                    ]) ?>
-							</div>
-							<div class="invoice-customer">
-								<?= Html::encode($invoice->customer->customer_name) ?>
-							</div>
-							<div class="invoice-date">
-								<?= Yii::$app->formatter->asDate($invoice->invoice_date) ?>
-							</div>
+					<div class="recent-item">
+						<div class="recent-info">
+							<span
+								class="invoice-number"><?= Html::a($invoice->invoice_number, ['/invoice/view', 'id' => $invoice->id]) ?></span>
+							<span class="customer-name"><?= Html::encode($invoice->customer->customer_name) ?></span>
 						</div>
-						<div class="invoice-amount">
-							<?= $invoice->formatAmount($invoice->total_amount) ?>
-						</div>
-						<div class="invoice-status">
-							<span class="status-badge status-<?= $invoice->status ?>">
-								<?= $invoice->getStatusLabel() ?>
-							</span>
+						<div class="recent-meta">
+							<span class="amount"><?= $invoice->formatAmount($invoice->total_amount) ?></span>
+							<span
+								class="status-badge status-<?= $invoice->status ?>"><?= $invoice->getStatusLabel() ?></span>
 						</div>
 					</div>
 					<?php endforeach; ?>
+					<?php else: ?>
+					<div class="empty-state-compact">
+						<p><?= Yii::t('app', 'No invoices yet') ?></p>
+						<?= Html::a(Yii::t('app/invoice', 'Create First Invoice'), ['/invoice/create'], ['class' => 'btn btn-primary btn-sm']) ?>
+					</div>
+					<?php endif; ?>
 				</div>
-				<?php else: ?>
-				<div class="empty-state">
-					<i class="fas fa-file-invoice fa-3x"></i>
-					<h3><?= Yii::t('app', 'No {item} Yet', ['item' => Yii::t('app/invoice', 'Invoices')]) ?></h3>
-					<p><?= Yii::t('app', 'Get started by creating your first invoice') ?>.</p>
-					<?= Html::a(Yii::t('app/invoice', 'Create Invoice'), ['/invoice/create'], ['class' => 'btn btn-primary']) ?>
-				</div>
-				<?php endif; ?>
 			</div>
 		</div>
 
-		<!-- Quick Actions -->
-		<div class="content-section quick-actions">
-			<div class="section-header">
-				<h2 class="section-title"><?= Yii::t('app', 'Quick Actions') ?></h2>
+		<!-- Right Column -->
+		<div class="dashboard-right">
+			<!-- Quick Actions Compact -->
+			<div class="quick-actions">
+				<h3><?= Yii::t('app', 'Quick Actions') ?></h3>
+				<div class="action-grid">
+					<?= Html::a('<i class="fas fa-file-invoice"></i>' . Yii::t('app/invoice', 'Invoice'), ['/invoice/create'], [
+                        'class' => 'action-btn primary'
+                    ]) ?>
+					<?= Html::a('<i class="fas fa-file-alt"></i>' . Yii::t('app/estimate', 'Estimate'), ['/estimate/create'], [
+                        'class' => 'action-btn secondary'
+                    ]) ?>
+					<?= Html::a('<i class="fas fa-user-plus"></i>' . Yii::t('app/customer', 'Customer'), ['/customer/create'], [
+                        'class' => 'action-btn secondary'
+                    ]) ?>
+					<?= Html::a('<i class="fas fa-box"></i>' . Yii::t('app/product', 'Product'), ['/product/create'], [
+                        'class' => 'action-btn secondary'
+                    ]) ?>
+				</div>
 			</div>
-			<div class="section-body">
-				<div class="actions-grid">
-					<?= Html::a('<i class="fas fa-file-invoice"></i><span>' . Yii::t('app/invoice', 'Create Invoice') . '</span>', ['/invoice/create'], [
-                        'class' => 'action-card primary-action'
-                    ]) ?>
-					<?= Html::a('<i class="fas fa-file-alt"></i><span>' . Yii::t('app/estimate', 'Create Estimate') . '</span>', ['/estimate/create'], [
-                        'class' => 'action-card secondary-action'
-                    ]) ?>
-					<?= Html::a('<i class="fas fa-user-plus"></i><span>' . Yii::t('app/customer', 'Add Customer') . '</span>', ['/customer/create'], [
-                        'class' => 'action-card secondary-action'
-                    ]) ?>
-					<?= Html::a('<i class="fas fa-box"></i><span>' . Yii::t('app', 'Add {item}', ['item' => Yii::t('app/product', 'Product')]) . '</span>', ['/product/create'], [
-                        'class' => 'action-card secondary-action'
-                    ]) ?>
-					<?= Html::a('<i class="fas fa-users"></i><span>' . Yii::t('app', 'Manage {item}', ['item' => Yii::t('app/customer', 'Customers')]) . '</span>', ['/customer/index'], [
-                        'class' => 'action-card tertiary-action'
-                    ]) ?>
-					<?= Html::a('<i class="fas fa-cog"></i><span>' . Yii::t('app', 'Settings') . '</span>', ['/company/settings'], [
-                        'class' => 'action-card tertiary-action'
-                    ]) ?>
+
+			<!-- Quick Stats -->
+			<div class="quick-stats">
+				<h3><?= Yii::t('app', 'Summary') ?></h3>
+				<div class="stats-list">
+					<div class="stat-item">
+						<span class="stat-label"><?= Yii::t('app', 'Total Invoices') ?></span>
+						<span class="stat-value"><?= $totalInvoices ?></span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label"><?= Yii::t('app', 'Average Invoice') ?></span>
+						<span class="stat-value"><?= $company->formatAmount($averageInvoiceValue) ?></span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label"><?= Yii::t('app', 'Collection Rate') ?></span>
+						<span class="stat-value"><?= $conversionRate ?>%</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label"><?= Yii::t('app', 'Avg per Customer') ?></span>
+						<span
+							class="stat-value"><?= $totalCustomers > 0 ? round($totalInvoices / $totalCustomers, 1) : 0 ?></span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Management Links -->
+			<div class="management-links">
+				<h3><?= Yii::t('app', 'Manage') ?></h3>
+				<div class="link-list">
+					<?= Html::a('<i class="fas fa-users"></i>' . Yii::t('app/customer', 'Customers'), ['/customer/index'], ['class' => 'mgmt-link']) ?>
+					<?= Html::a('<i class="fas fa-cube"></i>' . Yii::t('app/product', 'Products'), ['/product/index'], ['class' => 'mgmt-link']) ?>
+					<?= Html::a('<i class="fas fa-cog"></i>' . Yii::t('app', 'Settings'), ['/company/settings'], ['class' => 'mgmt-link']) ?>
+					<?= Html::a('<i class="fas fa-download"></i>' . Yii::t('app', 'Export'), ['/invoice/export'], ['class' => 'mgmt-link']) ?>
 				</div>
 			</div>
 		</div>
@@ -242,26 +216,28 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 </div>
 
 <style>
-/* Dashboard Styles */
+/* Compact Dashboard Styles */
 .dashboard-container {
-	max-width: 1600px;
+	max-width: 1400px;
 	margin: 0 auto;
 	padding: 0 1rem;
 }
 
+/* Compact Header */
 .dashboard-header {
-	margin-bottom: 2rem;
+	margin-bottom: 1.5rem;
 }
 
 .header-content {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 1.5rem 0;
+	padding: 1rem 0;
+	border-bottom: 1px solid var(--border-color);
 }
 
 .dashboard-title {
-	font-size: 2.5rem;
+	font-size: 1.8rem;
 	font-weight: 700;
 	color: var(--text-primary);
 	margin: 0;
@@ -270,285 +246,264 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 .dashboard-subtitle {
 	color: var(--text-secondary);
 	margin: 0;
-	font-size: 1.1rem;
+	font-size: 0.9rem;
+	font-weight: 500;
 }
 
 .header-actions .btn {
-	padding: 0.75rem 1.5rem;
+	padding: 0.5rem 1rem;
 	font-weight: 600;
-	border-radius: 8px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	transition: all 0.2s ease;
+	border-radius: 6px;
+	font-size: 0.875rem;
 }
 
-.header-actions .btn:hover {
-	transform: translateY(-1px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* KPI Grid */
-.kpi-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: 1.5rem;
-	margin-bottom: 2rem;
-}
-
-.kpi-card {
+/* Compact KPI Overview */
+.kpi-overview {
+	margin-bottom: 1.5rem;
 	background: white;
-	border-radius: 12px;
-	padding: 1.5rem;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-	transition: all 0.3s ease;
+	border-radius: 8px;
 	border: 1px solid var(--border-color);
+	overflow: hidden;
 }
 
-.kpi-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+.kpi-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
-.kpi-header {
+.kpi-item {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 1rem;
+	padding: 1rem;
+	border-right: 1px solid var(--border-color);
+	transition: background-color 0.2s ease;
+}
+
+.kpi-item:last-child {
+	border-right: none;
+}
+
+.kpi-item:hover {
+	background: var(--bg-secondary);
 }
 
 .kpi-icon {
-	width: 48px;
-	height: 48px;
-	border-radius: 12px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 20px;
-	color: white;
-}
-
-.revenue-card .kpi-icon {
-	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.paid-card .kpi-icon {
-	background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.pending-card .kpi-icon {
-	background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.customers-card .kpi-icon {
-	background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-}
-
-.kpi-trend {
-	width: 32px;
-	height: 32px;
+	width: 40px;
+	height: 40px;
 	border-radius: 8px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 14px;
+	font-size: 18px;
+	color: white;
+	margin-right: 1rem;
+	flex-shrink: 0;
 }
 
-.kpi-trend.positive {
-	background: #dcfce7;
-	color: #059669;
+.revenue .kpi-icon {
+	background: linear-gradient(135deg, #10b981, #059669);
 }
 
-body.dark-mode .kpi-trend.positive {
-	color: #059669 !important;
+.paid .kpi-icon {
+	background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
-.kpi-trend.warning {
-	background: #fef3c7;
-	color: #d97706;
+.pending .kpi-icon {
+	background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-body.dark-mode .kpi-trend.warning {
-	color: #d97706 !important;
+.customers .kpi-icon {
+	background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
-.kpi-trend.neutral {
-	background: #f3f4f6;
-	color: #6b7280;
-}
-
-body.dark-mode .kpi-trend.neutral {
-	color: #6b7280 !important;
+.kpi-content {
+	flex: 1;
 }
 
 .kpi-value {
-	font-size: 2rem;
+	font-size: 1.5rem;
 	font-weight: 700;
 	color: var(--text-primary);
-	margin: 0 0 0.5rem 0;
+	margin: 0 0 0.25rem 0;
+	line-height: 1;
 }
 
 .kpi-label {
 	color: var(--text-secondary);
-	font-weight: 600;
-	margin: 0 0 0.25rem 0;
-}
-
-.kpi-detail {
-	color: var(--text-secondary);
 	font-size: 0.875rem;
-}
-
-/* Status Overview */
-.status-overview {
-	background: white;
-	border-radius: 12px;
-	padding: 1.5rem;
-	margin-bottom: 2rem;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-	border: 1px solid var(--border-color);
-}
-
-.status-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1.5rem;
-}
-
-.section-title {
-	font-size: 1.5rem;
-	font-weight: 600;
-	color: var(--text-primary);
 	margin: 0;
+	line-height: 1;
 }
 
+/* Dashboard Grid */
+.dashboard-grid {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 1.5rem;
+}
+
+.dashboard-left,
+.dashboard-right {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+/* Status Cards */
 .status-cards {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	grid-template-columns: repeat(3, 1fr);
 	gap: 1rem;
 }
 
 .status-card {
-	text-align: center;
-	padding: 1.5rem;
+	background: white;
+	border: 1px solid var(--border-color);
 	border-radius: 8px;
-	border: 2px solid var(--border-color);
+	padding: 1rem;
+	text-align: center;
+	cursor: pointer;
 	transition: all 0.2s ease;
 }
 
 .status-card:hover {
 	border-color: var(--primary-color);
 	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.status-number {
-	font-size: 2rem;
-	font-weight: 700;
+.status-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	margin-bottom: 0.5rem;
 }
 
-.status-label {
-	font-weight: 600;
-	color: var(--text-secondary);
-	margin-bottom: 1rem;
+.status-count {
+	font-size: 1.5rem;
+	font-weight: 700;
 }
 
-.draft-status .status-number {
+.status-icon {
+	opacity: 0.6;
+	font-size: 1.2rem;
+}
+
+.status-label {
+	color: var(--text-secondary);
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.draft-card .status-count {
 	color: #6b7280;
 }
 
-.sent-status .status-number {
+.sent-card .status-count {
 	color: #f59e0b;
 }
 
-.paid-status .status-number {
+.paid-card .status-count {
 	color: #10b981;
 }
 
-/* Content Grid */
-.content-grid {
-	display: grid;
-	grid-template-columns: 2fr 1fr;
-	gap: 2rem;
-}
-
-.content-section {
+/* Recent Section */
+.recent-section {
 	background: white;
-	border-radius: 12px;
-	padding: 1.5rem;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	padding: 1rem;
 }
 
 .section-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 1.5rem;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--border-color);
 }
 
-/* Recent Invoices */
-.invoices-list {
+.section-header h3 {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin: 0;
+}
+
+.btn-link {
+	color: var(--primary-color);
+	text-decoration: none;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.btn-link:hover {
+	text-decoration: underline;
+}
+
+.recent-list {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	gap: 0.75rem;
 }
 
-.invoice-item {
+.recent-item {
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
-	padding: 1rem;
+	align-items: center;
+	padding: 0.75rem;
 	border: 1px solid var(--border-color);
-	border-radius: 8px;
+	border-radius: 6px;
 	transition: all 0.2s ease;
 }
 
-.invoice-item:hover {
+.recent-item:hover {
 	background: var(--bg-secondary);
 	border-color: var(--primary-color);
 }
 
-.invoice-info {
+.recent-info {
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
 }
 
-.invoice-number {
-	font-weight: 600;
-	margin-bottom: 0.25rem;
-}
-
-.invoice-link {
+.invoice-number a {
 	color: var(--primary-color);
 	text-decoration: none;
 	font-weight: 600;
+	font-size: 0.9rem;
 }
 
-.invoice-link:hover {
+.invoice-number a:hover {
 	text-decoration: underline;
 }
 
-.invoice-customer {
+.customer-name {
 	color: var(--text-secondary);
-	font-size: 0.9rem;
-	margin-bottom: 0.25rem;
+	font-size: 0.8rem;
 }
 
-.invoice-date {
-	color: var(--text-secondary);
-	font-size: 0.85rem;
+.recent-meta {
+	text-align: right;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	align-items: flex-end;
 }
 
-.invoice-amount {
+.amount {
 	font-weight: 600;
-	font-size: 1.1rem;
+	font-size: 0.9rem;
 	color: var(--text-primary);
-	margin-right: 1rem;
 }
 
 .status-badge {
-	padding: 0.25rem 0.75rem;
-	border-radius: 20px;
-	font-size: 0.75rem;
+	padding: 0.2rem 0.6rem;
+	border-radius: 12px;
+	font-size: 0.7rem;
 	font-weight: 600;
 	text-transform: uppercase;
 }
@@ -563,153 +518,192 @@ body.dark-mode .kpi-trend.neutral {
 	color: #d97706;
 }
 
-body.dark-mode .status-sent {
-	color: #d97706 !important;
-}
-
 .status-paid {
 	background: #dcfce7;
 	color: #059669;
 }
 
-body.dark-mode .status-paid {
-	color: #059669 !important;
-
+/* Right Column Sections */
+.dashboard-right>div {
+	background: white;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	padding: 1rem;
 }
 
-.status-printed {
-	background: #e0e7ff;
-	color: #3730a3;
-}
-
-body.dark-mode .status-printed {
-	color: #3730a3 !important;
+.dashboard-right h3 {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin: 0 0 1rem 0;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--border-color);
 }
 
 /* Quick Actions */
-.actions-grid {
+.action-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-	gap: 1rem;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.75rem;
 }
 
-.action-card {
+.action-btn {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 1.5rem 1rem;
-	border-radius: 8px;
+	padding: 1rem 0.5rem;
+	border-radius: 6px;
 	text-decoration: none;
 	transition: all 0.2s ease;
 	text-align: center;
-	min-height: 100px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	min-height: 80px;
 }
 
-.action-card i {
-	font-size: 1.5rem;
+.action-btn i {
+	font-size: 1.2rem;
 	margin-bottom: 0.5rem;
 }
 
-.action-card span {
-	font-weight: 600;
-	font-size: 0.9rem;
-}
-
-.primary-action {
-	background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+.action-btn.primary {
+	background: linear-gradient(135deg, #4f46e5, #7c3aed);
 	color: white;
 }
 
-.primary-action:hover {
+.action-btn.primary:hover {
 	color: white;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
 }
 
-.secondary-action {
-	background: #f8fafc;
-	color: var(--text-primary);
-	border: 1px solid var(--border-color);
-}
-
-.secondary-action:hover {
-	background: #e2e8f0;
-	color: var(--text-primary);
-	transform: translateY(-2px);
-}
-
-.tertiary-action {
-	background: transparent;
-	color: var(--text-secondary);
-	border: 1px solid var(--border-color);
-}
-
-.tertiary-action:hover {
+.action-btn.secondary {
 	background: var(--bg-secondary);
 	color: var(--text-primary);
-	transform: translateY(-2px);
+	border: 1px solid var(--border-color);
+}
+
+.action-btn.secondary:hover {
+	background: #e2e8f0;
+	color: var(--text-primary);
+	transform: translateY(-1px);
+}
+
+/* Quick Stats */
+.stats-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.stat-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item:last-child {
+	border-bottom: none;
+}
+
+.stat-label {
+	color: var(--text-secondary);
+	font-size: 0.875rem;
+}
+
+.stat-value {
+	font-weight: 600;
+	color: var(--text-primary);
+	font-size: 0.875rem;
+}
+
+/* Management Links */
+.link-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.mgmt-link {
+	display: flex;
+	align-items: center;
+	padding: 0.75rem;
+	color: var(--text-primary);
+	text-decoration: none;
+	border-radius: 6px;
+	transition: all 0.2s ease;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.mgmt-link:hover {
+	background: var(--bg-secondary);
+	color: var(--text-primary);
+	transform: translateX(2px);
+}
+
+.mgmt-link i {
+	margin-right: 0.75rem;
+	width: 16px;
+	text-align: center;
+	opacity: 0.7;
 }
 
 /* Empty State */
-.empty-state {
+.empty-state-compact {
 	text-align: center;
-	padding: 3rem 1rem;
+	padding: 2rem 1rem;
 	color: var(--text-secondary);
 }
 
-.empty-state i {
-	color: var(--text-secondary);
+.empty-state-compact p {
 	margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-	color: var(--text-primary);
-	margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-	margin-bottom: 1.5rem;
+	font-size: 0.9rem;
 }
 
 /* Dark Mode */
-.dark-mode .kpi-card,
-.dark-mode .status-overview,
-.dark-mode .content-section {
+.dark-mode .kpi-overview,
+.dark-mode .status-card,
+.dark-mode .recent-section,
+.dark-mode .dashboard-right>div {
 	background: #374151;
 	border-color: #4b5563;
 }
 
-.dark-mode .invoice-item {
-	border-color: #4b5563;
+.dark-mode .kpi-item:hover,
+.dark-mode .recent-item:hover {
+	background: #4b5563;
 }
 
-.dark-mode .invoice-item:hover {
+.dark-mode .action-btn.secondary {
 	background: #4b5563;
 	border-color: #6b7280;
 }
 
-.dark-mode .secondary-action {
-	background: #4b5563;
-	border-color: #6b7280;
-}
-
-.dark-mode .secondary-action:hover {
+.dark-mode .action-btn.secondary:hover {
 	background: #6b7280;
 }
 
-.dark-mode .tertiary-action {
-	border-color: #6b7280;
+/* Dark mode status badge colors */
+body.dark-mode .status-sent {
+	color: #d97706 !important;
 }
 
-.dark-mode .tertiary-action:hover {
-	background: #4b5563;
+body.dark-mode .status-paid {
+	color: #059669 !important;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-	.content-grid {
+	.dashboard-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.kpi-row {
+		grid-template-columns: repeat(2, 1fr);
 	}
 }
 
@@ -724,32 +718,37 @@ body.dark-mode .status-printed {
 		text-align: center;
 	}
 
-	.kpi-grid {
+	.kpi-row {
 		grid-template-columns: 1fr;
+	}
+
+	.kpi-item {
+		border-right: none;
+		border-bottom: 1px solid var(--border-color);
+	}
+
+	.kpi-item:last-child {
+		border-bottom: none;
 	}
 
 	.status-cards {
 		grid-template-columns: 1fr;
 	}
 
-	.invoice-item {
+	.action-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.recent-item {
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.5rem;
 	}
 
-	.invoice-amount {
-		margin-right: 0;
-	}
-
-	.actions-grid {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (max-width: 480px) {
-	.actions-grid {
-		grid-template-columns: 1fr;
+	.recent-meta {
+		align-items: flex-start;
+		flex-direction: row;
+		gap: 1rem;
 	}
 }
 </style>

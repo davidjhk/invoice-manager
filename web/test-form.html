@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Form Submission</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Test Company Settings Form</h2>
+    
+    <form id="test-form" method="POST" action="/company/settings" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="test-csrf-token">
+        
+        <label>Company Name:</label>
+        <input type="text" name="Company[company_name]" value="Test Company">
+        <br><br>
+        
+        <label>Company Email:</label>
+        <input type="email" name="Company[company_email]" value="test@example.com">
+        <br><br>
+        
+        <label>Tax Rate:</label>
+        <input type="number" name="Company[tax_rate]" value="10" step="0.01">
+        <br><br>
+        
+        <input type="submit" value="Save Settings">
+        <button type="button" id="ajax-btn">Test AJAX Button</button>
+    </form>
+    
+    <script>
+        // Debug form submission
+        $('#test-form').on('submit', function(e) {
+            console.log('Test form submission detected');
+            console.log('Form data:', $(this).serialize());
+            alert('Form will be submitted to: ' + $(this).attr('action'));
+            // Uncomment next line to prevent actual submission for testing
+            // e.preventDefault();
+        });
+        
+        // Test AJAX button
+        $('#ajax-btn').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('AJAX button clicked');
+            alert('AJAX button clicked - should not affect form submission');
+            return false;
+        });
+    </script>
+</body>
+</html>

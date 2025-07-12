@@ -1780,9 +1780,9 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 								<i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
 							</button>
 							<ul class="dropdown-menu">
-								<li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
-								</li>
 								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
+								</li>
+								<li><?= Html::a('<i class="fas fa-exchange-alt mr-2"></i>' . Yii::t('app/nav', 'Switch Company'), ['/company/select'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
 								<li>
