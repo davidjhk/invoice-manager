@@ -9,6 +9,9 @@ use yii\helpers\Url;
 
 $this->title = 'Company Settings';
 $this->params['breadcrumbs'][] = $this->title;
+
+// Register collapse helper JavaScript
+$this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 ?>
 
 <div class="company-settings">
@@ -53,165 +56,66 @@ $this->params['breadcrumbs'][] = $this->title;
 				</div>
 			</div>
 
-			<!-- Company Logo -->
+		</div>
+
+		<!-- Company Logo -->
+		<div class="col-lg-6">
 			<div class="card mb-4">
-				<div class="card-header">
-					<h5 class="card-title mb-0">
-						<i class="fas fa-image mr-2"></i>Company Logo
+				<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+					data-target="#company-logo-collapse" aria-expanded="false">
+					<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+						<span><i class="fas fa-image mr-2"></i>Company Logo</span>
+						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h5>
 				</div>
-				<div class="card-body">
-					<?php if ($model->hasLogo()): ?>
-					<div class="current-logo mb-3">
-						<label class="form-label font-weight-bold">Current Logo</label>
-						<div class="logo-preview">
-							<img src="<?= $model->getLogoUrl() ?>" alt="Company Logo" class="img-thumbnail"
-								style="max-height: 150px;">
-							<div class="mt-2">
-								<small class="text-muted">Filename: <?= Html::encode($model->logo_filename) ?></small>
-								<br>
-								<?= Html::button('Delete Logo', [
+				<div class="collapse" id="company-logo-collapse">
+					<div class="card-body">
+						<?php if ($model->hasLogo()): ?>
+						<div class="current-logo mb-3">
+							<label class="form-label font-weight-bold">Current Logo</label>
+							<div class="logo-preview">
+								<img src="<?= $model->getLogoUrl() ?>" alt="Company Logo" class="img-thumbnail"
+									style="max-height: 150px;">
+								<div class="mt-2">
+									<small class="text-muted">Filename:
+										<?= Html::encode($model->logo_filename) ?></small>
+									<br>
+									<?= Html::button('Delete Logo', [
                                         'class' => 'btn btn-outline-danger btn-sm mt-1',
                                         'id' => 'delete-logo-btn'
                                     ]) ?>
+								</div>
 							</div>
 						</div>
-					</div>
-					<?php endif; ?>
+						<?php endif; ?>
 
-					<div class="form-group">
-						<label class="form-label font-weight-bold">Upload New Logo</label>
-						<div class="logo-upload-area" id="logo-upload-area">
-							<div class="upload-content">
-								<i class="fas fa-cloud-upload-alt upload-icon"></i>
-								<div class="upload-text">
-									<strong>Click to upload</strong> or drag and drop
+						<div class="form-group">
+							<label class="form-label font-weight-bold">Upload New Logo</label>
+							<div class="logo-upload-area" id="logo-upload-area">
+								<div class="upload-content">
+									<i class="fas fa-cloud-upload-alt upload-icon"></i>
+									<div class="upload-text">
+										<strong>Click to upload</strong> or drag and drop
+									</div>
+									<div class="upload-hint">
+										PNG, JPG, JPEG, GIF up to 2MB
+									</div>
 								</div>
-								<div class="upload-hint">
-									PNG, JPG, JPEG, GIF up to 2MB
-								</div>
-							</div>
-							<?= Html::activeFileInput($model, 'logo_upload', [
+								<?= Html::activeFileInput($model, 'logo_upload', [
                                 'class' => 'file-input',
                                 'accept' => 'image/*',
                                 'id' => 'logo-upload'
                             ]) ?>
+							</div>
 						</div>
-					</div>
 
-					<div id="logo-preview" class="mt-3" style="display: none;">
-						<label class="form-label">Preview</label>
-						<div>
-							<img id="logo-preview-img" src="#" alt="Logo Preview" class="img-thumbnail"
-								style="max-height: 150px;">
+						<div id="logo-preview" class="mt-3" style="display: none;">
+							<label class="form-label">Preview</label>
+							<div>
+								<img id="logo-preview-img" src="#" alt="Logo Preview" class="img-thumbnail"
+									style="max-height: 150px;">
+							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Email Settings -->
-		<div class="col-lg-6">
-			<div class="card mb-4">
-				<div class="card-header d-flex justify-content-between align-items-center">
-					<h5 class="card-title mb-0">
-						<i class="fas fa-envelope mr-2"></i>Email Settings
-					</h5>
-					<?= Html::button('Test Email', [
-                        'class' => 'btn btn-outline-primary btn-sm',
-                        'id' => 'test-email-btn',
-                        'data-toggle' => 'modal',
-                        'data-target' => '#test-email-modal'
-                    ]) ?>
-				</div>
-				<div class="card-body">
-					<?= $form->field($model, 'smtp2go_api_key')->passwordInput([
-                        'maxlength' => true,
-                        'placeholder' => 'Enter your SMTP2GO API key'
-                    ]) ?>
-
-					<?= $form->field($model, 'sender_email')->input('email', [
-                        'maxlength' => true,
-                        'placeholder' => 'noreply@yourcompany.com'
-                    ]) ?>
-
-					<?= $form->field($model, 'sender_name')->textInput([
-                        'maxlength' => true,
-                        'placeholder' => 'Your Company Name'
-                    ]) ?>
-
-					<?= $form->field($model, 'bcc_email')->input('email', [
-                        'maxlength' => true,
-                        'placeholder' => 'admin@yourcompany.com'
-                    ]) ?>
-
-					<div class="alert alert-info">
-						<small>
-							<i class="fas fa-info-circle mr-1"></i>
-							To use email functionality, you need to configure SMTP2GO API.
-							<a href="https://www.smtp2go.com" target="_blank">Get your API key here</a>.
-							<br><br>
-							<strong>Email Configuration:</strong>
-							<br>• <strong>Sender Email:</strong> The email address that will appear as "From" in sent
-							emails
-							<br>• <strong>Sender Name:</strong> The name that will appear as sender (defaults to company
-							name)
-							<br>• <strong>BCC Email:</strong> Email address to receive blind carbon copy of all sent
-							emails
-						</small>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Display & PDF Settings -->
-	<div class="card mb-4">
-		<div class="card-header">
-			<h5 class="card-title mb-0">
-				<i class="fas fa-palette mr-2"></i>Display & PDF Settings
-			</h5>
-		</div>
-		<div class="card-body">
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label class="font-weight-bold">Dark Mode</label>
-						<div class="custom-control custom-switch">
-							<input type="hidden" name="Company[dark_mode]" value="0">
-							<input type="checkbox" 
-								   class="custom-control-input" 
-								   id="dark-mode-switch" 
-								   name="Company[dark_mode]" 
-								   value="1"
-								   <?= $model->dark_mode ? 'checked' : '' ?>>
-							<label class="custom-control-label" for="dark-mode-switch">
-								Enable dark mode theme
-							</label>
-						</div>
-						<small class="form-text text-muted">
-							Enable dark mode theme for your company's interface
-						</small>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="form-group">
-						<label class="font-weight-bold">Use CJK Fonts for PDF</label>
-						<div class="custom-control custom-switch">
-							<input type="hidden" name="Company[use_cjk_font]" value="0">
-							<input type="checkbox" 
-								   class="custom-control-input" 
-								   id="cjk-font-switch" 
-								   name="Company[use_cjk_font]" 
-								   value="1"
-								   <?= $model->use_cjk_font ? 'checked' : '' ?>>
-							<label class="custom-control-label" for="cjk-font-switch">
-								Use CJK fonts for PDF generation
-							</label>
-						</div>
-						<small class="form-text text-muted">
-							Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters
-						</small>
 					</div>
 				</div>
 			</div>
@@ -220,75 +124,195 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<!-- Invoice Settings -->
 	<div class="card mb-4">
-		<div class="card-header">
-			<h5 class="card-title mb-0">
-				<i class="fas fa-file-invoice mr-2"></i>Invoice Settings
+		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+			data-target="#invoice-settings-collapse" aria-expanded="false">
+			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+				<span><i class="fas fa-file-invoice mr-2"></i>Invoice Settings</span>
+				<i class="fas fa-chevron-down collapse-icon"></i>
 			</h5>
 		</div>
-		<div class="card-body">
-			<div class="row">
-				<div class="col-md-3">
-					<?= $form->field($model, 'tax_rate')->textInput([
+		<div class="collapse" id="invoice-settings-collapse">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-3">
+						<?= $form->field($model, 'tax_rate')->textInput([
                         'type' => 'number',
                         'min' => 0,
                         'max' => 100,
                         'step' => 0.01,
                         'append' => '%'
                     ]) ?>
-				</div>
-				<div class="col-md-3">
-					<?= $form->field($model, 'currency')->dropDownList([
+					</div>
+					<div class="col-md-3">
+						<?= $form->field($model, 'currency')->dropDownList([
                         'USD' => 'USD ($)',
                         'EUR' => 'EUR (€)',
                         'GBP' => 'GBP (£)',
                         'KRW' => 'KRW (₩)',
                     ], ['prompt' => 'Select Currency']) ?>
-				</div>
-				<div class="col-md-3">
-					<?= $form->field($model, 'invoice_prefix')->textInput([
+					</div>
+					<div class="col-md-3">
+						<?= $form->field($model, 'invoice_prefix')->textInput([
                         'maxlength' => true,
                         'placeholder' => 'INV'
                     ]) ?>
-				</div>
-				<div class="col-md-3">
-					<?= $form->field($model, 'estimate_prefix')->textInput([
+					</div>
+					<div class="col-md-3">
+						<?= $form->field($model, 'estimate_prefix')->textInput([
                         'maxlength' => true,
                         'placeholder' => 'EST'
                     ]) ?>
-				</div>
-				<div class="col-md-3">
-					<?= $form->field($model, 'due_date_days')->textInput([
+					</div>
+					<div class="col-md-3">
+						<?= $form->field($model, 'due_date_days')->textInput([
                         'type' => 'number',
                         'min' => 1,
                         'max' => 365
                     ]) ?>
-				</div>
-				<div class="col-md-3">
-					<?= $form->field($model, 'estimate_validity_days')->textInput([
+					</div>
+					<div class="col-md-3">
+						<?= $form->field($model, 'estimate_validity_days')->textInput([
                         'type' => 'number',
                         'min' => 1,
                         'max' => 365
                     ]) ?>
+					</div>
+				</div>
+
+				<div class="alert alert-light">
+					<div class="row">
+						<div class="col-md-3">
+							<small><strong>Next Invoice Number:</strong> <span
+									id="next-invoice-number"><?= $model->generateInvoiceNumber() ?></span></small>
+						</div>
+						<div class="col-md-3">
+							<small><strong>Next Estimate Number:</strong> <span
+									id="next-estimate-number"><?= $model->generateEstimateNumber() ?></span></small>
+						</div>
+						<div class="col-md-3">
+							<small><strong>Default Due Date:</strong>
+								<?= Yii::$app->formatter->asDate($model->getDefaultDueDate()) ?></small>
+						</div>
+						<div class="col-md-3">
+							<small><strong>Default Estimate Expiry:</strong>
+								<?= Yii::$app->formatter->asDate($model->getDefaultExpiryDate()) ?></small>
+						</div>
+					</div>
 				</div>
 			</div>
+		</div>
+	</div>
 
-			<div class="alert alert-light">
+	<!-- Display & PDF Settings -->
+	<div class="card mb-4">
+		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+			data-target="#display-settings-collapse" aria-expanded="false">
+			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+				<span><i class="fas fa-palette mr-2"></i>Display & PDF Settings</span>
+				<i class="fas fa-chevron-down collapse-icon"></i>
+			</h5>
+		</div>
+		<div class="collapse" id="display-settings-collapse">
+			<div class="card-body">
 				<div class="row">
-					<div class="col-md-3">
-						<small><strong>Next Invoice Number:</strong> <span
-								id="next-invoice-number"><?= $model->generateInvoiceNumber() ?></span></small>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="font-weight-bold">Dark Mode</label>
+							<div class="custom-control custom-switch">
+								<input type="hidden" name="Company[dark_mode]" value="0">
+								<input type="checkbox" class="custom-control-input" id="dark-mode-switch"
+									name="Company[dark_mode]" value="1" <?= $model->dark_mode ? 'checked' : '' ?>>
+								<label class="custom-control-label" for="dark-mode-switch">
+									Enable dark mode theme
+								</label>
+							</div>
+							<small class="form-text text-muted">
+								Enable dark mode theme for your company's interface
+							</small>
+						</div>
 					</div>
-					<div class="col-md-3">
-						<small><strong>Next Estimate Number:</strong> <span
-								id="next-estimate-number"><?= $model->generateEstimateNumber() ?></span></small>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="font-weight-bold">Use CJK Fonts for PDF</label>
+							<div class="custom-control custom-switch">
+								<input type="hidden" name="Company[use_cjk_font]" value="0">
+								<input type="checkbox" class="custom-control-input" id="cjk-font-switch"
+									name="Company[use_cjk_font]" value="1" <?= $model->use_cjk_font ? 'checked' : '' ?>>
+								<label class="custom-control-label" for="cjk-font-switch">
+									Use CJK fonts for PDF generation
+								</label>
+							</div>
+							<small class="form-text text-muted">
+								Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters
+							</small>
+						</div>
 					</div>
-					<div class="col-md-3">
-						<small><strong>Default Due Date:</strong>
-							<?= Yii::$app->formatter->asDate($model->getDefaultDueDate()) ?></small>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Email Settings -->
+	<div class="card mb-4">
+		<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+			data-target="#email-settings-collapse" aria-expanded="false">
+			<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+				<span><i class="fas fa-envelope mr-2"></i>Email Settings</span>
+				<i class="fas fa-chevron-down collapse-icon"></i>
+			</h5>
+		</div>
+		<div class="collapse" id="email-settings-collapse">
+			<div class="card-body">
+				<div class="card mb-4">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h5 class="card-title mb-0">
+							<i class="fas fa-envelope mr-2"></i>Email Settings
+						</h5>
+						<?= Html::button('Test Email', [
+                        'class' => 'btn btn-outline-primary btn-sm',
+                        'id' => 'test-email-btn',
+                        'data-toggle' => 'modal',
+                        'data-target' => '#test-email-modal'
+                    ]) ?>
 					</div>
-					<div class="col-md-3">
-						<small><strong>Default Estimate Expiry:</strong>
-							<?= Yii::$app->formatter->asDate($model->getDefaultExpiryDate()) ?></small>
+					<div class="card-body">
+						<?= $form->field($model, 'smtp2go_api_key')->passwordInput([
+                        'maxlength' => true,
+                        'placeholder' => 'Enter your SMTP2GO API key'
+                    ]) ?>
+
+						<?= $form->field($model, 'sender_email')->input('email', [
+                        'maxlength' => true,
+                        'placeholder' => 'noreply@yourcompany.com'
+                    ]) ?>
+
+						<?= $form->field($model, 'sender_name')->textInput([
+                        'maxlength' => true,
+                        'placeholder' => 'Your Company Name'
+                    ]) ?>
+
+						<?= $form->field($model, 'bcc_email')->input('email', [
+                        'maxlength' => true,
+                        'placeholder' => 'admin@yourcompany.com'
+                    ]) ?>
+
+						<div class="alert alert-info">
+							<small>
+								<i class="fas fa-info-circle mr-1"></i>
+								To use email functionality, you need to configure SMTP2GO API.
+								<a href="https://www.smtp2go.com" target="_blank">Get your API key here</a>.
+								<br><br>
+								<strong>Email Configuration:</strong>
+								<br>• <strong>Sender Email:</strong> The email address that will appear as "From" in
+								sent
+								emails
+								<br>• <strong>Sender Name:</strong> The name that will appear as sender (defaults to
+								company
+								name)
+								<br>• <strong>BCC Email:</strong> Email address to receive blind carbon copy of all sent
+								emails
+							</small>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -315,80 +339,80 @@ $this->params['breadcrumbs'][] = $this->title;
 <style>
 /* Custom switch styling to ensure proper display */
 .custom-switch {
-    padding-left: 2.25rem;
-    position: relative;
+	padding-left: 2.25rem;
+	position: relative;
 }
 
 .custom-switch .custom-control-input {
-    position: absolute;
-    left: 0;
-    z-index: -1;
-    width: 1rem;
-    height: 1.25rem;
-    opacity: 0;
+	position: absolute;
+	left: 0;
+	z-index: -1;
+	width: 1rem;
+	height: 1.25rem;
+	opacity: 0;
 }
 
 .custom-switch .custom-control-label {
-    position: relative;
-    margin-bottom: 0;
-    vertical-align: top;
+	position: relative;
+	margin-bottom: 0;
+	vertical-align: top;
 }
 
 .custom-switch .custom-control-label::before {
-    position: absolute;
-    top: 0.25rem;
-    left: -2.25rem;
-    width: 1.75rem;
-    height: 1rem;
-    pointer-events: none;
-    content: "";
-    background-color: #adb5bd;
-    border: #adb5bd;
-    border-radius: 0.5rem;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	position: absolute;
+	top: 0.25rem;
+	left: -2.25rem;
+	width: 1.75rem;
+	height: 1rem;
+	pointer-events: none;
+	content: "";
+	background-color: #adb5bd;
+	border: #adb5bd;
+	border-radius: 0.5rem;
+	transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .custom-switch .custom-control-label::after {
-    position: absolute;
-    top: calc(0.25rem + 2px);
-    left: calc(-2.25rem + 2px);
-    width: calc(1rem - 4px);
-    height: calc(1rem - 4px);
-    content: "";
-    background-color: #fff;
-    border-radius: 0.5rem;
-    transition: transform 0.15s ease-in-out;
+	position: absolute;
+	top: calc(0.25rem + 2px);
+	left: calc(-2.25rem + 2px);
+	width: calc(1rem - 4px);
+	height: calc(1rem - 4px);
+	content: "";
+	background-color: #fff;
+	border-radius: 0.5rem;
+	transition: transform 0.15s ease-in-out;
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #007bff;
-    border-color: #007bff;
+.custom-switch .custom-control-input:checked~.custom-control-label::before {
+	background-color: #007bff;
+	border-color: #007bff;
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
-    transform: translateX(0.75rem);
+.custom-switch .custom-control-input:checked~.custom-control-label::after {
+	transform: translateX(0.75rem);
 }
 
-.custom-switch .custom-control-input:focus ~ .custom-control-label::before {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+.custom-switch .custom-control-input:focus~.custom-control-label::before {
+	box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-.custom-switch .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
-    border-color: #80bdff;
+.custom-switch .custom-control-input:focus:not(:checked)~.custom-control-label::before {
+	border-color: #80bdff;
 }
 
-.custom-switch .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
-    background-color: #b3d7ff;
-    border-color: #b3d7ff;
+.custom-switch .custom-control-input:not(:disabled):active~.custom-control-label::before {
+	background-color: #b3d7ff;
+	border-color: #b3d7ff;
 }
 
-.custom-switch .custom-control-input:disabled ~ .custom-control-label,
-.custom-switch .custom-control-input:disabled ~ .custom-control-label::before {
-    color: #6c757d;
+.custom-switch .custom-control-input:disabled~.custom-control-label,
+.custom-switch .custom-control-input:disabled~.custom-control-label::before {
+	color: #6c757d;
 }
 
-.custom-switch .custom-control-input:disabled ~ .custom-control-label::before {
-    background-color: #e9ecef;
+.custom-switch .custom-control-input:disabled~.custom-control-label::before {
+	background-color: #e9ecef;
 }
 </style>
 
@@ -663,5 +687,36 @@ $this->registerJs("
     $('#cjk-font-switch').on('change', function() {
         console.log('CJK font changed to: ' + $(this).is(':checked'));
     });
+    
+    // Collapse functionality is handled by collapse-helper.js
+");
+
+// Include collapse helper CSS
+$this->registerCss("
+    /* Collapse functionality styles */
+    .collapse {
+        display: none;
+        transition: all 0.3s ease;
+    }
+    
+    .collapse.show {
+        display: block;
+    }
+    
+    .collapse-icon {
+        transition: transform 0.3s ease;
+    }
+    
+    .collapse-icon.rotated {
+        transform: rotate(180deg);
+    }
+    
+    [data-custom-collapse] {
+        transition: background-color 0.3s ease;
+    }
+    
+    [data-custom-collapse]:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
 ");
 ?>
