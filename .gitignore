@@ -32,6 +32,9 @@ tests/_support/_generated
 #vagrant folder
 /.vagrant
 
+#composer.lock
+/.composer.lock
+
 #vscode folder
 /.vscode
 
