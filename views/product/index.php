@@ -11,7 +11,7 @@ use app\models\Product;
 /** @var string $typeFilter */
 /** @var string $categoryFilter */
 
-$this->title = 'Products & Services';
+$this->title = Yii::t('app/product', 'Products') . ' & ' . Yii::t('app/product', 'Services');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -20,12 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-download mr-1"></i>Export CSV', ['export'], [
+            <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export') . ' CSV', ['export'], [
                 'class' => 'btn btn-outline-info',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
-            <?= Html::a('<i class="fas fa-plus mr-1"></i>Add Product/Service', ['create'], [
+            <?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/product', 'Create New Product'), ['create'], [
                 'class' => 'btn btn-success',
                 'encode' => false
             ]) ?>
@@ -38,27 +38,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="input-group">
                     <?= Html::input('text', 'search', $searchTerm, [
                         'class' => 'form-control',
-                        'placeholder' => 'Search products...',
+                        'placeholder' => Yii::t('app/product', 'Search products...'),
                         'id' => 'searchInput'
                     ]) ?>
                     <div class="input-group-append">
-                        <?= Html::submitButton('<i class="fas fa-search"></i> Search', ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
+                        <?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', 'Search'), ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
                     </div>
                 </div>
             <?= Html::endForm() ?>
         </div>
         <div class="col-md-6 text-right">
             <div class="btn-group" role="group">
-                <?= Html::a('All', ['index'], [
+                <?= Html::a(Yii::t('app', 'All'), ['index'], [
                     'class' => 'btn btn-sm ' . (empty($typeFilter) ? 'btn-primary' : 'btn-outline-primary')
                 ]) ?>
-                <?= Html::a('Products', ['index', 'type' => Product::TYPE_PRODUCT], [
+                <?= Html::a(Yii::t('app/product', 'Products'), ['index', 'type' => Product::TYPE_PRODUCT], [
                     'class' => 'btn btn-sm ' . ($typeFilter === Product::TYPE_PRODUCT ? 'btn-primary' : 'btn-outline-primary')
                 ]) ?>
-                <?= Html::a('Services', ['index', 'type' => Product::TYPE_SERVICE], [
+                <?= Html::a(Yii::t('app/product', 'Services'), ['index', 'type' => Product::TYPE_SERVICE], [
                     'class' => 'btn btn-sm ' . ($typeFilter === Product::TYPE_SERVICE ? 'btn-info' : 'btn-outline-info')
                 ]) ?>
-                <?= Html::a('Non-Inventory', ['index', 'type' => Product::TYPE_NON_INVENTORY], [
+                <?= Html::a(Yii::t('app/product', 'Non-Inventory'), ['index', 'type' => Product::TYPE_NON_INVENTORY], [
                     'class' => 'btn btn-sm ' . ($typeFilter === Product::TYPE_NON_INVENTORY ? 'btn-warning' : 'btn-outline-warning')
                 ]) ?>
             </div>
@@ -67,25 +67,25 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php if (empty($products)): ?>
         <div class="alert alert-info text-center">
-            <h4>No Products Found</h4>
-            <p>You haven't added any products or services yet.</p>
-            <?= Html::a('<i class="fas fa-plus mr-1"></i>Add Your First Product/Service', ['create'], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+            <h4><?= Yii::t('app/product', 'No products found') ?></h4>
+            <p><?= Yii::t('app/product', 'You haven\'t created any products yet.') ?></p>
+            <?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/product', 'Create Your First Product'), ['create'], ['class' => 'btn btn-primary', 'encode' => false]) ?>
         </div>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Category</th>
-                        <th>SKU</th>
-                        <th>Unit</th>
-                        <th>Price</th>
-                        <th>Cost</th>
-                        <th>Margin</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th><?= Yii::t('app/product', 'Name') ?></th>
+                        <th><?= Yii::t('app/product', 'Type') ?></th>
+                        <th><?= Yii::t('app/product', 'Category') ?></th>
+                        <th><?= Yii::t('app/product', 'SKU') ?></th>
+                        <th><?= Yii::t('app/product', 'Unit') ?></th>
+                        <th><?= Yii::t('app/product', 'Price') ?></th>
+                        <th><?= Yii::t('app/product', 'Cost') ?></th>
+                        <th><?= Yii::t('app', 'Margin') ?></th>
+                        <th><?= Yii::t('app/product', 'Status') ?></th>
+                        <th><?= Yii::t('app', 'Actions') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,23 +153,23 @@ $this->params['breadcrumbs'][] = $this->title;
                             </td>
                             <td>
                                 <?php if ($product->is_active): ?>
-                                    <span class="badge badge-success">Active</span>
+                                    <span class="badge badge-success"><?= Yii::t('app/product', 'Active') ?></span>
                                 <?php else: ?>
-                                    <span class="badge badge-secondary">Inactive</span>
+                                    <span class="badge badge-secondary"><?= Yii::t('app/product', 'Inactive') ?></span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <?= Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $product->id], [
                                         'class' => 'btn btn-outline-primary',
-                                        'title' => 'View',
+                                        'title' => Yii::t('app/product', 'View'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
                                     
                                     <?= Html::a('<i class="fas fa-edit"></i>', ['update', 'id' => $product->id], [
                                         'class' => 'btn btn-outline-secondary',
-                                        'title' => 'Edit',
+                                        'title' => Yii::t('app/product', 'Edit'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
@@ -177,19 +177,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?= Html::a('<i class="fas fa-' . ($product->is_active ? 'pause' : 'play') . '"></i>', 
                                         ['toggle-status', 'id' => $product->id], [
                                         'class' => 'btn btn-outline-' . ($product->is_active ? 'warning' : 'success'),
-                                        'title' => $product->is_active ? 'Deactivate' : 'Activate',
+                                        'title' => $product->is_active ? Yii::t('app', 'Deactivate') : Yii::t('app', 'Activate'),
                                         'data-toggle' => 'tooltip',
                                         'data-method' => 'post',
-                                        'data-confirm' => 'Are you sure you want to ' . ($product->is_active ? 'deactivate' : 'activate') . ' this product?',
+                                        'data-confirm' => Yii::t('app', 'Are you sure you want to {action} this product?', ['action' => $product->is_active ? Yii::t('app', 'deactivate') : Yii::t('app', 'activate')]),
                                         'encode' => false
                                     ]) ?>
                                     
                                     <?= Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $product->id], [
                                         'class' => 'btn btn-outline-danger',
-                                        'title' => 'Delete',
+                                        'title' => Yii::t('app/product', 'Delete'),
                                         'data-toggle' => 'tooltip',
                                         'data-method' => 'post',
-                                        'data-confirm' => 'Are you sure you want to delete this product?',
+                                        'data-confirm' => Yii::t('app/product', 'Are you sure you want to delete this product?'),
                                         'encode' => false
                                     ]) ?>
                                 </div>
@@ -203,9 +203,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row mt-3">
             <div class="col-md-6">
                 <div class="dataTables_info">
-                    Showing <?= count($products) ?> products
+                    <?= Yii::t('app', 'Showing {count} products', ['count' => count($products)]) ?>
                     <?php if (!empty($searchTerm) || !empty($typeFilter) || !empty($categoryFilter)): ?>
-                        (filtered)
+                        (<?= Yii::t('app', 'filtered') ?>)
                     <?php endif; ?>
                 </div>
             </div>

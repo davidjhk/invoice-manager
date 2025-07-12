@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /** @var string $searchTerm */
 /** @var app\models\Company $company */
 
-$this->title = 'Customers';
+$this->title = Yii::t('app/customer', 'Customers');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -17,12 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-download mr-1"></i>Export CSV', ['export'], [
+            <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export') . ' CSV', ['export'], [
                 'class' => 'btn btn-outline-info',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
-            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>Add Customer', ['create'], [
+            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>' . Yii::t('app/customer', 'Create New Customer'), ['create'], [
                 'class' => 'btn btn-success',
                 'encode' => false
             ]) ?>
@@ -35,11 +35,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="input-group">
                     <?= Html::input('text', 'search', $searchTerm, [
                         'class' => 'form-control',
-                        'placeholder' => 'Search customers...',
+                        'placeholder' => Yii::t('app/customer', 'Search customers...'),
                         'id' => 'searchInput'
                     ]) ?>
                     <div class="input-group-append">
-                        <?= Html::submitButton('<i class="fas fa-search"></i> Search', ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
+                        <?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', 'Search'), ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
                     </div>
                 </div>
             <?= Html::endForm() ?>
@@ -51,23 +51,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php if (empty($customers)): ?>
         <div class="alert alert-info text-center">
-            <h4>No Customers Found</h4>
-            <p>You haven't added any customers yet.</p>
-            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>Add Your First Customer', ['create'], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+            <h4><?= Yii::t('app/customer', 'No customers found') ?></h4>
+            <p><?= Yii::t('app/customer', 'You haven\'t created any customers yet.') ?></p>
+            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>' . Yii::t('app/customer', 'Create Your First Customer'), ['create'], ['class' => 'btn btn-primary', 'encode' => false]) ?>
         </div>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Total Invoices</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th><?= Yii::t('app/customer', 'Customer Name') ?></th>
+                        <th><?= Yii::t('app/customer', 'Contact Person') ?></th>
+                        <th><?= Yii::t('app/customer', 'Email') ?></th>
+                        <th><?= Yii::t('app/customer', 'Phone') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Total Invoices') ?></th>
+                        <th><?= Yii::t('app/invoice', 'Total Amount') ?></th>
+                        <th><?= Yii::t('app/customer', 'Status') ?></th>
+                        <th><?= Yii::t('app', 'Actions') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,30 +112,30 @@ $this->params['breadcrumbs'][] = $this->title;
                             </td>
                             <td>
                                 <?php if ($customer->is_active): ?>
-                                    <span class="badge badge-success">Active</span>
+                                    <span class="badge badge-success"><?= Yii::t('app/customer', 'Active') ?></span>
                                 <?php else: ?>
-                                    <span class="badge badge-secondary">Inactive</span>
+                                    <span class="badge badge-secondary"><?= Yii::t('app/customer', 'Inactive') ?></span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <?= Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $customer->id], [
                                         'class' => 'btn btn-outline-primary',
-                                        'title' => 'View',
+                                        'title' => Yii::t('app/customer', 'View'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
                                     
                                     <?= Html::a('<i class="fas fa-edit"></i>', ['update', 'id' => $customer->id], [
                                         'class' => 'btn btn-outline-secondary',
-                                        'title' => 'Edit',
+                                        'title' => Yii::t('app/customer', 'Edit'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
                                     
                                     <?= Html::a('<i class="fas fa-file-invoice"></i>', ['/invoice/create', 'customer_id' => $customer->id], [
                                         'class' => 'btn btn-outline-success',
-                                        'title' => 'Create Invoice',
+                                        'title' => Yii::t('app/customer', 'Create Invoice'),
                                         'data-toggle' => 'tooltip',
                                         'encode' => false
                                     ]) ?>
@@ -143,16 +143,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php if ($customer->is_active): ?>
                                         <?= Html::a('<i class="fas fa-ban"></i>', ['toggle-status', 'id' => $customer->id], [
                                             'class' => 'btn btn-outline-warning',
-                                            'title' => 'Deactivate',
+                                            'title' => Yii::t('app/customer', 'Deactivate'),
                                             'data-toggle' => 'tooltip',
                                             'data-method' => 'post',
-                                            'data-confirm' => 'Are you sure you want to deactivate this customer?',
+                                            'data-confirm' => Yii::t('app/customer', 'Are you sure you want to deactivate this customer?'),
                                             'encode' => false
                                         ]) ?>
                                     <?php else: ?>
                                         <?= Html::a('<i class="fas fa-check"></i>', ['toggle-status', 'id' => $customer->id], [
                                             'class' => 'btn btn-outline-success',
-                                            'title' => 'Activate',
+                                            'title' => Yii::t('app/customer', 'Activate'),
                                             'data-toggle' => 'tooltip',
                                             'data-method' => 'post',
                                             'encode' => false
@@ -162,9 +162,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php if ($customer->getInvoicesCount() == 0): ?>
                                         <?= Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $customer->id], [
                                             'class' => 'btn btn-outline-danger',
-                                            'title' => 'Delete',
+                                            'title' => Yii::t('app/customer', 'Delete'),
                                             'data-toggle' => 'tooltip',
-                                            'data-confirm' => 'Are you sure you want to delete this customer?',
+                                            'data-confirm' => Yii::t('app/customer', 'Are you sure you want to delete this customer?'),
                                             'data-method' => 'post',
                                             'encode' => false
                                         ]) ?>

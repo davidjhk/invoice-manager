@@ -31,27 +31,27 @@ use app\models\ProductCategory;
 			<div class="card mb-4">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-info-circle mr-2"></i>Basic Information
+						<i class="fas fa-info-circle mr-2"></i><?= Yii::t('app/product', 'Product Information') ?>
 					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
 						<div class="col-md-6">
-							<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+							<?= $form->field($model, 'name')->label(Yii::t('app/product', 'Name'))->textInput(['maxlength' => true]) ?>
 						</div>
 						<div class="col-md-6">
-							<?= $form->field($model, 'type')->dropDownList(Product::getTypeOptions(), ['prompt' => 'Select Type']) ?>
+							<?= $form->field($model, 'type')->label(Yii::t('app/product', 'Type'))->dropDownList(Product::getTypeOptions(), ['prompt' => Yii::t('app', 'Select Type')]) ?>
 						</div>
 					</div>
 
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
-								<?= Html::label('Category', 'product-category_id', ['class' => 'form-label font-weight-bold']) ?>
+								<?= Html::label(Yii::t('app/product', 'Category'), 'product-category_id', ['class' => 'form-label font-weight-bold']) ?>
 								<div class="input-group">
 									<?= Html::dropDownList('Product[category_id]', $model->category_id, ProductCategory::getCategoryOptions($company->id), [
 										'class' => 'form-control',
-										'prompt' => 'Select Category',
+										'prompt' => Yii::t('app', 'Select Category'),
 										'id' => 'product-category_id'
 									]) ?>
 									<div class="input-group-append">
@@ -66,11 +66,11 @@ use app\models\ProductCategory;
 							</div>
 						</div>
 						<div class="col-md-6">
-							<?= $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
+							<?= $form->field($model, 'sku')->label(Yii::t('app/product', 'SKU'))->textInput(['maxlength' => true]) ?>
 						</div>
 					</div>
 
-					<?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
+					<?= $form->field($model, 'description')->label(Yii::t('app/product', 'Description'))->textarea(['rows' => 3]) ?>
 				</div>
 			</div>
 
@@ -84,10 +84,10 @@ use app\models\ProductCategory;
 				<div class="card-body">
 					<div class="row">
 						<div class="col-md-4">
-							<?= $form->field($model, 'unit')->dropDownList(Product::getUnitOptions(), ['prompt' => 'Select Unit']) ?>
+							<?= $form->field($model, 'unit')->label(Yii::t('app/product', 'Unit'))->dropDownList(Product::getUnitOptions(), ['prompt' => Yii::t('app', 'Select Unit')]) ?>
 						</div>
 						<div class="col-md-4">
-							<?= $form->field($model, 'price')->textInput([
+							<?= $form->field($model, 'price')->label(Yii::t('app/product', 'Price'))->textInput([
                                 'type' => 'number',
                                 'min' => 0,
                                 'step' => 0.01,
@@ -95,7 +95,7 @@ use app\models\ProductCategory;
                             ]) ?>
 						</div>
 						<div class="col-md-4">
-							<?= $form->field($model, 'cost')->textInput([
+							<?= $form->field($model, 'cost')->label(Yii::t('app/product', 'Cost'))->textInput([
                                 'type' => 'number',
                                 'min' => 0,
                                 'step' => 0.01,
@@ -150,7 +150,7 @@ use app\models\ProductCategory;
                             'label' => false,
                         ]) ?>
 						<label class="form-check-label" for="product-is_taxable">
-							This product/service is taxable
+							<?= Yii::t('app/product', 'This product is subject to tax') ?>
 						</label>
 					</div>
 
@@ -160,7 +160,7 @@ use app\models\ProductCategory;
                             'label' => false,
                         ]) ?>
 						<label class="form-check-label" for="product-is_active">
-							Product is active
+							<?= Yii::t('app/product', 'Active') ?>
 						</label>
 					</div>
 				</div>
@@ -212,10 +212,10 @@ use app\models\ProductCategory;
 
 	<!-- Form Actions -->
 	<div class="form-group mt-4">
-		<?= Html::submitButton($model->isNewRecord ? 'Create Product' : 'Update Product', [
+		<?= Html::submitButton($model->isNewRecord ? Yii::t('app/product', 'Create Product') : Yii::t('app/product', 'Update Product'), [
             'class' => 'btn btn-success'
         ]) ?>
-		<?= Html::a('Cancel', $model->isNewRecord ? ['index'] : ['view', 'id' => $model->id], [
+		<?= Html::a(Yii::t('app/product', 'Cancel'), $model->isNewRecord ? ['index'] : ['view', 'id' => $model->id], [
             'class' => 'btn btn-secondary'
         ]) ?>
 	</div>

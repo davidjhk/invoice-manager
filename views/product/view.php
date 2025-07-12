@@ -8,7 +8,7 @@ use app\models\Product;
 /** @var app\models\Product $model */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Products', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app/product', 'Products'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-view">
@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			<h1><?= Html::encode($this->title) ?></h1>
 		</div>
 		<div class="col-md-4 text-right">
-			<?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-			<?= Html::a('Delete', ['delete', 'id' => $model->id], [
+			<?= Html::a(Yii::t('app/product', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+			<?= Html::a(Yii::t('app/product', 'Delete'), ['delete', 'id' => $model->id], [
                 'class' => 'btn btn-danger',
                 'data' => [
-                    'confirm' => 'Are you sure you want to delete this product?',
+                    'confirm' => Yii::t('app/product', 'Are you sure you want to delete this product?'),
                     'method' => 'post',
                 ],
             ]) ?>
@@ -36,16 +36,19 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Basic Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Basic Information</h6>
+					<h6 class="mb-0"><?= Yii::t('app/product', 'Product Information') ?></h6>
 				</div>
 				<div class="card-body">
 					<?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'name',
+                            [
+                                'attribute' => 'name',
+                                'label' => Yii::t('app/product', 'Name'),
+                            ],
                             [
                                 'attribute' => 'type',
-                                'value' => $model->getTypeLabel(),
+                                'label' => Yii::t('app/product', 'Type'),
                                 'format' => 'raw',
                                 'value' => function($model) {
                                     $typeClass = 'secondary';
@@ -61,9 +64,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ]);
                                 }
                             ],
-                            'category',
-                            'sku',
-                            'description:ntext',
+                            [
+                                'attribute' => 'category',
+                                'label' => Yii::t('app/product', 'Category'),
+                            ],
+                            [
+                                'attribute' => 'sku',
+                                'label' => Yii::t('app/product', 'SKU'),
+                            ],
+                            [
+                                'attribute' => 'description',
+                                'label' => Yii::t('app/product', 'Description'),
+                                'format' => 'ntext',
+                            ],
                         ],
                     ]) ?>
 				</div>
@@ -72,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Pricing Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Pricing & Cost</h6>
+					<h6 class="mb-0"><?= Yii::t('app/product', 'Pricing Information') ?></h6>
 				</div>
 				<div class="card-body">
 					<?= DetailView::widget([
@@ -80,18 +93,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attributes' => [
                             [
                                 'attribute' => 'unit',
+                                'label' => Yii::t('app/product', 'Unit'),
                                 'value' => $model->getUnitLabel(),
                             ],
                             [
                                 'attribute' => 'price',
+                                'label' => Yii::t('app/product', 'Price'),
                                 'value' => $model->getFormattedPrice(),
                             ],
                             [
                                 'attribute' => 'cost',
+                                'label' => Yii::t('app/product', 'Cost'),
                                 'value' => $model->getFormattedCost(),
                             ],
                             [
-                                'label' => 'Profit Margin',
+                                'label' => Yii::t('app', 'Profit Margin'),
                                 'value' => number_format($model->getProfitMargin(), 2) . '%',
                                 'format' => 'raw',
                                 'value' => function($model) {
@@ -103,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                             ],
                             [
-                                'label' => 'Profit Amount',
+                                'label' => Yii::t('app', 'Profit Amount'),
                                 'value' => '$' . number_format($model->price - $model->cost, 2),
                             ],
                         ],
@@ -119,7 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Settings -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Settings</h6>
+					<h6 class="mb-0"><?= Yii::t('app/product', 'Product Settings') ?></h6>
 				</div>
 				<div class="card-body">
 					<?= DetailView::widget([
@@ -128,16 +144,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'is_taxable',
                                 'format' => 'raw',
+                                'label' => Yii::t('app/product', 'Is Taxable'),
                                 'value' => $model->is_taxable ? 
-                                    '<span class="badge badge-success">Taxable</span>' : 
-                                    '<span class="badge badge-secondary">Non-taxable</span>'
+                                    '<span class="badge badge-success">' . Yii::t('app', 'Taxable') . '</span>' : 
+                                    '<span class="badge badge-secondary">' . Yii::t('app', 'Non-taxable') . '</span>'
                             ],
                             [
                                 'attribute' => 'is_active',
                                 'format' => 'raw',
+                                'label' => Yii::t('app/product', 'Status'),
                                 'value' => $model->is_active ? 
-                                    '<span class="badge badge-success">Active</span>' : 
-                                    '<span class="badge badge-secondary">Inactive</span>'
+                                    '<span class="badge badge-success">' . Yii::t('app/product', 'Active') . '</span>' : 
+                                    '<span class="badge badge-secondary">' . Yii::t('app/product', 'Inactive') . '</span>'
                             ],
                         ],
                     ]) ?>
@@ -147,7 +165,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Company Information -->
 			<div class="card mb-4">
 				<div class="card-header">
-					<h6 class="mb-0">Company</h6>
+					<h6 class="mb-0"><?= Yii::t('app', 'Company') ?></h6>
 				</div>
 				<div class="card-body">
 					<?= DetailView::widget([
@@ -155,10 +173,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attributes' => [
                             [
                                 'attribute' => 'company.company_name',
-                                'label' => 'Company',
+                                'label' => Yii::t('app', 'Company'),
                             ],
-                            'created_at',
-                            'updated_at',
+                            [
+                                'attribute' => 'created_at',
+                                'label' => Yii::t('app', 'Created At'),
+                            ],
+                            [
+                                'attribute' => 'updated_at', 
+                                'label' => Yii::t('app', 'Updated At'),
+                            ],
                         ],
                     ]) ?>
 				</div>
@@ -167,15 +191,15 @@ $this->params['breadcrumbs'][] = $this->title;
 			<!-- Actions -->
 			<div class="card">
 				<div class="card-header">
-					<h6 class="mb-0">Actions</h6>
+					<h6 class="mb-0"><?= Yii::t('app', 'Actions') ?></h6>
 				</div>
 				<div class="card-body">
-					<?= Html::a('Toggle Status', ['toggle-status', 'id' => $model->id], [
+					<?= Html::a(Yii::t('app', 'Toggle Status'), ['toggle-status', 'id' => $model->id], [
                         'class' => 'btn btn-outline-' . ($model->is_active ? 'warning' : 'success') . ' btn-block',
                         'data-method' => 'post',
-                        'data-confirm' => 'Are you sure you want to ' . ($model->is_active ? 'deactivate' : 'activate') . ' this product?'
+                        'data-confirm' => Yii::t('app', 'Are you sure you want to {action} this product?', ['action' => $model->is_active ? Yii::t('app', 'deactivate') : Yii::t('app', 'activate')])
                     ]) ?>
-					<?= Html::a('Edit Product', ['update', 'id' => $model->id], [
+					<?= Html::a(Yii::t('app/product', 'Edit') . ' ' . Yii::t('app/product', 'Product'), ['update', 'id' => $model->id], [
                         'class' => 'btn btn-primary btn-block'
                     ]) ?>
 				</div>

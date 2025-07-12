@@ -7,16 +7,16 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
-$this->title = 'User Management';
-$this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['index']];
+$this->title = Yii::t('app', 'User Management');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Admin'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="admin-users">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="btn-group">
-            <?= Html::a('<i class="fas fa-plus mr-2"></i>Create User', ['create-user'], ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('<i class="fas fa-arrow-left mr-2"></i>Back to Dashboard', ['index'], ['class' => 'btn btn-secondary']) ?>
+            <?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app', 'Create User'), ['create-user'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('<i class="fas fa-arrow-left mr-2"></i>' . Yii::t('app', 'Back to Dashboard'), ['index'], ['class' => 'btn btn-secondary']) ?>
         </div>
     </div>
 
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     
                     [
                         'attribute' => 'full_name',
-                        'label' => 'Name',
+                        'label' => Yii::t('app', 'Name'),
                         'value' => function($model) {
                             return $model->full_name ?: $model->username;
                         },
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'email:email',
                     [
                         'attribute' => 'role',
-                        'label' => 'Role',
+                        'label' => Yii::t('app', 'Role'),
                         'value' => function($model) {
                             return $model->getRoleLabel();
                         },
@@ -51,27 +51,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                         'attribute' => 'is_active',
-                        'label' => 'Status',
+                        'label' => Yii::t('app', 'Status'),
                         'value' => function($model) {
                             return $model->is_active ? 
-                                '<span class="badge badge-success">Active</span>' : 
-                                '<span class="badge badge-secondary">Inactive</span>';
+                                '<span class="badge badge-success">' . Yii::t('app', 'Active') . '</span>' : 
+                                '<span class="badge badge-secondary">' . Yii::t('app', 'Inactive') . '</span>';
                         },
                         'format' => 'raw',
                     ],
                     [
                         'attribute' => 'login_type',
-                        'label' => 'Login Type',
+                        'label' => Yii::t('app', 'Login Type'),
                         'value' => function($model) {
                             return $model->login_type === 'google' ? 
-                                '<span class="badge badge-info">Google</span>' : 
-                                '<span class="badge badge-secondary">Local</span>';
+                                '<span class="badge badge-info">' . Yii::t('app', 'Google') . '</span>' : 
+                                '<span class="badge badge-secondary">' . Yii::t('app', 'Local') . '</span>';
                         },
                         'format' => 'raw',
                     ],
                     [
                         'attribute' => 'created_at',
-                        'label' => 'Created',
+                        'label' => Yii::t('app', 'Created'),
                         'value' => function($model) {
                             return Yii::$app->formatter->asRelativeTime($model->created_at);
                         },
@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'view' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-eye"></i>', '#', [
                                     'class' => 'btn btn-sm btn-outline-info',
-                                    'title' => 'View User',
+                                    'title' => Yii::t('app', 'View User'),
                                     'data-toggle' => 'modal',
                                     'data-target' => '#userModal',
                                     'data-user-id' => $model->id,
@@ -92,13 +92,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             'update' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-edit"></i>', ['update-user', 'id' => $model->id], [
                                     'class' => 'btn btn-sm btn-outline-primary',
-                                    'title' => 'Edit User',
+                                    'title' => Yii::t('app', 'Edit User'),
                                 ]);
                             },
                             'reset-password' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-key"></i>', ['reset-user-password', 'id' => $model->id], [
                                     'class' => 'btn btn-sm btn-outline-warning',
-                                    'title' => 'Reset Password',
+                                    'title' => Yii::t('app', 'Reset Password'),
                                 ]);
                             },
                             'toggle-status' => function ($url, $model, $key) {
@@ -107,13 +107,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 $icon = $model->is_active ? 'fas fa-user-slash' : 'fas fa-user-check';
                                 $class = $model->is_active ? 'btn-outline-warning' : 'btn-outline-success';
-                                $title = $model->is_active ? 'Deactivate User' : 'Activate User';
+                                $title = $model->is_active ? Yii::t('app', 'Deactivate User') : Yii::t('app', 'Activate User');
                                 
                                 return Html::a("<i class=\"{$icon}\"></i>", ['toggle-user-status', 'id' => $model->id], [
                                     'class' => "btn btn-sm {$class}",
                                     'title' => $title,
                                     'data-method' => 'post',
-                                    'data-confirm' => "Are you sure you want to {$title}?",
+                                    'data-confirm' => Yii::t('app', 'Are you sure you want to {action}?', ['action' => strtolower($title)]),
                                 ]);
                             },
                             'delete' => function ($url, $model, $key) {
@@ -122,9 +122,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 return Html::a('<i class="fas fa-trash"></i>', ['delete-user', 'id' => $model->id], [
                                     'class' => 'btn btn-sm btn-outline-danger',
-                                    'title' => 'Delete User',
+                                    'title' => Yii::t('app', 'Delete User'),
                                     'data-method' => 'post',
-                                    'data-confirm' => 'Are you sure you want to delete this user?',
+                                    'data-confirm' => Yii::t('app', 'Are you sure you want to delete this user?'),
                                 ]);
                             },
                         ],

@@ -5,24 +5,24 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Admin Dashboard';
+$this->title = Yii::t('app', 'Admin Dashboard');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="admin-index">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-user-plus mr-2"></i>Create User', ['create-user'], ['class' => 'btn btn-success']) ?>
-            <?= Html::a('<i class="fas fa-cog mr-2"></i>Settings', ['settings'], ['class' => 'btn btn-outline-primary']) ?>
-            <?= Html::a('<i class="fas fa-users mr-2"></i>Manage Users', ['users'], ['class' => 'btn btn-outline-primary']) ?>
+            <?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create User'), ['create-user'], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app', 'Settings'), ['settings'], ['class' => 'btn btn-outline-primary']) ?>
+            <?= Html::a('<i class="fas fa-users mr-2"></i>' . Yii::t('app', 'Manage Users'), ['users'], ['class' => 'btn btn-outline-primary']) ?>
         </div>
     </div>
 
     <div class="alert alert-info mb-4">
         <i class="fas fa-info-circle mr-2"></i>
-        <strong>Account Creation:</strong> Users can only be created by administrators. 
-        The public signup feature has been disabled for security. 
-        Use the "Create User" button to add new accounts to the system.
+        <strong><?= Yii::t('app', 'Account Creation') ?>:</strong> <?= Yii::t('app', 'Users can only be created by administrators') ?>. 
+        <?= Yii::t('app', 'The public signup feature has been disabled for security') ?>. 
+        <?= Yii::t('app', 'Use the "Create User" button to add new accounts to the system') ?>.
     </div>
 
     <div class="row">
@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h5 class="card-title">Total Users</h5>
+                            <h5 class="card-title"><?= Yii::t('app', 'Total Users') ?></h5>
                             <h2 class="card-text"><?= $stats['totalUsers'] ?></h2>
                         </div>
                         <div class="card-icon">
@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h5 class="card-title">Active Users</h5>
+                            <h5 class="card-title"><?= Yii::t('app', 'Active Users') ?></h5>
                             <h2 class="card-text"><?= $stats['activeUsers'] ?></h2>
                         </div>
                         <div class="card-icon">
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h5 class="card-title">Inactive Users</h5>
+                            <h5 class="card-title"><?= Yii::t('app', 'Inactive Users') ?></h5>
                             <h2 class="card-text"><?= $stats['inactiveUsers'] ?></h2>
                         </div>
                         <div class="card-icon">
@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h5 class="card-title">Admin Users</h5>
+                            <h5 class="card-title"><?= Yii::t('app', 'Admin Users') ?></h5>
                             <h2 class="card-text"><?= $stats['adminUsers'] ?></h2>
                         </div>
                         <div class="card-icon">
@@ -95,13 +95,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Quick Actions</h5>
+                    <h5 class="card-title"><?= Yii::t('app', 'Quick Actions') ?></h5>
                 </div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
-                        <?= Html::a('<i class="fas fa-user-plus mr-2"></i>Create New User', ['create-user'], ['class' => 'list-group-item list-group-item-action']) ?>
-                        <?= Html::a('<i class="fas fa-cogs mr-2"></i>System Settings', ['settings'], ['class' => 'list-group-item list-group-item-action']) ?>
-                        <?= Html::a('<i class="fas fa-users-cog mr-2"></i>User Management', ['users'], ['class' => 'list-group-item list-group-item-action']) ?>
+                        <?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create New User'), ['create-user'], ['class' => 'list-group-item list-group-item-action']) ?>
+                        <?= Html::a('<i class="fas fa-cogs mr-2"></i>' . Yii::t('app', 'System Settings'), ['settings'], ['class' => 'list-group-item list-group-item-action']) ?>
+                        <?= Html::a('<i class="fas fa-users-cog mr-2"></i>' . Yii::t('app', 'User Management'), ['users'], ['class' => 'list-group-item list-group-item-action']) ?>
                     </div>
                 </div>
             </div>
@@ -110,17 +110,17 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">System Information</h5>
+                    <h5 class="card-title"><?= Yii::t('app', 'System Information') ?></h5>
                 </div>
                 <div class="card-body">
                     <dl class="row">
-                        <dt class="col-sm-4">PHP Version:</dt>
+                        <dt class="col-sm-4"><?= Yii::t('app', 'PHP Version') ?>:</dt>
                         <dd class="col-sm-8"><?= PHP_VERSION ?></dd>
                         
-                        <dt class="col-sm-4">Yii Version:</dt>
+                        <dt class="col-sm-4"><?= Yii::t('app', 'Yii Version') ?>:</dt>
                         <dd class="col-sm-8"><?= Yii::getVersion() ?></dd>
                         
-                        <dt class="col-sm-4">Server Time:</dt>
+                        <dt class="col-sm-4"><?= Yii::t('app', 'Server Time') ?>:</dt>
                         <dd class="col-sm-8"><?= date('Y-m-d H:i:s') ?></dd>
                     </dl>
                 </div>

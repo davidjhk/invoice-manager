@@ -8,7 +8,7 @@ use app\models\Customer;
 
 /** @var yii\web\View $this */
 
-$this->title = (Yii::$app->params['siteName'] ?? 'Invoice Manager') . ' Dashboard';
+$this->title = (Yii::$app->params['siteName'] ?? Yii::t('app', 'Invoice Manager')) . ' ' . Yii::t('app', 'Dashboard');
 
 // Get company and statistics
 $company = Company::getCurrent();
@@ -44,11 +44,11 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 	<div class="dashboard-header">
 		<div class="header-content">
 			<div class="header-info">
-				<h1 class="dashboard-title">Dashboard</h1>
-				<p class="dashboard-subtitle">Welcome back, <?= Html::encode($company->company_name) ?></p>
+				<h1 class="dashboard-title"><?= Yii::t('app', 'Dashboard') ?></h1>
+				<p class="dashboard-subtitle"><?= Yii::t('app', 'Welcome back, {company}', ['company' => Html::encode($company->company_name)]) ?></p>
 			</div>
 			<div class="header-actions action-buttons">
-				<?= Html::a('<i class="fas fa-plus mr-2"></i>New Invoice', ['/invoice/create'], [
+				<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/invoice', 'New Invoice'), ['/invoice/create'], [
                     'class' => 'btn btn-primary'
                 ]) ?>
 			</div>
@@ -68,9 +68,8 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			</div>
 			<div class="kpi-body">
 				<h3 class="kpi-value"><?= $company->formatAmount($totalAmount) ?></h3>
-				<p class="kpi-label">Total Revenue</p>
-				<small class="kpi-detail">Average: <?= $company->formatAmount($averageInvoiceValue) ?> per
-					invoice</small>
+				<p class="kpi-label"><?= Yii::t('app', 'Total Revenue') ?></p>
+				<small class="kpi-detail"><?= Yii::t('app', 'Average: {amount} per invoice', ['amount' => $company->formatAmount($averageInvoiceValue)]) ?></small>
 			</div>
 		</div>
 
@@ -85,8 +84,8 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			</div>
 			<div class="kpi-body">
 				<h3 class="kpi-value"><?= $company->formatAmount($paidAmount) ?></h3>
-				<p class="kpi-label">Paid Amount</p>
-				<small class="kpi-detail"><?= $conversionRate ?>% collection rate</small>
+				<p class="kpi-label"><?= Yii::t('app', 'Paid Amount') ?></p>
+				<small class="kpi-detail"><?= Yii::t('app', '{rate}% collection rate', ['rate' => $conversionRate]) ?></small>
 			</div>
 		</div>
 
@@ -101,8 +100,8 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			</div>
 			<div class="kpi-body">
 				<h3 class="kpi-value"><?= $company->formatAmount($pendingAmount) ?></h3>
-				<p class="kpi-label">Pending Amount</p>
-				<small class="kpi-detail"><?= $sentInvoices ?> invoices awaiting payment</small>
+				<p class="kpi-label"><?= Yii::t('app', 'Pending Amount') ?></p>
+				<small class="kpi-detail"><?= Yii::t('app', '{count} invoices awaiting payment', ['count' => $sentInvoices]) ?></small>
 			</div>
 		</div>
 
@@ -117,9 +116,8 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			</div>
 			<div class="kpi-body">
 				<h3 class="kpi-value"><?= $totalCustomers ?></h3>
-				<p class="kpi-label">Active Customers</p>
-				<small class="kpi-detail"><?= $totalCustomers > 0 ? round($totalInvoices / $totalCustomers, 1) : 0 ?>
-					avg invoices per customer</small>
+				<p class="kpi-label"><?= Yii::t('app/customer', 'Active Customers') ?></p>
+				<small class="kpi-detail"><?= Yii::t('app', '{avg} avg invoices per customer', ['avg' => $totalCustomers > 0 ? round($totalInvoices / $totalCustomers, 1) : 0]) ?></small>
 			</div>
 		</div>
 	</div>
@@ -127,31 +125,31 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 	<!-- Invoice Status Overview -->
 	<div class="status-overview">
 		<div class="status-header">
-			<h2 class="section-title">Invoice Status</h2>
+			<h2 class="section-title"><?= Yii::t('app/invoice', 'Invoice Status') ?></h2>
 			<div class="status-actions">
-				<?= Html::a('View All Invoices', ['/invoice/index'], ['class' => 'btn btn-outline-primary']) ?>
+				<?= Html::a(Yii::t('app', 'View All {item}', ['item' => Yii::t('app/invoice', 'Invoices')]), ['/invoice/index'], ['class' => 'btn btn-outline-primary']) ?>
 			</div>
 		</div>
 		<div class="status-cards">
 			<div class="status-card draft-status">
 				<div class="status-number"><?= $draftInvoices ?></div>
-				<div class="status-label">Draft</div>
+				<div class="status-label"><?= Yii::t('app/invoice', 'Draft') ?></div>
 				<div class="status-action">
-					<?= Html::a('Review', ['/invoice/index', 'status' => 'draft'], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+					<?= Html::a(Yii::t('app', 'Review'), ['/invoice/index', 'status' => 'draft'], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
 				</div>
 			</div>
 			<div class="status-card sent-status">
 				<div class="status-number"><?= $sentInvoices ?></div>
-				<div class="status-label">Sent</div>
+				<div class="status-label"><?= Yii::t('app/invoice', 'Sent') ?></div>
 				<div class="status-action">
-					<?= Html::a('Follow Up', ['/invoice/index', 'status' => 'sent'], ['class' => 'btn btn-sm btn-outline-warning']) ?>
+					<?= Html::a(Yii::t('app', 'Follow Up'), ['/invoice/index', 'status' => 'sent'], ['class' => 'btn btn-sm btn-outline-warning']) ?>
 				</div>
 			</div>
 			<div class="status-card paid-status">
 				<div class="status-number"><?= $paidInvoices ?></div>
-				<div class="status-label">Paid</div>
+				<div class="status-label"><?= Yii::t('app/invoice', 'Paid') ?></div>
 				<div class="status-action">
-					<?= Html::a('View', ['/invoice/index', 'status' => 'paid'], ['class' => 'btn btn-sm btn-outline-success']) ?>
+					<?= Html::a(Yii::t('app/invoice', 'View'), ['/invoice/index', 'status' => 'paid'], ['class' => 'btn btn-sm btn-outline-success']) ?>
 				</div>
 			</div>
 		</div>
@@ -162,8 +160,8 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 		<!-- Recent Invoices -->
 		<div class="content-section recent-invoices">
 			<div class="section-header">
-				<h2 class="section-title">Recent Invoices</h2>
-				<?= Html::a('View All', ['/invoice/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
+				<h2 class="section-title"><?= Yii::t('app', 'Recent {item}', ['item' => Yii::t('app/invoice', 'Invoices')]) ?></h2>
+				<?= Html::a(Yii::t('app', 'View All'), ['/invoice/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
 			</div>
 			<div class="section-body">
 				<?php if (!empty($recentInvoices)): ?>
@@ -197,9 +195,9 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 				<?php else: ?>
 				<div class="empty-state">
 					<i class="fas fa-file-invoice fa-3x"></i>
-					<h3>No Invoices Yet</h3>
-					<p>Get started by creating your first invoice.</p>
-					<?= Html::a('Create Invoice', ['/invoice/create'], ['class' => 'btn btn-primary']) ?>
+					<h3><?= Yii::t('app', 'No {item} Yet', ['item' => Yii::t('app/invoice', 'Invoices')]) ?></h3>
+					<p><?= Yii::t('app', 'Get started by creating your first invoice') ?>.</p>
+					<?= Html::a(Yii::t('app/invoice', 'Create Invoice'), ['/invoice/create'], ['class' => 'btn btn-primary']) ?>
 				</div>
 				<?php endif; ?>
 			</div>
@@ -208,26 +206,26 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 		<!-- Quick Actions -->
 		<div class="content-section quick-actions">
 			<div class="section-header">
-				<h2 class="section-title">Quick Actions</h2>
+				<h2 class="section-title"><?= Yii::t('app', 'Quick Actions') ?></h2>
 			</div>
 			<div class="section-body">
 				<div class="actions-grid">
-					<?= Html::a('<i class="fas fa-file-invoice"></i><span>Create Invoice</span>', ['/invoice/create'], [
+					<?= Html::a('<i class="fas fa-file-invoice"></i><span>' . Yii::t('app/invoice', 'Create Invoice') . '</span>', ['/invoice/create'], [
                         'class' => 'action-card primary-action'
                     ]) ?>
-					<?= Html::a('<i class="fas fa-file-alt"></i><span>Create Estimate</span>', ['/estimate/create'], [
+					<?= Html::a('<i class="fas fa-file-alt"></i><span>' . Yii::t('app/estimate', 'Create Estimate') . '</span>', ['/estimate/create'], [
                         'class' => 'action-card secondary-action'
                     ]) ?>
-					<?= Html::a('<i class="fas fa-user-plus"></i><span>Add Customer</span>', ['/customer/create'], [
+					<?= Html::a('<i class="fas fa-user-plus"></i><span>' . Yii::t('app/customer', 'Add Customer') . '</span>', ['/customer/create'], [
                         'class' => 'action-card secondary-action'
                     ]) ?>
-					<?= Html::a('<i class="fas fa-box"></i><span>Add Product</span>', ['/product/create'], [
+					<?= Html::a('<i class="fas fa-box"></i><span>' . Yii::t('app', 'Add {item}', ['item' => Yii::t('app/product', 'Product')]) . '</span>', ['/product/create'], [
                         'class' => 'action-card secondary-action'
                     ]) ?>
-					<?= Html::a('<i class="fas fa-users"></i><span>Manage Customers</span>', ['/customer/index'], [
+					<?= Html::a('<i class="fas fa-users"></i><span>' . Yii::t('app', 'Manage {item}', ['item' => Yii::t('app/customer', 'Customers')]) . '</span>', ['/customer/index'], [
                         'class' => 'action-card tertiary-action'
                     ]) ?>
-					<?= Html::a('<i class="fas fa-cog"></i><span>Settings</span>', ['/company/settings'], [
+					<?= Html::a('<i class="fas fa-cog"></i><span>' . Yii::t('app', 'Settings') . '</span>', ['/company/settings'], [
                         'class' => 'action-card tertiary-action'
                     ]) ?>
 				</div>
