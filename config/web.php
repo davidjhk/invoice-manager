@@ -74,6 +74,7 @@ $config = [
                         'app' => 'app.php',
                         'app/error' => 'error.php',
                         'app/invoice' => 'invoice.php',
+                        'app/estimate' => 'estimate.php',
                         'app/customer' => 'customer.php',
                         'app/product' => 'product.php',
                         'app/company' => 'company.php',

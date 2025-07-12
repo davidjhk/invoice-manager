@@ -65,7 +65,7 @@ $this->registerJsVar('estimateConfig', [
 			<div class="card card-default">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-file-invoice mr-2"></i>ESTIMATE
+						<i class="fas fa-file-invoice mr-2"></i><?= strtoupper(Yii::t('app/estimate', 'Estimate')) ?>
 					</h5>
 				</div>
 				<div class="card-body">
@@ -74,23 +74,23 @@ $this->registerJsVar('estimateConfig', [
 							<?= $form->field($model, 'customer_id')->dropDownList(
                                 ArrayHelper::map($customers, 'id', 'customer_name'),
                                 [
-                                    'prompt' => 'Select Customer',
+                                    'prompt' => Yii::t('app/estimate', 'Select Customer'),
                                     'id' => 'customer-select',
                                 ]
-                            )->label('Customer') ?>
+                            )->label(Yii::t('app/estimate', 'Customer')) ?>
 
 							<div id="customer-details" class="mb-3">
-								<label class="form-label">Customer Details</label>
+								<label class="form-label"><?= Yii::t('app/estimate', 'Customer Information') ?></label>
 								<div id="bill-to-address" class="border p-2 bg-light min-h-100 rounded">
 									<?php if (!empty($model->bill_to_address)): ?>
 									<?= nl2br(Html::encode($model->bill_to_address)) ?>
 									<?php else: ?>
-									<span class="text-muted">Select a customer to see details.</span>
+									<span class="text-muted"><?= Yii::t('app/estimate', 'Select Customer') ?>.</span>
 									<?php endif; ?>
 								</div>
 								<?= $form->field($model, 'bill_to_address')->hiddenInput(['id' => 'estimate-bill_to_address'])->label(false) ?>
 							</div>
-							<?= Html::button('Edit Customer', [
+							<?= Html::button(Yii::t('app/estimate', 'Edit'), [
                                 'class' => 'btn btn-outline-primary btn-sm',
                                 'id' => 'edit-customer-btn'
                             ]) ?>
@@ -98,9 +98,9 @@ $this->registerJsVar('estimateConfig', [
 						<div class="col-md-6">
 							<?= $form->field($model, 'ship_to_address')->textarea([
                                 'rows' => 4,
-                                'placeholder' => "Shipping address (if different from billing)"
-                            ])->label('Ship To') ?>
-							<?= Html::button('Clear Shipping Info', [
+                                'placeholder' => Yii::t('app/estimate', 'Shipping address (if different from billing)')
+                            ])->label(Yii::t('app/estimate', 'Ship To')) ?>
+							<?= Html::button(Yii::t('app/estimate', 'Clear Shipping Info'), [
                                 'class' => 'btn btn-link btn-sm p-0',
                                 'id' => 'remove-shipping-btn'
                             ]) ?>
@@ -114,14 +114,14 @@ $this->registerJsVar('estimateConfig', [
 			<div class="card card-default">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-info-circle mr-2"></i>Details
+						<i class="fas fa-info-circle mr-2"></i><?= Yii::t('app/estimate', 'Estimate Details') ?>
 					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
 						<div class="col-md-6">
-							<?= $form->field($model, 'estimate_number')->textInput(['maxlength' => true]) ?>
-							<?= $form->field($model, 'estimate_date')->input('date') ?>
+							<?= $form->field($model, 'estimate_number')->textInput(['maxlength' => true])->label(Yii::t('app/estimate', 'Estimate Number')) ?>
+							<?= $form->field($model, 'estimate_date')->input('date')->label(Yii::t('app/estimate', 'Estimate Date')) ?>
 						</div>
 						<div class="col-md-6">
 							<?= $form->field($model, 'terms')->dropDownList([
@@ -129,8 +129,8 @@ $this->registerJsVar('estimateConfig', [
                                 'Net 30' => 'Net 30',
                                 'Net 60' => 'Net 60',
                                 'Due on receipt' => 'Due on receipt'
-                            ], ['prompt' => 'Select terms']) ?>
-							<?= $form->field($model, 'expiry_date')->input('date') ?>
+                            ], ['prompt' => Yii::t('app/estimate', 'Select terms')]) ?>
+							<?= $form->field($model, 'expiry_date')->input('date')->label(Yii::t('app/estimate', 'Expiry Date')) ?>
 						</div>
 					</div>
 				</div>
@@ -140,7 +140,7 @@ $this->registerJsVar('estimateConfig', [
 			<div class="card mt-3">
 				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#estimate-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
-						<span><i class="fas fa-question-circle mr-2"></i>Estimate Help</span>
+						<span><i class="fas fa-question-circle mr-2"></i><?= Yii::t('app/estimate', 'Estimate Help') ?></span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h6>
 				</div>
@@ -148,12 +148,12 @@ $this->registerJsVar('estimateConfig', [
 					<div class="card-body py-2">
 						<div class="alert alert-info py-2 mb-0">
 							<small>
-								<strong>Estimate Number:</strong> Unique identifier for this estimate.<br>
-								<strong>Terms:</strong> Payment terms for when estimate becomes invoice.<br>
-								<strong>Estimate Date:</strong> Date when estimate is created.<br>
-								<strong>Expiry Date:</strong> When estimate expires automatically calculated from terms.<br>
-								<strong>Items:</strong> Add products/services with quantity and rate.<br>
-								<strong>Convert:</strong> Convert approved estimates to invoices.
+								<strong><?= Yii::t('app/estimate', 'Estimate Number') ?>:</strong> <?= Yii::t('app/estimate', 'Unique identifier for this estimate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Terms') ?>:</strong> <?= Yii::t('app/estimate', 'Terms and conditions for this estimate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Estimate Date') ?>:</strong> <?= Yii::t('app/estimate', 'Date when estimate is issued.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Expiry Date') ?>:</strong> <?= Yii::t('app/estimate', 'Expiry date for this estimate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Items') ?>:</strong> <?= Yii::t('app/estimate', 'Add products/services with quantity and rate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Convert to Invoice') ?>:</strong> <?= Yii::t('app/estimate', 'Convert approved estimates to invoices.') ?>
 							</small>
 						</div>
 					</div>
@@ -165,7 +165,7 @@ $this->registerJsVar('estimateConfig', [
 	<div class="card card-default mt-4">
 		<div class="card-header">
 			<h5 class="card-title mb-0">
-				<i class="fas fa-list mr-2"></i>Items
+				<i class="fas fa-list mr-2"></i><?= Yii::t('app/estimate', 'Items') ?>
 			</h5>
 		</div>
 		<div class="card-body">
@@ -174,12 +174,12 @@ $this->registerJsVar('estimateConfig', [
 					<thead class="thead-light">
 						<tr>
 							<th style="width: 5%;">#</th>
-							<th style="width: 25%;">Product/Service</th>
-							<th style="width: 35%;">Description</th>
-							<th style="width: 10%;" class="text-right">Qty</th>
-							<th style="width: 10%;" class="text-right">Rate</th>
-							<th style="width: 10%;" class="text-right">Amount</th>
-							<th style="width: 5%;" class="text-center">Tax</th>
+							<th style="width: 25%;"><?= Yii::t('app/estimate', 'Product/Service') ?></th>
+							<th style="width: 35%;"><?= Yii::t('app/estimate', 'Description') ?></th>
+							<th style="width: 10%;" class="text-right"><?= Yii::t('app/estimate', 'Quantity') ?></th>
+							<th style="width: 10%;" class="text-right"><?= Yii::t('app/estimate', 'Price') ?></th>
+							<th style="width: 10%;" class="text-right"><?= Yii::t('app/estimate', 'Amount') ?></th>
+							<th style="width: 5%;" class="text-center"><?= Yii::t('app/estimate', 'Tax') ?></th>
 							<th style="width: 5%;"></th>
 						</tr>
 					</thead>
@@ -188,8 +188,8 @@ $this->registerJsVar('estimateConfig', [
 					</tbody>
 				</table>
 			</div>
-			<?= Html::button('Add Item', ['class' => 'btn btn-outline-primary', 'id' => 'add-item-btn']) ?>
-			<?= Html::button('Clear All', ['class' => 'btn btn-outline-danger', 'id' => 'clear-lines-btn']) ?>
+			<?= Html::button(Yii::t('app/estimate', 'Add Item'), ['class' => 'btn btn-outline-primary', 'id' => 'add-item-btn']) ?>
+			<?= Html::button(Yii::t('app/estimate', 'Clear All'), ['class' => 'btn btn-outline-danger', 'id' => 'clear-lines-btn']) ?>
 		</div>
 	</div>
 
@@ -198,12 +198,12 @@ $this->registerJsVar('estimateConfig', [
 			<div class="card card-default">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-comment mr-2"></i>Notes
+						<i class="fas fa-comment mr-2"></i><?= Yii::t('app/estimate', 'Notes') ?>
 					</h5>
 				</div>
 				<div class="card-body">
-					<?= $form->field($model, 'customer_notes')->textarea(['rows' => 3, 'placeholder' => 'e.g. This estimate is valid for 30 days.'])->label('Note to Customer') ?>
-					<?= $form->field($model, 'memo')->textarea(['rows' => 3, 'placeholder' => 'Internal notes for your team.'])->label('Memo (Internal)') ?>
+					<?= $form->field($model, 'customer_notes')->textarea(['rows' => 3, 'placeholder' => Yii::t('app/estimate', 'e.g. This estimate is valid for 30 days.')])->label(Yii::t('app/estimate', 'Note to Customer')) ?>
+					<?= $form->field($model, 'memo')->textarea(['rows' => 3, 'placeholder' => Yii::t('app/estimate', 'Internal notes for your team.')])->label(Yii::t('app/estimate', 'Memo (Internal)')) ?>
 				</div>
 			</div>
 		</div>
@@ -212,32 +212,32 @@ $this->registerJsVar('estimateConfig', [
 			<div class="card card-default">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-calculator mr-2"></i>Totals
+						<i class="fas fa-calculator mr-2"></i><?= Yii::t('app/estimate', 'Total') ?>
 					</h5>
 				</div>
 				<div class="card-body">
 					<div class="totals-grid">
-						<span>Subtotal</span>
+						<span><?= Yii::t('app/estimate', 'Subtotal') ?></span>
 						<span id="subtotal-display" class="text-right">$0.00</span>
 
-						<span>Discount</span>
+						<span><?= Yii::t('app/estimate', 'Discount') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
 							<?= $form->field($model, 'discount_value', ['options' => ['class' => 'mb-0 mr-1'], 'template' => '{input}'])->textInput(['id' => 'discount-input', 'class' => 'form-control form-control-sm text-right', 'style' => 'width: 60px;', 'placeholder' => '0']) ?>
 							<?= $form->field($model, 'discount_type', ['options' => ['class' => 'mb-0'], 'template' => '{input}'])->dropDownList(['percentage' => '%', 'fixed' => '$'], ['id' => 'discount-type', 'class' => 'form-control form-control-sm', 'style' => 'width: 50px;']) ?>
 							<span id="discount-display" class="ml-2">-$0.00</span>
 						</div>
 
-						<span>Taxable Subtotal</span>
+						<span><?= Yii::t('app/estimate', 'Taxable Subtotal') ?></span>
 						<span id="taxable-subtotal-display" class="text-right">$0.00</span>
 
-						<span>Sales Tax</span>
+						<span><?= Yii::t('app/estimate', 'Sales Tax') ?></span>
 						<span id="tax-display" class="text-right">$0.00</span>
 					</div>
 
 					<hr>
 
 					<div class="totals-grid font-weight-bold h5">
-						<span>Total</span>
+						<span><?= Yii::t('app/estimate', 'Total') ?></span>
 						<span id="total-display" class="text-right">$0.00</span>
 					</div>
 				</div>
@@ -246,8 +246,8 @@ $this->registerJsVar('estimateConfig', [
 	</div>
 
 	<div class="form-group mt-4">
-		<?= Html::submitButton($model->isNewRecord ? 'Create Estimate' : 'Update Estimate', ['class' => 'btn btn-success']) ?>
-		<?= Html::a('Cancel', ['index'], ['class' => 'btn btn-secondary']) ?>
+		<?= Html::submitButton($model->isNewRecord ? Yii::t('app/estimate', 'Create Estimate') : Yii::t('app/estimate', 'Update Estimate'), ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('app/estimate', 'Cancel'), ['index'], ['class' => 'btn btn-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

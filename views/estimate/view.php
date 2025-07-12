@@ -6,8 +6,8 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\Estimate $model */
 
-$this->title = 'Estimate: ' . $model->estimate_number;
-$this->params['breadcrumbs'][] = ['label' => 'Estimates', 'url' => ['index']];
+$this->title = Yii::t('app/estimate', 'Estimate') . ': ' . $model->estimate_number;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app/estimate', 'Estimates'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="estimate-view">
@@ -19,49 +19,49 @@ $this->params['breadcrumbs'][] = $this->title;
 				<?= Html::encode($model->getStatusLabel()) ?>
 			</span>
 			<?php if ($model->isExpired()): ?>
-				<span class="badge badge-warning ml-1">Expired</span>
+				<span class="badge badge-warning ml-1"><?= Yii::t('app/estimate', 'Expired') ?></span>
 			<?php endif; ?>
 		</h1>
 		<div class="btn-group" role="group">
 			<?php if (!$model->converted_to_invoice): ?>
-			<?= Html::a('<i class="fas fa-edit mr-1"></i>Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>Preview', ['preview', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Estimate Preview'), ['preview', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
 
 			<?php if ($model->status === \app\models\Estimate::STATUS_DRAFT): ?>
-			<?= Html::a('<i class="fas fa-envelope mr-1"></i>Send Email', ['send-email', 'id' => $model->id], ['class' => 'btn btn-success', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), ['send-email', 'id' => $model->id], ['class' => 'btn btn-success', 'encode' => false]) ?>
 			<?php endif; ?>
 
 			<?php if ($model->canConvertToInvoice()): ?>
-			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>Convert to Invoice', ['convert-to-invoice', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>' . Yii::t('app/estimate', 'Convert to Invoice'), ['convert-to-invoice', 'id' => $model->id], [
 				'class' => 'btn btn-warning',
 				'data' => [
-					'confirm' => 'Are you sure you want to convert this estimate to an invoice?',
+					'confirm' => Yii::t('app/estimate', 'Are you sure you want to convert this estimate to an invoice?'),
 					'method' => 'post',
 				],
 				'encode' => false
 			]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-copy mr-1"></i>Duplicate', ['duplicate', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-copy mr-1"></i>' . Yii::t('app/estimate', 'Duplicate'), ['duplicate', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'data' => [
-                    'confirm' => 'Are you sure you want to duplicate this estimate?',
+                    'confirm' => Yii::t('app/estimate', 'Are you sure you want to duplicate this estimate?'),
                     'method' => 'post',
                 ],
                 'encode' => false
             ]) ?>
 
 			<?php if (!$model->converted_to_invoice): ?>
-			<?= Html::a('<i class="fas fa-trash mr-1"></i>Delete', ['delete', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/estimate', 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
-                        'confirm' => 'Are you sure you want to delete this estimate?',
+                        'confirm' => Yii::t('app/estimate', 'Are you sure you want to delete this estimate?'),
                         'method' => 'post',
                     ],
                     'encode' => false
@@ -73,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php if ($model->converted_to_invoice): ?>
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
-            This estimate has been converted to invoice: 
+            <?= Yii::t('app/estimate', 'This estimate has been converted to invoice') ?>: 
             <?= Html::a($model->invoice->invoice_number, ['/invoice/view', 'id' => $model->invoice_id], [
                 'class' => 'font-weight-bold'
             ]) ?>
@@ -85,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <!-- Estimate Details -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Estimate Information</h5>
+                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Information') ?></h5>
                 </div>
                 <div class="card-body">
                     <?= DetailView::widget([
@@ -94,7 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'estimate_number',
                             [
                                 'attribute' => 'customer_id',
-                                'label' => 'Customer',
+                                'label' => Yii::t('app/estimate', 'Customer'),
                                 'value' => $model->customer->customer_name,
                             ],
                             [
