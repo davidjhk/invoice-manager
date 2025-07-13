@@ -48,6 +48,7 @@ return [
     'Tax' => '세금',
     'Discount' => '할인',
     'Currency' => '통화',
+    'Saving...' => '저장 중...',
     'Language' => '언어',
     
     // Messages

@@ -207,16 +207,27 @@ class CustomerController extends Controller
         $model->company_id = $company->id;
         $model->is_active = true;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        // Load data from POST request
+        $postData = Yii::$app->request->post();
+        
+        // Manually set attributes from form data
+        $model->customer_name = $postData['customer_name'] ?? '';
+        $model->customer_email = $postData['customer_email'] ?? '';
+        $model->customer_phone = $postData['customer_phone'] ?? '';
+        $model->customer_address = $postData['customer_address'] ?? '';
+        $model->payment_terms = $postData['payment_terms'] ?? 'Net 30';
+
+        if ($model->save()) {
             return [
                 'success' => true,
                 'customer' => [
                     'id' => $model->id,
-                    'name' => $model->customer_name,
-                    'email' => $model->customer_email,
-                    'phone' => $model->customer_phone,
-                    'address' => $model->customer_address,
-                    'displayName' => $model->getDisplayName(),
+                    'customer_name' => $model->customer_name,
+                    'customer_email' => $model->customer_email,
+                    'customer_phone' => $model->customer_phone,
+                    'customer_address' => $model->customer_address,
+                    'payment_terms' => $model->payment_terms,
+                    'displayName' => method_exists($model, 'getDisplayName') ? $model->getDisplayName() : $model->customer_name,
                 ],
                 'message' => 'Customer created successfully.',
             ];
@@ -225,7 +236,11 @@ class CustomerController extends Controller
         return [
             'success' => false,
             'errors' => $model->errors,
-            'message' => 'Failed to create customer.',
+            'attributes' => $model->attributes,
+            'postData' => $postData,
+            'message' => 'Failed to create customer. ' . implode(', ', array_map(function($field, $errors) {
+                return $field . ': ' . implode(', ', $errors);
+            }, array_keys($model->errors), $model->errors)),
         ];
     }
 

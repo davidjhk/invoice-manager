@@ -15,6 +15,7 @@ use yii\helpers\Url;
 $customerDataUrl = Url::to(['/customer/get-data']);
 $productSearchUrl = Url::to(['/product/search']);
 $customerUpdateUrl = Url::to(['/customer/update']);
+$customerCreateUrl = Url::to(['/customer/create-ajax']);
 
 $existingItems = [];
 if (!$model->isNewRecord) {
@@ -41,6 +42,7 @@ $this->registerJsVar('estimateConfig', [
     'customerDataUrl' => $customerDataUrl,
     'productSearchUrl' => $productSearchUrl,
     'customerUpdateUrl' => $customerUpdateUrl,
+    'customerCreateUrl' => $customerCreateUrl,
     'existingItems' => $existingItems,
     'isNewRecord' => $model->isNewRecord,
     'selectedCustomerId' => $model->isNewRecord ? null : $model->customer_id,
@@ -78,6 +80,16 @@ $this->registerJsVar('estimateConfig', [
                                     'id' => 'customer-select',
                                 ]
                             )->label(Yii::t('app/estimate', 'Customer')) ?>
+							
+							<div class="d-flex align-items-center mb-3">
+								<small class="text-muted mr-2"><?= Yii::t('app/estimate', 'Customer not in list?') ?></small>
+								<?= Html::button(Yii::t('app/estimate', 'Add New Customer'), [
+									'class' => 'btn btn-outline-success btn-sm',
+									'id' => 'add-customer-btn',
+									'data-toggle' => 'modal',
+									'data-target' => '#addCustomerModal'
+								]) ?>
+							</div>
 
 							<div id="customer-details" class="mb-3">
 								<label class="form-label"><?= Yii::t('app/estimate', 'Customer Information') ?></label>
@@ -254,6 +266,54 @@ $this->registerJsVar('estimateConfig', [
 
 </div>
 
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="addCustomerModalLabel"><?= Yii::t('app/estimate', 'Add New Customer') ?></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form id="add-customer-form">
+					<div class="form-group">
+						<label for="new-customer-name"><?= Yii::t('app/customer', 'Customer Name') ?> <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="new-customer-name" name="customer_name" required>
+					</div>
+					<div class="form-group">
+						<label for="new-customer-email"><?= Yii::t('app/customer', 'Email') ?></label>
+						<input type="email" class="form-control" id="new-customer-email" name="customer_email">
+					</div>
+					<div class="form-group">
+						<label for="new-customer-phone"><?= Yii::t('app/customer', 'Phone') ?></label>
+						<input type="tel" class="form-control" id="new-customer-phone" name="customer_phone" placeholder="e.g. +1 (555) 123-4567" pattern="[\+\-\s\(\)\d\.\#\*]*">
+					</div>
+					<div class="form-group">
+						<label for="new-customer-address"><?= Yii::t('app/customer', 'Address') ?></label>
+						<textarea class="form-control" id="new-customer-address" name="customer_address" rows="3"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="new-customer-terms"><?= Yii::t('app/customer', 'Payment Terms') ?></label>
+						<select class="form-control" id="new-customer-terms" name="payment_terms">
+							<option value=""><?= Yii::t('app/customer', 'Select terms') ?></option>
+							<option value="Net 15">Net 15</option>
+							<option value="Net 30">Net 30</option>
+							<option value="Net 60">Net 60</option>
+							<option value="Due on receipt">Due on receipt</option>
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Cancel') ?></button>
+				<button type="button" class="btn btn-success" id="save-customer-btn"><?= Yii::t('app/customer', 'Add Customer') ?></button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 	// --- FORM VALIDATION ---
@@ -271,6 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	const customerDataUrl = config.customerDataUrl;
 	const productSearchUrl = config.productSearchUrl;
 	const customerUpdateUrl = config.customerUpdateUrl;
+	const customerCreateUrl = config.customerCreateUrl;
 	const existingItems = config.existingItems || [];
 	const isNewRecord = config.isNewRecord;
 	const selectedCustomerId = config.selectedCustomerId;
@@ -286,6 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	const editCustomerBtn = document.getElementById('edit-customer-btn');
 	const removeShippingBtn = document.getElementById('remove-shipping-btn');
 	const estimateDateInput = document.getElementById('estimate-estimate_date');
+	const addCustomerBtn = document.getElementById('add-customer-btn');
+	const saveCustomerBtn = document.getElementById('save-customer-btn');
 
 	// --- INITIALIZATION ---
 	initializePage();
@@ -372,6 +435,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		removeShippingBtn.addEventListener('click', () => {
 			document.getElementById('estimate-ship_to_address').value = '';
+		});
+
+		// Add Customer Modal Event Listeners
+		saveCustomerBtn.addEventListener('click', handleSaveCustomer);
+		
+		// Handle modal cleanup
+		$('#addCustomerModal').on('hidden.bs.modal', function () {
+			$('.modal-backdrop').remove();
+			$('body').removeClass('modal-open');
+			$('body').css('padding-right', '');
 		});
 
 		$(itemsTbody).on('focus', '.product-input:not(.ui-autocomplete-input)', function() {
@@ -565,6 +638,72 @@ document.addEventListener('DOMContentLoaded', function() {
 				return false;
 			}
 		});
+	}
+
+	// --- CUSTOMER MANAGEMENT FUNCTIONS ---
+	async function handleSaveCustomer() {
+		const form = document.getElementById('add-customer-form');
+		const formData = new FormData(form);
+		
+		// Add CSRF token
+		formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->csrfToken ?>');
+		
+		// Basic validation
+		const customerName = formData.get('customer_name');
+		if (!customerName || customerName.trim() === '') {
+			alert('<?= Yii::t('app/customer', 'Customer name is required.') ?>');
+			return;
+		}
+		
+		saveCustomerBtn.disabled = true;
+		saveCustomerBtn.textContent = '<?= Yii::t('app', 'Saving...') ?>';
+		
+		try {
+			const response = await fetch(customerCreateUrl, {
+				method: 'POST',
+				body: formData,
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+				}
+			});
+			
+			const data = await response.json();
+			
+			if (data.success) {
+				// Add new customer to dropdown
+				const option = new Option(data.customer.customer_name, data.customer.id);
+				customerSelect.add(option);
+				
+				// Select the new customer
+				customerSelect.value = data.customer.id;
+				
+				// Load customer data
+				await loadCustomerData(data.customer.id);
+				
+				// Close modal and reset form
+				$('#addCustomerModal').modal('hide');
+				form.reset();
+				
+				// Show success message
+				setTimeout(() => {
+					alert('<?= Yii::t('app/customer', 'Customer added successfully!') ?>');
+				}, 500);
+			} else {
+				console.error('Customer creation failed:', data);
+				let errorMessage = data.message || '<?= Yii::t('app/customer', 'Failed to add customer. Please try again.') ?>';
+				if (data.errors) {
+					errorMessage += '\nErrors: ' + JSON.stringify(data.errors);
+				}
+				alert(errorMessage);
+			}
+		} catch (error) {
+			console.error('Error adding customer:', error);
+			alert('<?= Yii::t('app/customer', 'Error adding customer. Please try again.') ?>');
+		} finally {
+			saveCustomerBtn.disabled = false;
+			saveCustomerBtn.textContent = '<?= Yii::t('app/customer', 'Add Customer') ?>';
+		}
 	}
 
 	// --- UTILITY FUNCTIONS ---

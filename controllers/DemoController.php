@@ -78,7 +78,7 @@ class DemoController extends Controller
         $company->sender_name = 'Demo Company';
         $company->currency = 'USD';
         $company->tax_rate = 10.00;
-        $company->invoice_prefix = 'DEMO';
+        $company->invoice_prefix = 'DEMO-INV';
         $company->estimate_prefix = 'DEMO-EST';
         $company->due_date_days = 30;
         $company->estimate_validity_days = 30;

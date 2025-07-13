@@ -70,6 +70,7 @@ class Customer extends ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
             [['customer_name', 'contact_name'], 'string', 'max' => 255],
             [['customer_phone', 'customer_fax', 'customer_mobile'], 'string', 'max' => 50],
+            [['customer_phone', 'customer_fax', 'customer_mobile'], 'match', 'pattern' => '/^[\+\-\s\(\)\d\.\#\*]*$/', 'message' => Yii::t('app/customer', 'Phone number can only contain numbers, spaces, parentheses, plus signs, hyphens, periods, hash and asterisk symbols.'), 'skipOnEmpty' => true],
             [['customer_email'], 'string', 'max' => 255],
             [['billing_address', 'shipping_address'], 'string'],
             [['customer_email'], 'email'],

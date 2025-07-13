@@ -159,4 +159,6 @@ return [
     'Send Email' => 'Send Email',
     'Email not configured. Configure SMTP2GO in Company Settings.' => 'Email not configured. Configure SMTP2GO in Company Settings.',
     'All' => 'All',
+    'Customer not in list?' => 'Customer not in list?',
+    'Add New Customer' => 'Add New Customer',
 ];

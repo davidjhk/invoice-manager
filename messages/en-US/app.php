@@ -48,6 +48,7 @@ return [
     'Tax' => 'Tax',
     'Discount' => 'Discount',
     'Currency' => 'Currency',
+    'Saving...' => 'Saving...',
     'Language' => 'Language',
     
     // Messages
