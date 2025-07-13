@@ -122,4 +122,11 @@ if (YII_ENV_DEV) {
     ];
 }
 
+// Load local configuration if it exists
+$localConfigPath = __DIR__ . '/web-local.php';
+if (file_exists($localConfigPath)) {
+    $localConfig = require $localConfigPath;
+    $config = \yii\helpers\ArrayHelper::merge($config, $localConfig);
+}
+
 return $config;

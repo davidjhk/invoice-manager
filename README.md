@@ -125,7 +125,66 @@ return [
 - CJK 폰트 지원
 - 사용자 역할 시스템
 
-### 6. 웹서버 설정
+### 6. 이메일 설정 (선택사항)
+
+Symphony Mailer를 사용한 SMTP 이메일 설정:
+
+#### 6.1. 로컬 설정 파일 생성
+
+```bash
+# 샘플 파일을 복사하여 로컬 설정 생성
+cp config/web-local.php.example config/web-local.php
+```
+
+#### 6.2. 이메일 설정 구성
+
+`config/web-local.php` 파일을 편집하여 SMTP 설정을 입력:
+
+```php
+return [
+    'components' => [
+        'mailer' => [
+            'class' => 'yii\symfonymailer\Mailer',
+            'transport' => [
+                'scheme' => 'smtp',
+                'host' => 'smtp.gmail.com',        // SMTP 서버
+                'username' => 'your@gmail.com',    // 이메일 주소
+                'password' => 'your-app-password', // 앱 비밀번호
+                'port' => 587,
+                'encryption' => 'tls',
+            ],
+            'messageConfig' => [
+                'charset' => 'UTF-8',
+                'from' => ['noreply@yourdomain.com' => 'Invoice Manager'],
+            ],
+            'useFileTransport' => false, // 개발시에는 true
+        ],
+    ],
+];
+```
+
+#### 6.3. 주요 이메일 제공업체 설정
+
+**Gmail:**
+- Host: `smtp.gmail.com`
+- Port: `587` (TLS) 또는 `465` (SSL)
+- 2단계 인증 활성화 후 앱 비밀번호 생성 필요
+
+**Outlook/Hotmail:**
+- Host: `smtp-mail.outlook.com`
+- Port: `587` (TLS)
+
+**Yahoo:**
+- Host: `smtp.mail.yahoo.com`
+- Port: `587` (TLS)
+
+#### 6.4. 보안 주의사항
+
+- `web-local.php` 파일은 `.gitignore`에 포함되어 Git에 업로드되지 않습니다
+- 실제 이메일 계정 정보를 안전하게 보관하세요
+- 가능한 앱 비밀번호를 사용하세요 (실제 비밀번호 대신)
+
+### 7. 웹서버 설정
 
 DocumentRoot를 `web/` 디렉토리로 설정하고 URL 리라이팅 활성화
 
@@ -169,7 +228,7 @@ sudo a2enmod headers deflate expires
 sudo systemctl restart apache2
 ```
 
-### 7. 파일 권한 설정
+### 8. 파일 권한 설정
 
 ```bash
 # 웹서버 사용자 권한 설정

@@ -44,6 +44,7 @@ tests/_support/_generated
 # config folder
 /config/db-local.php
 /config/params-local.php
+/config/web-local.php
 
 # backups folder
 /backups/

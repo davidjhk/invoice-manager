@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Local configuration file for email settings
+ * 
+ * Copy this file to web-local.php and configure your email settings.
+ * The web-local.php file is ignored by git for security reasons.
+ */
+
+return [
+    'components' => [
+        'mailer' => [
+            'class' => 'yii\symfonymailer\Mailer',
+            'transport' => [
+                'scheme' => 'smtp',
+                'host' => 'your-smtp-server.com',
+                'username' => 'your-email@example.com',
+                'password' => 'your-app-password',
+                'port' => 587,
+                'encryption' => 'tls',
+                // 'dsn' => 'smtp://username:password@smtp.example.com:587',
+            ],
+            'messageConfig' => [
+                'charset' => 'UTF-8',
+                'from' => ['your-email@example.com' => 'Your Application Name'],
+            ],
+            'useFileTransport' => false, // Set to true for development
+        ],
+    ],
+];
