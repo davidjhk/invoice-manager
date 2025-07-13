@@ -579,6 +579,73 @@ rm -rf temp_backup
 git stash pop
 ```
 
+#### 충돌 유형 1-1: 스태시 복원 충돌 해결 ⚠️
+
+`update.sh` 실행 중 **"스태시 복원 중 충돌이 발생했습니다"** 오류가 나타나는 경우:
+
+##### 해결 방법 1: 현재 변경사항 유지 (권장)
+
+```bash
+# 현재 작업 디렉토리의 변경사항을 우선시 (로컬 설정 보존)
+git checkout --ours .
+
+# 스태시 제거
+git stash drop
+
+# 상태 확인
+git status
+
+# 필요시 변경사항 스테이징
+git add .
+```
+
+##### 해결 방법 2: 스태시된 변경사항 적용
+
+```bash
+# 스태시에 저장된 이전 변경사항을 적용
+git checkout --theirs .
+
+# 변경사항 스테이징
+git add .
+
+# 스태시 정리
+git stash drop
+```
+
+##### 해결 방법 3: 수동 병합 (고급 사용자)
+
+```bash
+# 충돌 파일 직접 편집 (<<<< ==== >>>> 마커 해결)
+nano config/web.php
+
+# 수정 완료 후 스테이징
+git add config/web.php
+
+# 스태시 정리
+git stash drop
+```
+
+##### 💡 권장 해결 순서
+
+```bash
+# 1. 현재 변경사항 유지 (가장 안전)
+git checkout --ours .
+git stash drop
+
+# 2. 상태 확인 및 정리
+git add .
+git status
+
+# 3. 업데이트 스크립트 재실행 (필요시)
+./update.sh
+```
+
+**이 방법의 장점:**
+- ✅ 로컬 이메일 설정 (`web-local.php`) 보존
+- ✅ 사용자 정의 설정 유지
+- ✅ 충돌 즉시 해결
+- ✅ 업데이트 스크립트 계속 진행 가능
+
 #### 충돌 유형 2: 완전히 새로 시작 (주의: 모든 로컬 변경사항 손실)
 
 ```bash
