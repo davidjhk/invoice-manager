@@ -39,31 +39,31 @@ class LanguageSwitcher extends Widget
         'en-US' => [
             'name' => 'English',
             'native' => 'English',
-            'flag' => '🇺🇸',
+            'flag' => 'EN',
             'code' => 'en'
         ],
         'es-ES' => [
             'name' => 'Spanish',
             'native' => 'Español',
-            'flag' => '🇪🇸',
+            'flag' => 'ES',
             'code' => 'es'
         ],
         'ko-KR' => [
             'name' => 'Korean',
             'native' => '한국어',
-            'flag' => '🇰🇷',
+            'flag' => 'KO',
             'code' => 'ko'
         ],
         'zh-CN' => [
             'name' => 'Chinese (Simplified)',
             'native' => '简体中文',
-            'flag' => '🇨🇳',
+            'flag' => 'CN',
             'code' => 'zh-CN'
         ],
         'zh-TW' => [
             'name' => 'Chinese (Traditional)',
             'native' => '繁體中文',
-            'flag' => '🇹🇼',
+            'flag' => 'TW',
             'code' => 'zh-TW'
         ]
     ];
@@ -93,17 +93,14 @@ class LanguageSwitcher extends Widget
         
         $html = Html::beginTag('div', ['class' => $this->containerClass]);
         
-        // Dropdown button
-        $buttonText = $currentLangConfig['flag'] . ' ' . 
+        // Dropdown button with modern language code
+        $flagHtml = '<span class="lang-code">' . $currentLangConfig['flag'] . '</span>';
+        $buttonText = $flagHtml . ' ' . 
                      ($this->showNativeNames ? $currentLangConfig['native'] : $currentLangConfig['name']);
         
-        $html .= Html::button($buttonText, [
-            'class' => $this->buttonClass . ' language-dropdown-toggle',
-            'type' => 'button',
-            'aria-haspopup' => 'true',
-            'aria-expanded' => 'false',
-            'id' => 'language-switcher-btn'
-        ]);
+        $html .= '<button class="' . $this->buttonClass . ' language-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" id="language-switcher-btn">';
+        $html .= $buttonText;
+        $html .= '</button>';
         
         // Dropdown menu
         $html .= Html::beginTag('div', [
@@ -113,7 +110,8 @@ class LanguageSwitcher extends Widget
         
         foreach ($this->languages as $langCode => $langConfig) {
             $isActive = $langCode === $currentLanguage;
-            $linkText = $langConfig['flag'] . ' ' . 
+            $flagHtml = '<span class="lang-code">' . $langConfig['flag'] . '</span>';
+            $linkText = $flagHtml . ' ' . 
                        ($this->showNativeNames ? $langConfig['native'] : $langConfig['name']);
             
             $html .= Html::a($linkText, 
@@ -239,6 +237,27 @@ class LanguageSwitcher extends Widget
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 white-space: nowrap !important;
+            }
+            
+            /* Modern language code styling */
+            .lang-code {
+                display: inline-block;
+                background: rgba(99, 102, 241, 0.9);
+                color: #ffffff;
+                font-size: 0.6rem;
+                font-weight: 700;
+                padding: 0.1rem 0.3rem;
+                border-radius: 0.25rem;
+                margin-right: 0.4rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                vertical-align: middle;
+            }
+            
+            body.dark-mode .lang-code {
+                background: rgba(139, 92, 246, 0.9);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
             }
         ");
         

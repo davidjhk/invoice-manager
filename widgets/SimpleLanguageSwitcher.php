@@ -13,11 +13,11 @@ use yii\helpers\Url;
 class SimpleLanguageSwitcher extends Widget
 {
     public $languages = [
-        'en-US' => ['name' => 'English', 'native' => 'English', 'flag' => '🇺🇸'],
-        'es-ES' => ['name' => 'Spanish', 'native' => 'Español', 'flag' => '🇪🇸'],
-        'ko-KR' => ['name' => 'Korean', 'native' => '한국어', 'flag' => '🇰🇷'],
-        'zh-CN' => ['name' => 'Chinese (Simplified)', 'native' => '简体中文', 'flag' => '🇨🇳'],
-        'zh-TW' => ['name' => 'Chinese (Traditional)', 'native' => '繁體中文', 'flag' => '🇹🇼']
+        'en-US' => ['name' => 'English', 'native' => 'English', 'flag' => 'EN'],
+        'es-ES' => ['name' => 'Spanish', 'native' => 'Español', 'flag' => 'ES'],
+        'ko-KR' => ['name' => 'Korean', 'native' => '한국어', 'flag' => 'KO'],
+        'zh-CN' => ['name' => 'Chinese (Simplified)', 'native' => '简体中文', 'flag' => 'CN'],
+        'zh-TW' => ['name' => 'Chinese (Traditional)', 'native' => '繁體中文', 'flag' => 'TW']
     ];
 
     public function run()
@@ -34,8 +34,9 @@ class SimpleLanguageSwitcher extends Widget
         
         $html = '<div class="simple-language-switcher">';
         
-        // Current language button
-        $buttonText = $currentLangConfig['flag'] . ' ' . $currentLangConfig['native'];
+        // Current language button with modern code style
+        $flagHtml = '<span class="lang-code">' . $currentLangConfig['flag'] . '</span>';
+        $buttonText = $flagHtml . ' ' . $currentLangConfig['native'];
         $html .= '<button type="button" class="simple-lang-button" onclick="toggleLanguageMenu()">';
         $html .= $buttonText;
         $html .= '</button>';
@@ -45,7 +46,8 @@ class SimpleLanguageSwitcher extends Widget
         
         foreach ($this->languages as $langCode => $langConfig) {
             $isActive = $langCode === $currentLanguage;
-            $linkText = $langConfig['flag'] . ' ' . $langConfig['native'];
+            $flagHtml = '<span class="lang-code">' . $langConfig['flag'] . '</span>';
+            $linkText = $flagHtml . ' ' . $langConfig['native'];
             
             if ($isActive) {
                 $html .= '<div class="simple-lang-item active">' . $linkText . '</div>';
@@ -144,6 +146,27 @@ class SimpleLanguageSwitcher extends Widget
             body.dark-mode .simple-lang-item.active {
                 background: rgba(99, 102, 241, 0.3);
                 color: #a5b4fc;
+            }
+            
+            /* Modern language code styling */
+            .lang-code {
+                display: inline-block;
+                background: rgba(99, 102, 241, 0.9);
+                color: #ffffff;
+                font-size: 0.6rem;
+                font-weight: 700;
+                padding: 0.1rem 0.3rem;
+                border-radius: 0.25rem;
+                margin-right: 0.4rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                vertical-align: middle;
+            }
+            
+            body.dark-mode .lang-code {
+                background: rgba(139, 92, 246, 0.9);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
             }
         ");
         

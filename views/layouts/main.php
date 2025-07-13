@@ -494,7 +494,7 @@ AppAsset::register($this);
 		z-index: 9999 !important;
 		display: none !important;
 		float: none !important;
-		min-width: 200px !important;
+		min-width: 120px !important;
 		padding: 0.5rem 0 !important;
 		margin: 0.125rem 0 0 !important;
 		background: rgba(255, 255, 255, 0.98) !important;
@@ -760,14 +760,17 @@ AppAsset::register($this);
 
 	// Handle clicks outside menu to close it
 	document.addEventListener('click', function(e) {
-		// Close language dropdown if clicking outside
-		var langDropdowns = document.querySelectorAll('.mobile-lang-dropdown.show');
-		langDropdowns.forEach(function(dropdown) {
-			var langIcon = dropdown.previousElementSibling;
-			if (!dropdown.contains(e.target) && !langIcon.contains(e.target)) {
-				dropdown.classList.remove('show');
+		// Close language overlay if clicking outside
+		var langOverlay = document.querySelector('.mobile-lang-overlay');
+		var langIcon = document.querySelector('.mobile-lang-icon');
+		if (langOverlay && langIcon && langOverlay.classList.contains('active')) {
+			var langMenu = langOverlay.querySelector('.mobile-lang-menu');
+			// If clicked outside the language menu or on language icon, close menu
+			if (!langMenu.contains(e.target) && !langIcon.contains(e.target)) {
+				langOverlay.classList.remove('active');
+				document.body.style.overflow = '';
 			}
-		});
+		}
 
 		// Close mobile menu if clicking outside
 		var overlay = document.querySelector('.mobile-nav-overlay');
@@ -911,40 +914,51 @@ AppAsset::register($this);
 		langIcon.setAttribute('aria-label', 'Select language');
 		langIcon.onclick = function(e) {
 			e.stopPropagation();
-			var dropdown = langContainer.querySelector('.mobile-lang-dropdown');
-			if (dropdown) {
-				dropdown.classList.toggle('show');
+			var overlay = document.querySelector('.mobile-lang-overlay');
+			if (overlay) {
+				if (overlay.classList.contains('active')) {
+					// Close language menu
+					overlay.classList.remove('active');
+					document.body.style.overflow = '';
+				} else {
+					// Open language menu
+					overlay.classList.add('active');
+					document.body.style.overflow = 'hidden';
+				}
 			}
 		};
 
-		// Create language dropdown
+		// Create language dropdown overlay (similar to mobile nav overlay)
+		var langOverlay = document.createElement('div');
+		langOverlay.className = 'mobile-lang-overlay';
+
 		var langDropdown = document.createElement('div');
-		langDropdown.className = 'mobile-lang-dropdown';
+		langDropdown.className = 'mobile-lang-menu';
 
 		// Create all language options (including current language for mobile)
 		var allLanguages = [{
 				code: 'en-US',
-				name: '🇺🇸 English',
+				name: '<span class="lang-code">EN</span> English',
 				url: '/site/change-language?language=en-US'
 			},
 			{
 				code: 'es-ES',
-				name: '🇪🇸 Español',
+				name: '<span class="lang-code">ES</span> Español',
 				url: '/site/change-language?language=es-ES'
 			},
 			{
 				code: 'ko-KR',
-				name: '🇰🇷 한국어',
+				name: '<span class="lang-code">KO</span> 한국어',
 				url: '/site/change-language?language=ko-KR'
 			},
 			{
 				code: 'zh-CN',
-				name: '🇨🇳 简体中文',
+				name: '<span class="lang-code">CN</span> 简体中文',
 				url: '/site/change-language?language=zh-CN'
 			},
 			{
 				code: 'zh-TW',
-				name: '🇹🇼 繁體中文',
+				name: '<span class="lang-code">TW</span> 繁體中文',
 				url: '/site/change-language?language=zh-TW'
 			}
 		];
@@ -956,7 +970,8 @@ AppAsset::register($this);
 		allLanguages.forEach(function(lang) {
 			var langLink = document.createElement('a');
 			langLink.href = lang.url;
-			langLink.textContent = lang.name;
+			langLink.innerHTML = lang.name;
+			langLink.className = 'mobile-lang-link';
 
 			// Mark current language
 			if (lang.code === currentLang ||
@@ -965,14 +980,30 @@ AppAsset::register($this);
 				(currentLang === 'ko' && lang.code === 'ko-KR') ||
 				(currentLang === 'zh-CN' && lang.code === 'zh-CN') ||
 				(currentLang === 'zh-TW' && lang.code === 'zh-TW')) {
-				langLink.className = 'current';
+				langLink.classList.add('current');
 			}
+
+			// Add click handler to close overlay after selection
+			langLink.onclick = function() {
+				setTimeout(function() {
+					var overlay = document.querySelector('.mobile-lang-overlay');
+					if (overlay) {
+						overlay.classList.remove('active');
+						document.body.style.overflow = '';
+					}
+				}, 100);
+			};
 
 			langDropdown.appendChild(langLink);
 		});
 
+		// Append dropdown to overlay
+		langOverlay.appendChild(langDropdown);
+
 		langContainer.appendChild(langIcon);
-		langContainer.appendChild(langDropdown);
+
+		// Add overlay to body (not container)
+		document.body.appendChild(langOverlay);
 
 		// Create title (center)
 		var titleLink = document.createElement('a');
@@ -1230,42 +1261,93 @@ AppAsset::register($this);
 			transition: all 0.3s ease !important;
 		}
 
-		/* Language Dropdown - Positioned under icon */
-		.mobile-lang-dropdown {
-			position: absolute !important;
-			top: 100% !important;
+		/* Language overlay - Full screen like mobile nav */
+		.mobile-lang-overlay {
+			position: fixed !important;
+			top: 70px !important;
 			left: 0 !important;
-			margin-top: 0.5rem !important;
-			background: rgba(255, 255, 255, 0.98) !important;
-			border: 1px solid rgba(99, 102, 241, 0.3) !important;
-			border-radius: 0.5rem !important;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-			min-width: 150px !important;
+			right: 0 !important;
+			bottom: 0 !important;
+			background: rgba(0, 0, 0, 0.5) !important;
+			backdrop-filter: none !important;
+			z-index: 1055 !important;
 			display: none !important;
-			z-index: 1070 !important;
+			padding-top: 1rem !important;
+			overflow-y: auto !important;
+			opacity: 0 !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			transform: translateY(-10px) scale(0.98) !important;
+			border-top: none !important;
 		}
 
-		.mobile-lang-dropdown.show {
+		.mobile-lang-overlay.active {
 			display: block !important;
+			opacity: 1 !important;
+			transform: translateY(0) scale(1) !important;
 		}
 
-		.mobile-lang-dropdown a {
+		.mobile-lang-menu {
+			padding: 1.5rem 1rem !important;
+			max-width: 320px !important;
+			margin: 0 auto !important;
+			position: relative !important;
+			z-index: 1060 !important;
+		}
+
+		.mobile-lang-link {
 			display: block !important;
-			padding: 0.5rem 1rem !important;
-			color: #374151 !important;
+			padding: 0.6rem 0.8rem !important;
+			margin: 0.25rem 0 !important;
+			width: 100% !important;
+			text-align: center !important;
+			border-radius: 0.5rem !important;
+			border: 1px solid rgba(99, 102, 241, 0.3) !important;
+			font-weight: 500 !important;
+			letter-spacing: 0.025em !important;
+			color: #1f2937 !important;
 			text-decoration: none !important;
-			transition: all 0.2s ease !important;
+			background: rgba(255, 255, 255, 0.95) !important;
+			backdrop-filter: blur(10px) !important;
+			transition: all 0.3s ease !important;
+			font-size: 0.875rem !important;
+			min-height: 42px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 		}
 
-		.mobile-lang-dropdown a:hover {
-			background: rgba(99, 102, 241, 0.1) !important;
-			color: #4f46e5 !important;
+		.mobile-lang-link:hover,
+		.mobile-lang-link:active {
+			color: #ffffff !important;
+			background: rgba(99, 102, 241, 0.95) !important;
+			border-color: rgba(99, 102, 241, 0.8) !important;
+			transform: translateY(-2px) !important;
+			box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
 		}
 
-		.mobile-lang-dropdown a.current {
-			background: rgba(99, 102, 241, 0.2) !important;
-			color: #4f46e5 !important;
+		.mobile-lang-link.current {
+			background: rgba(99, 102, 241, 0.9) !important;
+			color: #ffffff !important;
+			border-color: rgba(99, 102, 241, 0.8) !important;
 			font-weight: 600 !important;
+			box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3) !important;
+		}
+
+		/* Modern language code styling for mobile */
+		.mobile-lang-link .lang-code {
+			display: inline-block !important;
+			background: rgba(99, 102, 241, 0.9) !important;
+			color: #ffffff !important;
+			font-size: 0.6rem !important;
+			font-weight: 700 !important;
+			padding: 0.1rem 0.3rem !important;
+			border-radius: 0.25rem !important;
+			margin-right: 0.4rem !important;
+			text-transform: uppercase !important;
+			letter-spacing: 0.05em !important;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+			vertical-align: middle !important;
 		}
 
 
@@ -1330,7 +1412,7 @@ AppAsset::register($this);
 			left: 0 !important;
 			right: 0 !important;
 			bottom: 0 !important;
-			background: transparent !important;
+			background: rgba(0, 0, 0, 0.5) !important;
 			backdrop-filter: none !important;
 			z-index: 1055 !important;
 			display: none !important;
@@ -1704,7 +1786,8 @@ AppAsset::register($this);
 	/* Hide mobile menu toggle on desktop */
 	@media (min-width: 769px) {
 
-		.mobile-nav-overlay {
+		.mobile-nav-overlay,
+		.mobile-lang-overlay {
 			display: none !important;
 		}
 
