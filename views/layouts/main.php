@@ -2474,9 +2474,6 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 	});
 	</script>
 
-	<!-- Collapse Helper Script -->
-	<script src="<?= Yii::$app->request->baseUrl ?>/js/main.js?v=<?= time() ?>"></script>
-	<script src="<?= Yii::$app->request->baseUrl ?>/js/collapse-helper.js?v=<?= time() ?>"></script>
 </body>
 
 </html>
