@@ -158,4 +158,5 @@ return [
     'Print' => '列印',
     'Send Email' => '發送郵件',
     'Email not configured. Configure SMTP2GO in Company Settings.' => '郵件未配置。請在公司設定中配置SMTP2GO。',
+    'All' => '全部',
 ];

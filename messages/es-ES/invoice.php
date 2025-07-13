@@ -154,4 +154,5 @@ return [
     // Preview page translations
     'Preview' => 'Vista Previa',
     'Email not configured. Configure SMTP2GO in Company Settings.' => 'Correo no configurado. Configure SMTP2GO en Configuración de Empresa.',
+    'All' => 'Todos',
 ];

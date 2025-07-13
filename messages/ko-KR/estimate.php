@@ -151,4 +151,5 @@ return [
     'Print' => '인쇄',
     'Send Email' => '이메일 보내기',
     'Email not configured. Configure SMTP2GO in Company Settings.' => '이메일이 설정되지 않았습니다. 회사 설정에서 SMTP2GO를 구성하세요.',
+    'All' => '전체',
 ];

@@ -151,4 +151,5 @@ return [
     'Print' => 'Print',
     'Send Email' => 'Send Email',
     'Email not configured. Configure SMTP2GO in Company Settings.' => 'Email not configured. Configure SMTP2GO in Company Settings.',
+    'All' => 'All',
 ];
