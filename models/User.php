@@ -328,6 +328,19 @@ class User extends ActiveRecord implements IdentityInterface
     public static function createFromGoogle($profile)
     {
         $user = new static();
+        
+        // Generate unique username from email
+        $baseUsername = explode('@', $profile['email'])[0];
+        $username = $baseUsername;
+        $counter = 1;
+        
+        // Ensure username is unique
+        while (static::find()->where(['username' => $username])->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+        
+        $user->username = $username;
         $user->email = $profile['email'];
         $user->full_name = $profile['name'] ?? null;
         $user->google_id = $profile['id'];
@@ -339,6 +352,11 @@ class User extends ActiveRecord implements IdentityInterface
         
         if ($user->save()) {
             return $user;
+        }
+        
+        // Log validation errors for debugging
+        if (!empty($user->errors)) {
+            Yii::error('User creation failed: ' . json_encode($user->errors), 'app');
         }
         
         return null;

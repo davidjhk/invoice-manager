@@ -160,4 +160,5 @@ return [
     'Follow Up' => 'Seguimiento',
     'Add {item}' => 'Añadir {item}',
     'Manage {item}' => 'Gestionar {item}',
+    'No account found with this email address. Please contact administrator to create an account first.' => 'No se encontró una cuenta con esta dirección de correo electrónico. Póngase en contacto con el administrador para crear una cuenta primero.',
 ];

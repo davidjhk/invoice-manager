@@ -7,4 +7,14 @@ return [
     'senderName' => 'KIMS',
     'user.passwordResetTokenExpire' => 3600 * 24, // 24 hours
     'siteName' => 'Invoice Manager', // Site title displayed in header
+    
+    // Google OAuth Settings
+    // Get these from Google Cloud Console: https://console.cloud.google.com/
+    // 1. Create a new project or select existing one
+    // 2. Enable Google+ API
+    // 3. Create OAuth 2.0 credentials
+    // 4. Add your domain to authorized origins
+    // 5. Add redirect URI: https://yourdomain.com/site/google-login
+    'googleClientId' => 'your-google-client-id-here.apps.googleusercontent.com',
+    'googleClientSecret' => 'your-google-client-secret-here',
 ];

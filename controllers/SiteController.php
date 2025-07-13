@@ -17,7 +17,6 @@ use app\models\Company;
 use app\models\AdminSettings;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
-use yii\httpclient\Client;
 
 class SiteController extends Controller
 {
@@ -272,69 +271,58 @@ class SiteController extends Controller
         }
 
         // Exchange code for access token
-        $client = new Client();
         $redirectUri = Yii::$app->urlManager->createAbsoluteUrl(['site/google-login']);
         
         try {
-            $response = $client->createRequest()
-                ->setMethod('POST')
-                ->setUrl('https://oauth2.googleapis.com/token')
-                ->setData([
-                    'client_id' => $clientId,
-                    'client_secret' => $clientSecret,
-                    'redirect_uri' => $redirectUri,
-                    'grant_type' => 'authorization_code',
-                    'code' => $code,
-                ])
-                ->send();
+            // Use cURL for HTTP requests (fallback when yii2-httpclient is not available)
+            $tokenData = $this->makeHttpRequest('https://oauth2.googleapis.com/token', [
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'redirect_uri' => $redirectUri,
+                'grant_type' => 'authorization_code',
+                'code' => $code,
+            ], 'POST');
             
-            if (!$response->isOk) {
+            if (!$tokenData || !isset($tokenData['access_token'])) {
                 throw new \Exception('Failed to exchange code for token');
             }
             
-            $tokenData = $response->data;
             $accessToken = $tokenData['access_token'];
             
             // Get user info from Google
-            $userResponse = $client->createRequest()
-                ->setMethod('GET')
-                ->setUrl('https://www.googleapis.com/oauth2/v2/userinfo')
-                ->addHeaders(['Authorization' => 'Bearer ' . $accessToken])
-                ->send();
+            $googleUser = $this->makeHttpRequest('https://www.googleapis.com/oauth2/v2/userinfo', [], 'GET', [
+                'Authorization: Bearer ' . $accessToken
+            ]);
             
-            if (!$userResponse->isOk) {
+            if (!$googleUser || !isset($googleUser['email'])) {
                 throw new \Exception('Failed to get user info from Google');
             }
             
-            $googleUser = $userResponse->data;
-            
-            // Check if user exists
+            // Check if user exists by Google ID first
             $user = User::findByGoogleId($googleUser['id']);
+            
             if (!$user) {
-                // Check if user exists by email
+                // Check if user exists by email (existing user wants to use Google SSO)
                 $user = User::findByEmail($googleUser['email']);
+                
                 if ($user) {
                     // Link Google account to existing user
                     $user->google_id = $googleUser['id'];
                     $user->avatar_url = $googleUser['picture'] ?? null;
-                    $user->updateFromGoogle($googleUser);
-                } else {
-                    // Create new user
-                    $user = User::createFromGoogle($googleUser);
-                    if ($user) {
-                        // Create a default company for the user
-                        $company = new Company();
-                        $company->company_name = ($googleUser['name'] ?? 'User') . "'s Company";
-                        $company->company_email = $googleUser['email'];
-                        $company->sender_email = $googleUser['email'];
-                        $company->sender_name = $googleUser['name'] ?? 'User';
-                        $company->user_id = $user->id;
-                        $company->save();
+                    $user->login_type = User::LOGIN_TYPE_GOOGLE;
+                    if (!$user->updateFromGoogle($googleUser)) {
+                        Yii::error('Failed to update existing user with Google profile: ' . json_encode($user->errors), 'app');
                     }
+                } else {
+                    // No existing user found - deny access
+                    Yii::$app->session->setFlash('error', Yii::t('app', 'No account found with this email address. Please contact administrator to create an account first.'));
+                    return $this->redirect(['site/login']);
                 }
             } else {
                 // Update existing Google user
-                $user->updateFromGoogle($googleUser);
+                if (!$user->updateFromGoogle($googleUser)) {
+                    Yii::error('Failed to update existing Google user: ' . json_encode($user->errors), 'app');
+                }
             }
             
             if ($user) {
@@ -348,10 +336,73 @@ class SiteController extends Controller
             }
             
         } catch (\Exception $e) {
-            Yii::error('Google OAuth error: ' . $e->getMessage(), 'app');
-            Yii::$app->session->setFlash('error', 'Google authentication failed. Please try again.');
+            Yii::error('Google OAuth error: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString(), 'app');
+            
+            // Show more detailed error in development mode
+            if (YII_ENV_DEV) {
+                Yii::$app->session->setFlash('error', 'Google authentication failed: ' . $e->getMessage());
+            } else {
+                Yii::$app->session->setFlash('error', 'Google authentication failed. Please try again.');
+            }
             return $this->redirect(['site/login']);
         }
+    }
+
+    /**
+     * Make HTTP request using cURL
+     *
+     * @param string $url
+     * @param array $data
+     * @param string $method
+     * @param array $headers
+     * @return array|null
+     */
+    private function makeHttpRequest($url, $data = [], $method = 'GET', $headers = [])
+    {
+        $ch = curl_init();
+        
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_USERAGENT => 'Invoice Manager OAuth Client/1.0',
+        ]);
+        
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, true);
+            if (!empty($data)) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            }
+        }
+        
+        if (!empty($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($error) {
+            Yii::error('cURL error: ' . $error, 'app');
+            return null;
+        }
+        
+        if ($httpCode >= 400) {
+            Yii::error('HTTP error: ' . $httpCode . ' | Response: ' . $response, 'app');
+            return null;
+        }
+        
+        $decoded = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Yii::error('JSON decode error: ' . json_last_error_msg() . ' | Response: ' . $response, 'app');
+            return null;
+        }
+        
+        return $decoded;
     }
 
     /**

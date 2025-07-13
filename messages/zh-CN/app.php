@@ -153,4 +153,5 @@ return [
     'Follow Up' => '跟进',
     'Add {item}' => '添加 {item}',
     'Manage {item}' => '管理 {item}',
+    'No account found with this email address. Please contact administrator to create an account first.' => '未找到此电子邮件地址的帐户。请联系管理员先创建帐户。',
 ];

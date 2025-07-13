@@ -142,6 +142,7 @@ return [
     'Are you sure you want to {action}?' => 'Are you sure you want to {action}?',
     'Delete User' => 'Delete User',
     'Are you sure you want to delete this user?' => 'Are you sure you want to delete this user?',
+    'No account found with this email address. Please contact administrator to create an account first.' => 'No account found with this email address. Please contact administrator to create an account first.',
 
     // Dashboard
     'Total Revenue' => 'Total Revenue',

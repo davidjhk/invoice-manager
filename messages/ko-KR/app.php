@@ -197,6 +197,9 @@ return [
     'View All' => '모두 보기',
     'No {item} Yet' => '아직 {item}이(가) 없습니다',
     'Get started by creating your first invoice' => '첫 인보이스를 작성하여 시작하세요',
+    
+    // Google SSO
+    'No account found with this email address. Please contact administrator to create an account first.' => '이 이메일 주소로 등록된 계정이 없습니다. 계정 생성을 위해 관리자에게 문의하세요.',
     'Review' => '검토',
     'Follow Up' => '후속 조치',
     'Add {item}' => '{item} 추가',
