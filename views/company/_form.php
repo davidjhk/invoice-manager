@@ -275,6 +275,21 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 					</div>
 
 					<div class="form-group">
+						<label class="font-weight-bold"><?= Yii::t('app/company', 'Compact Mode') ?></label>
+						<div class="custom-control custom-switch">
+							<input type="hidden" name="Company[compact_mode]" value="0">
+							<input type="checkbox" class="custom-control-input" id="compact-mode-switch"
+								name="Company[compact_mode]" value="1" <?= $model->compact_mode ? 'checked' : '' ?>>
+							<label class="custom-control-label" for="compact-mode-switch">
+								<?= Yii::t('app/company', 'Enable compact menu display') ?>
+							</label>
+						</div>
+						<small class="form-text text-muted">
+							<?= Yii::t('app/company', 'Hide menu text in the top bar and show icons only') ?>
+						</small>
+					</div>
+
+					<div class="form-group">
 						<label class="font-weight-bold"><?= Yii::t('app/company', 'Use CJK Fonts for PDF') ?></label>
 						<div class="custom-control custom-switch">
 							<input type="hidden" name="Company[use_cjk_font]" value="0">

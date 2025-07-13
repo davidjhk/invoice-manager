@@ -614,6 +614,98 @@ AppAsset::register($this);
 		color: #a5b4fc !important;
 		text-decoration: none !important;
 	}
+
+	/* Compact Mode Styles */
+	body .main-navbar .navbar-nav .nav-link.compact-mode .nav-text,
+	body .main-navbar .dropdown .nav-link.compact-mode .nav-text {
+		display: none !important;
+	}
+
+	body .main-navbar .navbar-nav .nav-link.compact-mode,
+	body .main-navbar .dropdown .nav-link.compact-mode {
+		padding: 0.75rem 1rem !important;
+		min-width: auto !important;
+		width: auto !important;
+	}
+
+	body .main-navbar .navbar-nav .nav-link.compact-mode i,
+	body .main-navbar .dropdown .nav-link.compact-mode i {
+		margin-right: 0 !important;
+		font-size: 1rem !important;
+	}
+
+	/* Ensure icons are centered in compact mode */
+	body .main-navbar .navbar-nav .nav-link.compact-mode,
+	body .main-navbar .dropdown .nav-link.compact-mode {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		text-align: center !important;
+	}
+
+	/* Top Bar Compact Mode Styles */
+	.top-bar .btn.compact-mode .btn-text {
+		display: none !important;
+	}
+
+	.top-bar .btn.compact-mode {
+		padding: 0.375rem 0.75rem !important;
+		min-width: auto !important;
+		width: auto !important;
+	}
+
+	.top-bar .btn.compact-mode i {
+		margin-right: 0 !important;
+		font-size: 1rem !important;
+	}
+
+	/* Center icons in compact top bar buttons */
+	.top-bar .btn.compact-mode {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		text-align: center !important;
+	}
+
+	/* Tooltip Styles for Compact Mode */
+	.tooltip {
+		font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+		font-size: 0.75rem !important;
+		z-index: 1060 !important;
+	}
+
+	.tooltip .tooltip-inner {
+		background-color: rgba(31, 41, 55, 0.95) !important;
+		color: #ffffff !important;
+		border-radius: 0.375rem !important;
+		padding: 0.375rem 0.75rem !important;
+		font-weight: 500 !important;
+		backdrop-filter: blur(10px) !important;
+		border: 1px solid rgba(156, 163, 175, 0.3) !important;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+	}
+
+	.tooltip.bs-tooltip-bottom .arrow::before {
+		border-bottom-color: rgba(31, 41, 55, 0.95) !important;
+	}
+
+	.tooltip.bs-tooltip-top .arrow::before {
+		border-top-color: rgba(31, 41, 55, 0.95) !important;
+	}
+
+	/* Dark mode tooltip adjustments */
+	body.dark-mode .tooltip .tooltip-inner {
+		background-color: rgba(55, 65, 81, 0.95) !important;
+		border: 1px solid rgba(107, 114, 128, 0.3) !important;
+	}
+
+	body.dark-mode .tooltip.bs-tooltip-bottom .arrow::before {
+		border-bottom-color: rgba(55, 65, 81, 0.95) !important;
+	}
+
+	body.dark-mode .tooltip.bs-tooltip-top .arrow::before {
+		border-top-color: rgba(55, 65, 81, 0.95) !important;
+	}
 	</style>
 
 	<!-- Suppress PageSpeed errors -->
@@ -1737,6 +1829,7 @@ if (!Yii::$app->user->isGuest) {
 	}
 }
 $isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 
 <body class="d-flex flex-column h-100<?= $isDarkMode ? ' dark-mode' : '' ?>">
@@ -1774,9 +1867,9 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 						<!-- Change Mode Button -->
 						<?php if ($currentCompany): ?>
 						<div class="dropdown mr-3">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle theme-toggle-btn" type="button"
-								data-toggle="dropdown" aria-expanded="false">
-								<i class="fas fa-palette mr-1"></i><?= Yii::t('app/nav', 'Change Mode') ?>
+							<button class="btn btn-outline-light btn-sm dropdown-toggle theme-toggle-btn<?= $isCompactMode ? ' compact-mode' : '' ?>" type="button"
+								data-toggle="dropdown" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Yii::t('app/nav', 'Change Mode') . '"' : '' ?>>
+								<i class="fas fa-palette mr-1"></i><span class="btn-text"><?= Yii::t('app/nav', 'Change Mode') ?></span>
 							</button>
 							<ul class="dropdown-menu">
 								<li>
@@ -1793,9 +1886,9 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 						<!-- Company Dropdown -->
 						<?php if ($currentCompany): ?>
 						<div class="dropdown mr-3">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle company-btn" type="button"
-								data-toggle="dropdown" aria-expanded="false">
-								<i class="fas fa-building mr-1"></i><?= Html::encode($currentCompany->company_name) ?>
+							<button class="btn btn-outline-light btn-sm dropdown-toggle company-btn<?= $isCompactMode ? ' compact-mode' : '' ?>" type="button"
+								data-toggle="dropdown" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Html::encode($currentCompany->company_name) . '"' : '' ?>>
+								<i class="fas fa-building mr-1"></i><span class="btn-text"><?= Html::encode($currentCompany->company_name) ?></span>
 							</button>
 							<ul class="dropdown-menu">
 								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
@@ -1815,10 +1908,9 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 
 						<!-- User Dropdown -->
 						<div class="dropdown">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle user-btn" type="button"
-								data-toggle="dropdown" aria-expanded="false">
-								<i
-									class="fas fa-user-circle mr-1"></i><?= Yii::$app->user->identity->getDisplayName() ?>
+							<button class="btn btn-outline-light btn-sm dropdown-toggle user-btn<?= $isCompactMode ? ' compact-mode' : '' ?>" type="button"
+								data-toggle="dropdown" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Html::encode(Yii::$app->user->identity->getDisplayName()) . '"' : '' ?>>
+								<i class="fas fa-user-circle mr-1"></i><span class="btn-text"><?= Yii::$app->user->identity->getDisplayName() ?></span>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
 								<?php if (Yii::$app->user->identity->isDemo()): ?>
@@ -1858,7 +1950,7 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 			<div class="container">
 				<div class="navbar-nav mx-auto">
 					<?php
-					// Main navigation items
+					// Main navigation items with icons
 					$dashboardLabel = Yii::t('app/nav', 'Dashboard');
 					$invoicesLabel = Yii::t('app/nav', 'Invoices');
 					$estimatesLabel = Yii::t('app/nav', 'Estimates');
@@ -1866,12 +1958,16 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 					$productsLabel = Yii::t('app/nav', 'Products');
 					
 					$mainNavItems = [
-						['label' => $dashboardLabel, 'url' => Yii::$app->user->identity->isDemo() ? ['/demo/index'] : ['/site/index']],
-						['label' => $invoicesLabel, 'url' => ['/invoice/index']],
-						['label' => $estimatesLabel, 'url' => ['/estimate/index']],
-						['label' => $customersLabel, 'url' => ['/customer/index']],
-						['label' => $productsLabel, 'url' => ['/product/index']],
+						['label' => $dashboardLabel, 'icon' => 'fas fa-home', 'url' => Yii::$app->user->identity->isDemo() ? ['/demo/index'] : ['/site/index']],
+						['label' => $invoicesLabel, 'icon' => 'fas fa-file-invoice', 'url' => ['/invoice/index']],
+						['label' => $estimatesLabel, 'icon' => 'fas fa-file-alt', 'url' => ['/estimate/index']],
+						['label' => $customersLabel, 'icon' => 'fas fa-users', 'url' => ['/customer/index']],
+						['label' => $productsLabel, 'icon' => 'fas fa-box', 'url' => ['/product/index']],
 					];
+					
+					// Check if compact mode is enabled
+					$isCompactMode = $currentCompany && $currentCompany->compact_mode;
+					$compactClass = $isCompactMode ? ' compact-mode' : '';
 					
 					// Render navigation items directly
 					foreach ($mainNavItems as $item) {
@@ -1883,14 +1979,25 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 								  (Yii::$app->controller->id === 'product' && $item['label'] === $productsLabel);
 						
 						$activeClass = $active ? ' active' : '';
-						echo Html::a($item['label'], $item['url'], ['class' => 'nav-link' . $activeClass]);
+						$iconHtml = '<i class="' . $item['icon'] . ' mr-1"></i>';
+						$labelHtml = '<span class="nav-text">' . $item['label'] . '</span>';
+						$linkOptions = ['class' => 'nav-link' . $activeClass . $compactClass];
+						
+						// Add tooltip for compact mode
+						if ($isCompactMode) {
+							$linkOptions['title'] = $item['label'];
+							$linkOptions['data-toggle'] = 'tooltip';
+							$linkOptions['data-placement'] = 'bottom';
+						}
+						
+						echo Html::a($iconHtml . $labelHtml, $item['url'], $linkOptions);
 					}
 					?>
 
 					<!-- Create Dropdown -->
 					<div class="dropdown">
-						<a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
-							<i class="fas fa-plus mr-1"></i><?= Yii::t('app/nav', 'Create') ?>
+						<a class="nav-link dropdown-toggle<?= $compactClass ?>" href="#" role="button" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Yii::t('app/nav', 'Create') . '"' : '' ?>>
+							<i class="fas fa-plus mr-1"></i><span class="nav-text"><?= Yii::t('app/nav', 'Create') ?></span>
 						</a>
 						<div class="dropdown-menu">
 							<?= Html::a('<i class="fas fa-file-invoice mr-2"></i>' . Yii::t('app/nav', 'New Invoice'), ['/invoice/create'], ['class' => 'dropdown-item']) ?>
@@ -2004,6 +2111,35 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 	</footer>
 
 	<?php $this->endBody() ?>
+
+	<!-- Initialize Tooltips for Compact Mode -->
+	<script>
+	// Initialize tooltips when DOM is ready
+	$(document).ready(function() {
+		// Initialize tooltips for navigation elements with data-toggle="tooltip"
+		$('[data-toggle="tooltip"]').tooltip({
+			container: 'body',
+			delay: { show: 500, hide: 100 },
+			trigger: 'hover focus'
+		});
+
+		// Initialize custom tooltips for compact mode elements
+		$('[data-compact-tooltip]').each(function() {
+			var $this = $(this);
+			var tooltipText = $this.attr('data-compact-tooltip');
+			
+			if (tooltipText) {
+				$this.tooltip({
+					title: tooltipText,
+					placement: 'bottom',
+					container: 'body',
+					delay: { show: 500, hide: 100 },
+					trigger: 'hover focus'
+				});
+			}
+		});
+	});
+	</script>
 
 	<script>
 	// Debug function to check if elements exist
