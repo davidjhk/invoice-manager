@@ -32,7 +32,7 @@ class m250711_000004_add_role_to_users_table extends Migration
             $this->insert('{{%jdosa_users}}', [
                 'username' => 'demo',
                 'email' => 'demo@example.com',
-                'password_hash' => '$2y$13$nJ1WDlBaGcbCdbNC9wYL5.bEFPPRxnI8r/jkBMfJl8iWlEGlz1l4K', // password: admin123
+                'password_hash' => '$2y$12$pYVkNbCOfyACtOzWPWWISOGzRDVPkwReYZQ.FIGiH/wIk30X1cHF.', // password: demo123
                 'full_name' => 'Demo User',
                 'login_type' => 'local',
                 'is_active' => true,
