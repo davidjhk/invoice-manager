@@ -128,4 +128,6 @@ return [
     'Error' => '오류',
     'Failed to apply API key' => 'API 키 적용에 실패했습니다',
     'Network error occurred' => '네트워크 오류가 발생했습니다',
+    'Please configure SMTP2GO API Key first' => '먼저 SMTP2GO API 키를 설정해 주세요',
+    'Language & Display Settings' => '언어 및 화면 설정',
 ];

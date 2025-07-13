@@ -325,11 +325,16 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 						<h6 class="font-weight-bold mb-0">
 							<i class="fas fa-cog mr-2"></i><?= Yii::t('app/company', 'Email Configuration') ?>
 						</h6>
+						<?php 
+							$hasSmtpKey = !empty($model->smtp2go_api_key);
+						?>
 						<?= Html::button(Yii::t('app/company', 'Test Email'), [
-                            'class' => 'btn btn-outline-primary btn-sm',
+                            'class' => 'btn ' . ($hasSmtpKey ? 'btn-outline-primary' : 'btn-outline-secondary') . ' btn-sm',
                             'id' => 'test-email-btn',
-                            'data-toggle' => 'modal',
-                            'data-target' => '#test-email-modal'
+                            'data-toggle' => $hasSmtpKey ? 'modal' : null,
+                            'data-target' => $hasSmtpKey ? '#test-email-modal' : null,
+                            'disabled' => !$hasSmtpKey,
+                            'title' => $hasSmtpKey ? null : Yii::t('app/company', 'Please configure SMTP2GO API Key first')
                         ]) ?>
 					</div>
 					<?php endif; ?>
@@ -806,6 +811,34 @@ document.addEventListener("DOMContentLoaded", function() {
     // SMTP2GO API Key Apply functionality
     const applySmtpKeyBtn = document.getElementById('apply-smtp-key-btn');
     const smtpKeyInput = document.getElementById('smtp2go-api-key-input');
+    const testEmailBtn = document.getElementById('test-email-btn');
+    
+    // Function to update Test Email button state
+    function updateTestEmailButton() {
+        const hasApiKey = smtpKeyInput && smtpKeyInput.value.trim() !== '';
+        
+        if (testEmailBtn) {
+            if (hasApiKey) {
+                testEmailBtn.className = 'btn btn-outline-primary btn-sm';
+                testEmailBtn.disabled = false;
+                testEmailBtn.setAttribute('data-toggle', 'modal');
+                testEmailBtn.setAttribute('data-target', '#test-email-modal');
+                testEmailBtn.removeAttribute('title');
+            } else {
+                testEmailBtn.className = 'btn btn-outline-secondary btn-sm';
+                testEmailBtn.disabled = true;
+                testEmailBtn.removeAttribute('data-toggle');
+                testEmailBtn.removeAttribute('data-target');
+                testEmailBtn.setAttribute('title', '<?= Yii::t('app/company', 'Please configure SMTP2GO API Key first') ?>');
+            }
+        }
+    }
+    
+    // Update Test Email button when SMTP key input changes
+    if (smtpKeyInput) {
+        smtpKeyInput.addEventListener('input', updateTestEmailButton);
+        smtpKeyInput.addEventListener('change', updateTestEmailButton);
+    }
     
     if (applySmtpKeyBtn && smtpKeyInput) {
         applySmtpKeyBtn.addEventListener('click', function() {
@@ -837,6 +870,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Show success state
                     applySmtpKeyBtn.innerHTML = '<i class="fas fa-check"></i> <?= Yii::t('app/company', 'Applied!') ?>';
                     applySmtpKeyBtn.className = 'btn btn-success btn-sm';
+                    
+                    // Update Test Email button state
+                    updateTestEmailButton();
                     
                     // Show success message
                     alert('<?= Yii::t('app/company', 'SMTP2GO API Key applied successfully!') ?>');

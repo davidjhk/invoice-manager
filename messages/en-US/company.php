@@ -128,4 +128,6 @@ return [
     'Error' => 'Error',
     'Failed to apply API key' => 'Failed to apply API key',
     'Network error occurred' => 'Network error occurred',
+    'Please configure SMTP2GO API Key first' => 'Please configure SMTP2GO API Key first',
+    'Language & Display Settings' => 'Language & Display Settings',
 ];

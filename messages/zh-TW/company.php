@@ -128,4 +128,6 @@ return [
     'Error' => '錯誤',
     'Failed to apply API key' => '套用API金鑰失敗',
     'Network error occurred' => '發生網路錯誤',
+    'Please configure SMTP2GO API Key first' => '請先設定SMTP2GO API金鑰',
+    'Language & Display Settings' => '語言和顯示設定',
 ];
