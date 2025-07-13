@@ -25,6 +25,7 @@ class AppAsset extends AssetBundle
     ];
     public $js = [
         'js/collapse-helper.js',
+		'js/main.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
