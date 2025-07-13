@@ -240,7 +240,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	background-color: #dbeafe;
 	border-color: #3b82f6;
 	color: #1e40af;
-	padding: 2em;
 }
 
 .btn {
