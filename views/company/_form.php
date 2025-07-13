@@ -334,12 +334,27 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 					</div>
 					<?php endif; ?>
 
-					<?= $form->field($model, 'smtp2go_api_key')->passwordInput([
-                        'maxlength' => true,
-                        'placeholder' => $isCreate 
-                            ? Yii::t('app/company', 'Enter your SMTP2GO API key (optional)')
-                            : Yii::t('app/company', 'Enter your SMTP2GO API key')
-                    ]) ?>
+					<div class="form-group">
+						<?= Html::activeLabel($model, 'smtp2go_api_key', ['class' => 'control-label']) ?>
+						<div class="input-group">
+							<?= Html::activePasswordInput($model, 'smtp2go_api_key', [
+								'class' => 'form-control',
+								'maxlength' => true,
+								'placeholder' => $isCreate 
+									? Yii::t('app/company', 'Enter your SMTP2GO API key (optional)')
+									: Yii::t('app/company', 'Enter your SMTP2GO API key'),
+								'id' => 'smtp2go-api-key-input'
+							]) ?>
+							<div class="input-group-append">
+								<?= Html::button('<i class="fas fa-check"></i> ' . Yii::t('app/company', 'Apply'), [
+									'class' => 'btn btn-outline-success btn-sm',
+									'id' => 'apply-smtp-key-btn',
+									'title' => Yii::t('app/company', 'Apply SMTP2GO API Key')
+								]) ?>
+							</div>
+						</div>
+						<?= Html::error($model, 'smtp2go_api_key', ['class' => 'help-block']) ?>
+					</div>
 
 					<?= $form->field($model, 'sender_email')->input('email', [
                         'maxlength' => true,
@@ -784,6 +799,70 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => {
                 console.error("Fetch error:", error);
                 alert(<?= $errorMsg ?>);
+            });
+        });
+    }
+
+    // SMTP2GO API Key Apply functionality
+    const applySmtpKeyBtn = document.getElementById('apply-smtp-key-btn');
+    const smtpKeyInput = document.getElementById('smtp2go-api-key-input');
+    
+    if (applySmtpKeyBtn && smtpKeyInput) {
+        applySmtpKeyBtn.addEventListener('click', function() {
+            const apiKey = smtpKeyInput.value.trim();
+            
+            if (!apiKey) {
+                alert('<?= Yii::t('app/company', 'Please enter an API key') ?>');
+                return;
+            }
+            
+            // Show loading state
+            const originalText = applySmtpKeyBtn.innerHTML;
+            applySmtpKeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('app/company', 'Applying...') ?>';
+            applySmtpKeyBtn.disabled = true;
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('Company[smtp2go_api_key]', apiKey);
+            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->csrfToken ?>');
+            
+            // Send AJAX request
+            fetch('<?= \yii\helpers\Url::to(['company/update-settings']) ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success state
+                    applySmtpKeyBtn.innerHTML = '<i class="fas fa-check"></i> <?= Yii::t('app/company', 'Applied!') ?>';
+                    applySmtpKeyBtn.className = 'btn btn-success btn-sm';
+                    
+                    // Show success message
+                    alert('<?= Yii::t('app/company', 'SMTP2GO API Key applied successfully!') ?>');
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        applySmtpKeyBtn.innerHTML = originalText;
+                        applySmtpKeyBtn.className = 'btn btn-outline-success btn-sm';
+                        applySmtpKeyBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    // Show error
+                    alert('<?= Yii::t('app/company', 'Error') ?>: ' + (data.message || '<?= Yii::t('app/company', 'Failed to apply API key') ?>'));
+                    
+                    // Reset button
+                    applySmtpKeyBtn.innerHTML = originalText;
+                    applySmtpKeyBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('SMTP Key Apply Error:', error);
+                alert('<?= Yii::t('app/company', 'Network error occurred') ?>');
+                
+                // Reset button
+                applySmtpKeyBtn.innerHTML = originalText;
+                applySmtpKeyBtn.disabled = false;
             });
         });
     }

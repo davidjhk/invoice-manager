@@ -157,4 +157,5 @@ return [
     'Download PDF' => '下载PDF',
     'Print' => '打印',
     'Send Email' => '发送邮件',
+    'Email not configured. Configure SMTP2GO in Company Settings.' => '邮件未配置。请在公司设置中配置SMTP2GO。',
 ];

@@ -248,6 +248,16 @@ class Company extends ActiveRecord
     }
 
     /**
+     * Check if SMTP2GO is configured and email sending is available
+     *
+     * @return bool
+     */
+    public function hasEmailConfiguration()
+    {
+        return !empty($this->smtp2go_api_key) && !empty($this->sender_email);
+    }
+
+    /**
      * Generate next invoice number (prefix + year + 4-digit, roll over after 9999, no year reset)
      * 중복 방지 포함
      * @return string

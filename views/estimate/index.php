@@ -156,12 +156,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'encode' => false
                                     ]) ?>
 
+							<?= Html::a('<i class="fas fa-download"></i>', ['download-pdf', 'id' => $estimate->id], [
+                                        'class' => 'btn btn-outline-primary',
+                                        'title' => Yii::t('app/estimate', 'Download PDF'),
+                                        'data-toggle' => 'tooltip',
+                                        'encode' => false
+                                    ]) ?>
+
 							<?php if ($estimate->customer->customer_email && in_array($estimate->status, ['draft', 'printed'])): ?>
-							<?= Html::a('<i class="fas fa-envelope"></i>', ['send-email', 'id' => $estimate->id], [
-                                            'class' => 'btn btn-outline-success',
-                                            'title' => Yii::t('app/estimate', 'Send Email'),
+							<?php 
+								$company = \app\models\Company::getCurrent();
+								$hasEmailConfig = $company && $company->hasEmailConfiguration();
+							?>
+							<?= Html::a('<i class="fas fa-envelope"></i>', $hasEmailConfig ? ['send-email', 'id' => $estimate->id] : '#', [
+                                            'class' => 'btn ' . ($hasEmailConfig ? 'btn-outline-success' : 'btn-outline-secondary'),
+                                            'title' => $hasEmailConfig ? Yii::t('app/estimate', 'Send Email') : Yii::t('app/estimate', 'Email not configured. Configure SMTP2GO in Company Settings.'),
                                             'data-toggle' => 'tooltip',
-                                            'encode' => false
+                                            'encode' => false,
+                                            'disabled' => !$hasEmailConfig,
+                                            'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
                                         ]) ?>
 							<?php endif; ?>
 

@@ -117,4 +117,15 @@ return [
     'EST' => 'EST',
     '30' => '30',
     'Create Company' => 'Create Company',
+    
+    // SMTP2GO Apply button translations
+    'Apply' => 'Apply',
+    'Apply SMTP2GO API Key' => 'Apply SMTP2GO API Key',
+    'Please enter an API key' => 'Please enter an API key',
+    'Applying...' => 'Applying...',
+    'Applied!' => 'Applied!',
+    'SMTP2GO API Key applied successfully!' => 'SMTP2GO API Key applied successfully!',
+    'Error' => 'Error',
+    'Failed to apply API key' => 'Failed to apply API key',
+    'Network error occurred' => 'Network error occurred',
 ];

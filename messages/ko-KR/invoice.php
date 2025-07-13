@@ -53,7 +53,7 @@ return [
     'Edit' => '수정',
     'Delete' => '삭제',
     'View' => '보기',
-    'Duplicate' => '복사',
+    'Duplicate' => '복제',
     'Cancel' => '취소',
     
     // Email
@@ -157,4 +157,5 @@ return [
     'Download PDF' => 'PDF 다운로드',
     'Print' => '인쇄',
     'Send Email' => '이메일 보내기',
+    'Email not configured. Configure SMTP2GO in Company Settings.' => '이메일이 설정되지 않았습니다. 회사 설정에서 SMTP2GO를 구성하세요.',
 ];

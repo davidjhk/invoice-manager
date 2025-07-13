@@ -383,7 +383,7 @@ main.flex-shrink-0 .container {
 }
 
 .card-header h1,
-.card-header h2, 
+.card-header h2,
 .card-header h3,
 .card-header h4,
 .card-header h5,
@@ -499,7 +499,9 @@ main.flex-shrink-0 .container {
   min-width: auto !important;
   white-space: nowrap !important;
 }
-
+.alert-info {
+  padding: 2rem;
+}
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
   body {

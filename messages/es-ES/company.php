@@ -117,4 +117,15 @@ return [
     'EST' => 'COT',
     '30' => '30',
     'Create Company' => 'Crear Empresa',
+    
+    // SMTP2GO Apply button translations
+    'Apply' => 'Aplicar',
+    'Apply SMTP2GO API Key' => 'Aplicar Clave API de SMTP2GO',
+    'Please enter an API key' => 'Por favor ingrese una clave API',
+    'Applying...' => 'Aplicando...',
+    'Applied!' => '¡Aplicado!',
+    'SMTP2GO API Key applied successfully!' => '¡Clave API de SMTP2GO aplicada con éxito!',
+    'Error' => 'Error',
+    'Failed to apply API key' => 'Error al aplicar la clave API',
+    'Network error occurred' => 'Ocurrió un error de red',
 ];

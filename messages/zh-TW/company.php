@@ -117,4 +117,15 @@ return [
     'EST' => 'EST',
     '30' => '30',
     'Create Company' => '建立公司',
+    
+    // SMTP2GO Apply button translations
+    'Apply' => '套用',
+    'Apply SMTP2GO API Key' => '套用SMTP2GO API金鑰',
+    'Please enter an API key' => '請輸入API金鑰',
+    'Applying...' => '套用中...',
+    'Applied!' => '已套用！',
+    'SMTP2GO API Key applied successfully!' => 'SMTP2GO API金鑰套用成功！',
+    'Error' => '錯誤',
+    'Failed to apply API key' => '套用API金鑰失敗',
+    'Network error occurred' => '發生網路錯誤',
 ];

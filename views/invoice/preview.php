@@ -30,10 +30,22 @@ $this->params['breadcrumbs'][] = Yii::t('app/invoice', 'Preview');
             ]) ?>
 
 			<?php if ($model->canBeSent()): ?>
-			<?= Html::a('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', 'Send Email'), ['send-email', 'id' => $model->id], [
-                    'class' => 'btn btn-success',
-                    'encode' => false
-                ]) ?>
+			<?php 
+				$company = \app\models\Company::getCurrent();
+				$hasEmailConfig = $company && $company->hasEmailConfiguration();
+			?>
+			<?= Html::a(
+				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', 'Send Email'), 
+				$hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
+				[
+					'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
+					'encode' => false,
+					'disabled' => !$hasEmailConfig,
+					'title' => $hasEmailConfig ? '' : Yii::t('app/invoice', 'Email not configured. Configure SMTP2GO in Company Settings.'),
+					'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
+					'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
+				]
+			) ?>
 			<?php endif; ?>
 
 			<?php if ($model->isEditable()): ?>

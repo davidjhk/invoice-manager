@@ -22,15 +22,19 @@ $this->params['breadcrumbs'][] = $this->title;
 		<div class="col-md-12">
 			<div class="alert alert-info">
 				<h4><i class="fas fa-info-circle mr-2"></i><?= Yii::t('app', 'Welcome to Demo Mode!') ?></h4>
-				<p class="mb-2"><?= Yii::t('app', 'You are currently logged in as a {user}. This mode allows you to explore the system with the following restrictions:', ['user' => '<strong>' . Yii::t('app', 'demo user') . '</strong>']) ?></p>
+				<p class="mb-2">
+					<?= Yii::t('app', 'You are currently logged in as a {user}. This mode allows you to explore the system with the following restrictions:', ['user' => '<strong>' . Yii::t('app', 'demo user') . '</strong>']) ?>
+				</p>
 				<ul class="mb-3">
-					<li><?= Yii::t('app', 'You can create and manage invoices, estimates, customers, and products') ?></li>
+					<li><?= Yii::t('app', 'You can create and manage invoices, estimates, customers, and products') ?>
+					</li>
 					<li><?= Yii::t('app', 'All demo data is isolated from other users') ?></li>
 					<li><?= Yii::t('app', 'You can reset all demo data at any time') ?></li>
 					<li><?= Yii::t('app', 'Some advanced features may be limited') ?></li>
 				</ul>
 				<p class="mb-0">
-					<strong><?= Yii::t('app', 'Demo Credentials') ?>:</strong> <?= Yii::t('app', 'Username') ?>: <code>demo</code>, <?= Yii::t('app', 'Password') ?>: <code>demo123</code>
+					<strong><?= Yii::t('app', 'Demo Credentials') ?>:</strong> <?= Yii::t('app', 'Username') ?>:
+					<code>demo</code>, <?= Yii::t('app', 'Password') ?>: <code>demo123</code>
 				</p>
 			</div>
 		</div>
@@ -46,7 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
 					</h5>
 				</div>
 				<div class="card-body">
-					<p class="card-text"><?= Yii::t('app', 'Create, edit, and manage invoices for your demo company') ?>.</p>
+					<p class="card-text">
+						<?= Yii::t('app', 'Create, edit, and manage invoices for your demo company') ?>.</p>
 					<div class="mt-auto">
 						<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/invoice', 'Create Invoice'), ['/invoice/create'], [
                             'class' => 'btn btn-primary btn-sm mr-2'
@@ -182,7 +187,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				<div class="card-body">
 					<div class="row">
 						<div class="col-md-6">
-							<h6><i class="fas fa-check-circle text-success mr-2"></i><?= Yii::t('app', 'What You Can Do') ?>:</h6>
+							<h6><i
+									class="fas fa-check-circle text-success mr-2"></i><?= Yii::t('app', 'What You Can Do') ?>:
+							</h6>
 							<ul>
 								<li><?= Yii::t('app', 'Create and manage invoices and estimates') ?></li>
 								<li><?= Yii::t('app', 'Add customers and products') ?></li>
@@ -193,7 +200,9 @@ $this->params['breadcrumbs'][] = $this->title;
 							</ul>
 						</div>
 						<div class="col-md-6">
-							<h6><i class="fas fa-times-circle text-danger mr-2"></i><?= Yii::t('app', 'Demo Limitations') ?>:</h6>
+							<h6><i
+									class="fas fa-times-circle text-danger mr-2"></i><?= Yii::t('app', 'Demo Limitations') ?>:
+							</h6>
 							<ul>
 								<li><?= Yii::t('app', 'Cannot create additional companies') ?></li>
 								<li><?= Yii::t('app', 'Cannot access admin functions') ?></li>
@@ -231,6 +240,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	background-color: #dbeafe;
 	border-color: #3b82f6;
 	color: #1e40af;
+	padding: 2em;
 }
 
 .btn {

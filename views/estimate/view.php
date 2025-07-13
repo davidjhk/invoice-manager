@@ -34,7 +34,22 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
 
 			<?php if ($model->status === \app\models\Estimate::STATUS_DRAFT): ?>
-			<?= Html::a('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), ['send-email', 'id' => $model->id], ['class' => 'btn btn-success', 'encode' => false]) ?>
+			<?php 
+				$company = \app\models\Company::getCurrent();
+				$hasEmailConfig = $company && $company->hasEmailConfiguration();
+			?>
+			<?= Html::a(
+				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), 
+				$hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
+				[
+					'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
+					'encode' => false,
+					'disabled' => !$hasEmailConfig,
+					'title' => $hasEmailConfig ? '' : Yii::t('app/estimate', 'Email not configured. Configure SMTP2GO in Company Settings.'),
+					'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
+					'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
+				]
+			) ?>
 			<?php endif; ?>
 
 			<?php if ($model->canConvertToInvoice()): ?>

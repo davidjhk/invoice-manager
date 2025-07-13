@@ -145,12 +145,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'encode' => false
                                     ]) ?>
 
+							<?= Html::a('<i class="fas fa-download"></i>', ['download-pdf', 'id' => $invoice->id], [
+                                        'class' => 'btn btn-outline-primary',
+                                        'title' => Yii::t('app/invoice', 'Download PDF'),
+                                        'data-toggle' => 'tooltip',
+                                        'encode' => false
+                                    ]) ?>
+
 							<?php if ($invoice->canBeSent()): ?>
-							<?= Html::a('<i class="fas fa-envelope"></i>', ['send-email', 'id' => $invoice->id], [
-                                            'class' => 'btn btn-outline-success',
-                                            'title' => Yii::t('app/invoice', 'Send Email'),
+							<?php 
+								$company = \app\models\Company::getCurrent();
+								$hasEmailConfig = $company && $company->hasEmailConfiguration();
+							?>
+							<?= Html::a('<i class="fas fa-envelope"></i>', $hasEmailConfig ? ['send-email', 'id' => $invoice->id] : '#', [
+                                            'class' => 'btn ' . ($hasEmailConfig ? 'btn-outline-success' : 'btn-outline-secondary'),
+                                            'title' => $hasEmailConfig ? Yii::t('app/invoice', 'Send Email') : Yii::t('app/invoice', 'Email not configured. Configure SMTP2GO in Company Settings.'),
                                             'data-toggle' => 'tooltip',
-                                            'encode' => false
+                                            'encode' => false,
+                                            'disabled' => !$hasEmailConfig,
+                                            'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
                                         ]) ?>
 							<?php endif; ?>
 

@@ -117,4 +117,15 @@ return [
     'EST' => 'EST',
     '30' => '30',
     'Create Company' => '회사 생성',
+    
+    // SMTP2GO Apply button translations
+    'Apply' => '적용',
+    'Apply SMTP2GO API Key' => 'SMTP2GO API 키 적용',
+    'Please enter an API key' => 'API 키를 입력해 주세요',
+    'Applying...' => '적용 중...',
+    'Applied!' => '적용됨!',
+    'SMTP2GO API Key applied successfully!' => 'SMTP2GO API 키가 성공적으로 적용되었습니다!',
+    'Error' => '오류',
+    'Failed to apply API key' => 'API 키 적용에 실패했습니다',
+    'Network error occurred' => '네트워크 오류가 발생했습니다',
 ];
