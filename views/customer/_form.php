@@ -207,31 +207,8 @@ $this->registerJs("
         form.classList.add('was-validated');
     });
 
-    // Auto-format phone number
-    $('#customer-customer_phone, #customer-customer_fax, #customer-customer_mobile').on('input', function() {
-        let value = this.value.replace(/\D/g, '');
-        
-        // Limit to 11 digits maximum (1 + 10 digits for US numbers)
-        if (value.length > 11) {
-            value = value.substring(0, 11);
-        }
-        
-        if (value.length === 11 && value.charAt(0) === '1') {
-            // Format as +1 (XXX) XXX-XXXX
-            value = '+1 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 11);
-        } else if (value.length === 10) {
-            // Format as (XXX) XXX-XXXX
-            value = '(' + value.substring(0, 3) + ') ' + value.substring(3, 6) + '-' + value.substring(6, 10);
-        } else if (value.length > 6) {
-            // Partial formatting XXX-XXXX
-            value = value.substring(0, 3) + '-' + value.substring(3);
-        } else if (value.length > 3) {
-            // Partial formatting XXX-
-            value = value.substring(0, 3) + '-' + value.substring(3);
-        }
-        
-        this.value = value;
-    });
+    // Auto-format phone number using common utility
+    PhoneFormatter.initPhoneFormattingJQuery('#customer-customer_phone, #customer-customer_fax, #customer-customer_mobile');
     
     // Collapse functionality is handled by collapse-helper.js
 ");

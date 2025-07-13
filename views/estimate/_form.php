@@ -441,11 +441,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		saveCustomerBtn.addEventListener('click', handleSaveCustomer);
 		
 		// Handle modal cleanup
-		$('#addCustomerModal').on('hidden.bs.modal', function () {
-			$('.modal-backdrop').remove();
-			$('body').removeClass('modal-open');
-			$('body').css('padding-right', '');
-		});
+		ModalUtils.setupModalCleanup('#addCustomerModal');
+
+		// Auto-format phone number in modal
+		PhoneFormatter.initPhoneFormattingJQuery('#new-customer-phone');
 
 		$(itemsTbody).on('focus', '.product-input:not(.ui-autocomplete-input)', function() {
 			initializeProductAutocomplete($(this));
@@ -643,10 +642,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	// --- CUSTOMER MANAGEMENT FUNCTIONS ---
 	async function handleSaveCustomer() {
 		const form = document.getElementById('add-customer-form');
-		const formData = new FormData(form);
 		
-		// Add CSRF token
-		formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->csrfToken ?>');
+		// Create FormData with CSRF token using common utility
+		const formData = AjaxUtils.prepareFormData(form);
 		
 		// Basic validation
 		const customerName = formData.get('customer_name');
@@ -686,20 +684,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				form.reset();
 				
 				// Show success message
-				setTimeout(() => {
-					alert('<?= Yii::t('app/customer', 'Customer added successfully!') ?>');
-				}, 500);
+				NotificationUtils.showSuccess('<?= Yii::t('app/customer', 'Customer added successfully!') ?>', 500);
 			} else {
-				console.error('Customer creation failed:', data);
-				let errorMessage = data.message || '<?= Yii::t('app/customer', 'Failed to add customer. Please try again.') ?>';
-				if (data.errors) {
-					errorMessage += '\nErrors: ' + JSON.stringify(data.errors);
-				}
-				alert(errorMessage);
+				const errorMessage = data.message || '<?= Yii::t('app/customer', 'Failed to add customer. Please try again.') ?>';
+				NotificationUtils.showError(errorMessage, data.errors);
 			}
 		} catch (error) {
-			console.error('Error adding customer:', error);
-			alert('<?= Yii::t('app/customer', 'Error adding customer. Please try again.') ?>');
+			NotificationUtils.showError('<?= Yii::t('app/customer', 'Error adding customer. Please try again.') ?>');
 		} finally {
 			saveCustomerBtn.disabled = false;
 			saveCustomerBtn.textContent = '<?= Yii::t('app/customer', 'Add Customer') ?>';
@@ -708,14 +699,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// --- UTILITY FUNCTIONS ---
 	function formatDate(date) {
-		return date.toISOString().split('T')[0];
+		return DateUtils.formatDateForInput(date);
 	}
 
 	function formatCurrency(amount) {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'USD'
-		}).format(amount);
+		return CurrencyUtils.formatCurrency(amount);
 	}
 
 	// Collapse functionality is handled by collapse-helper.js
