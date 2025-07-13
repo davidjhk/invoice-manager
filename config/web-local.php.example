@@ -8,6 +8,7 @@
  */
 
 return [
+	'name' => 'Invoice Manager',
     'components' => [
         'mailer' => [
             'class' => 'yii\symfonymailer\Mailer',
