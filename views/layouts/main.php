@@ -1867,9 +1867,12 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 						<!-- Change Mode Button -->
 						<?php if ($currentCompany): ?>
 						<div class="dropdown mr-3">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle theme-toggle-btn<?= $isCompactMode ? ' compact-mode' : '' ?>" type="button"
-								data-toggle="dropdown" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Yii::t('app/nav', 'Change Mode') . '"' : '' ?>>
-								<i class="fas fa-palette mr-1"></i><span class="btn-text"><?= Yii::t('app/nav', 'Change Mode') ?></span>
+							<button
+								class="btn btn-outline-light btn-sm dropdown-toggle theme-toggle-btn<?= $isCompactMode ? ' compact-mode' : '' ?>"
+								type="button" data-toggle="dropdown" aria-expanded="false"
+								<?= $isCompactMode ? ' data-compact-tooltip="' . Yii::t('app/nav', 'Change Mode') . '"' : '' ?>>
+								<i class="fas fa-palette mr-1"></i><span
+									class="btn-text"><?= Yii::t('app/nav', 'Change Mode') ?></span>
 							</button>
 							<ul class="dropdown-menu">
 								<li>
@@ -1879,6 +1882,14 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 										<?= $currentCompany->dark_mode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
 									</a>
 								</li>
+								<li>
+									<a href="#" class="dropdown-item compact-toggle-item"
+										data-compact-mode="<?= $currentCompany->compact_mode ? 'normal' : 'compact' ?>">
+										<i
+											class="fas fa-<?= $currentCompany->compact_mode ? 'expand-arrows-alt' : 'compress-arrows-alt' ?> mr-2"></i>
+										<?= $currentCompany->compact_mode ? Yii::t('app/nav', 'Switch to Normal Mode') : Yii::t('app/nav', 'Switch to Compact Mode') ?>
+									</a>
+								</li>
 							</ul>
 						</div>
 						<?php endif; ?>
@@ -1886,9 +1897,12 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 						<!-- Company Dropdown -->
 						<?php if ($currentCompany): ?>
 						<div class="dropdown mr-3">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle company-btn<?= $isCompactMode ? ' compact-mode' : '' ?>" type="button"
-								data-toggle="dropdown" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Html::encode($currentCompany->company_name) . '"' : '' ?>>
-								<i class="fas fa-building mr-1"></i><span class="btn-text"><?= Html::encode($currentCompany->company_name) ?></span>
+							<button
+								class="btn btn-outline-light btn-sm dropdown-toggle company-btn<?= $isCompactMode ? ' compact-mode' : '' ?>"
+								type="button" data-toggle="dropdown" aria-expanded="false"
+								<?= $isCompactMode ? ' data-compact-tooltip="' . Html::encode($currentCompany->company_name) . '"' : '' ?>>
+								<i class="fas fa-building mr-1"></i><span
+									class="btn-text"><?= Html::encode($currentCompany->company_name) ?></span>
 							</button>
 							<ul class="dropdown-menu">
 								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'dropdown-item']) ?>
@@ -1908,9 +1922,12 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 
 						<!-- User Dropdown -->
 						<div class="dropdown">
-							<button class="btn btn-outline-light btn-sm dropdown-toggle user-btn<?= $isCompactMode ? ' compact-mode' : '' ?>" type="button"
-								data-toggle="dropdown" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Html::encode(Yii::$app->user->identity->getDisplayName()) . '"' : '' ?>>
-								<i class="fas fa-user-circle mr-1"></i><span class="btn-text"><?= Yii::$app->user->identity->getDisplayName() ?></span>
+							<button
+								class="btn btn-outline-light btn-sm dropdown-toggle user-btn<?= $isCompactMode ? ' compact-mode' : '' ?>"
+								type="button" data-toggle="dropdown" aria-expanded="false"
+								<?= $isCompactMode ? ' data-compact-tooltip="' . Html::encode(Yii::$app->user->identity->getDisplayName()) . '"' : '' ?>>
+								<i class="fas fa-user-circle mr-1"></i><span
+									class="btn-text"><?= Yii::$app->user->identity->getDisplayName() ?></span>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
 								<?php if (Yii::$app->user->identity->isDemo()): ?>
@@ -1996,8 +2013,11 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 
 					<!-- Create Dropdown -->
 					<div class="dropdown">
-						<a class="nav-link dropdown-toggle<?= $compactClass ?>" href="#" role="button" aria-expanded="false"<?= $isCompactMode ? ' data-compact-tooltip="' . Yii::t('app/nav', 'Create') . '"' : '' ?>>
-							<i class="fas fa-plus mr-1"></i><span class="nav-text"><?= Yii::t('app/nav', 'Create') ?></span>
+						<a class="nav-link dropdown-toggle<?= $compactClass ?>" href="#" role="button"
+							aria-expanded="false"
+							<?= $isCompactMode ? ' data-compact-tooltip="' . Yii::t('app/nav', 'Create') . '"' : '' ?>>
+							<i class="fas fa-plus mr-1"></i><span
+								class="nav-text"><?= Yii::t('app/nav', 'Create') ?></span>
 						</a>
 						<div class="dropdown-menu">
 							<?= Html::a('<i class="fas fa-file-invoice mr-2"></i>' . Yii::t('app/nav', 'New Invoice'), ['/invoice/create'], ['class' => 'dropdown-item']) ?>
@@ -2119,7 +2139,10 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		// Initialize tooltips for navigation elements with data-toggle="tooltip"
 		$('[data-toggle="tooltip"]').tooltip({
 			container: 'body',
-			delay: { show: 500, hide: 100 },
+			delay: {
+				show: 500,
+				hide: 100
+			},
 			trigger: 'hover focus'
 		});
 
@@ -2127,13 +2150,16 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		$('[data-compact-tooltip]').each(function() {
 			var $this = $(this);
 			var tooltipText = $this.attr('data-compact-tooltip');
-			
+
 			if (tooltipText) {
 				$this.tooltip({
 					title: tooltipText,
 					placement: 'bottom',
 					container: 'body',
-					delay: { show: 500, hide: 100 },
+					delay: {
+						show: 500,
+						hide: 100
+					},
 					trigger: 'hover focus'
 				});
 			}
@@ -2317,6 +2343,48 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 						'<?= Yii::t('app/nav', 'Switch to Dark Mode') ?>' :
 						'<?= Yii::t('app/nav', 'Switch to Light Mode') ?>';
 					$button.html('<i class="fas fa-' + icon + ' mr-2"></i>' + text);
+				}
+			});
+		});
+
+		// Compact Mode Toggle Handler
+		$('.compact-toggle-item').on('click', function(e) {
+			e.preventDefault();
+
+			var $button = $(this);
+			var currentMode = $button.data('compact-mode');
+
+			// Show loading state
+			var originalHtml = $button.html();
+			$button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Switching...');
+
+			// Make AJAX request
+			$.ajax({
+				url: '<?= \yii\helpers\Url::to(['/company/toggle-compact-mode']) ?>',
+				type: 'POST',
+				data: {
+					'<?= Yii::$app->request->csrfParam ?>': '<?= Yii::$app->request->csrfToken ?>'
+				},
+				success: function(response) {
+					if (response.success) {
+						// Show success message briefly
+						$button.html('<i class="fas fa-check mr-2"></i>' + response.message);
+
+						// Reload page to apply compact mode changes
+						setTimeout(function() {
+							window.location.reload();
+						}, 1000);
+					} else {
+						alert('Failed to toggle compact mode: ' + (response.message ||
+							'Unknown error'));
+						// Reset button
+						$button.html(originalHtml);
+					}
+				},
+				error: function() {
+					alert('Failed to toggle compact mode. Please try again.');
+					// Reset button
+					$button.html(originalHtml);
 				}
 			});
 		});

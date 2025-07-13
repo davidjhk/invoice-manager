@@ -56,6 +56,10 @@ return [
     'Change Mode' => 'Cambiar Modo',
     'Switch to Dark Mode' => 'Cambiar a Modo Oscuro',
     'Switch to Light Mode' => 'Cambiar a Modo Claro',
+    'Switch to Compact Mode' => 'Cambiar a Modo Compacto',
+    'Switch to Normal Mode' => 'Cambiar a Modo Normal',
+    'Switched to Compact Mode' => 'Cambiado a Modo Compacto',
+    'Switched to Normal Mode' => 'Cambiado a Modo Normal',
     
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => '¿Está seguro de que desea reiniciar todos los datos de demostración?',

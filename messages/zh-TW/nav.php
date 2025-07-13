@@ -56,6 +56,8 @@ return [
     'Change Mode' => '切換模式',
     'Switch to Dark Mode' => '切換到暗黑模式',
     'Switch to Light Mode' => '切換到明亮模式',
+    'Switch to Compact Mode' => '切換到緊湊模式',
+    'Switch to Normal Mode' => '切換到一般模式',
     
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => '您確定要重設所有示範資料嗎？',

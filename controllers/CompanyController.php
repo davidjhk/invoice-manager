@@ -48,7 +48,7 @@ class CompanyController extends Controller
     public function beforeAction($action)
     {
         // Disable CSRF validation for AJAX requests
-        $ajaxActions = ['set-current', 'test-email', 'reset-to-default', 'delete-logo'];
+        $ajaxActions = ['set-current', 'test-email', 'reset-to-default', 'delete-logo', 'toggle-compact-mode'];
         if (in_array($action->id, $ajaxActions) && Yii::$app->request->isAjax) {
             $this->enableCsrfValidation = false;
         }
@@ -798,5 +798,42 @@ class CompanyController extends Controller
                 'errors' => $model->errors,
             ];
         }
+    }
+
+    /**
+     * Toggle compact mode for current company
+     *
+     * @return Response
+     */
+    public function actionToggleCompactMode()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $model = Company::getCurrent();
+        if (!$model) {
+            return [
+                'success' => false,
+                'message' => 'Company not found.',
+            ];
+        }
+
+        // Toggle compact mode
+        $model->compact_mode = !$model->compact_mode;
+
+        if ($model->save()) {
+            return [
+                'success' => true,
+                'compact_mode' => $model->compact_mode,
+                'message' => $model->compact_mode 
+                    ? Yii::t('app/nav', 'Switched to Compact Mode') 
+                    : Yii::t('app/nav', 'Switched to Normal Mode'),
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to update compact mode.',
+            'errors' => $model->errors,
+        ];
     }
 }

@@ -56,6 +56,10 @@ return [
     'Change Mode' => 'Change Mode',
     'Switch to Dark Mode' => 'Switch to Dark Mode',
     'Switch to Light Mode' => 'Switch to Light Mode',
+    'Switch to Compact Mode' => 'Switch to Compact Mode',
+    'Switch to Normal Mode' => 'Switch to Normal Mode',
+    'Switched to Compact Mode' => 'Switched to Compact Mode',
+    'Switched to Normal Mode' => 'Switched to Normal Mode',
     
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => 'Are you sure you want to reset all demo data?',

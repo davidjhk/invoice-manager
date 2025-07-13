@@ -56,6 +56,10 @@ return [
     'Change Mode' => '모드 변경',
     'Switch to Dark Mode' => '다크 모드로 전환',
     'Switch to Light Mode' => '라이트 모드로 전환',
+    'Switch to Compact Mode' => '컴팩트 모드로 전환',
+    'Switch to Normal Mode' => '일반 모드로 전환',
+    'Switched to Compact Mode' => '컴팩트 모드로 전환됨',
+    'Switched to Normal Mode' => '일반 모드로 전환됨',
     
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => '모든 데모 데이터를 초기화하시겠습니까?',
