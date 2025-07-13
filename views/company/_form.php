@@ -57,14 +57,12 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 	<!-- Company Logo -->
 	<div class="col-lg-6">
 		<div class="card mb-4">
-			<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
-				data-target="#company-logo-collapse" aria-expanded="<?= $isCreate ? 'true' : 'false' ?>">
-				<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+			<div class="card-header">
+				<h5 class="card-title mb-0">
 					<span><i class="fas fa-image mr-2"></i><?= Yii::t('app/company', 'Company Logo') ?></span>
-					<i class="fas fa-chevron-down collapse-icon <?= $isCreate ? 'rotated' : '' ?>"></i>
 				</h5>
 			</div>
-			<div class="collapse <?= $isCreate ? 'show' : '' ?>" id="company-logo-collapse">
+			<div id="company-logo-collapse">
 				<div class="card-body">
 					<?php if ($isSettings && $model->hasLogo()): ?>
 					<div class="current-logo mb-3">

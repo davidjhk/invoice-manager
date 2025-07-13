@@ -149,10 +149,10 @@ $this->params['breadcrumbs'][] = $this->title;
 }
 
 .table th {
-    background-color: #f8f9fa;
+    background-color: #343a40;
     border-top: none;
     font-weight: 600;
-    color: #495057;
+    color: #ffffff;
 }
 
 .btn-group .btn {
