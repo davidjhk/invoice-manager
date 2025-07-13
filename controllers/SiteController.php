@@ -29,14 +29,14 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password', 'change-language'],
+                'only' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password', 'change-language', 'toggle-theme'],
                 'rules' => [
                     [
                         'actions' => ['change-language'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password'],
+                        'actions' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password', 'toggle-theme'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -46,6 +46,7 @@ class SiteController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'toggle-theme' => ['post'],
                 ],
             ],
         ];
@@ -419,5 +420,41 @@ class SiteController extends Controller
         }
         
         return $this->goHome();
+    }
+
+    /**
+     * Toggle theme action.
+     *
+     * @return Response|array
+     */
+    public function actionToggleTheme()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if (Yii::$app->user->isGuest) {
+            return ['success' => false, 'message' => 'User not logged in'];
+        }
+
+        $mode = Yii::$app->request->post('mode', 'light');
+        $darkMode = ($mode === 'dark') ? 1 : 0;
+
+        $user = Yii::$app->user->identity;
+        $companyId = Yii::$app->session->get('current_company_id');
+
+        if (!$companyId) {
+            return ['success' => false, 'message' => 'No company selected'];
+        }
+
+        $company = Company::findOne(['id' => $companyId, 'user_id' => $user->id]);
+        if (!$company) {
+            return ['success' => false, 'message' => 'Company not found'];
+        }
+
+        $company->dark_mode = $darkMode;
+        if ($company->save(false, ['dark_mode'])) {
+            return ['success' => true, 'mode' => $mode, 'dark_mode' => $darkMode];
+        } else {
+            return ['success' => false, 'message' => 'Failed to save theme preference'];
+        }
     }
 }

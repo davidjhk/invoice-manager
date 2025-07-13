@@ -1266,11 +1266,11 @@ AppAsset::register($this);
 
 		.mobile-nav-menu .nav-link {
 			display: block !important;
-			padding: 0.9rem 1.2rem !important;
-			margin: 0.4rem 0 !important;
+			padding: 0.6rem 0.8rem !important;
+			margin: 0.25rem 0 !important;
 			width: 100% !important;
 			text-align: center !important;
-			border-radius: 0.75rem !important;
+			border-radius: 0.5rem !important;
 			border: 1px solid rgba(99, 102, 241, 0.3) !important;
 			font-weight: 500 !important;
 			letter-spacing: 0.025em !important;
@@ -1279,8 +1279,8 @@ AppAsset::register($this);
 			background: rgba(255, 255, 255, 0.95) !important;
 			backdrop-filter: blur(10px) !important;
 			transition: all 0.3s ease !important;
-			font-size: 1rem !important;
-			min-height: 50px !important;
+			font-size: 0.875rem !important;
+			min-height: 42px !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
@@ -1348,11 +1348,11 @@ AppAsset::register($this);
 
 		.mobile-nav-logout .logout-btn {
 			display: block !important;
-			padding: 0.9rem 1.2rem !important;
+			padding: 0.6rem 0.8rem !important;
 			margin: 0 !important;
 			width: 100% !important;
 			text-align: center !important;
-			border-radius: 0.75rem !important;
+			border-radius: 0.5rem !important;
 			border: 1px solid rgba(220, 38, 38, 0.3) !important;
 			font-weight: 500 !important;
 			letter-spacing: 0.025em !important;
@@ -1361,8 +1361,8 @@ AppAsset::register($this);
 			background: rgba(254, 226, 226, 0.95) !important;
 			backdrop-filter: blur(10px) !important;
 			transition: all 0.3s ease !important;
-			font-size: 1rem !important;
-			min-height: 50px !important;
+			font-size: 0.875rem !important;
+			min-height: 42px !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
@@ -1771,6 +1771,24 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 							<?= \app\widgets\SimpleLanguageSwitcher::widget() ?>
 						</div>
 
+						<!-- Change Mode Button -->
+						<?php if ($currentCompany): ?>
+						<div class="dropdown mr-3">
+							<button class="btn btn-outline-light btn-sm dropdown-toggle theme-toggle-btn" type="button"
+								data-toggle="dropdown" aria-expanded="false">
+								<i class="fas fa-palette mr-1"></i><?= Yii::t('app/nav', 'Change Mode') ?>
+							</button>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="#" class="dropdown-item theme-toggle-item"
+										data-mode="<?= $currentCompany->dark_mode ? 'light' : 'dark' ?>">
+										<i class="fas fa-<?= $currentCompany->dark_mode ? 'sun' : 'moon' ?> mr-2"></i>
+										<?= $currentCompany->dark_mode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
+									</a>
+								</li>
+							</ul>
+						</div>
+						<?php endif; ?>
 
 						<!-- Company Dropdown -->
 						<?php if ($currentCompany): ?>
@@ -1922,6 +1940,15 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 
 				<!-- Settings Menu -->
 				<?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], ['class' => 'nav-link mobile-nav-link']) ?>
+
+				<!-- Change Mode -->
+				<?php if ($currentCompany): ?>
+				<a href="#" class="nav-link mobile-nav-link theme-toggle-item"
+					data-mode="<?= $currentCompany->dark_mode ? 'light' : 'dark' ?>">
+					<i class="fas fa-<?= $currentCompany->dark_mode ? 'sun' : 'moon' ?> mr-2"></i>
+					<?= $currentCompany->dark_mode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
+				</a>
+				<?php endif; ?>
 
 				<!-- Change Password (for non-demo users) -->
 				<?php if (!Yii::$app->user->identity->isDemo()): ?>
@@ -2111,6 +2138,51 @@ $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 			if (href && window.location.pathname.indexOf(href) === 0) {
 				$(this).addClass('active');
 			}
+		});
+
+		// Theme toggle functionality
+		$('.theme-toggle-item').on('click', function(e) {
+			e.preventDefault();
+
+			var $button = $(this);
+			var mode = $button.data('mode');
+
+			// Show loading state
+			$button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Switching...');
+
+			// Make AJAX request
+			$.ajax({
+				url: '<?= \yii\helpers\Url::to(['/site/toggle-theme']) ?>',
+				type: 'POST',
+				data: {
+					'<?= Yii::$app->request->csrfParam ?>': '<?= Yii::$app->request->csrfToken ?>',
+					mode: mode
+				},
+				success: function(response) {
+					if (response.success) {
+						// Reload page to apply new theme
+						window.location.reload();
+					} else {
+						alert('Failed to change theme: ' + (response.message ||
+							'Unknown error'));
+						// Reset button
+						var icon = mode === 'dark' ? 'moon' : 'sun';
+						var text = mode === 'dark' ?
+							'<?= Yii::t('app/nav', 'Switch to Dark Mode') ?>' :
+							'<?= Yii::t('app/nav', 'Switch to Light Mode') ?>';
+						$button.html('<i class="fas fa-' + icon + ' mr-2"></i>' + text);
+					}
+				},
+				error: function() {
+					alert('Failed to change theme. Please try again.');
+					// Reset button
+					var icon = mode === 'dark' ? 'moon' : 'sun';
+					var text = mode === 'dark' ?
+						'<?= Yii::t('app/nav', 'Switch to Dark Mode') ?>' :
+						'<?= Yii::t('app/nav', 'Switch to Light Mode') ?>';
+					$button.html('<i class="fas fa-' + icon + ' mr-2"></i>' + text);
+				}
+			});
 		});
 	});
 	</script>

@@ -52,6 +52,11 @@ return [
     'Change Password' => '비밀번호 변경',
     'Admin Panel' => '관리자 패널',
     
+    // Theme toggle
+    'Change Mode' => '모드 변경',
+    'Switch to Dark Mode' => '다크 모드로 전환',
+    'Switch to Light Mode' => '라이트 모드로 전환',
+    
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => '모든 데모 데이터를 초기화하시겠습니까?',
 ];

@@ -52,6 +52,11 @@ return [
     'Change Password' => '更改密碼',
     'Admin Panel' => '管理面板',
     
+    // Theme toggle
+    'Change Mode' => '切換模式',
+    'Switch to Dark Mode' => '切換到暗黑模式',
+    'Switch to Light Mode' => '切換到明亮模式',
+    
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => '您確定要重設所有示範資料嗎？',
 ];

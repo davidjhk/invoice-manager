@@ -52,6 +52,11 @@ return [
     'Change Password' => 'Change Password',
     'Admin Panel' => 'Admin Panel',
     
+    // Theme toggle
+    'Change Mode' => 'Change Mode',
+    'Switch to Dark Mode' => 'Switch to Dark Mode',
+    'Switch to Light Mode' => 'Switch to Light Mode',
+    
     // Confirmation messages
     'Are you sure you want to reset all demo data?' => 'Are you sure you want to reset all demo data?',
 ];
