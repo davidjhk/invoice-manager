@@ -22,7 +22,11 @@ $draftInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' 
 $paidInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->count();
 $sentInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'sent'])->count();
 $totalAmount = Invoice::find()->where(['company_id' => $company->id])->sum('total_amount') ?: 0;
-$paidAmount = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->sum('total_amount') ?: 0;
+// Calculate actual paid amount including partial payments from Payment table
+$paidAmount = \app\models\Payment::find()
+    ->innerJoin('{{%jdosa_invoices}}', '{{%jdosa_invoices}}.id = {{%jdosa_payments}}.invoice_id')
+    ->where(['{{%jdosa_invoices}}.company_id' => $company->id])
+    ->sum('{{%jdosa_payments}}.amount') ?: 0;
 $pendingAmount = $totalAmount - $paidAmount;
 $totalCustomers = Customer::find()->where(['company_id' => $company->id])->count();
 
