@@ -30,10 +30,14 @@ class TaxJurisdictionController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return Yii::$app->user->identity->isAdmin();
+                            // Only allow admin users
+                            return Yii::$app->user->identity && Yii::$app->user->identity->role === 'admin';
                         }
                     ],
                 ],
+                'denyCallback' => function () {
+                    throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You are not allowed to access this page.'));
+                }
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
@@ -268,11 +272,16 @@ class TaxJurisdictionController extends Controller
 
         $filename = 'tax_jurisdictions_' . date('Y-m-d_H-i-s') . '.csv';
 
+        // Set response format and headers for file download
         Yii::$app->response->format = Response::FORMAT_RAW;
-        Yii::$app->response->headers->add('Content-Type', 'text/csv');
-        Yii::$app->response->headers->add('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        Yii::$app->response->headers->set('Content-Type', 'application/csv');
+        Yii::$app->response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        Yii::$app->response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        Yii::$app->response->headers->set('Pragma', 'no-cache');
+        Yii::$app->response->headers->set('Expires', '0');
 
-        $output = fopen('php://output', 'w');
+        // Create CSV content
+        $output = fopen('php://temp', 'w');
 
         // Write header row
         fputcsv($output, [
@@ -303,7 +312,11 @@ class TaxJurisdictionController extends Controller
             ]);
         }
 
+        rewind($output);
+        $csvContent = stream_get_contents($output);
         fclose($output);
+
+        Yii::$app->response->content = $csvContent;
         return Yii::$app->response;
     }
 

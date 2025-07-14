@@ -438,7 +438,8 @@ main.flex-shrink-0 .container {
   vertical-align: middle !important;
 }
 
-.table-responsive .table thead th {
+.table-responsive .table thead th,
+.table-responsive .table thead th a {
   background: #667eea !important;
   color: white !important;
   border-color: #667eea !important;

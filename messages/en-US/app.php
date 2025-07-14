@@ -282,4 +282,18 @@ return [
     'The requested page does not exist.' => 'The requested page does not exist.',
     'Import default tax rates' => 'Import default tax rates',
     'State has local tax jurisdictions' => 'State has local tax jurisdictions',
+    
+    // TaxJurisdiction State Rate Display
+    'Used in calculations' => 'Used in calculations',
+    'Stored rate differs' => 'Stored rate differs',
+    'With local tax' => 'With local tax',
+    
+    // Tax Management Navigation
+    'Tax Management Tools' => 'Tax Management Tools',
+    'ZIP Code Tax Rates' => 'ZIP Code Tax Rates',
+    'Detailed jurisdiction-based rates' => 'Detailed jurisdiction-based rates',
+    'State-level rates for calculations' => 'State-level rates for calculations',
+    'Analysis and reports' => 'Analysis and reports',
+    'Import Data' => 'Import Data',
+    'Bulk import tax rates' => 'Bulk import tax rates',
 ];

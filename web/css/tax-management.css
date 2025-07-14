@@ -1,0 +1,462 @@
+/**
+ * Tax Management Common Styles
+ * Supports Light and Dark Mode.
+ */
+
+/* 1. CSS Variables for Theming 
+--------------------------------------------------------------------------------*/
+:root {
+    /* Light Theme */
+    --bg-color: #ffffff;
+    --text-color: #374151;
+    --muted-text-color: #6b7280;
+    --border-color: #e1e5e9;
+    --card-bg: linear-gradient(145deg, #ffffff, #f8f9fa);
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --card-hover-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --card-header-bg: #f8f9fa;
+    --active-border-color: #6366f1;
+    --active-card-bg: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+    --nav-header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --nav-header-text: white;
+    --btn-outline-bg: white;
+    --btn-outline-text: #6b7280;
+    --btn-outline-border: #d1d5db;
+    --btn-outline-hover-bg: #f9fafb;
+    --btn-outline-hover-text: #374151;
+    --btn-outline-hover-border: #9ca3af;
+
+    /* Dark Theme */
+    --bg-color-dark: #111827;
+    --text-color-dark: #d1d5db;
+    --muted-text-color-dark: #9ca3af;
+    --border-color-dark: #374151;
+    --card-bg-dark: linear-gradient(145deg, #1f2937, #111827);
+    --card-shadow-dark: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --card-hover-shadow-dark: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --card-header-bg-dark: #1f2937;
+    --active-border-color-dark: #818cf8;
+    --active-card-bg-dark: linear-gradient(145deg, #312e81, #25216b);
+    --nav-header-bg-dark: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%);
+    --nav-header-text-dark: white;
+    --btn-outline-bg-dark: #374151;
+    --btn-outline-text-dark: #d1d5db;
+    --btn-outline-border-dark: #4b5563;
+    --btn-outline-hover-bg-dark: #4b5563;
+    --btn-outline-hover-text-dark: #f3f4f6;
+    --btn-outline-hover-border-dark: #6b7280;
+}
+
+/* Apply theme based on data attribute or system preference */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode {
+    --bg-color: var(--bg-color-dark);
+    --text-color: var(--text-color-dark);
+    --muted-text-color: var(--muted-text-color-dark);
+    --border-color: var(--border-color-dark);
+    --card-bg: var(--card-bg-dark);
+    --card-shadow: var(--card-shadow-dark);
+    --card-hover-shadow: var(--card-hover-shadow-dark);
+    --card-header-bg: var(--card-header-bg-dark);
+    --active-border-color: var(--active-border-color-dark);
+    --active-card-bg: var(--active-card-bg-dark);
+    --nav-header-bg: var(--nav-header-bg-dark);
+    --nav-header-text: var(--nav-header-text-dark);
+    --btn-outline-bg: var(--btn-outline-bg-dark);
+    --btn-outline-text: var(--btn-outline-text-dark);
+    --btn-outline-border: var(--btn-outline-border-dark);
+    --btn-outline-hover-bg: var(--btn-outline-hover-bg-dark);
+    --btn-outline-hover-text: var(--btn-outline-hover-text-dark);
+    --btn-outline-hover-border: var(--btn-outline-hover-border-dark);
+}
+
+/* 2. Base Card Styles 
+--------------------------------------------------------------------------------*/
+.tax-card {
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.tax-card-header {
+    background: var(--card-header-bg);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+}
+
+.tax-card-body {
+    padding: 1.5rem;
+    background: transparent;
+}
+
+/* 3. Navigation Cards 
+--------------------------------------------------------------------------------*/
+.nav-item-card {
+    display: block;
+    padding: 1.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--card-bg);
+    height: 100%;
+    text-decoration: none;
+    color: var(--text-color);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-item-card:hover {
+    border-color: var(--active-border-color);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--card-hover-shadow);
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.nav-item-card:hover::before {
+    opacity: 1;
+}
+
+.nav-item-card.active {
+    border-color: var(--active-border-color);
+    background: var(--active-card-bg);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+
+.nav-item-card.active::before {
+    opacity: 1;
+}
+
+.nav-item-card i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    transition: all 0.3s ease;
+    color: var(--active-border-color);
+}
+
+.nav-item-card:hover i {
+    transform: scale(1.1);
+}
+
+.nav-item-card strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: -0.025em;
+}
+
+.nav-item-card small {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--muted-text-color);
+    line-height: 1.4;
+}
+
+/* 4. Tax Management Navigation Header 
+--------------------------------------------------------------------------------*/
+.tax-management-navigation {
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.tax-management-navigation .tax-card-header {
+    background: var(--nav-header-bg);
+    color: var(--nav-header-text);
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.tax-management-navigation .tax-card-header h6 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: -0.025em;
+}
+
+.tax-management-navigation .tax-card-body {
+    padding: 2rem 1.5rem;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+}
+
+/* 5. Action Buttons 
+--------------------------------------------------------------------------------*/
+.tax-action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.tax-action-buttons .btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: var(--card-shadow);
+}
+
+.tax-action-buttons .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.tax-action-buttons .btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.tax-action-buttons .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+.tax-action-buttons .btn-outline-secondary {
+    background: var(--btn-outline-bg);
+    color: var(--btn-outline-text);
+    border: 1px solid var(--btn-outline-border);
+}
+
+.tax-action-buttons .btn-outline-secondary:hover {
+    background: var(--btn-outline-hover-bg);
+    color: var(--btn-outline-hover-text);
+    border-color: var(--btn-outline-hover-border);
+}
+
+/* 6. GridView and Info Cards 
+--------------------------------------------------------------------------------*/
+.tax-grid-view .table {
+    background-color: transparent;
+}
+
+.tax-grid-view .table td,
+.tax-grid-view .table th {
+    vertical-align: middle;
+    padding: 0.75rem;
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.tax-grid-view .badge {
+    font-size: 0.85em;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+}
+
+.tax-info-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    background-color: var(--card-bg);
+}
+
+.tax-info-card .tax-card-header {
+    border-radius: 0;
+    padding: 1rem 1.25rem;
+}
+
+/* 7. Form Controls 
+--------------------------------------------------------------------------------*/
+.form-control {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9rem;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.form-control:focus {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--active-border-color);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+.form-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+/* 8. Responsive Adjustments 
+--------------------------------------------------------------------------------*/
+@media (max-width: 768px) {
+    .nav-item-card {
+        margin-bottom: 1rem;
+    }
+    
+    .tax-action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .tax-action-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tax-management-navigation .tax-card-body {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* 9. Statistics Page Styles
+--------------------------------------------------------------------------------*/
+.stats-card {
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.stats-card .card-icon {
+    opacity: 0.7;
+    align-self: center;
+}
+
+.stats-card-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.stats-card-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.stats-card-info {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+}
+
+.stats-card-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+body.dark-mode .stats-card-primary {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+body.dark-mode .stats-card-success {
+    background: linear-gradient(135deg, #34d399, #10b981);
+}
+
+body.dark-mode .stats-card-info {
+    background: linear-gradient(135deg, #7dd3fc, #38bdf8);
+}
+
+body.dark-mode .stats-card-warning {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.table thead th {
+    background-color: var(--card-header-bg);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.875em;
+    font-weight: 600;
+}
+
+.alert-info-custom {
+    background-color: var(--active-card-bg);
+    border: 1px solid var(--active-border-color);
+    color: var(--text-color);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+}
+
+.progress {
+    background-color: rgba(0,0,0,0.1);
+}
+
+body.dark-mode .progress {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* 10. Customer/Index-like Table Styles
+--------------------------------------------------------------------------------*/
+.table-container {
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.table-container .table {
+    margin-bottom: 0;
+}
+
+.table-container .table thead th {
+    background-color: var(--card-header-bg);
+    color: var(--text-color);
+    font-weight: 600;
+    border-top: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 11. Dark Mode for Navigation Cards
+--------------------------------------------------------------------------------*/
+body.dark-mode .nav-item-card {
+    background: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    color: var(--text-color-dark);
+}
+
+body.dark-mode .nav-item-card:hover {
+    border-color: var(--active-border-color-dark);
+    color: var(--text-color-dark);
+}
+
+body.dark-mode .nav-item-card.active {
+    background: var(--active-card-bg-dark);
+    border-color: var(--active-border-color-dark);
+}
+
+body.dark-mode .nav-item-card i {
+    color: var(--active-border-color-dark);
+}
+
+body.dark-mode .nav-item-card strong {
+    color: var(--text-color-dark);
+}
+
+body.dark-mode .nav-item-card small {
+    color: var(--muted-text-color-dark);
+}

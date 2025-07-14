@@ -13,25 +13,71 @@ use app\models\Country;
 $this->title = Yii::t('app', 'State Tax Rates');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Admin'), 'url' => ['/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// Register tax management CSS
+$this->registerCssFile('@web/css/tax-management.css');
 ?>
 <div class="state-tax-rate-index">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><?= Html::encode($this->title) ?></h1>
-        <div>
-            <?= Html::a(Yii::t('app', 'Bulk Import'), ['bulk-import'], [
-                'class' => 'btn btn-info mr-2',
-                'title' => Yii::t('app', 'Import default tax rates')
-            ]) ?>
-            <?= Html::a(Yii::t('app', 'Create State Tax Rate'), ['create'], ['class' => 'btn btn-success']) ?>
-        </div>
-    </div>
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1><?= Html::encode($this->title) ?></h1>
+		<div class="action-buttons tax-action-buttons">
+			<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app', 'Add'), ['create'], ['class' => 'btn btn-success']) ?>
+			<?= Html::a('<i class="fas fa-upload mr-2"></i>' . Yii::t('app', 'Import'), ['bulk-import'], ['class' => 'btn btn-primary']) ?>
+			<?= Html::a('<i class="fas fa-download mr-2"></i>' . Yii::t('app', 'Export'), ['/tax-jurisdiction/export-csv'], ['class' => 'btn btn-outline-secondary']) ?>
+		</div>
+	</div>
 
-    <div class="card">
-        <div class="card-body">
-            <?php Pjax::begin(); ?>
+	<!-- Tax Management Navigation -->
+	<div class="tax-card tax-management-navigation mb-4">
+		<div class="card-header tax-card-header">
+			<h6 class="mb-0"><i class="fas fa-sitemap mr-2"></i><?= Yii::t('app', 'Tax Management Tools') ?></h6>
+		</div>
+		<div class="card-body tax-card-body">
+			<div class="row">
+				<div class="col-md-3">
+					<?= Html::a('
+                        <div class="nav-item-card">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                            <strong>' . Yii::t('app', 'ZIP Code Tax Rates') . '</strong>
+                            <small class="text-muted">' . Yii::t('app', 'Detailed jurisdiction-based rates') . '</small>
+                        </div>
+                    ', ['/tax-jurisdiction/index'], ['class' => 'text-decoration-none']) ?>
+				</div>
+				<div class="col-md-3">
+					<div class="nav-item-card active">
+						<i class="fas fa-percent text-success"></i>
+						<strong><?= Yii::t('app', 'State Tax Rates') ?></strong>
+						<small class="text-muted"><?= Yii::t('app', 'State-level rates for calculations') ?></small>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<?= Html::a('
+                        <div class="nav-item-card">
+                            <i class="fas fa-chart-line text-info"></i>
+                            <strong>' . Yii::t('app', 'Tax Statistics') . '</strong>
+                            <small class="text-muted">' . Yii::t('app', 'Analysis and reports') . '</small>
+                        </div>
+                    ', ['/tax-jurisdiction/stats'], ['class' => 'text-decoration-none']) ?>
+				</div>
+				<div class="col-md-3">
+					<?= Html::a('
+                        <div class="nav-item-card">
+                            <i class="fas fa-file-import text-warning"></i>
+                            <strong>' . Yii::t('app', 'Import Data') . '</strong>
+                            <small class="text-muted">' . Yii::t('app', 'Bulk import tax rates') . '</small>
+                        </div>
+                    ', ['/tax-jurisdiction/import-csv'], ['class' => 'text-decoration-none']) ?>
+				</div>
+			</div>
+		</div>
+	</div>
 
-            <?= GridView::widget([
+	<div class="tax-card">
+		<div class="card-body tax-card-body">
+			<?php Pjax::begin(); ?>
+
+			<?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'options' => ['class' => 'table-responsive'],
                 'tableOptions' => ['class' => 'table table-striped table-hover'],
@@ -48,7 +94,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'class' => 'badge badge-secondary'
                             ]);
                         },
-                        'contentOptions' => ['style' => 'width: 150px;'],
                     ],
                     [
                         'attribute' => 'country_code',
@@ -133,19 +178,23 @@ $this->params['breadcrumbs'][] = $this->title;
                         'class' => 'yii\grid\ActionColumn',
                         'header' => Yii::t('app', 'Actions'),
                         'template' => '{view} {update} {toggle} {delete}',
+                        'headerOptions' => [ 'style' => 'width: 150px;'],
+                        'contentOptions' => [ 'class' => 'text-center btn-group','style' => 'width: 150px;'],
                         'buttons' => [
                             'view' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-eye"></i>', $url, [
                                     'title' => Yii::t('app', 'View'),
-                                    'class' => 'btn btn-sm btn-outline-info mr-1',
+                                    'class' => 'btn btn-outline-info btn-sm mr-1',
                                     'data-pjax' => '0',
+                                    'data-toggle' => 'tooltip',
                                 ]);
                             },
                             'update' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-edit"></i>', $url, [
                                     'title' => Yii::t('app', 'Update'),
-                                    'class' => 'btn btn-sm btn-outline-primary mr-1',
+                                    'class' => 'btn btn-outline-primary btn-sm mr-1',
                                     'data-pjax' => '0',
+                                    'data-toggle' => 'tooltip',
                                 ]);
                             },
                             'toggle' => function ($url, $model, $key) {
@@ -153,60 +202,82 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $title = $model->is_active ? Yii::t('app', 'Deactivate') : Yii::t('app', 'Activate');
                                 return Html::a("<i class=\"{$icon}\"></i>", ['toggle-active', 'id' => $model->id], [
                                     'title' => $title,
-                                    'class' => 'btn btn-sm btn-outline-secondary mr-1',
+                                    'class' => 'btn btn-outline-secondary btn-sm mr-1',
                                     'data-confirm' => Yii::t('app', 'Are you sure you want to toggle the status of this tax rate?'),
                                     'data-method' => 'post',
+                                    'data-toggle' => 'tooltip',
                                 ]);
                             },
                             'delete' => function ($url, $model, $key) {
                                 return Html::a('<i class="fas fa-trash"></i>', $url, [
                                     'title' => Yii::t('app', 'Delete'),
-                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'class' => 'btn btn-outline-danger btn-sm',
                                     'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
                                     'data-method' => 'post',
+                                    'data-toggle' => 'tooltip',
                                 ]);
                             },
                         ],
-                        'contentOptions' => ['style' => 'width: 180px;'],
                     ],
                 ],
             ]); ?>
 
-            <?php Pjax::end(); ?>
-        </div>
-    </div>
+			<?php Pjax::end(); ?>
+		</div>
+	</div>
 
-    <div class="mt-4">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card border-info">
-                    <div class="card-header bg-info text-white">
-                        <h6 class="mb-0"><i class="fas fa-info-circle mr-2"></i><?= Yii::t('app', 'Information') ?></h6>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled mb-0">
-                            <li><i class="fas fa-circle text-success mr-2"></i><?= Yii::t('app', 'Base Rate: State-level sales tax rate') ?></li>
-                            <li><i class="fas fa-circle text-info mr-2"></i><?= Yii::t('app', 'Avg Total: Includes local taxes') ?></li>
-                            <li><i class="fas fa-circle text-warning mr-2"></i><?= Yii::t('app', 'Revenue Threshold: Economic nexus limit') ?></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card border-warning">
-                    <div class="card-header bg-warning text-dark">
-                        <h6 class="mb-0"><i class="fas fa-exclamation-triangle mr-2"></i><?= Yii::t('app', 'Important Notes') ?></h6>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled mb-0">
-                            <li><i class="fas fa-circle text-danger mr-2"></i><?= Yii::t('app', 'Tax rates change frequently - keep updated') ?></li>
-                            <li><i class="fas fa-circle text-primary mr-2"></i><?= Yii::t('app', 'Consult tax professionals for compliance') ?></li>
-                            <li><i class="fas fa-circle text-secondary mr-2"></i><?= Yii::t('app', 'Effective dates determine which rate applies') ?></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="mt-4">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="tax-card tax-info-card">
+					<div class="card-header tax-card-header">
+						<h6 class="mb-0"><i class="fas fa-info-circle mr-2"></i><?= Yii::t('app', 'Information') ?></h6>
+					</div>
+					<div class="card-body tax-card-body">
+						<ul class="list-unstyled mb-0">
+							<li><i
+									class="fas fa-circle text-success mr-2"></i><?= Yii::t('app', 'Base Rate: State-level sales tax rate') ?>
+							</li>
+							<li><i
+									class="fas fa-circle text-info mr-2"></i><?= Yii::t('app', 'Avg Total: Includes local taxes') ?>
+							</li>
+							<li><i
+									class="fas fa-circle text-warning mr-2"></i><?= Yii::t('app', 'Revenue Threshold: Economic nexus limit') ?>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="tax-card tax-info-card">
+					<div class="card-header tax-card-header">
+						<h6 class="mb-0"><i
+								class="fas fa-exclamation-triangle mr-2"></i><?= Yii::t('app', 'Important Notes') ?>
+						</h6>
+					</div>
+					<div class="card-body tax-card-body">
+						<ul class="list-unstyled mb-0">
+							<li><i
+									class="fas fa-circle text-danger mr-2"></i><?= Yii::t('app', 'Tax rates change frequently - keep updated') ?>
+							</li>
+							<li><i
+									class="fas fa-circle text-primary mr-2"></i><?= Yii::t('app', 'Consult tax professionals for compliance') ?>
+							</li>
+							<li><i
+									class="fas fa-circle text-secondary mr-2"></i><?= Yii::t('app', 'Effective dates determine which rate applies') ?>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </div>
+
+<?php
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+
+?>

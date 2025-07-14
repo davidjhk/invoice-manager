@@ -95,12 +95,39 @@ $this->params['breadcrumbs'][] = $this->title;
                     <h5 class="mb-0"><i class="fas fa-calculator mr-2"></i><?= Yii::t('app', 'Tax Rates') ?></h5>
                 </div>
                 <div class="card-body">
+                    <?php 
+                    $stateRateInfo = $model->getStateTaxRateInfo();
+                    $actualStateRate = $stateRateInfo['actual_base_rate'];
+                    $actualRateWithLocal = $stateRateInfo['actual_rate_with_local'];
+                    $storedStateRate = $model->state_rate;
+                    $hasMismatch = $stateRateInfo['has_mismatch'];
+                    ?>
+                    
                     <div class="tax-rates">
                         <div class="rate-item mb-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="rate-label"><?= Yii::t('app', 'State Rate') ?>:</span>
-                                <span class="rate-value badge badge-primary"><?= \app\models\TaxJurisdiction::formatRate($model->state_rate) ?></span>
+                                <span class="rate-label">
+                                    <?= Yii::t('app', 'State Rate') ?> 
+                                    <small class="text-muted">(<?= Yii::t('app', 'Used in calculations') ?>)</small>:
+                                </span>
+                                <span class="rate-value badge badge-primary"><?= \app\models\TaxJurisdiction::formatRate($actualStateRate) ?></span>
                             </div>
+                            <?php if ($hasMismatch): ?>
+                            <div class="mt-1">
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    <?= Yii::t('app', 'Stored rate differs') ?>: <?= \app\models\TaxJurisdiction::formatRate($storedStateRate) ?>
+                                </small>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($actualRateWithLocal !== $actualStateRate): ?>
+                            <div class="mt-1">
+                                <small class="text-info">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    <?= Yii::t('app', 'With local tax') ?>: <?= \app\models\TaxJurisdiction::formatRate($actualRateWithLocal) ?>
+                                </small>
+                            </div>
+                            <?php endif; ?>
                         </div>
                         
                         <div class="rate-item mb-3">

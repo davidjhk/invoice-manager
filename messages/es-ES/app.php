@@ -281,4 +281,18 @@ return [
     'The requested page does not exist.' => 'La página solicitada no existe.',
     'Import default tax rates' => 'Importar tasas de impuesto por defecto',
     'State has local tax jurisdictions' => 'El estado tiene jurisdicciones de impuestos locales',
+    
+    // TaxJurisdiction State Rate Display
+    'Used in calculations' => 'Usado en cálculos',
+    'Stored rate differs' => 'La tasa almacenada difiere',
+    'With local tax' => 'Con impuesto local',
+    
+    // Tax Management Navigation
+    'Tax Management Tools' => 'Herramientas de Gestión Fiscal',
+    'ZIP Code Tax Rates' => 'Tasas de Impuesto por Código Postal',
+    'Detailed jurisdiction-based rates' => 'Tasas detalladas basadas en jurisdicción',
+    'State-level rates for calculations' => 'Tasas a nivel estatal para cálculos',
+    'Analysis and reports' => 'Análisis e informes',
+    'Import Data' => 'Importar Datos',
+    'Bulk import tax rates' => 'Importación masiva de tasas de impuesto',
 ];

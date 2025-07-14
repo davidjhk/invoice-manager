@@ -274,4 +274,18 @@ return [
     'The requested page does not exist.' => '請求的頁面不存在。',
     'Import default tax rates' => '匯入預設稅率',
     'State has local tax jurisdictions' => '州有地方稅管轄區',
+    
+    // TaxJurisdiction State Rate Display
+    'Used in calculations' => '用於計算',
+    'Stored rate differs' => '儲存的稅率不同',
+    'With local tax' => '含地方稅',
+    
+    // Tax Management Navigation
+    'Tax Management Tools' => '稅務管理工具',
+    'ZIP Code Tax Rates' => '郵政編碼稅率',
+    'Detailed jurisdiction-based rates' => '基於管轄區的詳細稅率',
+    'State-level rates for calculations' => '用於計算的州級稅率',
+    'Analysis and reports' => '分析和報告',
+    'Import Data' => '匯入資料',
+    'Bulk import tax rates' => '批次匯入稅率',
 ];

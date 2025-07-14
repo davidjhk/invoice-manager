@@ -274,4 +274,18 @@ return [
     'The requested page does not exist.' => '请求的页面不存在。',
     'Import default tax rates' => '导入默认税率',
     'State has local tax jurisdictions' => '州有地方税管辖区',
+    
+    // TaxJurisdiction State Rate Display
+    'Used in calculations' => '用于计算',
+    'Stored rate differs' => '存储的税率不同',
+    'With local tax' => '含地方税',
+    
+    // Tax Management Navigation
+    'Tax Management Tools' => '税务管理工具',
+    'ZIP Code Tax Rates' => '邮政编码税率',
+    'Detailed jurisdiction-based rates' => '基于管辖区的详细税率',
+    'State-level rates for calculations' => '用于计算的州级税率',
+    'Analysis and reports' => '分析和报告',
+    'Import Data' => '导入数据',
+    'Bulk import tax rates' => '批量导入税率',
 ];

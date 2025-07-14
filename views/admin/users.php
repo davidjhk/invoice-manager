@@ -12,19 +12,19 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Admin'), 'url' => ['
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="admin-users">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><?= Html::encode($this->title) ?></h1>
-        <div class="btn-group">
-            <?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app', 'Create User'), ['create-user'], ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('<i class="fas fa-arrow-left mr-2"></i>' . Yii::t('app', 'Back to Dashboard'), ['index'], ['class' => 'btn btn-secondary']) ?>
-        </div>
-    </div>
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1><?= Html::encode($this->title) ?></h1>
+		<div class="btn-group">
+			<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app', 'Create User'), ['create-user'], ['class' => 'btn btn-primary']) ?>
+			<?= Html::a('<i class="fas fa-arrow-left mr-2"></i>' . Yii::t('app', 'Back to Dashboard'), ['index'], ['class' => 'btn btn-secondary']) ?>
+		</div>
+	</div>
 
-    <div class="card">
-        <div class="card-body">
-            <?php Pjax::begin(); ?>
-            
-            <?= GridView::widget([
+	<div class="card">
+		<div class="card-body">
+			<?php Pjax::begin(); ?>
+
+			<?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'tableOptions' => ['class' => 'table table-striped table-bordered table-hover'],
                 'columns' => [
@@ -128,70 +128,61 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]);
                             },
                         ],
+                        'contentOptions' => ['class' => 'text-center btn-group'],
                     ],
                 ],
             ]); ?>
-            
-            <?php Pjax::end(); ?>
-        </div>
-    </div>
+
+			<?php Pjax::end(); ?>
+		</div>
+	</div>
 </div>
 
 <style>
 .card {
-    border: none;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border-radius: 0.5rem;
+	border: none;
+	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+	border-radius: 0.5rem;
 }
 
 .table {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .table th {
-    background-color: #343a40;
-    border-top: none;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-.btn-group .btn {
-    margin-left: 0.25rem;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 0.25rem;
+	background-color: #343a40;
+	border-top: none;
+	font-weight: 600;
+	color: #ffffff;
 }
 
 .btn-outline-info:hover {
-    background-color: #17a2b8;
-    border-color: #17a2b8;
+	background-color: #17a2b8;
+	border-color: #17a2b8;
 }
 
 .btn-outline-primary:hover {
-    background-color: #4f46e5;
-    border-color: #4f46e5;
+	background-color: #4f46e5;
+	border-color: #4f46e5;
 }
 
 .btn-outline-warning:hover {
-    background-color: #ffc107;
-    border-color: #ffc107;
+	background-color: #ffc107;
+	border-color: #ffc107;
 }
 
 .btn-outline-success:hover {
-    background-color: #28a745;
-    border-color: #28a745;
+	background-color: #28a745;
+	border-color: #28a745;
 }
 
 .btn-outline-danger:hover {
-    background-color: #dc3545;
-    border-color: #dc3545;
+	background-color: #dc3545;
+	border-color: #dc3545;
 }
 
 .badge {
-    font-size: 0.75rem;
-    padding: 0.25em 0.5em;
+	font-size: 0.75rem;
+	padding: 0.25em 0.5em;
 }
 </style>

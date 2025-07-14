@@ -325,4 +325,18 @@ return [
     'The requested page does not exist.' => '요청한 페이지가 존재하지 않습니다.',
     'Import default tax rates' => '기본 세율 가져오기',
     'State has local tax jurisdictions' => '주에 지방세 관할이 있습니다',
+    
+    // TaxJurisdiction State Rate Display
+    'Used in calculations' => '계산에 사용됨',
+    'Stored rate differs' => '저장된 세율과 다름',
+    'With local tax' => '지방세 포함',
+    
+    // Tax Management Navigation
+    'Tax Management Tools' => '세무 관리 도구',
+    'ZIP Code Tax Rates' => 'ZIP 코드 세율',
+    'Detailed jurisdiction-based rates' => '관할구역 기반 상세 세율',
+    'State-level rates for calculations' => '계산용 주 단위 세율',
+    'Analysis and reports' => '분석 및 보고서',
+    'Import Data' => '데이터 가져오기',
+    'Bulk import tax rates' => '세율 일괄 가져오기',
 ];

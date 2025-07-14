@@ -513,7 +513,7 @@ class TaxJurisdiction extends ActiveRecord
      */
     public static function formatRate($rate)
     {
-        return number_format($rate, 4) . '%';
+        return number_format($rate * 100, 2) . '%';
     }
 
     /**
@@ -552,5 +552,83 @@ class TaxJurisdiction extends ActiveRecord
         $threshold = new \DateTime("-{$daysThreshold} days");
         
         return $verifiedDate < $threshold;
+    }
+
+    /**
+     * Get actual state tax rate from StateTaxRate table (used in automatic calculations)
+     *
+     * @param bool $useLocalTax Whether to include local taxes in the rate
+     * @return float
+     */
+    public function getActualStateTaxRate($useLocalTax = false)
+    {
+        if (!class_exists('app\models\StateTaxRate')) {
+            return $this->state_rate; // Fallback to stored rate
+        }
+
+        try {
+            $stateTaxRate = \app\models\StateTaxRate::getCurrentRate($this->state_code, 'US');
+            
+            if ($stateTaxRate) {
+                if ($useLocalTax && $stateTaxRate->has_local_tax) {
+                    return (float) $stateTaxRate->average_total_rate;
+                } else {
+                    return (float) $stateTaxRate->base_rate;
+                }
+            }
+        } catch (\Exception $e) {
+            // Log error and fall back to stored rate
+            Yii::error("Error getting actual state tax rate for {$this->state_code}: " . $e->getMessage());
+        }
+
+        return $this->state_rate; // Fallback to stored rate
+    }
+
+    /**
+     * Get formatted actual state tax rate as percentage
+     *
+     * @param bool $useLocalTax Whether to include local taxes in the rate
+     * @return string
+     */
+    public function getFormattedActualStateTaxRate($useLocalTax = false)
+    {
+        return static::formatRate($this->getActualStateTaxRate($useLocalTax));
+    }
+
+    /**
+     * Check if actual state tax rate differs from stored rate
+     *
+     * @return bool
+     */
+    public function hasStateTaxRateMismatch()
+    {
+        $actualRate = $this->getActualStateTaxRate(false);
+        $storedRate = $this->state_rate;
+        
+        // Consider rates different if they differ by more than 0.0001%
+        return abs($actualRate - $storedRate * 100) > 0.0001;
+    }
+
+    /**
+     * Get state tax rate information for display
+     *
+     * @return array
+     */
+    public function getStateTaxRateInfo()
+    {
+        $actualRate = $this->getActualStateTaxRate(false) / 100;
+        $actualRateWithLocal = $this->getActualStateTaxRate(true);
+        $storedRate = $this->state_rate;
+        $hasMismatch = $this->hasStateTaxRateMismatch();
+
+        return [
+            'actual_base_rate' => $actualRate,
+            'actual_rate_with_local' => $actualRateWithLocal,
+            'stored_rate' => $storedRate,
+            'has_mismatch' => $hasMismatch,
+            'formatted_actual_base' => static::formatRate($actualRate),
+            'formatted_actual_with_local' => static::formatRate($actualRateWithLocal),
+            'formatted_stored' => static::formatRate($storedRate),
+        ];
     }
 }
