@@ -136,6 +136,18 @@ $this->params['breadcrumbs'][] = $this->title;
 							<?php if ($model->customer->customer_address): ?>
 							<br><?= nl2br(Html::encode($model->customer->customer_address)) ?>
 							<?php endif; ?>
+							<?php 
+								$locationParts = [];
+								if ($model->customer->city) $locationParts[] = $model->customer->city;
+								if ($model->customer->state) $locationParts[] = $model->customer->state;
+								if ($model->customer->zip_code) $locationParts[] = $model->customer->zip_code;
+								if (!empty($locationParts)): 
+							?>
+							<br><?= Html::encode(implode(', ', $locationParts)) ?>
+							<?php endif; ?>
+							<?php if ($model->customer->country && $model->customer->country !== 'US'): ?>
+							<br><?= Html::encode($model->customer->country) ?>
+							<?php endif; ?>
 						</div>
 						<div class="col-md-6">
 							<?php if ($model->customer->customer_phone): ?>
@@ -209,6 +221,18 @@ $this->params['breadcrumbs'][] = $this->title;
 					<strong><?= Html::encode($model->company->company_name) ?></strong>
 					<?php if ($model->company->company_address): ?>
 					<br><?= nl2br(Html::encode($model->company->company_address)) ?>
+					<?php endif; ?>
+					<?php 
+						$locationParts = [];
+						if ($model->company->city) $locationParts[] = $model->company->city;
+						if ($model->company->state) $locationParts[] = $model->company->state;
+						if ($model->company->zip_code) $locationParts[] = $model->company->zip_code;
+						if (!empty($locationParts)): 
+					?>
+					<br><?= Html::encode(implode(', ', $locationParts)) ?>
+					<?php endif; ?>
+					<?php if ($model->company->country && $model->company->country !== 'US'): ?>
+					<br><?= Html::encode($model->company->country) ?>
 					<?php endif; ?>
 					<?php if ($model->company->company_phone): ?>
 					<br><i class="fas fa-phone mr-2"></i><?= Html::encode($model->company->company_phone) ?>

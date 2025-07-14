@@ -36,6 +36,12 @@ return [
     'Subtotal' => 'Subtotal',
     'Tax' => 'Tax',
     'Tax Rate' => 'Tax Rate',
+    'Tax Calculation' => 'Tax Calculation',
+    'Tax Calculation Mode' => 'Tax Calculation Mode',
+    'Manual Input' => 'Manual Input',
+    'Automatic Calculation' => 'Automatic Calculation',
+    'Calculate' => 'Calculate',
+    'Calculating...' => 'Calculating...',
     'Total' => 'Total',
     'Total Amount' => 'Total Amount',
     'Notes' => 'Notes',
@@ -161,4 +167,14 @@ return [
     'All' => 'All',
     'Customer not in list?' => 'Customer not in list?',
     'Add New Customer' => 'Add New Customer',
+    
+    // Tax calculation messages
+    'Please select a customer first to calculate automatic tax.' => 'Please select a customer first to calculate automatic tax.',
+    'Failed to calculate automatic tax.' => 'Failed to calculate automatic tax.',
+    'Error calculating tax. Using company default.' => 'Error calculating tax. Using company default.',
+    'Customer and company are required' => 'Customer and company are required',
+    'Customer or company not found' => 'Customer or company not found',
+    'Tax rate calculated automatically based on customer address' => 'Tax rate calculated automatically based on customer address',
+    'Using company default tax rate (address not found or invalid)' => 'Using company default tax rate (address not found or invalid)',
+    'Error calculating tax rate' => 'Error calculating tax rate',
 ];

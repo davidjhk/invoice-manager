@@ -80,9 +80,10 @@ $this->registerJsVar('estimateConfig', [
                                     'id' => 'customer-select',
                                 ]
                             )->label(Yii::t('app/estimate', 'Customer')) ?>
-							
+
 							<div class="d-flex align-items-center mb-3">
-								<small class="text-muted mr-2"><?= Yii::t('app/estimate', 'Customer not in list?') ?></small>
+								<small
+									class="text-muted mr-2"><?= Yii::t('app/estimate', 'Customer not in list?') ?></small>
 								<?= Html::button(Yii::t('app/estimate', 'Add New Customer'), [
 									'class' => 'btn btn-outline-success btn-sm',
 									'id' => 'add-customer-btn',
@@ -112,6 +113,7 @@ $this->registerJsVar('estimateConfig', [
                                 'rows' => 4,
                                 'placeholder' => Yii::t('app/estimate', 'Shipping address (if different from billing)')
                             ])->label(Yii::t('app/estimate', 'Ship To')) ?>
+
 							<?= Html::button(Yii::t('app/estimate', 'Clear Shipping Info'), [
                                 'class' => 'btn btn-link btn-sm p-0',
                                 'id' => 'remove-shipping-btn'
@@ -150,9 +152,11 @@ $this->registerJsVar('estimateConfig', [
 
 			<!-- Help Information -->
 			<div class="card mt-3">
-				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#estimate-help-collapse" aria-expanded="false">
+				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse"
+					data-target="#estimate-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
-						<span><i class="fas fa-question-circle mr-2"></i><?= Yii::t('app/estimate', 'Estimate Help') ?></span>
+						<span><i
+								class="fas fa-question-circle mr-2"></i><?= Yii::t('app/estimate', 'Estimate Help') ?></span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h6>
 				</div>
@@ -160,12 +164,18 @@ $this->registerJsVar('estimateConfig', [
 					<div class="card-body py-2">
 						<div class="alert alert-info py-2 mb-0">
 							<small>
-								<strong><?= Yii::t('app/estimate', 'Estimate Number') ?>:</strong> <?= Yii::t('app/estimate', 'Unique identifier for this estimate.') ?><br>
-								<strong><?= Yii::t('app/estimate', 'Terms') ?>:</strong> <?= Yii::t('app/estimate', 'Terms and conditions for this estimate.') ?><br>
-								<strong><?= Yii::t('app/estimate', 'Estimate Date') ?>:</strong> <?= Yii::t('app/estimate', 'Date when estimate is issued.') ?><br>
-								<strong><?= Yii::t('app/estimate', 'Expiry Date') ?>:</strong> <?= Yii::t('app/estimate', 'Expiry date for this estimate.') ?><br>
-								<strong><?= Yii::t('app/estimate', 'Items') ?>:</strong> <?= Yii::t('app/estimate', 'Add products/services with quantity and rate.') ?><br>
-								<strong><?= Yii::t('app/estimate', 'Convert to Invoice') ?>:</strong> <?= Yii::t('app/estimate', 'Convert approved estimates to invoices.') ?>
+								<strong><?= Yii::t('app/estimate', 'Estimate Number') ?>:</strong>
+								<?= Yii::t('app/estimate', 'Unique identifier for this estimate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Terms') ?>:</strong>
+								<?= Yii::t('app/estimate', 'Terms and conditions for this estimate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Estimate Date') ?>:</strong>
+								<?= Yii::t('app/estimate', 'Date when estimate is issued.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Expiry Date') ?>:</strong>
+								<?= Yii::t('app/estimate', 'Expiry date for this estimate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Items') ?>:</strong>
+								<?= Yii::t('app/estimate', 'Add products/services with quantity and rate.') ?><br>
+								<strong><?= Yii::t('app/estimate', 'Convert to Invoice') ?>:</strong>
+								<?= Yii::t('app/estimate', 'Convert approved estimates to invoices.') ?>
 							</small>
 						</div>
 					</div>
@@ -242,13 +252,33 @@ $this->registerJsVar('estimateConfig', [
 						<span><?= Yii::t('app/estimate', 'Taxable Subtotal') ?></span>
 						<span id="taxable-subtotal-display" class="text-right">$0.00</span>
 
+						<span><?= Yii::t('app/invoice', 'Tax Calculation') ?></span>
+						<div class="text-right">
+							<?php if ($model->hasAttribute('tax_calculation_mode')): ?>
+							<?= $form->field($model, 'tax_calculation_mode', ['options' => ['class' => 'mb-2'], 'template' => '{input}'])->dropDownList(
+									\app\models\Estimate::getTaxCalculationModeOptions(),
+									['id' => 'tax-calculation-mode', 'class' => 'form-control form-control-sm']
+								) ?>
+							<?php else: ?>
+							<select id="tax-calculation-mode" class="form-control form-control-sm mb-2">
+								<option value="manual" selected><?= Yii::t('app/invoice', 'Manual Input') ?></option>
+								<option value="automatic"><?= Yii::t('app/invoice', 'Automatic Calculation') ?></option>
+							</select>
+							<?php endif; ?>
+						</div>
+
 						<span><?= Yii::t('app/estimate', 'Sales Tax') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
 							<input type="number" class="form-control form-control-sm mr-2" id="tax-rate-input"
-								style="width: 120px;" min="0" max="100" step="0.01" 
-								value="<?= $company->tax_rate ?? 0 ?>" placeholder="0.00">
+								style="width: 120px;" min="0" max="100" step="0.01"
+								value="<?= ($model->hasAttribute('tax_calculation_mode') && $model->tax_calculation_mode === \app\models\Estimate::TAX_MODE_AUTOMATIC) ? ($model->hasAttribute('auto_calculated_tax_rate') ? ($model->auto_calculated_tax_rate ?? 0) : 0) : ($company->tax_rate ?? 0) ?>"
+								placeholder="0.00">
 							<span class="mr-2">%</span>
 							<span id="tax-display">$0.00</span>
+							<button type="button" class="btn btn-outline-primary btn-sm ml-2" id="calculate-tax-btn"
+								style="display: none;">
+								<i class="fas fa-calculator"></i> <?= Yii::t('app/invoice', 'Calculate') ?>
+							</button>
 						</div>
 					</div>
 
@@ -276,11 +306,13 @@ $this->registerJsVar('estimateConfig', [
 </div>
 
 <!-- Add Customer Modal -->
-<div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+<div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-labelledby="addCustomerModalLabel"
+	aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="addCustomerModalLabel"><?= Yii::t('app/estimate', 'Add New Customer') ?></h5>
+				<h5 class="modal-title" id="addCustomerModalLabel"><?= Yii::t('app/estimate', 'Add New Customer') ?>
+				</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -288,7 +320,8 @@ $this->registerJsVar('estimateConfig', [
 			<div class="modal-body">
 				<form id="add-customer-form">
 					<div class="form-group">
-						<label for="new-customer-name"><?= Yii::t('app/customer', 'Customer Name') ?> <span class="text-danger">*</span></label>
+						<label for="new-customer-name"><?= Yii::t('app/customer', 'Customer Name') ?> <span
+								class="text-danger">*</span></label>
 						<input type="text" class="form-control" id="new-customer-name" name="customer_name" required>
 					</div>
 					<div class="form-group">
@@ -297,11 +330,86 @@ $this->registerJsVar('estimateConfig', [
 					</div>
 					<div class="form-group">
 						<label for="new-customer-phone"><?= Yii::t('app/customer', 'Phone') ?></label>
-						<input type="tel" class="form-control" id="new-customer-phone" name="customer_phone" placeholder="e.g. +1 (555) 123-4567" pattern="[\+\-\s\(\)\d\.\#\*]*">
+						<input type="tel" class="form-control" id="new-customer-phone" name="customer_phone"
+							placeholder="e.g. +1 (555) 123-4567" pattern="[\+\-\s\(\)\d\.\#\*]*">
 					</div>
 					<div class="form-group">
 						<label for="new-customer-address"><?= Yii::t('app/customer', 'Address') ?></label>
-						<textarea class="form-control" id="new-customer-address" name="customer_address" rows="3"></textarea>
+						<textarea class="form-control" id="new-customer-address" name="customer_address"
+							rows="2"></textarea>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="new-customer-city"><?= Yii::t('app/customer', 'City') ?></label>
+								<input type="text" class="form-control" id="new-customer-city" name="city">
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="new-customer-state"><?= Yii::t('app/customer', 'State') ?></label>
+								<select class="form-control" id="new-customer-state" name="state">
+									<option value=""><?= Yii::t('app/customer', 'Select State') ?></option>
+									<option value="AL">Alabama</option>
+									<option value="AK">Alaska</option>
+									<option value="AZ">Arizona</option>
+									<option value="AR">Arkansas</option>
+									<option value="CA">California</option>
+									<option value="CO">Colorado</option>
+									<option value="CT">Connecticut</option>
+									<option value="DE">Delaware</option>
+									<option value="FL">Florida</option>
+									<option value="GA">Georgia</option>
+									<option value="HI">Hawaii</option>
+									<option value="ID">Idaho</option>
+									<option value="IL">Illinois</option>
+									<option value="IN">Indiana</option>
+									<option value="IA">Iowa</option>
+									<option value="KS">Kansas</option>
+									<option value="KY">Kentucky</option>
+									<option value="LA">Louisiana</option>
+									<option value="ME">Maine</option>
+									<option value="MD">Maryland</option>
+									<option value="MA">Massachusetts</option>
+									<option value="MI">Michigan</option>
+									<option value="MN">Minnesota</option>
+									<option value="MS">Mississippi</option>
+									<option value="MO">Missouri</option>
+									<option value="MT">Montana</option>
+									<option value="NE">Nebraska</option>
+									<option value="NV">Nevada</option>
+									<option value="NH">New Hampshire</option>
+									<option value="NJ">New Jersey</option>
+									<option value="NM">New Mexico</option>
+									<option value="NY">New York</option>
+									<option value="NC">North Carolina</option>
+									<option value="ND">North Dakota</option>
+									<option value="OH">Ohio</option>
+									<option value="OK">Oklahoma</option>
+									<option value="OR">Oregon</option>
+									<option value="PA">Pennsylvania</option>
+									<option value="RI">Rhode Island</option>
+									<option value="SC">South Carolina</option>
+									<option value="SD">South Dakota</option>
+									<option value="TN">Tennessee</option>
+									<option value="TX">Texas</option>
+									<option value="UT">Utah</option>
+									<option value="VT">Vermont</option>
+									<option value="VA">Virginia</option>
+									<option value="WA">Washington</option>
+									<option value="WV">West Virginia</option>
+									<option value="WI">Wisconsin</option>
+									<option value="WY">Wyoming</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="new-customer-zip"><?= Yii::t('app/customer', 'ZIP Code') ?></label>
+								<input type="text" class="form-control" id="new-customer-zip" name="zip_code"
+									placeholder="12345">
+							</div>
+						</div>
 					</div>
 					<div class="form-group">
 						<label for="new-customer-terms"><?= Yii::t('app/customer', 'Payment Terms') ?></label>
@@ -316,8 +424,10 @@ $this->registerJsVar('estimateConfig', [
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Cancel') ?></button>
-				<button type="button" class="btn btn-success" id="save-customer-btn"><?= Yii::t('app/customer', 'Add Customer') ?></button>
+				<button type="button" class="btn btn-secondary"
+					data-dismiss="modal"><?= Yii::t('app', 'Cancel') ?></button>
+				<button type="button" class="btn btn-success"
+					id="save-customer-btn"><?= Yii::t('app/customer', 'Add Customer') ?></button>
 			</div>
 		</div>
 	</div>
@@ -380,6 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		addEventListeners();
+		initializeTaxMode();
 	}
 
 	// --- EVENT LISTENERS ---
@@ -425,6 +536,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		discountInput.addEventListener('input', calculateTotals);
 		discountType.addEventListener('change', calculateTotals);
 		document.getElementById('tax-rate-input').addEventListener('input', calculateTotals);
+		document.getElementById('tax-calculation-mode').addEventListener('change', handleTaxModeChange);
+		document.getElementById('calculate-tax-btn').addEventListener('click', calculateAutomaticTax);
 
 		termsSelect.addEventListener('change', (e) => {
 			if (e.target.value) updateExpiryDateFromTerms(e.target.value);
@@ -449,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// Add Customer Modal Event Listeners
 		saveCustomerBtn.addEventListener('click', handleSaveCustomer);
-		
+
 		// Handle modal cleanup
 		ModalUtils.setupModalCleanup('#addCustomerModal');
 
@@ -525,10 +638,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		const taxRateVal = document.getElementById('tax-rate-input').value;
 		const taxRate = parseFloat(taxRateVal) || 0;
 		const taxAmount = taxableSubtotal * (taxRate / 100);
-		
+
 		// Update hidden tax_rate field
 		document.getElementById('tax-rate-hidden').value = taxRate;
-		
+
 		const total = subtotalAfterDiscount + taxAmount;
 
 		document.getElementById('subtotal-display').textContent = formatCurrency(subtotal);
@@ -547,20 +660,48 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (data.success) {
 				const customer = data.customer;
 				let billToHtml = `<strong>${customer.customer_name}</strong>`;
-				if (customer.customer_address) billToHtml +=
-					`<br>${customer.customer_address.replace(/\n/g, '<br>')}`;
+
+				// Build address with new structure
+				let addressParts = [];
+				if (customer.customer_address) addressParts.push(customer.customer_address);
+
+				let locationParts = [];
+				if (customer.city) locationParts.push(customer.city);
+				if (customer.state) locationParts.push(customer.state);
+				if (customer.zip_code) locationParts.push(customer.zip_code);
+
+				if (locationParts.length > 0) {
+					addressParts.push(locationParts.join(', '));
+				}
+
+				if (addressParts.length > 0) {
+					billToHtml += `<br>${addressParts.join('<br>')}`;
+				}
+
 				if (customer.customer_phone) billToHtml += `<br>Phone: ${customer.customer_phone}`;
 				if (customer.customer_email) billToHtml += `<br>Email: ${customer.customer_email}`;
 				document.getElementById('bill-to-address').innerHTML = billToHtml;
 
-				document.getElementById('estimate-bill_to_address').value = [
-					customer.customer_name,
-					customer.customer_address,
-					customer.customer_phone ? `Phone: ${customer.customer_phone}` : '',
-					customer.customer_email ? `Email: ${customer.customer_email}` : ''
-				].filter(Boolean).join('\n');
+				// Build text version for hidden field
+				let textAddress = [customer.customer_name];
+				if (addressParts.length > 0) {
+					textAddress = textAddress.concat(addressParts);
+				}
+				if (customer.customer_phone) textAddress.push(`Phone: ${customer.customer_phone}`);
+				if (customer.customer_email) textAddress.push(`Email: ${customer.customer_email}`);
 
-				document.getElementById('estimate-ship_to_address').value = customer.customer_address || '';
+				document.getElementById('estimate-bill_to_address').value = textAddress.filter(Boolean)
+					.join('\n');
+
+				// Build ship-to address with integrated city/state/zip
+				let shipToAddress = customer.customer_address || '';
+				if (locationParts.length > 0) {
+					if (shipToAddress) shipToAddress += '\n';
+					shipToAddress += locationParts.join(', ');
+				}
+				document.getElementById('estimate-ship_to_address').value = shipToAddress;
+
+
 				if (customer.payment_terms) {
 					termsSelect.value = customer.payment_terms;
 					updateExpiryDateFromTerms(customer.payment_terms);
@@ -658,20 +799,20 @@ document.addEventListener('DOMContentLoaded', function() {
 	// --- CUSTOMER MANAGEMENT FUNCTIONS ---
 	async function handleSaveCustomer() {
 		const form = document.getElementById('add-customer-form');
-		
+
 		// Create FormData with CSRF token using common utility
 		const formData = AjaxUtils.prepareFormData(form);
-		
+
 		// Basic validation
 		const customerName = formData.get('customer_name');
 		if (!customerName || customerName.trim() === '') {
 			alert('<?= Yii::t('app/customer', 'Customer name is required.') ?>');
 			return;
 		}
-		
+
 		saveCustomerBtn.disabled = true;
 		saveCustomerBtn.textContent = '<?= Yii::t('app', 'Saving...') ?>';
-		
+
 		try {
 			const response = await fetch(customerCreateUrl, {
 				method: 'POST',
@@ -681,36 +822,121 @@ document.addEventListener('DOMContentLoaded', function() {
 					'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
 				}
 			});
-			
+
 			const data = await response.json();
-			
+
 			if (data.success) {
 				// Add new customer to dropdown
 				const option = new Option(data.customer.customer_name, data.customer.id);
 				customerSelect.add(option);
-				
+
 				// Select the new customer
 				customerSelect.value = data.customer.id;
-				
+
 				// Load customer data
 				await loadCustomerData(data.customer.id);
-				
+
 				// Close modal and reset form
 				$('#addCustomerModal').modal('hide');
 				form.reset();
-				
+
 				// Show success message
-				NotificationUtils.showSuccess('<?= Yii::t('app/customer', 'Customer added successfully!') ?>', 500);
+				NotificationUtils.showSuccess(
+					'<?= Yii::t('app/customer', 'Customer added successfully!') ?>', 500);
 			} else {
-				const errorMessage = data.message || '<?= Yii::t('app/customer', 'Failed to add customer. Please try again.') ?>';
+				const errorMessage = data.message ||
+					'<?= Yii::t('app/customer', 'Failed to add customer. Please try again.') ?>';
 				NotificationUtils.showError(errorMessage, data.errors);
 			}
 		} catch (error) {
-			NotificationUtils.showError('<?= Yii::t('app/customer', 'Error adding customer. Please try again.') ?>');
+			NotificationUtils.showError(
+				'<?= Yii::t('app/customer', 'Error adding customer. Please try again.') ?>');
 		} finally {
 			saveCustomerBtn.disabled = false;
 			saveCustomerBtn.textContent = '<?= Yii::t('app/customer', 'Add Customer') ?>';
 		}
+	}
+
+	// --- TAX CALCULATION FUNCTIONS ---
+	function handleTaxModeChange() {
+		const mode = document.getElementById('tax-calculation-mode').value;
+		const taxRateInput = document.getElementById('tax-rate-input');
+		const calculateBtn = document.getElementById('calculate-tax-btn');
+
+		if (mode === 'automatic') {
+			calculateBtn.style.display = 'inline-block';
+			taxRateInput.readOnly = true;
+			taxRateInput.classList.add('bg-light');
+			calculateAutomaticTax();
+		} else {
+			calculateBtn.style.display = 'none';
+			taxRateInput.readOnly = false;
+			taxRateInput.classList.remove('bg-light');
+			// Set to company default tax rate
+			taxRateInput.value = <?= $company->tax_rate ?? 0 ?>;
+			calculateTotals();
+		}
+	}
+
+	async function calculateAutomaticTax() {
+		const customerId = customerSelect.value;
+		if (!customerId) {
+			alert(
+				'<?= Yii::t('app/invoice', 'Please select a customer first to calculate automatic tax.') ?>');
+			return;
+		}
+
+		const calculateBtn = document.getElementById('calculate-tax-btn');
+		const originalText = calculateBtn.innerHTML;
+		calculateBtn.innerHTML =
+			'<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('app/invoice', 'Calculating...') ?>';
+		calculateBtn.disabled = true;
+
+		try {
+			const response = await fetch('<?= Url::to(['/estimate/calculate-tax']) ?>', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+				},
+				body: JSON.stringify({
+					customer_id: customerId,
+					company_id: <?= $company->id ?? 'null' ?>
+				})
+			});
+
+			const data = await response.json();
+
+			if (data.success) {
+				document.getElementById('tax-rate-input').value = data.tax_rate || 0;
+				calculateTotals();
+
+				// Success message removed - no popup for automatic tax calculation
+			} else {
+				NotificationUtils.showError(data.message ||
+					'<?= Yii::t('app/invoice', 'Failed to calculate automatic tax.') ?>');
+				// Fallback to company default or provided fallback rate
+				const fallbackRate = data.fallback_rate !== undefined ? data.fallback_rate :
+					<?= $company->tax_rate ?? 0 ?>;
+				document.getElementById('tax-rate-input').value = fallbackRate;
+				calculateTotals();
+			}
+		} catch (error) {
+			console.error('Tax calculation error:', error);
+			NotificationUtils.showError(
+				'<?= Yii::t('app/invoice', 'Error calculating tax. Using company default.') ?>');
+			// Fallback to company default
+			document.getElementById('tax-rate-input').value = <?= $company->tax_rate ?? 0 ?>;
+			calculateTotals();
+		} finally {
+			calculateBtn.innerHTML = originalText;
+			calculateBtn.disabled = false;
+		}
+	}
+
+	// Initialize tax mode on page load
+	function initializeTaxMode() {
+		handleTaxModeChange();
 	}
 
 	// --- UTILITY FUNCTIONS ---

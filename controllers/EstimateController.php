@@ -626,4 +626,79 @@ class EstimateController extends Controller
 
         throw new NotFoundHttpException('The requested estimate does not exist.');
     }
+
+    /**
+     * Calculate automatic tax rate for estimate
+     *
+     * @return array
+     */
+    public function actionCalculateTax()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        if (!Yii::$app->request->isPost) {
+            return ['success' => false, 'message' => 'Only POST requests allowed'];
+        }
+        
+        $data = Json::decode(Yii::$app->request->rawBody);
+        $customerId = $data['customer_id'] ?? null;
+        $companyId = $data['company_id'] ?? null;
+        
+        if (!$customerId || !$companyId) {
+            return [
+                'success' => false, 
+                'message' => Yii::t('app/invoice', 'Customer and company are required')
+            ];
+        }
+        
+        try {
+            $customer = Customer::findOne($customerId);
+            $company = Company::findOne($companyId);
+            
+            if (!$customer || !$company) {
+                return [
+                    'success' => false, 
+                    'message' => Yii::t('app/invoice', 'Customer or company not found')
+                ];
+            }
+            
+            // Create a temporary estimate to calculate tax
+            $estimate = new Estimate();
+            $estimate->customer_id = $customerId;
+            $estimate->company_id = $companyId;
+            if ($estimate->hasAttribute('tax_calculation_mode')) {
+                $estimate->tax_calculation_mode = Estimate::TAX_MODE_AUTOMATIC;
+            }
+            
+            // Calculate automatic tax rate
+            $taxRate = $estimate->calculateAutomaticTaxRate($customer, $company);
+            
+            if ($taxRate !== null) {
+                return [
+                    'success' => true,
+                    'tax_rate' => $taxRate,
+                    'message' => Yii::t('app/invoice', 'Tax rate calculated automatically based on customer address'),
+                    'details' => $estimate->hasAttribute('tax_calculation_details') ? Json::decode($estimate->tax_calculation_details) : null
+                ];
+            } else {
+                // Fallback to company default
+                return [
+                    'success' => true,
+                    'tax_rate' => $company->tax_rate ?? 0,
+                    'message' => Yii::t('app/invoice', 'Using company default tax rate (address not found or invalid)')
+                ];
+            }
+            
+        } catch (\Exception $e) {
+            Yii::error("Tax calculation controller error: " . $e->getMessage() . 
+                      " | Customer ID: " . $customerId . 
+                      " | Company ID: " . $companyId);
+            return [
+                'success' => false,
+                'message' => Yii::t('app/invoice', 'Error calculating tax rate'),
+                'error' => YII_DEBUG ? $e->getMessage() : null,
+                'fallback_rate' => isset($company) ? ($company->tax_rate ?? 0) : 0
+            ];
+        }
+    }
 }

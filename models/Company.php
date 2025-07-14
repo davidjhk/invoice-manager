@@ -12,6 +12,10 @@ use yii\behaviors\TimestampBehavior;
  * @property int $id
  * @property string $company_name
  * @property string|null $company_address
+ * @property string|null $city
+ * @property string|null $state
+ * @property string|null $zip_code
+ * @property string|null $country
  * @property string|null $company_phone
  * @property string|null $company_email
  * @property string|null $logo_path
@@ -79,6 +83,11 @@ class Company extends ActiveRecord
         return [
             [['company_name'], 'required'],
             [['company_address'], 'string'],
+            [['city'], 'string', 'max' => 100],
+            [['state'], 'string', 'max' => 2],
+            [['zip_code'], 'string', 'max' => 10],
+            [['country'], 'string', 'max' => 2],
+            [['country'], 'default', 'value' => 'US'],
             [['tax_rate'], 'number', 'min' => 0, 'max' => 100],
             [['due_date_days', 'estimate_validity_days', 'user_id'], 'integer', 'min' => 1],
             [['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => 'id'],
@@ -126,6 +135,10 @@ class Company extends ActiveRecord
             'id' => 'ID',
             'company_name' => 'Company Name',
             'company_address' => 'Company Address',
+            'city' => 'City',
+            'state' => 'State',
+            'zip_code' => 'ZIP Code',
+            'country' => 'Country',
             'company_phone' => 'Company Phone',
             'company_email' => 'Company Email',
             'logo_path' => 'Logo Path',

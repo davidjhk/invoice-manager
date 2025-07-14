@@ -215,6 +215,10 @@ class CustomerController extends Controller
         $model->customer_email = $postData['customer_email'] ?? '';
         $model->customer_phone = $postData['customer_phone'] ?? '';
         $model->customer_address = $postData['customer_address'] ?? '';
+        $model->city = $postData['city'] ?? '';
+        $model->state = $postData['state'] ?? '';
+        $model->zip_code = $postData['zip_code'] ?? '';
+        $model->country = $postData['country'] ?? 'US';
         $model->payment_terms = $postData['payment_terms'] ?? 'Net 30';
 
         if ($model->save()) {
@@ -226,6 +230,10 @@ class CustomerController extends Controller
                     'customer_email' => $model->customer_email,
                     'customer_phone' => $model->customer_phone,
                     'customer_address' => $model->customer_address,
+                    'city' => $model->city,
+                    'state' => $model->state,
+                    'zip_code' => $model->zip_code,
+                    'country' => $model->country,
                     'payment_terms' => $model->payment_terms,
                     'displayName' => method_exists($model, 'getDisplayName') ? $model->getDisplayName() : $model->customer_name,
                 ],
@@ -300,6 +308,10 @@ class CustomerController extends Controller
                 'customer_email' => $model->customer_email,
                 'customer_phone' => $model->customer_phone,
                 'customer_address' => $model->customer_address,
+                'city' => $model->city,
+                'state' => $model->state,
+                'zip_code' => $model->zip_code,
+                'country' => $model->country,
                 'payment_terms' => $model->payment_terms ?: 'Net 30',
                 'billing_address' => $model->customer_address,
                 'shipping_address' => $model->customer_address,

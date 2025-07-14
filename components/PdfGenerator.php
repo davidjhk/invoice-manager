@@ -339,7 +339,7 @@ class PdfGenerator
                         <div style="background: none; padding: 0; margin: 0;">
                             <strong>Bill To:</strong><br>
                             <strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
-        // Process customer billing address line by line
+        // Process customer billing address using structured fields first, then fallback to address field
         if ($customer->customer_address) {
             $addressLines = explode("\n", $customer->customer_address);
             foreach ($addressLines as $line) {
@@ -348,6 +348,17 @@ class PdfGenerator
                     $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
                 }
             }
+        }
+        // Add structured location information
+        $locationParts = [];
+        if ($customer->city) $locationParts[] = $customer->city;
+        if ($customer->state) $locationParts[] = $customer->state;
+        if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+        if (!empty($locationParts)) {
+            $html .= '&nbsp; ' . htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+        }
+        if ($customer->country && $customer->country !== 'US') {
+            $html .= '&nbsp; ' . htmlspecialchars($customer->country) . '<br>';
         }
         if ($customer->customer_phone) {
             $html .= '&nbsp; Phone: ' . htmlspecialchars($customer->customer_phone) . '<br>';
@@ -369,7 +380,7 @@ class PdfGenerator
                         <div style="background: none; padding: 0; margin: 0;">
                             <strong>Ship To:</strong><br>
                             <strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
-        // Process customer shipping address line by line
+        // Process customer shipping address using structured fields first, then fallback to address field
         if ($customer->customer_address) {
             $addressLines = explode("\n", $customer->customer_address);
             foreach ($addressLines as $line) {
@@ -378,6 +389,17 @@ class PdfGenerator
                     $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
                 }
             }
+        }
+        // Add structured location information
+        $locationParts = [];
+        if ($customer->city) $locationParts[] = $customer->city;
+        if ($customer->state) $locationParts[] = $customer->state;
+        if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+        if (!empty($locationParts)) {
+            $html .= '&nbsp; ' . htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+        }
+        if ($customer->country && $customer->country !== 'US') {
+            $html .= '&nbsp; ' . htmlspecialchars($customer->country) . '<br>';
         }
 
         $html .= '
@@ -717,6 +739,18 @@ class PdfGenerator
 					<?php endif; ?>
 					<?php endforeach; ?>
 					<?php endif; ?>
+					<?php 
+						$companyLocationParts = [];
+						if ($company->city) $companyLocationParts[] = $company->city;
+						if ($company->state) $companyLocationParts[] = $company->state;
+						if ($company->zip_code) $companyLocationParts[] = $company->zip_code;
+						if (!empty($companyLocationParts)): 
+					?>
+					<?= htmlspecialchars(implode(', ', $companyLocationParts)) ?><br>
+					<?php endif; ?>
+					<?php if ($company->country && $company->country !== 'US'): ?>
+					<?= htmlspecialchars($company->country) ?><br>
+					<?php endif; ?>
 					<?php if ($company->company_phone): ?>
 					Phone: <?= htmlspecialchars($company->company_phone) ?><br>
 					<?php endif; ?>
@@ -767,6 +801,18 @@ class PdfGenerator
 					<?php endif; ?>
 					<?php endforeach; ?>
 					<?php endif; ?>
+					<?php 
+						$locationParts = [];
+						if ($customer->city) $locationParts[] = $customer->city;
+						if ($customer->state) $locationParts[] = $customer->state;
+						if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+						if (!empty($locationParts)): 
+					?>
+					<?= htmlspecialchars(implode(', ', $locationParts)) ?><br>
+					<?php endif; ?>
+					<?php if ($customer->country && $customer->country !== 'US'): ?>
+					<?= htmlspecialchars($customer->country) ?><br>
+					<?php endif; ?>
 					<?php if ($customer->customer_phone): ?>
 					Phone: <?= htmlspecialchars($customer->customer_phone) ?><br>
 					<?php endif; ?>
@@ -791,6 +837,18 @@ class PdfGenerator
 					<?= htmlspecialchars($line) ?><br>
 					<?php endif; ?>
 					<?php endforeach; ?>
+					<?php endif; ?>
+					<?php 
+						$locationParts = [];
+						if ($customer->city) $locationParts[] = $customer->city;
+						if ($customer->state) $locationParts[] = $customer->state;
+						if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+						if (!empty($locationParts)): 
+					?>
+					<?= htmlspecialchars(implode(', ', $locationParts)) ?><br>
+					<?php endif; ?>
+					<?php if ($customer->country && $customer->country !== 'US'): ?>
+					<?= htmlspecialchars($customer->country) ?><br>
 					<?php endif; ?>
 				</div>
 			</td>
@@ -1067,6 +1125,18 @@ class PdfGenerator
 					<?= htmlspecialchars($line) ?><br>
 					<?php endif; ?>
 					<?php endforeach; ?>
+					<?php endif; ?>
+					<?php 
+						$locationParts = [];
+						if ($customer->city) $locationParts[] = $customer->city;
+						if ($customer->state) $locationParts[] = $customer->state;
+						if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+						if (!empty($locationParts)): 
+					?>
+					<?= htmlspecialchars(implode(', ', $locationParts)) ?><br>
+					<?php endif; ?>
+					<?php if ($customer->country && $customer->country !== 'US'): ?>
+					<?= htmlspecialchars($customer->country) ?><br>
 					<?php endif; ?>
 					<?php if ($customer->customer_phone): ?>
 					Phone: <?= htmlspecialchars($customer->customer_phone) ?><br>
@@ -1433,7 +1503,7 @@ class PdfGenerator
                         <div style="background: none; padding: 0; margin: 0;">
                             <strong>Bill To:</strong><br>
                             <strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
-        // Process customer billing address line by line
+        // Process customer billing address using structured fields first, then fallback to address field
         if ($customer->customer_address) {
             $addressLines = explode("\n", $customer->customer_address);
             foreach ($addressLines as $line) {
@@ -1442,6 +1512,17 @@ class PdfGenerator
                     $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
                 }
             }
+        }
+        // Add structured location information
+        $locationParts = [];
+        if ($customer->city) $locationParts[] = $customer->city;
+        if ($customer->state) $locationParts[] = $customer->state;
+        if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+        if (!empty($locationParts)) {
+            $html .= '&nbsp; ' . htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+        }
+        if ($customer->country && $customer->country !== 'US') {
+            $html .= '&nbsp; ' . htmlspecialchars($customer->country) . '<br>';
         }
         if ($customer->customer_phone) {
             $html .= '&nbsp; Phone: ' . htmlspecialchars($customer->customer_phone) . '<br>';
@@ -1475,6 +1556,17 @@ class PdfGenerator
                         $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
                     }
                 }
+            }
+            // Add structured location information
+            $locationParts = [];
+            if ($customer->city) $locationParts[] = $customer->city;
+            if ($customer->state) $locationParts[] = $customer->state;
+            if ($customer->zip_code) $locationParts[] = $customer->zip_code;
+            if (!empty($locationParts)) {
+                $html .= '&nbsp; ' . htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+            }
+            if ($customer->country && $customer->country !== 'US') {
+                $html .= '&nbsp; ' . htmlspecialchars($customer->country) . '<br>';
             }
         }
 

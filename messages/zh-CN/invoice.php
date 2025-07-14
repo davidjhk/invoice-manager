@@ -1,3 +1,99 @@
-    '客户不在列表中？' => '客户不在列表中？',
-    '添加新客户' => '添加新客户',
+<?php
+/**
+ * Chinese (Simplified) translations for invoice module
+ */
+return [
+    // General
+    'Invoice' => '发票',
+    'Invoices' => '发票',
+    'Create Invoice' => '创建发票',
+    'Update Invoice' => '更新发票',
+    'Invoice Details' => '发票详情',
+    'Invoice Information' => '发票信息',
+    'Invoice Items' => '发票项目',
+    'Invoice Preview' => '发票预览',
+    'Invoice Settings' => '发票设置',
+    
+    // Status
+    'Status' => '状态',
+    'Draft' => '草稿',
+    'Sent' => '已发送',
+    'Paid' => '已付款',
+    'Overdue' => '逾期',
+    'Cancelled' => '已取消',
+    'Partial' => '部分付款',
+    
+    // Fields
+    'Invoice Number' => '发票号码',
+    'Invoice Date' => '发票日期',
+    'Due Date' => '到期日期',
+    'Customer' => '客户',
+    'Select Customer' => '选择客户',
+    'Description' => '描述',
+    'Quantity' => '数量',
+    'Price' => '价格',
+    'Amount' => '金额',
+    'Subtotal' => '小计',
+    'Tax' => '税款',
+    'Tax Rate' => '税率',
+    'Tax Calculation' => '税款计算',
+    'Tax Calculation Mode' => '税款计算方式',
+    'Manual Input' => '手动输入',
+    'Automatic Calculation' => '自动计算',
+    'Calculate' => '计算',
+    'Calculating...' => '计算中...',
+    'Total' => '总计',
+    'Total Amount' => '总金额',
+    'Notes' => '备注',
+    'Terms' => '条款',
+    'Payment Terms' => '付款条款',
+    
+    // Actions
+    'Save' => '保存',
+    'Save as Draft' => '保存为草稿',
+    'Send Invoice' => '发送发票',
+    'Mark as Paid' => '标记为已付款',
+    'Mark as Sent' => '标记为已发送',
+    'Delete' => '删除',
+    'Edit' => '编辑',
+    'View' => '查看',
+    'Cancel' => '取消',
+    'Print' => '打印',
+    'Download PDF' => '下载PDF',
+    'Send Email' => '发送邮件',
+    'Duplicate' => '复制',
+    
+    // Form elements
+    'Add Item' => '添加项目',
+    'Remove' => '移除',
+    'Clear All' => '清除全部',
+    'Product/Service' => '产品/服务',
+    'Discount' => '折扣',
+    'Taxable Subtotal' => '应税小计',
+    'Sales Tax' => '销售税',
+    'Deposit' => '定金',
+    'Balance Due' => '应付余额',
+    'Notes & Payment' => '备注和付款',
+    'Note to Customer' => '客户备注',
+    'Thank you for your business.' => '感谢您的业务。',
+    'e.g. Bank transfer details' => '例如：银行转账详情',
+    'Payment Instructions' => '付款说明',
+    
+    // Messages
+    'invoices' => '发票',
+    'You haven\'t created any invoices yet.' => '您还没有创建任何发票。',
+    'Create Your First Invoice' => '创建您的第一张发票',
+    'Are you sure you want to duplicate this invoice?' => '您确定要复制这张发票吗？',
+    'Customer not in list?' => '客户不在列表中？',
+    'Add New Customer' => '添加新客户',
+    
+    // Tax calculation messages
+    'Please select a customer first to calculate automatic tax.' => '请先选择客户以计算自动税款。',
+    'Failed to calculate automatic tax.' => '自动税款计算失败。',
+    'Error calculating tax. Using company default.' => '税款计算错误。使用公司默认设置。',
+    'Customer and company are required' => '需要客户和公司信息',
+    'Customer or company not found' => '未找到客户或公司',
+    'Tax rate calculated automatically based on customer address' => '根据客户地址自动计算税率',
+    'Using company default tax rate (address not found or invalid)' => '使用公司默认税率（地址未找到或无效）',
+    'Error calculating tax rate' => '税率计算错误',
 ];

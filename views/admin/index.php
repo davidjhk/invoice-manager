@@ -134,6 +134,95 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <style>
+/* Dark mode styles for admin dashboard */
+body.dark-mode .admin-index .card {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .admin-index .card-header {
+    background-color: #4b5563 !important;
+    border-color: #6b7280 !important;
+    color: #f9fafb !important;
+}
+
+body.dark-mode .admin-index .card-body {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .admin-index .card-title {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .admin-index .list-group {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .admin-index .list-group-item {
+    background-color: #374151 !important;
+    border-color: #6b7280 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .admin-index .list-group-item-action {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .admin-index .list-group-item-action:hover {
+    background-color: #6b7280 !important;
+    color: #f9fafb !important;
+}
+
+body.dark-mode .admin-index .list-group-item-action:focus {
+    background-color: #6b7280 !important;
+    color: #f9fafb !important;
+}
+
+/* Additional specific targeting for list-group-flush */
+body.dark-mode .admin-index .list-group-flush .list-group-item {
+    background-color: #374151 !important;
+    border-color: #6b7280 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .admin-index .list-group-flush .list-group-item-action {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .admin-index .list-group-flush .list-group-item-action:hover {
+    background-color: #6b7280 !important;
+    color: #f9fafb !important;
+}
+
+/* Force override any Bootstrap defaults */
+body.dark-mode .admin-index .list-group-flush {
+    background-color: transparent !important;
+}
+
+body.dark-mode .alert-info {
+    background-color: #1e3a8a !important;
+    border-color: #3b82f6 !important;
+    color: #dbeafe !important;
+}
+
+body.dark-mode .alert-info .fas {
+    color: #60a5fa !important;
+}
+
+/* Dark mode definition list */
+body.dark-mode dl.row dt {
+    color: #d1d5db !important;
+}
+
+body.dark-mode dl.row dd {
+    color: #e5e7eb !important;
+}
+
+/* Light mode styles */
 .card-icon {
     opacity: 0.7;
     align-self: center;

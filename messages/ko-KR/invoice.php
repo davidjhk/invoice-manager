@@ -36,6 +36,12 @@ return [
     'Subtotal' => '소계',
     'Tax' => '세금',
     'Tax Rate' => '세율',
+    'Tax Calculation' => '세금 계산',
+    'Tax Calculation Mode' => '세금 계산 방식',
+    'Manual Input' => '수동 입력',
+    'Automatic Calculation' => '자동 계산',
+    'Calculate' => '계산',
+    'Calculating...' => '계산 중...',
     'Total' => '총계',
     'Total Amount' => '총 금액',
     'Notes' => '메모',
@@ -161,4 +167,14 @@ return [
     'All' => '전체',
     'Customer not in list?' => '고객이 목록에 없나요?',
     'Add New Customer' => '새 고객 추가',
+    
+    // Tax calculation messages
+    'Please select a customer first to calculate automatic tax.' => '자동 세금을 계산하려면 먼저 고객을 선택하세요.',
+    'Failed to calculate automatic tax.' => '자동 세금 계산에 실패했습니다.',
+    'Error calculating tax. Using company default.' => '세금 계산 오류. 회사 기본값을 사용합니다.',
+    'Customer and company are required' => '고객과 회사 정보가 필요합니다',
+    'Customer or company not found' => '고객 또는 회사를 찾을 수 없습니다',
+    'Tax rate calculated automatically based on customer address' => '고객 주소를 기반으로 세율이 자동 계산되었습니다',
+    'Using company default tax rate (address not found or invalid)' => '회사 기본 세율 사용 (주소를 찾을 수 없거나 유효하지 않음)',
+    'Error calculating tax rate' => '세율 계산 오류',
 ];

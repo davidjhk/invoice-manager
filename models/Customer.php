@@ -12,6 +12,10 @@ use yii\behaviors\TimestampBehavior;
  * @property int $id
  * @property string $customer_name
  * @property string|null $customer_address
+ * @property string|null $city
+ * @property string|null $state
+ * @property string|null $zip_code
+ * @property string|null $country
  * @property string|null $payment_terms
  * @property string|null $customer_phone
  * @property string|null $customer_fax
@@ -65,6 +69,11 @@ class Customer extends ActiveRecord
             [['company_id'], 'integer'],
             [['is_active'], 'boolean'],
             [['customer_address'], 'string'],
+            [['city'], 'string', 'max' => 100],
+            [['state'], 'string', 'max' => 2],
+            [['zip_code'], 'string', 'max' => 10],
+            [['country'], 'string', 'max' => 2],
+            [['country'], 'default', 'value' => 'US'],
             [['payment_terms'], 'string', 'max' => 50],
             [['payment_terms'], 'default', 'value' => 'Net 30'],
             [['created_at', 'updated_at'], 'safe'],
@@ -87,6 +96,10 @@ class Customer extends ActiveRecord
             'id' => 'ID',
             'customer_name' => 'Customer Name',
             'customer_address' => 'Customer Address',
+            'city' => 'City',
+            'state' => 'State',
+            'zip_code' => 'ZIP Code',
+            'country' => 'Country',
             'payment_terms' => 'Payment Terms',
             'customer_phone' => 'Phone',
             'customer_fax' => 'Fax',
