@@ -21,6 +21,7 @@ $totalInvoices = Invoice::find()->where(['company_id' => $company->id])->count()
 $draftInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'draft'])->count();
 $paidInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'paid'])->count();
 $sentInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'sent'])->count();
+$printedInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'printed'])->count();
 $totalAmount = Invoice::find()->where(['company_id' => $company->id])->sum('total_amount') ?: 0;
 // Calculate actual paid amount including partial payments from Payment table
 $paidAmount = \app\models\Payment::find()
@@ -109,6 +110,14 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 						<span class="status-icon"><i class="fas fa-file-alt"></i></span>
 					</div>
 					<div class="status-label"><?= Yii::t('app/invoice', 'Draft') ?></div>
+				</div>
+				<div class="status-card printed-card"
+					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'printed']) ?>'">
+					<div class="status-header">
+						<span class="status-count"><?= $printedInvoices ?></span>
+						<span class="status-icon"><i class="fas fa-print"></i></span>
+					</div>
+					<div class="status-label"><?= Yii::t('app/invoice', 'Printed') ?></div>
 				</div>
 				<div class="status-card sent-card"
 					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'sent']) ?>'">
@@ -356,7 +365,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 /* Status Cards */
 .status-cards {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(4, 1fr);
 	gap: 1rem;
 }
 
@@ -379,6 +388,10 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 
 .paid-card {
 	background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.printed-card {
+	background: linear-gradient(135deg, #fef7ff 0%, #fae8ff 100%);
 }
 
 .status-card:hover {
@@ -420,6 +433,10 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 
 .paid-card .status-count {
 	color: #10b981;
+}
+
+.printed-card .status-count {
+	color: #a855f7;
 }
 
 /* Recent Section */
@@ -719,6 +736,10 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 
 .dark-mode .paid-card {
 	background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+}
+
+.dark-mode .printed-card {
+	background: linear-gradient(135deg, #581c87 0%, #6b21a8 100%);
 }
 
 .dark-mode .recent-section {
