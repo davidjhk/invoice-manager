@@ -78,6 +78,14 @@ $this->context->layout = 'auth';
 
             <?php ActiveForm::end(); ?>
 
+            <?php
+            // Check if Google SSO is properly configured
+            $googleClientId = Yii::$app->params['googleClientId'] ?? '';
+            $googleClientSecret = Yii::$app->params['googleClientSecret'] ?? '';
+            $isGoogleSSOEnabled = !empty($googleClientId) && !empty($googleClientSecret);
+            ?>
+
+            <?php if ($isGoogleSSOEnabled): ?>
             <div class="auth-divider">
                 <span>or</span>
             </div>
@@ -88,6 +96,7 @@ $this->context->layout = 'auth';
                     Sign up with Google
                 </a>
             </div>
+            <?php endif; ?>
 
             <div class="auth-divider">
                 <span>Already have an account?</span>

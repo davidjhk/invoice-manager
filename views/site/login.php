@@ -69,6 +69,14 @@ $this->context->layout = 'auth';
 
 			<?php ActiveForm::end(); ?>
 
+			<?php
+			// Check if Google SSO is properly configured
+			$googleClientId = Yii::$app->params['googleClientId'] ?? '';
+			$googleClientSecret = Yii::$app->params['googleClientSecret'] ?? '';
+			$isGoogleSSOEnabled = !empty($googleClientId) && !empty($googleClientSecret);
+			?>
+
+			<?php if ($isGoogleSSOEnabled): ?>
 			<div class="auth-divider">
 				<span>or</span>
 			</div>
@@ -79,6 +87,7 @@ $this->context->layout = 'auth';
 					Continue with Google
 				</a>
 			</div>
+			<?php endif; ?>
 
 			<?php // Create Account 기능을 관리자 전용으로 변경 ?>
 			<?php /*
