@@ -254,7 +254,7 @@ class TaxJurisdiction extends ActiveRecord
      */
     public static function importFromCsv($csvData, $dataSource = self::DATA_SOURCE_IMPORT)
     {
-        $results = ['imported' => 0, 'updated' => 0, 'errors' => []];
+        $results = ['imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => []];
         
         foreach ($csvData as $rowIndex => $row) {
             try {
@@ -272,18 +272,29 @@ class TaxJurisdiction extends ActiveRecord
                     continue;
                 }
                 
-                if (!is_numeric($normalizedRow['combined_rate']) || $normalizedRow['combined_rate'] <= 0) {
+                if (!is_numeric($normalizedRow['combined_rate']) || $normalizedRow['combined_rate'] < 0) {
                     $results['errors'][] = "Row " . ($rowIndex + 1) . ": Invalid combined rate '{$normalizedRow['combined_rate']}'. Raw data: " . json_encode($row);
                     continue;
                 }
                 
-                $jurisdiction = static::findByZipCode($normalizedRow['zip_code']);
+                // Check for existing record with same zip_code, effective_date, and is_active=true
+                $effectiveDate = $normalizedRow['effective_date'] ?? date('Y-m-d');
+                $existingJurisdiction = static::find()
+                    ->where([
+                        'zip_code' => $normalizedRow['zip_code'],
+                        'effective_date' => $effectiveDate,
+                        'is_active' => true
+                    ])
+                    ->one();
                 
-                $isUpdate = ($jurisdiction !== null);
-                
-                if (!$jurisdiction) {
-                    $jurisdiction = new static();
+                // Skip if duplicate record already exists
+                if ($existingJurisdiction !== null) {
+                    $results['skipped']++;
+                    continue;
                 }
+                
+                // Create new record
+                $jurisdiction = new static();
                 
                 // Set attributes with better error handling
                 $jurisdiction->zip_code = trim($normalizedRow['zip_code']);
@@ -298,18 +309,14 @@ class TaxJurisdiction extends ActiveRecord
                 $jurisdiction->city_rate = (float)($normalizedRow['city_rate'] ?? 0);
                 $jurisdiction->special_rate = (float)($normalizedRow['special_rate'] ?? 0);
                 $jurisdiction->data_source = $dataSource;
-                $jurisdiction->effective_date = $normalizedRow['effective_date'] ?? date('Y-m-d');
+                $jurisdiction->effective_date = $effectiveDate;
                 $jurisdiction->data_year = $normalizedRow['data_year'] ?? date('Y');
                 $jurisdiction->data_month = $normalizedRow['data_month'] ?? date('n');
                 $jurisdiction->last_verified = date('Y-m-d');
                 $jurisdiction->is_active = true;
                 
                 if ($jurisdiction->save()) {
-                    if ($isUpdate) {
-                        $results['updated']++;
-                    } else {
-                        $results['imported']++;
-                    }
+                    $results['imported']++;
                 } else {
                     $errorDetails = [];
                     foreach ($jurisdiction->errors as $attribute => $errors) {

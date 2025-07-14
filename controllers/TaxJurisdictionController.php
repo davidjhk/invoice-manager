@@ -228,7 +228,7 @@ class TaxJurisdictionController extends Controller
 
                     $results = TaxJurisdiction::importFromCsv($csvData, $dataSource);
 
-                    $message = "Import completed! Imported: {$results['imported']}, Updated: {$results['updated']}";
+                    $message = "Import completed! Imported: {$results['imported']}, Updated: {$results['updated']}, Skipped: {$results['skipped']}";
                     if (!empty($results['errors'])) {
                         $message .= ". Errors: " . count($results['errors']);
                         Yii::$app->session->addFlash('warning', 'Some errors occurred during import. Check the error log.');
