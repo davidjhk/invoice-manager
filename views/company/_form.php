@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\State;
 
 /** @var yii\web\View $this */
 /** @var app\models\Company $model */
@@ -44,22 +45,10 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
                         ]) ?>
 					</div>
 					<div class="col-md-3">
-						<?= $form->field($model, 'state')->dropDownList([
-                            '' => Yii::t('app/company', 'Select State'),
-                            'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona', 'AR' => 'Arkansas',
-                            'CA' => 'California', 'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware',
-                            'FL' => 'Florida', 'GA' => 'Georgia', 'HI' => 'Hawaii', 'ID' => 'Idaho',
-                            'IL' => 'Illinois', 'IN' => 'Indiana', 'IA' => 'Iowa', 'KS' => 'Kansas',
-                            'KY' => 'Kentucky', 'LA' => 'Louisiana', 'ME' => 'Maine', 'MD' => 'Maryland',
-                            'MA' => 'Massachusetts', 'MI' => 'Michigan', 'MN' => 'Minnesota', 'MS' => 'Mississippi',
-                            'MO' => 'Missouri', 'MT' => 'Montana', 'NE' => 'Nebraska', 'NV' => 'Nevada',
-                            'NH' => 'New Hampshire', 'NJ' => 'New Jersey', 'NM' => 'New Mexico', 'NY' => 'New York',
-                            'NC' => 'North Carolina', 'ND' => 'North Dakota', 'OH' => 'Ohio', 'OK' => 'Oklahoma',
-                            'OR' => 'Oregon', 'PA' => 'Pennsylvania', 'RI' => 'Rhode Island', 'SC' => 'South Carolina',
-                            'SD' => 'South Dakota', 'TN' => 'Tennessee', 'TX' => 'Texas', 'UT' => 'Utah',
-                            'VT' => 'Vermont', 'VA' => 'Virginia', 'WA' => 'Washington', 'WV' => 'West Virginia',
-                            'WI' => 'Wisconsin', 'WY' => 'Wyoming'
-                        ]) ?>
+						<?= $form->field($model, 'state')->dropDownList(
+                            State::getUsStateList(), 
+                            ['prompt' => Yii::t('app/company', 'Select State')]
+                        ) ?>
 					</div>
 					<div class="col-md-3">
 						<?= $form->field($model, 'zip_code')->textInput([

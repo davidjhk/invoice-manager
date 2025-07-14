@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use app\models\State;
 
 /** @var yii\web\View $this */
 /** @var app\models\Estimate $model */
@@ -308,7 +309,7 @@ $this->registerJsVar('estimateConfig', [
 <!-- Add Customer Modal -->
 <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-labelledby="addCustomerModalLabel"
 	aria-hidden="true">
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog modal-dialog-wide" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="addCustomerModalLabel"><?= Yii::t('app/estimate', 'Add New Customer') ?>
@@ -348,59 +349,11 @@ $this->registerJsVar('estimateConfig', [
 						<div class="col-md-3">
 							<div class="form-group">
 								<label for="new-customer-state"><?= Yii::t('app/customer', 'State') ?></label>
-								<select class="form-control" id="new-customer-state" name="state">
-									<option value=""><?= Yii::t('app/customer', 'Select State') ?></option>
-									<option value="AL">Alabama</option>
-									<option value="AK">Alaska</option>
-									<option value="AZ">Arizona</option>
-									<option value="AR">Arkansas</option>
-									<option value="CA">California</option>
-									<option value="CO">Colorado</option>
-									<option value="CT">Connecticut</option>
-									<option value="DE">Delaware</option>
-									<option value="FL">Florida</option>
-									<option value="GA">Georgia</option>
-									<option value="HI">Hawaii</option>
-									<option value="ID">Idaho</option>
-									<option value="IL">Illinois</option>
-									<option value="IN">Indiana</option>
-									<option value="IA">Iowa</option>
-									<option value="KS">Kansas</option>
-									<option value="KY">Kentucky</option>
-									<option value="LA">Louisiana</option>
-									<option value="ME">Maine</option>
-									<option value="MD">Maryland</option>
-									<option value="MA">Massachusetts</option>
-									<option value="MI">Michigan</option>
-									<option value="MN">Minnesota</option>
-									<option value="MS">Mississippi</option>
-									<option value="MO">Missouri</option>
-									<option value="MT">Montana</option>
-									<option value="NE">Nebraska</option>
-									<option value="NV">Nevada</option>
-									<option value="NH">New Hampshire</option>
-									<option value="NJ">New Jersey</option>
-									<option value="NM">New Mexico</option>
-									<option value="NY">New York</option>
-									<option value="NC">North Carolina</option>
-									<option value="ND">North Dakota</option>
-									<option value="OH">Ohio</option>
-									<option value="OK">Oklahoma</option>
-									<option value="OR">Oregon</option>
-									<option value="PA">Pennsylvania</option>
-									<option value="RI">Rhode Island</option>
-									<option value="SC">South Carolina</option>
-									<option value="SD">South Dakota</option>
-									<option value="TN">Tennessee</option>
-									<option value="TX">Texas</option>
-									<option value="UT">Utah</option>
-									<option value="VT">Vermont</option>
-									<option value="VA">Virginia</option>
-									<option value="WA">Washington</option>
-									<option value="WV">West Virginia</option>
-									<option value="WI">Wisconsin</option>
-									<option value="WY">Wyoming</option>
-								</select>
+<?= Html::dropDownList('state', '', State::getUsStateList(), [
+									'class' => 'form-control',
+									'id' => 'new-customer-state',
+									'prompt' => Yii::t('app/customer', 'Select State')
+								]) ?>
 							</div>
 						</div>
 						<div class="col-md-3">
@@ -911,7 +864,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				document.getElementById('tax-rate-input').value = data.tax_rate || 0;
 				calculateTotals();
 
-				// Success message removed - no popup for automatic tax calculation
+				// Show appropriate message based on message type
+				if (data.message_type === 'warning') {
+					NotificationUtils.showWarning(data.message);
+				} else if (data.message_type === 'info') {
+					NotificationUtils.showInfo(data.message);
+				}
+				// No message for normal success to avoid cluttering the UI
 			} else {
 				NotificationUtils.showError(data.message ||
 					'<?= Yii::t('app/invoice', 'Failed to calculate automatic tax.') ?>');
@@ -966,5 +925,23 @@ document.addEventListener('DOMContentLoaded', function() {
 .form-check-input {
 	float: none;
 	margin-left: 0;
+}
+
+/* Modal width adjustment */
+.modal-dialog-wide {
+	max-width: calc(600px + 100px); /* Default modal-lg is 600px, adding 100px */
+}
+
+@media (min-width: 768px) {
+	.modal-dialog-wide {
+		max-width: calc(600px + 100px);
+		margin: 1.75rem auto;
+	}
+}
+
+@media (min-width: 992px) {
+	.modal-dialog-wide {
+		max-width: calc(800px + 100px); /* Bootstrap modal-xl is 800px, adding 100px */
+	}
 }
 </style>

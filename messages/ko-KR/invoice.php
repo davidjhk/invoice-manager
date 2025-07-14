@@ -177,4 +177,7 @@ return [
     'Tax rate calculated automatically based on customer address' => '고객 주소를 기반으로 세율이 자동 계산되었습니다',
     'Using company default tax rate (address not found or invalid)' => '회사 기본 세율 사용 (주소를 찾을 수 없거나 유효하지 않음)',
     'Error calculating tax rate' => '세율 계산 오류',
+    'Tax rate calculated using fallback rates (tax rate database is empty)' => '폴백 세율을 사용하여 계산됨 (세율 데이터베이스가 비어있음)',
+    'Tax rate calculated using fallback rates (database connection error)' => '폴백 세율을 사용하여 계산됨 (데이터베이스 연결 오류)',
+    'Tax rate calculated using fallback rates' => '폴백 세율을 사용하여 계산됨',
 ];

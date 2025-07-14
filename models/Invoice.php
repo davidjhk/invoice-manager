@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
+use app\components\UsSalesTaxCalculator;
+use app\models\State;
 
 /**
  * This is the model class for table "jdosa_invoices".
@@ -728,7 +730,7 @@ class Invoice extends ActiveRecord
 
         try {
             // Use UsSalesTaxCalculator component
-            $calculator = new \app\components\UsSalesTaxCalculator();
+            $calculator = new UsSalesTaxCalculator();
             
             // Get customer ZIP code - prefer structured field over extracted
             $zipCode = $customer->zip_code;
@@ -771,6 +773,8 @@ class Invoice extends ActiveRecord
                         'company_state' => $companyState,
                         'calculated_rate' => $taxRate,
                         'calculated_at' => date('Y-m-d H:i:s'),
+                        'used_fallback' => $calculator->lastCalculationUsedFallback,
+                        'fallback_reason' => $calculator->fallbackReason,
                     ]);
                 }
             } catch (\Exception $fieldError) {
@@ -838,14 +842,11 @@ class Invoice extends ActiveRecord
             return null;
         }
 
-        // Common US state abbreviations
-        $states = [
-            'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-            'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-            'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-            'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-            'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
-        ];
+        // Get US state abbreviations from database
+        $states = State::find()
+            ->select(['state_code'])
+            ->where(['country_code' => 'US'])
+            ->column();
 
         // Try to match state abbreviation in address
         foreach ($states as $state) {
@@ -854,18 +855,23 @@ class Invoice extends ActiveRecord
             }
         }
 
-        // Try to match common state name patterns
-        $stateNames = [
-            'california' => 'CA', 'texas' => 'TX', 'florida' => 'FL', 'new york' => 'NY',
-            'pennsylvania' => 'PA', 'illinois' => 'IL', 'ohio' => 'OH', 'georgia' => 'GA',
-            'north carolina' => 'NC', 'michigan' => 'MI', 'new jersey' => 'NJ', 'virginia' => 'VA',
-            'washington' => 'WA', 'arizona' => 'AZ', 'massachusetts' => 'MA', 'tennessee' => 'TN',
-            'indiana' => 'IN', 'missouri' => 'MO', 'maryland' => 'MD', 'wisconsin' => 'WI'
-        ];
+        // Get state names from database for name matching
+        $stateData = State::find()
+            ->select(['state_code', 'state_name'])
+            ->where(['country_code' => 'US'])
+            ->asArray()
+            ->all();
 
-        foreach ($stateNames as $name => $abbr) {
-            if (preg_match('/\b' . $name . '\b/i', $address)) {
-                return $abbr;
+        // Create name to code mapping
+        $stateNames = [];
+        foreach ($stateData as $state) {
+            $stateNames[strtolower($state['state_name'])] = $state['state_code'];
+        }
+
+        // Try to match state names in address
+        foreach ($stateNames as $name => $code) {
+            if (preg_match('/\b' . preg_quote($name, '/') . '\b/i', $address)) {
+                return $code;
             }
         }
 

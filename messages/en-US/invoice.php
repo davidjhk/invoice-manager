@@ -177,4 +177,7 @@ return [
     'Tax rate calculated automatically based on customer address' => 'Tax rate calculated automatically based on customer address',
     'Using company default tax rate (address not found or invalid)' => 'Using company default tax rate (address not found or invalid)',
     'Error calculating tax rate' => 'Error calculating tax rate',
+    'Tax rate calculated using fallback rates (tax rate database is empty)' => 'Tax rate calculated using fallback rates (tax rate database is empty)',
+    'Tax rate calculated using fallback rates (database connection error)' => 'Tax rate calculated using fallback rates (database connection error)',
+    'Tax rate calculated using fallback rates' => 'Tax rate calculated using fallback rates',
 ];

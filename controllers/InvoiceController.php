@@ -817,18 +817,40 @@ class InvoiceController extends Controller
             $taxRate = $invoice->calculateAutomaticTaxRate($customer, $company);
             
             if ($taxRate !== null) {
+                $details = Json::decode($invoice->tax_calculation_details);
+                $message = Yii::t('app/invoice', 'Tax rate calculated automatically based on customer address');
+                $messageType = 'success';
+                
+                // Check if fallback was used and modify message accordingly
+                if (!empty($details['used_fallback']) && $details['used_fallback'] === true) {
+                    $fallbackReason = $details['fallback_reason'] ?? 'unknown';
+                    
+                    if ($fallbackReason === 'no_data_in_table') {
+                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (tax rate database is empty)');
+                        $messageType = 'warning';
+                    } elseif ($fallbackReason === 'database_error') {
+                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (database connection error)');
+                        $messageType = 'warning';
+                    } else {
+                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates');
+                        $messageType = 'warning';
+                    }
+                }
+                
                 return [
                     'success' => true,
                     'tax_rate' => $taxRate,
-                    'message' => Yii::t('app/invoice', 'Tax rate calculated automatically based on customer address'),
-                    'details' => Json::decode($invoice->tax_calculation_details)
+                    'message' => $message,
+                    'message_type' => $messageType,
+                    'details' => $details
                 ];
             } else {
                 // Fallback to company default
                 return [
                     'success' => true,
                     'tax_rate' => $company->tax_rate ?? 0,
-                    'message' => Yii::t('app/invoice', 'Using company default tax rate (address not found or invalid)')
+                    'message' => Yii::t('app/invoice', 'Using company default tax rate (address not found or invalid)'),
+                    'message_type' => 'info'
                 ];
             }
             
