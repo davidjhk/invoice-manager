@@ -2,6 +2,12 @@
 
 namespace app\components;
 
+// Load custom TCPDF configuration BEFORE including TCPDF
+$configPath = dirname(__DIR__) . '/config/tcpdf_config.php';
+if (file_exists($configPath)) {
+    require_once $configPath;
+}
+
 use TCPDF;
 use app\models\Invoice;
 use app\models\Estimate;
@@ -296,17 +302,19 @@ class PdfGenerator
                     $originalWidth = $imageInfo[0];
                     $originalHeight = $imageInfo[1];
                     
-                    // Calculate new dimensions with max height of 120px (15px * 8)
+                    // Calculate new dimensions with max height of 120px and max width of 40% of page width
                     $maxHeight = 120;
-                    $maxWidth = 720;
+                    // Page width is approximately 595px for A4, so 40% is about 238px
+                    $maxWidth = 238;
                     
                     $ratio = min($maxHeight / $originalHeight, $maxWidth / $originalWidth);
                     $newWidth = $originalWidth * $ratio;
                     $newHeight = $originalHeight * $ratio;
                     
-                    $html .= '<img src="' . $logoPath . '" width="' . $newWidth . '" height="' . $newHeight . '" alt="Company Logo">';
+                    $html .= '<img src="' . $logoPath . '" width="' . $newWidth . '" height="' . $newHeight . '" alt="Company Logo" style="margin-top: 20px;">';
                 } else {
-                    $html .= '<img src="' . $logoPath . '" width="720" height="120" alt="Company Logo">';
+                    // Fallback with 40% page width limit
+                    $html .= '<img src="' . $logoPath . '" width="238" height="120" alt="Company Logo" style="margin-top: 20px;">';
                 }
             }
         }
@@ -704,7 +712,7 @@ class PdfGenerator
             .balance-due-paid { background: #d4edda !important; }
             .balance-due-unpaid { background: #fff3cd !important; }
             .notes-section { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
-            .logo { max-height: 120px; max-width: 720px; height: auto; }
+            .logo { max-height: 120px; max-width: 360px; height: auto;}
             .paid-watermark {
                 position: absolute; top: 50%; left: 50%;
                 transform: translate(-50%, -50%) rotate(-45deg);
@@ -763,7 +771,8 @@ class PdfGenerator
 			<td style="width: 40%; text-align: right; vertical-align: top;">
 				<div class="logo-section">
 					<?php if ($company->hasLogo()): ?>
-					<img src="<?= $company->getLogoUrl() ?>" alt="Company Logo" class="logo" style="max-height: 120px; max-width: 720px; height: auto;">
+					<img src="<?= $company->getLogoUrl() ?>" alt="Company Logo" class="logo"
+						style="max-height: 120px; max-width: 360px; height: auto;">
 					<?php endif; ?>
 				</div>
 			</td>
@@ -1088,7 +1097,8 @@ class PdfGenerator
 			<td style="width: 40%; text-align: right; vertical-align: top;">
 				<div class="logo-section">
 					<?php if ($company->hasLogo()): ?>
-					<img src="<?= $company->getLogoUrl() ?>" alt="Company Logo" class="logo" style="max-height: 120px; max-width: 720px; height: auto;">
+					<img src="<?= $company->getLogoUrl() ?>" alt="Company Logo" class="logo"
+						style="max-height: 120px; max-width: 360px; height: auto;">
 					<?php endif; ?>
 				</div>
 			</td>
@@ -1460,17 +1470,19 @@ class PdfGenerator
                     $originalWidth = $imageInfo[0];
                     $originalHeight = $imageInfo[1];
                     
-                    // Calculate new dimensions with max height of 120px (15px * 8)
+                    // Calculate new dimensions with max height of 120px and max width of 40% of page width
                     $maxHeight = 120;
-                    $maxWidth = 720;
+                    // Page width is approximately 595px for A4, so 40% is about 238px
+                    $maxWidth = 238;
                     
                     $ratio = min($maxHeight / $originalHeight, $maxWidth / $originalWidth);
                     $newWidth = $originalWidth * $ratio;
                     $newHeight = $originalHeight * $ratio;
                     
-                    $html .= '<img src="' . $logoPath . '" width="' . $newWidth . '" height="' . $newHeight . '" alt="Company Logo">';
+                    $html .= '<img src="' . $logoPath . '" width="' . $newWidth . '" height="' . $newHeight . '" alt="Company Logo" style="margin-top: 20px;">';
                 } else {
-                    $html .= '<img src="' . $logoPath . '" width="720" height="120" alt="Company Logo">';
+                    // Fallback with 40% page width limit
+                    $html .= '<img src="' . $logoPath . '" width="238" height="120" alt="Company Logo" style="margin-top: 20px;">';
                 }
             }
         }

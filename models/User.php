@@ -102,10 +102,10 @@ class User extends ActiveRecord implements IdentityInterface
             [['role'], 'default', 'value' => 'user'],
             [['created_at', 'updated_at'], 'safe'],
             [['username'], 'string', 'max' => 50],
-            [['username'], 'unique'],
+            [['username'], 'validateUniqueUsername'],
             [['email'], 'string', 'max' => 255],
             [['email'], 'email'],
-            [['email'], 'unique'],
+            [['email'], 'validateUniqueEmail'],
             [['password_hash', 'password_reset_token'], 'string', 'max' => 255],
             [['full_name'], 'string', 'max' => 100],
             [['google_id'], 'string', 'max' => 100],
@@ -183,25 +183,35 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Finds user by username
+     * Finds user by username (case-insensitive)
      *
      * @param string $username
      * @return static|null
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'is_active' => true]);
+        return static::find()
+            ->where(['and', 
+                ['LOWER(username)' => strtolower($username)], 
+                ['is_active' => true]
+            ])
+            ->one();
     }
 
     /**
-     * Finds user by email
+     * Finds user by email (case-insensitive)
      *
      * @param string $email
      * @return static|null
      */
     public static function findByEmail($email)
     {
-        return static::findOne(['email' => $email, 'is_active' => true]);
+        return static::find()
+            ->where(['and', 
+                ['LOWER(email)' => strtolower($email)], 
+                ['is_active' => true]
+            ])
+            ->one();
     }
 
     /**
@@ -334,14 +344,14 @@ class User extends ActiveRecord implements IdentityInterface
         $username = $baseUsername;
         $counter = 1;
         
-        // Ensure username is unique
-        while (static::find()->where(['username' => $username])->exists()) {
+        // Ensure username is unique (case-insensitive)
+        while (static::find()->where(['LOWER(username)' => strtolower($username)])->exists()) {
             $username = $baseUsername . $counter;
             $counter++;
         }
         
-        $user->username = $username;
-        $user->email = $profile['email'];
+        $user->username = strtolower($username);
+        $user->email = strtolower($profile['email']);
         $user->full_name = $profile['name'] ?? null;
         $user->google_id = $profile['id'];
         $user->avatar_url = $profile['picture'] ?? null;
@@ -515,6 +525,50 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Validates username uniqueness (case-insensitive)
+     *
+     * @param string $attribute
+     * @param array $params
+     */
+    public function validateUniqueUsername($attribute, $params)
+    {
+        if (!empty($this->$attribute)) {
+            $query = static::find()
+                ->where(['LOWER(username)' => strtolower($this->$attribute)]);
+            
+            if (!$this->isNewRecord) {
+                $query->andWhere(['!=', 'id', $this->id]);
+            }
+            
+            if ($query->exists()) {
+                $this->addError($attribute, 'This username has already been taken.');
+            }
+        }
+    }
+
+    /**
+     * Validates email uniqueness (case-insensitive)
+     *
+     * @param string $attribute
+     * @param array $params
+     */
+    public function validateUniqueEmail($attribute, $params)
+    {
+        if (!empty($this->$attribute)) {
+            $query = static::find()
+                ->where(['LOWER(email)' => strtolower($this->$attribute)]);
+            
+            if (!$this->isNewRecord) {
+                $query->andWhere(['!=', 'id', $this->id]);
+            }
+            
+            if ($query->exists()) {
+                $this->addError($attribute, 'This email address has already been taken.');
+            }
+        }
+    }
+
+    /**
      * Before save event
      *
      * @param bool $insert
@@ -525,6 +579,14 @@ class User extends ActiveRecord implements IdentityInterface
         if (parent::beforeSave($insert)) {
             if ($insert) {
                 $this->generateAuthKey();
+            }
+            
+            // Convert username and email to lowercase for consistency
+            if (!empty($this->username)) {
+                $this->username = strtolower($this->username);
+            }
+            if (!empty($this->email)) {
+                $this->email = strtolower($this->email);
             }
             
             if (!empty($this->password)) {
