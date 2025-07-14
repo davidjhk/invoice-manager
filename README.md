@@ -60,6 +60,15 @@
 - **회사별 설정**: 필요에 따라 CJK 폰트 활성화
 - **TCPDF 통합**: 고급 다국어 PDF 생성
 
+### 🧮 US Sales Tax 자동 계산 (2025년 7월 추가)
+
+- **완전한 세율 데이터베이스**: 50개 주 + ZIP 코드별 정확한 세율
+- **Economic Nexus 지원**: 각 주별 경제적 연결점 임계값 확인
+- **관리자 전용**: Admin 권한 사용자만 세율 관리 가능
+- **CSV 가져오기**: 외부 소스에서 세율 데이터 일괄 업로드
+- **실시간 조회**: ZIP 코드 입력으로 즉시 세율 확인
+- **이력 관리**: 세율 변경 이력 및 유효기간 추적
+
 ## 시스템 요구사항
 
 - **PHP**: 8.1 이상 (권장)
@@ -391,6 +400,196 @@ sudo usermod -a -G daemon $(whoami)
 - **언어 설정**: 회사별 인터페이스 언어 선택 (신규)
 - **디스플레이 설정**: 다크모드, 컴팩트모드 개별 설정 (신규)
 - **PDF 설정**: CJK 폰트 지원 활성화 (신규)
+
+## 🧮 US Sales Tax 자동 계산 시스템 (2025년 7월 추가)
+
+### 📋 주요 기능
+
+#### 🗄️ 완전한 세율 데이터베이스
+- **50개 주 기본 세율**: 각 주별 기본 세율 및 평균 세율
+- **ZIP 코드별 상세 세율**: 정확한 지역별 세율 지원
+- **Economic Nexus 확인**: 각 주별 경제적 연결점 임계값 자동 확인
+- **세율 분해**: 주/카운티/시/특별구역 세율 개별 관리
+
+#### 🔐 Admin 전용 관리 시스템
+- **관리자 권한 필요**: Admin Role 사용자만 세율 관리 접근 가능
+- **Admin Dashboard 통합**: 관리자 패널에서 바로 접근
+- **완전한 CRUD**: 세율 생성, 조회, 수정, 삭제 지원
+- **벌크 작업**: 다중 선택으로 일괄 활성화/비활성화/삭제
+
+#### 📊 실시간 세율 조회
+- **ZIP 코드 검색**: 우편번호 입력으로 즉시 세율 확인
+- **AJAX 기반**: 페이지 새로고침 없는 실시간 조회
+- **상세 정보**: 세율 분해, 유효기간, 데이터 소스 표시
+- **빠른 필터링**: 주/ZIP 코드/데이터 소스별 필터링
+
+#### 📤 CSV 데이터 가져오기
+- **파일 업로드**: CSV 파일을 통한 대량 세율 데이터 입력
+- **샘플 다운로드**: 정확한 형식의 샘플 CSV 제공
+- **데이터 검증**: 업로드 시 자동 유효성 검사
+- **진행 상황**: 실시간 업로드 진행 상황 표시
+
+#### 📈 통계 대시보드
+- **전체 현황**: 총 관할지역, 활성 상태, 커버리지 통계
+- **주별 분포**: 각 주별 관할지역 수 및 비율
+- **데이터 소스 분석**: 소스별 데이터 분포 현황
+- **최근 업데이트**: 최근 변경된 세율 이력
+
+### 🛠️ 콘솔 명령어
+
+#### 기본 세율 생성
+```bash
+# 50개 주 기본 세율 생성 (무료)
+./yii tax-rate/seed-basic-rates
+
+# 계산기 기반 세율 업데이트
+./yii tax-rate/update-from-calculator
+```
+
+#### CSV 파일 관리
+```bash
+# CSV 파일에서 세율 가져오기
+./yii tax-rate/import-csv /path/to/rates.csv
+
+# 샘플 CSV 파일 생성
+./yii tax-rate/generate-sample-csv sample_rates.csv
+```
+
+#### 시스템 관리
+```bash
+# 세율 통계 확인
+./yii tax-rate/stats
+
+# 특정 ZIP 코드 테스트
+./yii tax-rate/test 90210
+
+# 오래된 세율 정리
+./yii tax-rate/cleanup-old-rates
+
+# 세율 검증 및 만료 확인
+./yii tax-rate/verify-rates
+```
+
+### 💾 데이터 소스 및 가져오기
+
+#### 🆓 무료 소스
+
+**1. Avalara (기본 주별 세율)**
+- **URL**: https://www.avalara.com/taxrates/en/download-tax-tables.html
+- **형식**: CSV
+- **커버리지**: 50개 주 기본 세율
+- **업데이트**: 월별
+- **제한**: ZIP 코드별 상세 세율 없음
+
+**2. 정부 소스 (각 주 세무청)**
+- **워싱턴주**: https://dor.wa.gov/taxes-rates/sales-use-tax-rates/downloadable-database
+- **캘리포니아, 뉴욕 등**: 각 주 세무청 공식 사이트
+- **제한**: 주별로 개별 다운로드 필요
+
+**3. GitHub 오픈소스**
+- **URL**: https://github.com/dirk/sales_tax
+- **URL**: https://github.com/MirzaAreebBaig/Woocommerce-US-ZipCodes-TaxRates
+- **제한**: 데이터 정확성 및 최신성 확인 필요
+
+#### 💰 유료 상용 소스 (정확한 ZIP 코드별 세율)
+
+**1. Sales Tax Handbook** ⭐ 추천
+- **URL**: https://www.salestaxhandbook.com/data
+- **가격**: 
+  - 단일 주: $34.99 (일회성)
+  - 전체 50개 주: $119.99 (일회성)
+  - 월별 구독: $19.99/월 (단일 주), $59.99/월 (전체)
+- **형식**: CSV, Excel
+- **특징**: ZIP 코드별 상세 세율, 월별 업데이트
+
+**2. Zip2Tax**
+- **URL**: https://www.zip2tax.com/products/state-tax-rate-table
+- **가격**: 구독 또는 일회성 구매
+- **형식**: 다양한 CSV 형식 제공
+- **특징**: API도 함께 제공
+
+**3. Sales Tax USA (WooCommerce용)**
+- **URL**: https://salestaxusa.com/woocommerce-tax-rates-csv/
+- **가격**: 일회성 구매
+- **형식**: WooCommerce 호환 CSV
+- **특징**: 즉시 다운로드 가능
+
+#### 🔌 API 기반 실시간 소스
+
+**1. TaxJar API**
+- **URL**: https://developers.taxjar.com/api/reference/
+- **가격**: 유료 API 서비스
+- **특징**: 실시간 세율 조회, JSON 응답
+
+**2. Avalara API**
+- **URL**: Avalara AvaTax API
+- **가격**: 유료 API 서비스
+- **특징**: 기업급 세무 솔루션
+
+### 🎯 권장 사용 시나리오
+
+#### 개발/테스트 단계
+1. **기본 세율로 시작**:
+   ```bash
+   ./yii tax-rate/seed-basic-rates
+   ```
+
+2. **샘플 데이터 테스트**:
+   - Admin Panel > Tax Management > Import Tax Rates
+   - "Download Sample CSV" 버튼 클릭
+   - 다운로드된 파일을 바로 import
+
+#### 프로덕션 준비
+1. **정확한 데이터 구매**: Sales Tax Handbook ($119.99 일회성)
+2. **ZIP 코드별 정확한 세율 확보**
+3. **월별 업데이트 구독 고려**
+
+#### 대기업/고량 처리
+1. **TaxJar 또는 Avalara API 연동**
+2. **실시간 세율 조회**
+3. **자동 업데이트 구현**
+
+### 📋 CSV 파일 형식
+
+#### 필수 컬럼
+```csv
+zip_code,state_code,combined_rate
+90210,CA,9.5000
+10001,NY,8.2500
+```
+
+#### 전체 컬럼 (권장)
+```csv
+zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_rate,state_rate,county_rate,city_rate,special_rate,estimated_population
+90210,CA,California,Los Angeles,Beverly Hills,Beverly Hills Tax Region,9.5000,6.0000,1.0000,2.5000,0.0000,34000
+10001,NY,New York,New York,New York,Manhattan Tax Region,8.2500,4.0000,2.2500,2.0000,0.0000,1600000
+```
+
+### 🗄️ 데이터베이스 구조
+
+#### 새로운 테이블
+- `jdosa_tax_jurisdictions` - ZIP 코드별 세율 정보
+- `jdosa_tax_rates_history` - 세율 변경 이력
+
+#### 기존 테이블 확장
+- `jdosa_companies` - 세금 설정 (주 코드, ZIP 코드, 자동 계산 설정)
+- `jdosa_customers` - 고객 세금 정보 (면세 여부, 증명서)
+- `jdosa_invoices` - 세금 계산 상세 정보
+- `jdosa_invoice_items` - 아이템별 세금 카테고리
+
+### 🔧 Administration
+
+#### 관리자 패널 접근
+1. **Admin 계정으로 로그인**
+2. **Admin Panel > Tax Management**
+3. **세율 목록, 통계, 가져오기 메뉴 사용**
+
+#### 주요 관리 기능
+- **세율 관리**: 개별 세율 생성, 수정, 삭제
+- **벌크 작업**: 다중 선택으로 일괄 작업
+- **데이터 가져오기**: CSV 파일 업로드
+- **통계 확인**: 전체 시스템 현황 및 분석
+- **데이터 내보내기**: 현재 세율 데이터 CSV 다운로드
 
 ## 관리자 기능
 
@@ -744,11 +943,12 @@ GitHub Issues를 통해 버그 리포트나 기능 요청을 제출해주세요.
 - **보안 강화**: 역할 기반 접근 제어 향상
 - **성능 최적화**: AJAX 기반 실시간 업데이트
 - **접근성 향상**: 툴팁 및 키보드 네비게이션 지원
+- **US Sales Tax 시스템**: 완전한 미국 세율 자동 계산 시스템 구축
 
 ### 🗄️ 데이터베이스 변경
-- 새로운 테이블: `jdosa_product_categories`, `jdosa_admin_settings`
-- 업데이트된 테이블: `jdosa_companies` (언어, 테마 설정), `jdosa_users` (역할, 제한)
-- 새로운 필드: 다국어, 테마, 카테고리, 관리자 설정 관련
+- 새로운 테이블: `jdosa_product_categories`, `jdosa_admin_settings`, `jdosa_tax_jurisdictions`, `jdosa_tax_rates_history`
+- 업데이트된 테이블: `jdosa_companies` (언어, 테마, 세금 설정), `jdosa_users` (역할, 제한), `jdosa_customers` (세금 정보), `jdosa_invoices` (세금 상세), `jdosa_invoice_items` (세금 카테고리)
+- 새로운 필드: 다국어, 테마, 카테고리, 관리자 설정, US Sales Tax 관련
 
 ---
 

@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create User'), ['create-user'], ['class' => 'btn btn-success']) ?>
             <?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app', 'Settings'), ['settings'], ['class' => 'btn btn-outline-primary']) ?>
             <?= Html::a('<i class="fas fa-users mr-2"></i>' . Yii::t('app', 'Manage Users'), ['users'], ['class' => 'btn btn-outline-primary']) ?>
+            <?= Html::a('<i class="fas fa-calculator mr-2"></i>' . Yii::t('app', 'Tax Management'), ['/tax-jurisdiction/index'], ['class' => 'btn btn-outline-warning']) ?>
         </div>
     </div>
 
@@ -102,6 +103,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create New User'), ['create-user'], ['class' => 'list-group-item list-group-item-action']) ?>
                         <?= Html::a('<i class="fas fa-cogs mr-2"></i>' . Yii::t('app', 'System Settings'), ['settings'], ['class' => 'list-group-item list-group-item-action']) ?>
                         <?= Html::a('<i class="fas fa-users-cog mr-2"></i>' . Yii::t('app', 'User Management'), ['users'], ['class' => 'list-group-item list-group-item-action']) ?>
+                        <?= Html::a('<i class="fas fa-calculator mr-2"></i>' . Yii::t('app', 'Tax Management'), ['/tax-jurisdiction/index'], ['class' => 'list-group-item list-group-item-action']) ?>
+                        <?= Html::a('<i class="fas fa-chart-bar mr-2"></i>' . Yii::t('app', 'Tax Statistics'), ['/tax-jurisdiction/stats'], ['class' => 'list-group-item list-group-item-action']) ?>
+                        <?= Html::a('<i class="fas fa-upload mr-2"></i>' . Yii::t('app', 'Import Tax Rates'), ['/tax-jurisdiction/import-csv'], ['class' => 'list-group-item list-group-item-action']) ?>
                     </div>
                 </div>
             </div>
