@@ -323,7 +323,7 @@ class Invoice extends ActiveRecord
      */
     public function canBeSent()
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SENT, self::STATUS_PARTIAL]) && 
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SENT, self::STATUS_PARTIAL, self::STATUS_PRINTED]) && 
                !empty($this->customer->customer_email);
     }
 

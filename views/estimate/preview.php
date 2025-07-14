@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = Yii::t('app/estimate', 'Preview');
                 'encode' => false
             ]) ?>
 
-			<?php if ($model->status === \app\models\Estimate::STATUS_DRAFT): ?>
+			<?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED])): ?>
 			<?php 
 				$company = \app\models\Company::getCurrent();
 				$hasEmailConfig = $company && $company->hasEmailConfiguration();
