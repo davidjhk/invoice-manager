@@ -178,8 +178,7 @@ $this->registerCssFile('@web/css/tax-management.css');
 					<?= Html::submitButton('<i class="fas fa-play mr-2"></i>' . Yii::t('app', 'Execute'), [
                         'class' => 'btn btn-warning',
                         'id' => 'bulk-submit',
-                        'disabled' => true,
-                        'onclick' => 'return confirmBulkAction()'
+                        'disabled' => true
                     ]) ?>
 				</div>
 				<div class="col-md-6 text-right">
@@ -340,3 +339,154 @@ $this->registerCssFile('@web/css/tax-management.css');
 	<?php Pjax::end(); ?>
 
 </div>
+
+<?php
+$this->registerJs("
+// Quick ZIP code lookup functionality
+$('#lookup-btn').click(function() {
+    var zipCode = $('#lookup-zip').val().trim();
+    if (!zipCode) {
+        alert('" . Yii::t('app', 'Please enter a ZIP code') . "');
+        return;
+    }
+    
+    var btn = $(this);
+    var originalHtml = btn.html();
+    btn.html('<i class=\"fas fa-spinner fa-spin\"></i>').prop('disabled', true);
+    
+    $.ajax({
+        url: '" . \yii\helpers\Url::to(['lookup']) . "',
+        type: 'GET',
+        data: { zipCode: zipCode },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                var data = response.data;
+                var html = '<div class=\"alert alert-success\">' +
+                    '<strong>' + data.zip_code + ' - ' + data.city_name + ', ' + data.state_code + '</strong><br>' +
+                    '<div class=\"row mt-2\">' +
+                        '<div class=\"col-md-6\">' +
+                            '<strong>" . Yii::t('app', 'Tax Rates') . ":</strong><br>' +
+                            '" . Yii::t('app', 'State') . ": ' + (data.state_rate * 100).toFixed(4) + '%<br>' +
+                            '" . Yii::t('app', 'County') . ": ' + (data.county_rate * 100).toFixed(4) + '%<br>' +
+                            '" . Yii::t('app', 'City') . ": ' + (data.city_rate * 100).toFixed(4) + '%<br>' +
+                            (data.special_rate > 0 ? '" . Yii::t('app', 'Special') . ": ' + (data.special_rate * 100).toFixed(4) + '%<br>' : '') +
+                        '</div>' +
+                        '<div class=\"col-md-6\">' +
+                            '<strong>" . Yii::t('app', 'Total Rate') . ": ' + (data.combined_rate * 100).toFixed(4) + '%</strong><br>' +
+                            '<small class=\"text-muted\">" . Yii::t('app', 'Effective Date') . ": ' + data.effective_date + '</small><br>' +
+                            '<small class=\"text-muted\">" . Yii::t('app', 'Source') . ": ' + data.data_source + '</small>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+                $('#lookup-result').html(html);
+            } else {
+                $('#lookup-result').html('<div class=\"alert alert-warning\">' + response.message + '</div>');
+            }
+        },
+        error: function() {
+            $('#lookup-result').html('<div class=\"alert alert-danger\">" . Yii::t('app', 'Error occurred while looking up ZIP code') . "</div>');
+        },
+        complete: function() {
+            btn.html(originalHtml).prop('disabled', false);
+        }
+    });
+});
+
+// Allow Enter key to trigger lookup
+$('#lookup-zip').keypress(function(e) {
+    if (e.which == 13) {
+        $('#lookup-btn').click();
+    }
+});
+
+// Checkbox selection functionality
+function updateSelectedCount() {
+    var checkedCount = $('.bulk-checkbox:checked').length;
+    $('#selected-count').text(checkedCount);
+    $('#bulk-submit').prop('disabled', checkedCount === 0 || $('#bulk-operation').val() === '');
+}
+
+// Update count when checkboxes change
+$(document).on('change', '.bulk-checkbox', function() {
+    updateSelectedCount();
+});
+
+// Update submit button when operation changes
+$('#bulk-operation').change(function() {
+    updateSelectedCount();
+});
+
+// Handle select all checkbox (if exists)
+$(document).on('change', '.select-on-check-all', function() {
+    var isChecked = $(this).is(':checked');
+    $('.bulk-checkbox').prop('checked', isChecked);
+    updateSelectedCount();
+});
+
+// Bulk action confirmation
+function confirmBulkAction() {
+    var operation = $('#bulk-operation').val();
+    var count = $('.bulk-checkbox:checked').length;
+    
+    if (operation === '' || count === 0) {
+        alert('" . Yii::t('app', 'Please select an operation and at least one item') . "');
+        return false;
+    }
+    
+    var operationText = $('#bulk-operation option:selected').text();
+    var message = '" . Yii::t('app', 'Are you sure you want to {operation} {count} items?') . "'
+        .replace('{operation}', operationText.toLowerCase())
+        .replace('{count}', count);
+    
+    if (operation === 'delete') {
+        message = '" . Yii::t('app', 'Are you sure you want to permanently delete {count} items? This action cannot be undone.') . "'
+            .replace('{count}', count);
+    }
+    
+    if (confirm(message)) {
+        // Clear any existing ID inputs
+        $('#bulk-form input[name=\"ids[]\"]').remove();
+        
+        // Collect selected IDs
+        var selectedIds = [];
+        $('.bulk-checkbox:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+        
+        // Debug: log the selected IDs
+        console.log('Selected IDs:', selectedIds);
+        
+        // Add selected IDs to form as hidden inputs
+        $.each(selectedIds, function(index, id) {
+            $('#bulk-form').append('<input type=\"hidden\" name=\"ids[]\" value=\"' + id + '\">');
+        });
+        
+        // Debug: log the form data before submission
+        console.log('Form action:', $('#bulk-form').attr('action'));
+        console.log('Form method:', $('#bulk-form').attr('method'));
+        console.log('Operation:', operation);
+        console.log('Hidden inputs:', $('#bulk-form input[name=\"ids[]\"]').length);
+        
+        return true;
+    }
+    
+    return false;
+}
+
+// Handle form submission
+$('#bulk-form').on('submit', function(e) {
+    e.preventDefault(); // Prevent default submission
+    
+    if (confirmBulkAction()) {
+        // If confirmed, submit the form
+        this.submit();
+    }
+});
+
+// Initialize on page load
+$(document).ready(function() {
+    updateSelectedCount();
+});
+");
+?>

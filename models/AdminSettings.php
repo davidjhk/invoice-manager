@@ -93,7 +93,8 @@ class AdminSettings extends ActiveRecord
      */
     public static function isSignupAllowed()
     {
-        return (bool) static::getSetting('allow_signup', true);
+        $value = static::getSetting('allow_signup', '0');
+        return $value === '1' || $value === 1 || $value === true;
     }
 
     /**

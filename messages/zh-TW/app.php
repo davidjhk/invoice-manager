@@ -288,4 +288,38 @@ return [
     'Analysis and reports' => '分析和報告',
     'Import Data' => '匯入資料',
     'Bulk import tax rates' => '批次匯入稅率',
+    
+    // Tax Jurisdiction Quick Lookup
+    'Quick ZIP Code Lookup' => '快速郵政編碼查找',
+    'Enter ZIP code (e.g., 90210)' => '輸入郵政編碼（例如：90210）',
+    'Please enter a ZIP code' => '請輸入郵政編碼',
+    'Error occurred while looking up ZIP code' => '查找郵政編碼時發生錯誤',
+    'Tax Rates' => '稅率',
+    'County' => '縣',
+    'City' => '市',
+    'Special' => '特殊',
+    'Total Rate' => '總稅率',
+    'Source' => '來源',
+    
+    // Bulk Operations
+    'Select Action' => '選擇操作',
+    'Execute' => '執行',
+    'items selected' => '項已選擇',
+    'Mark as Verified' => '標記為已驗證',
+    'Please select an operation and at least one item' => '請選擇一個操作和至少一個項目',
+    'Are you sure you want to {operation} {count} items?' => '您確定要{operation} {count}個項目嗎？',
+    'Are you sure you want to permanently delete {count} items? This action cannot be undone.' => '您確定要永久刪除{count}個項目嗎？此操作無法撤銷。',
+    
+    // Tax Jurisdiction
+    'Tax Region' => '稅務區域',
+    'Rate Breakdown' => '稅率明細',
+    'Manage US sales tax rates by ZIP code and jurisdiction for accurate tax calculations' => '按郵政編碼和管轄區管理美國銷售稅率，以進行準確的稅務計算',
+    'ZIP Code' => '郵政編碼',
+    'Data Source' => '資料來源',
+    'All Sources' => '所有來源',
+    'Active Only' => '僅活躍',
+    'All Records' => '所有記錄',
+    'Clear' => '清除',
+    'Add' => '添加',
+    
 ];

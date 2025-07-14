@@ -78,7 +78,13 @@ class AdminController extends Controller
                 $post = Yii::$app->request->post();
                 
                 foreach ($settings as $setting) {
-                    if (isset($post[$setting->setting_key])) {
+                    // Handle checkbox settings (allow_signup, site_maintenance, etc.)
+                    if (in_array($setting->setting_key, ['allow_signup', 'site_maintenance'])) {
+                        // For checkboxes, set to 1 if checked, 0 if not checked
+                        $setting->setting_value = isset($post[$setting->setting_key]) ? '1' : '0';
+                        $setting->save();
+                    } elseif (isset($post[$setting->setting_key])) {
+                        // For other settings, only update if present in POST
                         $setting->setting_value = $post[$setting->setting_key];
                         $setting->save();
                     }

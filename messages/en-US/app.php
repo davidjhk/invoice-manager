@@ -296,4 +296,38 @@ return [
     'Analysis and reports' => 'Analysis and reports',
     'Import Data' => 'Import Data',
     'Bulk import tax rates' => 'Bulk import tax rates',
+    
+    // Tax Jurisdiction Quick Lookup
+    'Quick ZIP Code Lookup' => 'Quick ZIP Code Lookup',
+    'Enter ZIP code (e.g., 90210)' => 'Enter ZIP code (e.g., 90210)',
+    'Please enter a ZIP code' => 'Please enter a ZIP code',
+    'Error occurred while looking up ZIP code' => 'Error occurred while looking up ZIP code',
+    'Tax Rates' => 'Tax Rates',
+    'County' => 'County',
+    'City' => 'City',
+    'Special' => 'Special',
+    'Total Rate' => 'Total Rate',
+    'Source' => 'Source',
+    
+    // Bulk Operations
+    'Select Action' => 'Select Action',
+    'Execute' => 'Execute',
+    'items selected' => 'items selected',
+    'Mark as Verified' => 'Mark as Verified',
+    'Please select an operation and at least one item' => 'Please select an operation and at least one item',
+    'Are you sure you want to {operation} {count} items?' => 'Are you sure you want to {operation} {count} items?',
+    'Are you sure you want to permanently delete {count} items? This action cannot be undone.' => 'Are you sure you want to permanently delete {count} items? This action cannot be undone.',
+    
+    // Tax Jurisdiction
+    'Tax Region' => 'Tax Region',
+    'Rate Breakdown' => 'Rate Breakdown',
+    'Manage US sales tax rates by ZIP code and jurisdiction for accurate tax calculations' => 'Manage US sales tax rates by ZIP code and jurisdiction for accurate tax calculations',
+    'ZIP Code' => 'ZIP Code',
+    'Data Source' => 'Data Source',
+    'All Sources' => 'All Sources',
+    'Active Only' => 'Active Only',
+    'All Records' => 'All Records',
+    'Clear' => 'Clear',
+    'Add' => 'Add',
+    
 ];

@@ -295,4 +295,38 @@ return [
     'Analysis and reports' => 'Análisis e informes',
     'Import Data' => 'Importar Datos',
     'Bulk import tax rates' => 'Importación masiva de tasas de impuesto',
+    
+    // Tax Jurisdiction Quick Lookup
+    'Quick ZIP Code Lookup' => 'Búsqueda Rápida de Código Postal',
+    'Enter ZIP code (e.g., 90210)' => 'Ingrese código postal (ej: 90210)',
+    'Please enter a ZIP code' => 'Por favor ingrese un código postal',
+    'Error occurred while looking up ZIP code' => 'Ocurrió un error al buscar el código postal',
+    'Tax Rates' => 'Tasas de Impuesto',
+    'County' => 'Condado',
+    'City' => 'Ciudad',
+    'Special' => 'Especial',
+    'Total Rate' => 'Tasa Total',
+    'Source' => 'Fuente',
+    
+    // Bulk Operations
+    'Select Action' => 'Seleccionar Acción',
+    'Execute' => 'Ejecutar',
+    'items selected' => 'elementos seleccionados',
+    'Mark as Verified' => 'Marcar como Verificado',
+    'Please select an operation and at least one item' => 'Por favor seleccione una operación y al menos un elemento',
+    'Are you sure you want to {operation} {count} items?' => '¿Está seguro de que desea {operation} {count} elementos?',
+    'Are you sure you want to permanently delete {count} items? This action cannot be undone.' => '¿Está seguro de que desea eliminar permanentemente {count} elementos? Esta acción no se puede deshacer.',
+    
+    // Tax Jurisdiction
+    'Tax Region' => 'Región Fiscal',
+    'Rate Breakdown' => 'Desglose de Tasas',
+    'Manage US sales tax rates by ZIP code and jurisdiction for accurate tax calculations' => 'Gestionar las tasas de impuestos de ventas de EE.UU. por código postal y jurisdicción para cálculos de impuestos precisos',
+    'ZIP Code' => 'Código Postal',
+    'Data Source' => 'Fuente de Datos',
+    'All Sources' => 'Todas las Fuentes',
+    'Active Only' => 'Solo Activos',
+    'All Records' => 'Todos los Registros',
+    'Clear' => 'Limpiar',
+    'Add' => 'Agregar',
+    
 ];

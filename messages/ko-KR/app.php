@@ -339,4 +339,38 @@ return [
     'Analysis and reports' => '분석 및 보고서',
     'Import Data' => '데이터 가져오기',
     'Bulk import tax rates' => '세율 일괄 가져오기',
+    
+    // Tax Jurisdiction Quick Lookup
+    'Quick ZIP Code Lookup' => '빠른 ZIP 코드 검색',
+    'Enter ZIP code (e.g., 90210)' => 'ZIP 코드 입력 (예: 90210)',
+    'Please enter a ZIP code' => 'ZIP 코드를 입력해주세요',
+    'Error occurred while looking up ZIP code' => 'ZIP 코드 검색 중 오류가 발생했습니다',
+    'Tax Rates' => '세율',
+    'County' => '카운티',
+    'City' => '시',
+    'Special' => '특별',
+    'Total Rate' => '총 세율',
+    'Source' => '소스',
+    
+    // Bulk Operations
+    'Select Action' => '작업 선택',
+    'Execute' => '실행',
+    'items selected' => '개 항목 선택됨',
+    'Mark as Verified' => '확인됨으로 표시',
+    'Please select an operation and at least one item' => '작업을 선택하고 최소 하나의 항목을 선택해주세요',
+    'Are you sure you want to {operation} {count} items?' => '{count}개 항목을 {operation}하시겠습니까?',
+    'Are you sure you want to permanently delete {count} items? This action cannot be undone.' => '{count}개 항목을 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+    
+    // Tax Jurisdiction
+    'Tax Region' => '세무 지역',
+    'Rate Breakdown' => '세율 분류',
+    'Manage US sales tax rates by ZIP code and jurisdiction for accurate tax calculations' => '정확한 세금 계산을 위한 ZIP 코드 및 관할구역별 미국 판매세율 관리',
+    'ZIP Code' => 'ZIP 코드',
+    'Data Source' => '데이터 소스',
+    'All Sources' => '모든 소스',
+    'Active Only' => '활성화만',
+    'All Records' => '모든 기록',
+    'Clear' => '지우기',
+    'Add' => '추가',
+    
 ];

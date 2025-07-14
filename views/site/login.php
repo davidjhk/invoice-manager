@@ -89,16 +89,18 @@ $this->context->layout = 'auth';
 			</div>
 			<?php endif; ?>
 
-			<?php // Create Account 기능을 관리자 전용으로 변경 ?>
-			<?php /*
-            <div class="auth-divider">
-                <span>Don't have an account?</span>
-            </div>
+			<?php
+			// Show signup link only if registration is allowed
+			use app\models\AdminSettings;
+			if (AdminSettings::isSignupAllowed()): ?>
+			<div class="auth-divider">
+				<span>Don't have an account?</span>
+			</div>
 
-            <div class="auth-footer">
-                <?= Html::a('Create Account', ['site/signup'], ['class' => 'btn btn-outline-primary btn-block btn-auth']) ?>
-		</div>
-		*/ ?>
+			<div class="auth-footer">
+				<?= Html::a('Create Account', ['site/signup'], ['class' => 'btn btn-outline-primary btn-block btn-auth']) ?>
+			</div>
+			<?php endif; ?>
 	</div>
 
 	<div class="auth-demo-info">

@@ -429,7 +429,8 @@ main.flex-shrink-0 .container {
 }
 
 /* Table Headers */
-.table thead th {
+.table thead th,
+.table thead th a {
   background: #667eea !important;
   color: white !important;
   border-color: #667eea !important;

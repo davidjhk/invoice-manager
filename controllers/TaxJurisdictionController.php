@@ -408,6 +408,9 @@ class TaxJurisdictionController extends Controller
             $operation = Yii::$app->request->post('operation');
             $ids = Yii::$app->request->post('ids', []);
 
+            // Debug: Log the received data
+            Yii::error("Bulk Operation Debug - Operation: $operation, IDs: " . print_r($ids, true) . ", All POST: " . print_r(Yii::$app->request->post(), true));
+
             if (empty($ids)) {
                 Yii::$app->session->addFlash('error', 'Please select at least one jurisdiction.');
                 return $this->redirect(['index']);
