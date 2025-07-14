@@ -243,7 +243,13 @@ $this->registerJsVar('estimateConfig', [
 						<span id="taxable-subtotal-display" class="text-right">$0.00</span>
 
 						<span><?= Yii::t('app/estimate', 'Sales Tax') ?></span>
-						<span id="tax-display" class="text-right">$0.00</span>
+						<div class="text-right d-flex justify-content-end align-items-center">
+							<input type="number" class="form-control form-control-sm mr-2" id="tax-rate-input"
+								style="width: 120px;" min="0" max="100" step="0.01" 
+								value="<?= $company->tax_rate ?? 0 ?>" placeholder="0.00">
+							<span class="mr-2">%</span>
+							<span id="tax-display">$0.00</span>
+						</div>
 					</div>
 
 					<hr>
@@ -256,6 +262,9 @@ $this->registerJsVar('estimateConfig', [
 			</div>
 		</div>
 	</div>
+
+	<!-- Hidden fields for calculation values -->
+	<?= $form->field($model, 'tax_rate')->hiddenInput(['id' => 'tax-rate-hidden'])->label(false) ?>
 
 	<div class="form-group mt-4">
 		<?= Html::submitButton($model->isNewRecord ? Yii::t('app/estimate', 'Create Estimate') : Yii::t('app/estimate', 'Update Estimate'), ['class' => 'btn btn-success']) ?>
@@ -415,6 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		discountInput.addEventListener('input', calculateTotals);
 		discountType.addEventListener('change', calculateTotals);
+		document.getElementById('tax-rate-input').addEventListener('input', calculateTotals);
 
 		termsSelect.addEventListener('change', (e) => {
 			if (e.target.value) updateExpiryDateFromTerms(e.target.value);
@@ -512,7 +522,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		const taxableRatio = subtotal > 0 ? taxableAmount / subtotal : 0;
 		const taxableSubtotal = taxableAmount - (discountAmount * taxableRatio);
 
-		const taxAmount = 0; // Tax is not typically applied on estimates
+		const taxRateVal = document.getElementById('tax-rate-input').value;
+		const taxRate = parseFloat(taxRateVal) || 0;
+		const taxAmount = taxableSubtotal * (taxRate / 100);
+		
+		// Update hidden tax_rate field
+		document.getElementById('tax-rate-hidden').value = taxRate;
+		
 		const total = subtotalAfterDiscount + taxAmount;
 
 		document.getElementById('subtotal-display').textContent = formatCurrency(subtotal);

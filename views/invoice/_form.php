@@ -244,13 +244,10 @@ $this->registerJsVar('invoiceConfig', [
 
 						<span><?= Yii::t('app/invoice', 'Sales Tax') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
-							<select class="form-control form-control-sm mr-2" id="tax-rate-select"
-								style="width: 120px;">
-								<option value="auto">Auto</option>
-								<option value="0">0%</option>
-								<option value="5">5%</option>
-								<option value="10">10%</option>
-							</select>
+							<input type="number" class="form-control form-control-sm mr-2" id="tax-rate-input"
+								style="width: 120px;" min="0" max="100" step="0.01" 
+								value="<?= $company->tax_rate ?? 0 ?>" placeholder="0.00">
+							<span class="mr-2">%</span>
 							<span id="tax-display">$0.00</span>
 						</div>
 					</div>
@@ -269,6 +266,9 @@ $this->registerJsVar('invoiceConfig', [
 			</div>
 		</div>
 	</div>
+
+	<!-- Hidden fields for calculation values -->
+	<?= $form->field($model, 'tax_rate')->hiddenInput(['id' => 'tax-rate-hidden'])->label(false) ?>
 
 	<div class="form-group mt-4">
 		<?= Html::submitButton($model->isNewRecord ? Yii::t('app/invoice', 'Create Invoice') : Yii::t('app/invoice', 'Update Invoice'), ['class' => 'btn btn-success']) ?>
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		discountInput.addEventListener('input', calculateTotals);
 		discountType.addEventListener('change', calculateTotals);
-		document.getElementById('tax-rate-select').addEventListener('change', calculateTotals);
+		document.getElementById('tax-rate-input').addEventListener('input', calculateTotals);
 
 		termsSelect.addEventListener('change', (e) => {
 			if (e.target.value) updateDueDateFromTerms(e.target.value);
@@ -527,9 +527,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		const taxableRatio = subtotal > 0 ? taxableAmount / subtotal : 0;
 		const taxableSubtotal = taxableAmount - (discountAmount * taxableRatio);
 
-		const taxRateVal = document.getElementById('tax-rate-select').value;
-		const taxRate = taxRateVal === 'auto' ? 0 : parseFloat(taxRateVal) || 0;
+		const taxRateVal = document.getElementById('tax-rate-input').value;
+		const taxRate = parseFloat(taxRateVal) || 0;
 		const taxAmount = taxableSubtotal * (taxRate / 100);
+		
+		// Update hidden tax_rate field
+		document.getElementById('tax-rate-hidden').value = taxRate;
 
 		const total = subtotalAfterDiscount + taxAmount;
 		const deposit = 0; // Placeholder for deposit logic
