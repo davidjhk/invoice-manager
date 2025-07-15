@@ -145,7 +145,7 @@ AppAsset::register($this);
 			content: '' !important;
 			position: absolute !important;
 			top: 50% !important;
-			left: 50% !important;
+			right: 5% !important;
 			width: 0 !important;
 			height: 0 !important;
 			background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%) !important;
@@ -160,12 +160,12 @@ AppAsset::register($this);
 			left: 0 !important;
 		}
 
+		/*
 		body .main-navbar .navbar-nav .nav-link:hover::after {
 			width: 100px !important;
 			height: 100px !important;
 			opacity: 0.6 !important;
-		}
-
+		}*/
 		body .main-navbar .navbar-nav .nav-link:hover {
 			color: #ffffff !important;
 			text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
@@ -210,7 +210,7 @@ AppAsset::register($this);
 			content: '' !important;
 			position: absolute !important;
 			top: -2px !important;
-			left: -2px !important;
+			right: -2px !important;
 			right: -2px !important;
 			bottom: -2px !important;
 			background: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(124, 58, 237, 0.3)) !important;
@@ -290,7 +290,7 @@ AppAsset::register($this);
 			content: '' !important;
 			position: absolute !important;
 			top: 50% !important;
-			left: 50% !important;
+			right: 5% !important;
 			width: 0 !important;
 			height: 0 !important;
 			background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%) !important;
@@ -305,11 +305,12 @@ AppAsset::register($this);
 			left: 0 !important;
 		}
 
+		/*
 		body .main-navbar .dropdown .nav-link:hover::after {
 			width: 100px !important;
 			height: 100px !important;
 			opacity: 0.6 !important;
-		}
+		}*/
 
 		body .main-navbar .dropdown .nav-link:hover {
 			color: #ffffff !important;
