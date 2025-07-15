@@ -138,6 +138,7 @@ h3 {
 /* Top Bar Buttons - Enhanced Glass Effect with Better Contrast */
 .login-btn,
 .company-btn,
+.theme-toggle-btn,
 .user-btn {
   color: white !important;
   border: 1px solid rgba(255, 255, 255, 0.6) !important;
@@ -155,6 +156,7 @@ h3 {
 
 .login-btn:hover,
 .company-btn:hover,
+.theme-toggle-btn:hover,
 .user-btn:hover {
   background: rgba(255, 255, 255, 0.35) !important;
   border-color: rgba(255, 255, 255, 0.8) !important;
@@ -541,6 +543,7 @@ main.flex-shrink-0 .container {
 
   .login-btn,
   .company-btn,
+  .theme-toggle-btn,
   .user-btn {
     font-size: 0.8rem !important;
     padding: 0.4rem 0.8rem !important;
@@ -1093,6 +1096,7 @@ body.dark-mode .brand-link:hover {
 /* Dark mode top bar buttons */
 body.dark-mode .login-btn,
 body.dark-mode .company-btn,
+body.dark-mode .theme-toggle-btn,
 body.dark-mode .user-btn {
   background: rgba(255, 255, 255, 0.1) !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
@@ -1101,6 +1105,7 @@ body.dark-mode .user-btn {
 
 body.dark-mode .login-btn:hover,
 body.dark-mode .company-btn:hover,
+body.dark-mode .theme-toggle-btn:hover,
 body.dark-mode .user-btn:hover {
   background: rgba(255, 255, 255, 0.2) !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
