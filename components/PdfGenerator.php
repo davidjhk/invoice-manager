@@ -1660,8 +1660,8 @@ class PdfGenerator
             
             $html .= '
                 <tr>
-                    <td style="width:64%;">&nbsp;' . $description . '&nbsp;</td>
-                    <td style="width:12%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
+                    <td style="width:68%;">&nbsp;' . $description . '&nbsp;</td>
+                    <td style="width:8%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
                     <td style="width:12%;text-align: right;">&nbsp;' . $estimate->formatAmount($item->rate) . '&nbsp;</td>
                     <td style="width:12%;text-align: right;">&nbsp;' . $estimate->formatAmount($item->amount) . '&nbsp;</td>
                 </tr>';
