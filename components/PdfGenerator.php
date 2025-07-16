@@ -702,7 +702,7 @@ class PdfGenerator
             .separator { border-top: 3px solid #667eea; margin: 20px 0; }
             .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
             .items-table th { background: #667eea; color: white; padding: 12px; text-align: left; }
-            .items-table td { padding: 18px 12px; border-bottom: 1px solid #eee; }
+            .items-table td { padding: 18px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
             .items-table .text-right { text-align: right; }
             .totals-section { margin-top: 30px; }
             .totals-table { width: 350px; margin-left: auto; border-collapse: collapse; }
@@ -1637,10 +1637,10 @@ class PdfGenerator
         <table class="items-table" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 50%;">Description</th>
-                    <th style="width: 15%; text-align: right;">Quantity</th>
-                    <th style="width: 17.5%; text-align: right;">Rate</th>
-                    <th style="width: 17.5%; text-align: right;">Amount</th>
+                    <th style="width: 62%;">Description</th>
+                    <th style="width: 14%; text-align: right;">Quantity</th>
+                    <th style="width: 12%; text-align: right;">Rate</th>
+                    <th style="width: 12%; text-align: right;">Amount</th>
                 </tr>
             </thead>
             <tbody>';
@@ -1660,10 +1660,10 @@ class PdfGenerator
             
             $html .= '
                 <tr>
-                    <td style="width:50%;">&nbsp;' . $description . '&nbsp;</td>
-                    <td style="width:15%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
-                    <td style="width:17.5%;text-align: right;">&nbsp;' . $estimate->formatAmount($item->rate) . '&nbsp;</td>
-                    <td style="width:17.5%;text-align: right;">&nbsp;' . $estimate->formatAmount($item->amount) . '&nbsp;</td>
+                    <td style="width:64%;">&nbsp;' . $description . '&nbsp;</td>
+                    <td style="width:12%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
+                    <td style="width:12%;text-align: right;">&nbsp;' . $estimate->formatAmount($item->rate) . '&nbsp;</td>
+                    <td style="width:12%;text-align: right;">&nbsp;' . $estimate->formatAmount($item->amount) . '&nbsp;</td>
                 </tr>';
         }
 
