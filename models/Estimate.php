@@ -319,12 +319,7 @@ class Estimate extends ActiveRecord
             }
         }
 
-        // If no item-level tax amounts are calculated, use estimate-level tax calculation
-        if ($taxAmount == 0 && $this->tax_rate > 0 && $taxableSubtotal > 0) {
-            $taxAmount = $taxableSubtotal * ($this->tax_rate / 100);
-        }
-
-        // Apply discount
+        // Calculate discount
         $discountAmount = 0;
         $discountValue = is_numeric($this->discount_value) ? (float) $this->discount_value : 0;
         
@@ -332,6 +327,22 @@ class Estimate extends ActiveRecord
             $discountAmount = $subtotal * ($discountValue / 100);
         } elseif ($this->discount_type == 'fixed') {
             $discountAmount = $discountValue;
+        }
+
+        // If no item-level tax amounts are calculated, use estimate-level tax calculation
+        if ($taxAmount == 0 && $this->tax_rate > 0 && $taxableSubtotal > 0) {
+            // Calculate tax on taxable subtotal after discount (similar to Invoice model)
+            $afterDiscountTaxable = $taxableSubtotal;
+            if ($subtotal > 0) {
+                $afterDiscountTaxable = $taxableSubtotal - ($discountAmount * ($taxableSubtotal / $subtotal));
+            } else {
+                $afterDiscountTaxable = $taxableSubtotal - $discountAmount;
+            }
+            
+            // Ensure after discount taxable is not negative
+            $afterDiscountTaxable = max(0, $afterDiscountTaxable);
+            
+            $taxAmount = $afterDiscountTaxable * ($this->tax_rate / 100);
         }
 
         $this->subtotal = $subtotal;
