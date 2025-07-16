@@ -306,6 +306,7 @@ class Estimate extends ActiveRecord
     {
         $subtotal = 0;
         $taxAmount = 0;
+        $taxableSubtotal = 0;
 
         foreach ($this->estimateItems as $item) {
             $itemAmount = is_numeric($item->amount) ? (float) $item->amount : 0;
@@ -313,8 +314,14 @@ class Estimate extends ActiveRecord
             
             $subtotal += $itemAmount;
             if ($item->is_taxable) {
+                $taxableSubtotal += $itemAmount;
                 $taxAmount += $itemTaxAmount;
             }
+        }
+
+        // If no item-level tax amounts are calculated, use estimate-level tax calculation
+        if ($taxAmount == 0 && $this->tax_rate > 0 && $taxableSubtotal > 0) {
+            $taxAmount = $taxableSubtotal * ($this->tax_rate / 100);
         }
 
         // Apply discount
