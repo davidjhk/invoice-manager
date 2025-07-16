@@ -1637,8 +1637,8 @@ class PdfGenerator
         <table class="items-table" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 62%;">Description</th>
-                    <th style="width: 14%; text-align: right;">Quantity</th>
+                    <th style="width: 68%;">Description</th>
+                    <th style="width: 8%; text-align: right;">Qty</th>
                     <th style="width: 12%; text-align: right;">Rate</th>
                     <th style="width: 12%; text-align: right;">Amount</th>
                 </tr>
