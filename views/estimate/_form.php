@@ -349,7 +349,7 @@ $this->registerJsVar('estimateConfig', [
 						<div class="col-md-3">
 							<div class="form-group">
 								<label for="new-customer-state"><?= Yii::t('app/customer', 'State') ?></label>
-<?= Html::dropDownList('state', '', State::getUsStateList(), [
+								<?= Html::dropDownList('state', '', State::getUsStateList(), [
 									'class' => 'form-control',
 									'id' => 'new-customer-state',
 									'prompt' => Yii::t('app/customer', 'Select State')
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="text" class="form-control product-input" name="EstimateItem[${rowIndex}][product_service_name]" placeholder="Product or Service" value="${item.product_service_name || ''}">
                 <input type="hidden" class="product-id-input" name="EstimateItem[${rowIndex}][product_id]" value="${item.product_id || ''}">
             </td>
-            <td><textarea class="form-control description-input" name="EstimateItem[${rowIndex}][description]" rows="1" placeholder="Description">${item.description || ''}</textarea></td>
+            <td><textarea class="form-control description-input" name="EstimateItem[${rowIndex}][description]" rows="4" placeholder="Description">${item.description || ''}</textarea></td>
             <td><input type="number" class="form-control quantity-input text-right" name="EstimateItem[${rowIndex}][quantity]" value="${item.quantity || 1}" min="0" step="1"></td>
             <td><input type="number" class="form-control rate-input text-right" name="EstimateItem[${rowIndex}][rate]" value="${item.rate || '0.00'}" min="0" step="0.01"></td>
             <td class="align-middle text-right amount-display">$0.00</td>
@@ -835,7 +835,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		const customerId = customerSelect.value;
 		if (!customerId) {
 			alert(
-				'<?= Yii::t('app/invoice', 'Please select a customer first to calculate automatic tax.') ?>');
+				'<?= Yii::t('app/invoice', 'Please select a customer first to calculate automatic tax.') ?>'
+				);
 			return;
 		}
 
@@ -929,7 +930,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* Modal width adjustment */
 .modal-dialog-wide {
-	max-width: calc(600px + 100px); /* Default modal-lg is 600px, adding 100px */
+	max-width: calc(600px + 100px);
+	/* Default modal-lg is 600px, adding 100px */
 }
 
 @media (min-width: 768px) {
@@ -941,7 +943,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @media (min-width: 992px) {
 	.modal-dialog-wide {
-		max-width: calc(800px + 100px); /* Bootstrap modal-xl is 800px, adding 100px */
+		max-width: calc(800px + 100px);
+		/* Bootstrap modal-xl is 800px, adding 100px */
 	}
 }
 </style>

@@ -488,10 +488,10 @@ class PdfGenerator
             if (!empty($item->product_service_name)) {
                 $description .= '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;"><strong>' . htmlspecialchars($item->product_service_name) . '</strong></span>';
                 if (!empty($item->description)) {
-                    $description .= '<br><span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . htmlspecialchars($item->description) . '</span>';
+                    $description .= '<br><span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
                 }
             } else if (!empty($item->description)) {
-                $description = '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . htmlspecialchars($item->description) . '</span>';
+                $description = '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
             }
             
             $html .= '
@@ -929,10 +929,10 @@ class PdfGenerator
 				<?php if (!empty($item->product_service_name)): ?>
 				<strong><?= htmlspecialchars($item->product_service_name) ?></strong>
 				<?php if (!empty($item->description)): ?>
-				<br><small><?= htmlspecialchars($item->description) ?></small>
+				<br><small><?= nl2br(htmlspecialchars($item->description)) ?></small>
 				<?php endif; ?>
 				<?php elseif (!empty($item->description)): ?>
-				<?= htmlspecialchars($item->description) ?>
+				<?= nl2br(htmlspecialchars($item->description)) ?>
 				<?php endif; ?>
 			</td>
 			<td style="text-align: right;"><?= $item->getFormattedQuantity() ?></td>
@@ -1233,10 +1233,10 @@ class PdfGenerator
 				<?php if (!empty($item->product_service_name)): ?>
 				<strong><?= htmlspecialchars($item->product_service_name) ?></strong>
 				<?php if (!empty($item->description)): ?>
-				<br><small><?= htmlspecialchars($item->description) ?></small>
+				<br><small><?= nl2br(htmlspecialchars($item->description)) ?></small>
 				<?php endif; ?>
 				<?php elseif (!empty($item->description)): ?>
-				<?= htmlspecialchars($item->description) ?>
+				<?= nl2br(htmlspecialchars($item->description)) ?>
 				<?php endif; ?>
 			</td>
 			<td style="text-align: center;"><?= $item->getFormattedQuantity() ?></td>
@@ -1652,10 +1652,10 @@ class PdfGenerator
             if (!empty($item->product_service_name)) {
                 $description .= '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;"><strong>' . htmlspecialchars($item->product_service_name) . '</strong></span>';
                 if (!empty($item->description)) {
-                    $description .= '<br><span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . htmlspecialchars($item->description) . '</span>';
+                    $description .= '<br><span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
                 }
             } else if (!empty($item->description)) {
-                $description = '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . htmlspecialchars($item->description) . '</span>';
+                $description = '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
             }
             
             $html .= '

@@ -233,7 +233,7 @@ use yii\helpers\Html;
             <tr>
                 <td class="text-center"><?= $index + 1 ?></td>
                 <td><?= Html::encode($item->product_service_name ?: '-') ?></td>
-                <td><?= Html::encode($item->description) ?></td>
+                <td><?= nl2br(Html::encode($item->description)) ?></td>
                 <td class="text-center"><?= $item->getFormattedQuantity() ?></td>
                 <td class="text-right"><?= $model->formatAmount($item->rate) ?></td>
                 <td class="text-right"><?= $item->getFormattedAmount() ?></td>
