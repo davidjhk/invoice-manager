@@ -473,10 +473,10 @@ class PdfGenerator
         <table class="items-table" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 50%;">Description</th>
-                    <th style="width: 15%; text-align: right;">Quantity</th>
-                    <th style="width: 17.5%; text-align: right;">Rate</th>
-                    <th style="width: 17.5%; text-align: right;">Amount</th>
+                    <th style="width: 68%;">Description</th>
+                    <th style="width: 8%; text-align: right;">Qty</th>
+                    <th style="width: 12%; text-align: right;">Rate</th>
+                    <th style="width: 12%; text-align: right;">Amount</th>
                 </tr>
             </thead>
             <tbody>';
@@ -496,10 +496,10 @@ class PdfGenerator
             
             $html .= '
                 <tr>
-                    <td style="width:50%;">&nbsp;' . $description . '&nbsp;</td>
-                    <td style="width:15%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
-                    <td style="width:17.5%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->rate) . '&nbsp;</td>
-                    <td style="width:17.5%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->amount) . '&nbsp;</td>
+                    <td style="width:68%;">&nbsp;' . $description . '&nbsp;</td>
+                    <td style="width:8%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
+                    <td style="width:12%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->rate) . '&nbsp;</td>
+                    <td style="width:12%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->amount) . '&nbsp;</td>
                 </tr>';
         }
 
@@ -917,7 +917,7 @@ class PdfGenerator
 	<thead>
 		<tr>
 			<th style="width: 70%;">Description</th>
-			<th style="width: 10%; text-align: ;">Quantity</th>
+			<th style="width: 10%; text-align: ;">Qty</th>
 			<th style="width: 10%; text-align: right;">Rate</th>
 			<th style="width: 10%; text-align: right;">Amount</th>
 		</tr>
@@ -1221,7 +1221,7 @@ class PdfGenerator
 	<thead>
 		<tr>
 			<th style="width: 70%;">Description</th>
-			<th style="width: 10%; text-align: center;">Quantity</th>
+			<th style="width: 10%; text-align: center;">Qty</th>
 			<th style="width: 10%; text-align: right;">Rate</th>
 			<th style="width: 10%; text-align: right;">Amount</th>
 		</tr>
