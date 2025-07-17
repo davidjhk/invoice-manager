@@ -22,6 +22,84 @@ class InvoicePDF extends TCPDF
     public $documentType = 'INVOICE';
     
     /**
+     * Override AddPage to handle different margins for different pages
+     */
+    public function AddPage($orientation = '', $format = '', $keepmargins = false, $tocpage = false)
+    {
+        parent::AddPage($orientation, $format, $keepmargins, $tocpage);
+        
+        // After adding a page, draw header for pages after first
+        if ($this->getPage() > 1 && $this->headerData !== null) {
+            $this->drawManualHeader();
+        }
+    }
+    
+    /**
+     * Override checkPageBreak to handle page breaks with proper header spacing
+     */
+    public function checkPageBreak($h = 0, $y = '', $addpage = true)
+    {
+        $result = parent::checkPageBreak($h, $y, $addpage);
+        
+        // If a page break occurred and we're on page 2+, ensure proper spacing
+        if ($result && $this->getPage() > 1 && $this->headerData !== null) {
+            $this->drawManualHeader();
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Draw manual header for pages 2+
+     */
+    private function drawManualHeader()
+    {
+        $company = $this->headerData['company'];
+        $config = $this->headerData['config'];
+        $document = $this->headerData['document'] ?? null;
+        
+        // Set font for header
+        try {
+            if ($this->useCJKFont) {
+                $this->SetFont('kozgopromedium', 'B', 9);
+            } else {
+                $this->SetFont('helvetica', 'B', 9);
+            }
+        } catch (Exception $e) {
+            $this->SetFont('helvetica', 'B', 9);
+        }
+        
+        // Draw header line at top
+        $this->Line(15, 10, $this->getPageWidth() - 15, 10);
+        
+        // Build header text
+        $headerText = $company->company_name;
+        if ($document) {
+            $documentNumber = '';
+            if ($config['title'] === 'INVOICE' && isset($document->invoice_number)) {
+                $documentNumber = $document->invoice_number;
+            } elseif ($config['title'] === 'ESTIMATE' && isset($document->estimate_number)) {
+                $documentNumber = $document->estimate_number;
+            }
+            
+            if ($documentNumber) {
+                $headerText .= ' - ' . $config['title'] . ' #' . $documentNumber;
+            } else {
+                $headerText .= ' - ' . $config['title'];
+            }
+        } else {
+            $headerText .= ' - ' . $config['title'];
+        }
+        
+        // Draw header text
+        $this->SetXY(15, 12);
+        $this->Cell(0, 6, $headerText, 0, 1, 'L');
+        
+        // Force Y position to ensure content starts well below header
+        $this->SetY(35);
+    }
+    
+    /**
      * Set custom header data for repeating header
      */
     public function setCustomHeaderData($company, $config, $document = null)
@@ -31,71 +109,12 @@ class InvoicePDF extends TCPDF
     }
     
     /**
-     * Header method for repeating header on each page
+     * Header method - now disabled since we use manual headers
      */
     public function Header()
     {
-        if ($this->headerData === null) {
-            return;
-        }
-        
-        $company = $this->headerData['company'];
-        $config = $this->headerData['config'];
-        $document = $this->headerData['document'] ?? null;
-        
-        // Set font for header with error handling
-        try {
-            if ($this->useCJKFont) {
-                $this->SetFont('kozgopromedium', '', 8);
-            } else {
-                $this->SetFont('helvetica', '', 8);
-            }
-        } catch (Exception $e) {
-            // Fallback to helvetica if font fails
-            $this->SetFont('helvetica', '', 8);
-        }
-        
-        // Only show simplified header on pages after first page
-        if ($this->getPage() > 1) {
-            // Add a border line at top
-            $this->Line(15, 15, $this->getPageWidth() - 15, 15);
-            
-            // Company name and document info in simplified header
-            $this->SetXY(15, 16);
-            try {
-                if ($this->useCJKFont) {
-                    $this->SetFont('kozgopromedium', 'B', 9);
-                } else {
-                    $this->SetFont('helvetica', 'B', 9);
-                }
-            } catch (Exception $e) {
-                $this->SetFont('helvetica', 'B', 9);
-            }
-            
-            // Build header text with document number
-            $headerText = $company->company_name;
-            if ($document) {
-                $documentNumber = '';
-                if ($config['title'] === 'INVOICE' && isset($document->invoice_number)) {
-                    $documentNumber = $document->invoice_number;
-                } elseif ($config['title'] === 'ESTIMATE' && isset($document->estimate_number)) {
-                    $documentNumber = $document->estimate_number;
-                }
-                
-                if ($documentNumber) {
-                    $headerText .= ' - ' . $config['title'] . ' #' . $documentNumber;
-                } else {
-                    $headerText .= ' - ' . $config['title'];
-                }
-            } else {
-                $headerText .= ' - ' . $config['title'];
-            }
-            
-            $this->Cell(0, 6, $headerText, 0, 1, 'L');
-            
-            // Add some space after header
-            $this->Ln(3);
-        }
+        // Headers are now handled manually in AddPage method
+        // This prevents TCPDF automatic header interference
     }
     
     public function Footer()
@@ -295,15 +314,18 @@ class PdfGenerator
         $pdf->SetTitle('Invoice ' . $invoice->invoice_number);
         $pdf->SetSubject('Invoice');
 
-        // Enable custom header and footer
-        $pdf->setPrintHeader(true);
+        // Enable footer only, disable automatic header
+        $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         
         // Set header data for repeating header
         $pdf->setCustomHeaderData($invoice->company, self::getTemplateConfig('invoice'), $invoice);
 
-        // Set margins (top, left, right) - reduced top margin
+        // Set margins (top, left, right) - small top margin for first page
         $pdf->SetMargins(15, 5, 15);
+        
+        // Set initial header margin to 0 for first page
+        $pdf->SetHeaderMargin(0);
         
         // Set auto page break with bottom margin for footer
         $pdf->SetAutoPageBreak(true, 15);
@@ -385,6 +407,8 @@ class PdfGenerator
         return '
         <style>
             body { font-family: ' . $fontFamily . '; font-size: 9px; line-height: 1.4; ' . $letterSpacing . ' }
+            @page { margin-top: 40mm; }
+            @page:first { margin-top: 10mm; }
             p { margin: 0; padding: 5px; text-indent: 0; }
             div { text-indent: 0; }
             br { margin: 0; padding: 0; }
@@ -1685,15 +1709,18 @@ class PdfGenerator
         $pdf->SetTitle('Estimate ' . $estimate->estimate_number);
         $pdf->SetSubject('Estimate');
 
-        // Enable custom header and footer
-        $pdf->setPrintHeader(true);
+        // Enable footer only, disable automatic header
+        $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         
         // Set header data for repeating header
         $pdf->setCustomHeaderData($estimate->company, self::getTemplateConfig('estimate'), $estimate);
 
-        // Set margins (top, left, right) - reduced top margin
+        // Set margins (top, left, right) - small top margin for first page
         $pdf->SetMargins(15, 5, 15);
+        
+        // Set initial header margin to 0 for first page
+        $pdf->SetHeaderMargin(0);
         
         // Set auto page break with bottom margin for footer
         $pdf->SetAutoPageBreak(true, 15);
