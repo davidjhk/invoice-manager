@@ -350,7 +350,7 @@ class PdfHtmlGenerator
             foreach ($addressLines as $line) {
                 $line = trim($line);
                 if (!empty($line)) {
-                    $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
+                    $html .= htmlspecialchars($line) . '<br>';
                 }
             }
         }
@@ -360,22 +360,22 @@ class PdfHtmlGenerator
         if ($customer->state) $locationParts[] = $customer->state;
         if ($customer->zip_code) $locationParts[] = $customer->zip_code;
         if (!empty($locationParts)) {
-            $html .= '&nbsp; ' . htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+            $html .= htmlspecialchars(implode(', ', $locationParts)) . '<br>';
         }
         if ($customer->country && $customer->country !== 'US') {
-            $html .= '&nbsp; ' . htmlspecialchars($customer->country) . '<br>';
+            $html .= htmlspecialchars($customer->country) . '<br>';
         }
         if ($customer->customer_phone) {
-            $html .= '&nbsp; Phone: ' . htmlspecialchars($customer->customer_phone) . '<br>';
+            $html .= 'Phone: ' . htmlspecialchars($customer->customer_phone) . '<br>';
         }
         if ($customer->customer_fax && $config['title'] === 'INVOICE') {
-            $html .= '&nbsp; Fax: ' . htmlspecialchars($customer->customer_fax) . '<br>';
+            $html .= 'Fax: ' . htmlspecialchars($customer->customer_fax) . '<br>';
         }
         if ($customer->customer_mobile && $config['title'] === 'INVOICE') {
-            $html .= '&nbsp; Mobile: ' . htmlspecialchars($customer->customer_mobile) . '<br>';
+            $html .= 'Mobile: ' . htmlspecialchars($customer->customer_mobile) . '<br>';
         }
         if ($customer->customer_email) {
-            $html .= '&nbsp; Email: ' . htmlspecialchars($customer->customer_email) . '<br>';
+            $html .= 'Email: ' . htmlspecialchars($customer->customer_email) . '<br>';
         }
 
         $html .= '
@@ -391,7 +391,7 @@ class PdfHtmlGenerator
             foreach ($shipLines as $line) {
                 $line = trim($line);
                 if (!empty($line)) {
-                    $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
+                    $html .= htmlspecialchars($line) . '<br>';
                 }
             }
         } else {
@@ -401,7 +401,7 @@ class PdfHtmlGenerator
                 foreach ($addressLines as $line) {
                     $line = trim($line);
                     if (!empty($line)) {
-                        $html .= '&nbsp; '.htmlspecialchars($line) . '<br>';
+                        $html .= htmlspecialchars($line) . '<br>';
                     }
                 }
             }
@@ -411,10 +411,10 @@ class PdfHtmlGenerator
             if ($customer->state) $locationParts[] = $customer->state;
             if ($customer->zip_code) $locationParts[] = $customer->zip_code;
             if (!empty($locationParts)) {
-                $html .= '&nbsp; ' . htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+                $html .= htmlspecialchars(implode(', ', $locationParts)) . '<br>';
             }
             if ($customer->country && $customer->country !== 'US') {
-                $html .= '&nbsp; ' . htmlspecialchars($customer->country) . '<br>';
+                $html .= htmlspecialchars($customer->country) . '<br>';
             }
         }
 
