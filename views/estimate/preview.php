@@ -97,18 +97,21 @@ $this->registerCss("
     
     /* Dark mode override - force white background and black text for preview */
     body.dark-mode .estimate-preview-wrapper {
-        background: white !important;
-        color: black !important;
+        background: black !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     }
-    
     body.dark-mode .estimate-preview-wrapper *,
     body.dark-mode .estimate-preview-container *,
     body.dark-mode .estimate-preview-container,
     .dark-mode .estimate-preview-wrapper *,
     .dark-mode .estimate-preview-container * {
         color: black !important;
-        background: transparent !important;
+        background: white !important;
+		border-radius: 10px;
+    }
+	body.dark-mode .estimate-preview-wrapper,
+    body.dark-mode .estimate-preview-wrappe document-preview-container {
+        background: #111827 !important;
     }
     
     body.dark-mode .estimate-preview-container .items-table th,

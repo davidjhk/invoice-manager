@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Estimate Preview'), ['preview', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Preview'), ['preview', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'target' => '_blank',
                 'encode' => false

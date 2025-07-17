@@ -105,8 +105,7 @@ $this->registerCss("
     
     /* Dark mode override - force white background and black text for preview */
     body.dark-mode .invoice-preview-wrapper {
-        background: white !important;
-        color: black !important;
+        background: #111827 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     }
     
@@ -116,7 +115,8 @@ $this->registerCss("
     .dark-mode .invoice-preview-wrapper *,
     .dark-mode .invoice-preview-container * {
         color: black !important;
-        background: transparent !important;
+        background: white !important;
+		border-radius: 10px;
     }
     
     body.dark-mode .invoice-preview-container .items-table th,

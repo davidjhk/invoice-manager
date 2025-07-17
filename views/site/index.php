@@ -187,6 +187,12 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 					<?= Html::a('<i class="fas fa-box"></i>' . Yii::t('app/product', 'Product'), ['/product/create'], [
                         'class' => 'action-btn secondary'
                     ]) ?>
+					<?= Html::a('<i class="fas fa-cog"></i>' . Yii::t('app/nav', 'Settings'), ['/company/settings'], [
+                        'class' => 'action-btn secondary'
+                    ]) ?>
+					<?= Html::a('<i class="fas fa-key"></i>' . Yii::t('app/nav', 'Change Password'), ['/site/change-password'], [
+                        'class' => 'action-btn secondary'
+                    ]) ?>
 				</div>
 			</div>
 

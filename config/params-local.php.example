@@ -17,4 +17,5 @@ return [
     // 5. Add redirect URI: https://yourdomain.com/site/google-login
     'googleClientId' => 'your-google-client-id-here.apps.googleusercontent.com',
     'googleClientSecret' => 'your-google-client-secret-here',
+    'pdf.generator' => 'mpdf', // Options: 'tcpdf', 'mpdf'
 ];

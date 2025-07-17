@@ -25,6 +25,7 @@ define('K_TCPDF_EXTERNAL_CONFIG', true);
 define('K_PATH_CACHE', $temp_dir);
 
 // Define other essential configurations
+
 define('PDF_PAGE_FORMAT', 'LETTER');
 define('PDF_PAGE_ORIENTATION', 'P');
 define('PDF_CREATOR', 'Invoice Manager');
