@@ -14,55 +14,55 @@ $this->params['breadcrumbs'][] = Yii::t('app/estimate', 'Preview');
 
 <div class="estimate-preview">
 
-	<div class="d-flex justify-content-between align-items-center mb-4 print-hidden">
-		<h1><?= Html::encode($this->title) ?></h1>
-		<div class="action-buttons">
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Download PDF'), ['download-pdf', 'id' => $model->id], [
+    <div class="d-flex justify-content-between align-items-center mb-4 print-hidden">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <div class="action-buttons">
+            <?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Download PDF'), ['download-pdf', 'id' => $model->id], [
                 'class' => 'btn btn-primary',
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
 
-			<?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/estimate', 'Print'), '#', [
+            <?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/estimate', 'Print'), '#', [
                 'class' => 'btn btn-info',
                 'onclick' => 'window.print(); return false;',
                 'encode' => false
             ]) ?>
 
-			<?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED])): ?>
-			<?php 
-				$company = \app\models\Company::getCurrent();
-				$hasEmailConfig = $company && $company->hasEmailConfiguration();
-			?>
-			<?= Html::a(
-				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), 
-				$hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
-				[
-					'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
-					'encode' => false,
-					'disabled' => !$hasEmailConfig,
-					'title' => $hasEmailConfig ? '' : Yii::t('app/estimate', 'Email not configured. Configure SMTP2GO in Company Settings.'),
-					'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
-					'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
-				]
-			) ?>
-			<?php endif; ?>
+            <?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED])): ?>
+            <?php 
+                $company = \app\models\Company::getCurrent();
+                $hasEmailConfig = $company && $company->hasEmailConfiguration();
+            ?>
+            <?= Html::a(
+                '<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), 
+                $hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
+                [
+                    'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
+                    'encode' => false,
+                    'disabled' => !$hasEmailConfig,
+                    'title' => $hasEmailConfig ? '' : Yii::t('app/estimate', 'Email not configured. Configure SMTP2GO in Company Settings.'),
+                    'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
+                    'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
+                ]
+            ) ?>
+            <?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], [
                     'class' => 'btn btn-secondary',
                     'encode' => false
                 ]) ?>
 
-			<?= Html::a('<i class="fas fa-arrow-left mr-1"></i>' . Yii::t('app', 'Back'), ['view', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-arrow-left mr-1"></i>' . Yii::t('app', 'Back'), ['view', 'id' => $model->id], [
                 'class' => 'btn btn-outline-secondary',
                 'encode' => false
             ]) ?>
-		</div>
-	</div>
+        </div>
+    </div>
 
-	<div class="estimate-preview-wrapper">
-		<?= PdfGenerator::generateEstimatePreviewHtml($model) ?>
-	</div>
+    <div class="estimate-preview-wrapper">
+        <?= PdfGenerator::generateEstimatePreviewHtml($model) ?>
+    </div>
 
 </div>
 
@@ -107,9 +107,9 @@ $this->registerCss("
     .dark-mode .estimate-preview-container * {
         color: black !important;
         background: white !important;
-		border-radius: 10px;
+        border-radius: 10px;
     }
-	body.dark-mode .estimate-preview-wrapper,
+    body.dark-mode .estimate-preview-wrapper,
     body.dark-mode .estimate-preview-wrappe document-preview-container {
         background: #111827 !important;
     }
