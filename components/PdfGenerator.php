@@ -286,7 +286,8 @@ class PdfGenerator
     {
         // Create new PDF document using custom class
         $pdf = new InvoicePDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        
+        $pdf->company = $invoice->company; // 이 줄을 추가하세요
+
         // Set CJK font preference for footer
         $pdf->useCJKFont = $invoice->company->use_cjk_font;
         
@@ -1140,25 +1141,12 @@ class PdfGenerator
 			<td class="sub-header-column">
 				<div class="ship-to">
 					<strong>Ship To:</strong><br>
-					<strong><?= htmlspecialchars($customer->customer_name) ?></strong><br>
 					<?php if ($customer->customer_address): ?>
 					<?php foreach (explode("\n", $customer->customer_address) as $line): ?>
 					<?php $line = trim($line); if (!empty($line)): ?>
 					<?= htmlspecialchars($line) ?><br>
 					<?php endif; ?>
 					<?php endforeach; ?>
-					<?php endif; ?>
-					<?php 
-						$locationParts = [];
-						if ($customer->city) $locationParts[] = $customer->city;
-						if ($customer->state) $locationParts[] = $customer->state;
-						if ($customer->zip_code) $locationParts[] = $customer->zip_code;
-						if (!empty($locationParts)): 
-					?>
-					<?= htmlspecialchars(implode(', ', $locationParts)) ?><br>
-					<?php endif; ?>
-					<?php if ($customer->country && $customer->country !== 'US'): ?>
-					<?= htmlspecialchars($customer->country) ?><br>
 					<?php endif; ?>
 				</div>
 			</td>
@@ -1612,7 +1600,8 @@ class PdfGenerator
     {
         // Create new PDF document using custom class
         $pdf = new InvoicePDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        
+        $pdf->company = $estimate->company; // 이 줄을 추가하세요
+
         // Set CJK font preference for footer
         $pdf->useCJKFont = $estimate->company->use_cjk_font;
         
