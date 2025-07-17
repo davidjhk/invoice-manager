@@ -158,9 +158,7 @@ class PdfHtmlGenerator
      */
     public static function getTemplateStyles($useCJKFont = false, $colorScheme = '#667eea')
     {
-        $fontFamily = $useCJKFont ? 
-            '"kozgopromedium", "DejaVu Sans", "FreeSerif", "Times", sans-serif' :
-            '"DejaVu Sans", "FreeSerif", "Times", sans-serif';
+        $fontFamily = '"FreeSans", "DejavuSans", "Arial", sans-serif';
             
         // Add letter spacing for CJK fonts to improve readability
         $letterSpacing = $useCJKFont ? 'letter-spacing: 0.5px;' : '';
@@ -227,7 +225,7 @@ class PdfHtmlGenerator
         <div class="header">
             <table width="100%">
                 <tr>
-                    <td width="40%" class="company-info">
+                    <td width="35%" class="company-info">
                         <div class="document-title">' . $config['title'] . '</div>
                         <strong>' . htmlspecialchars($company->company_name) . '</strong><br>';
         
@@ -264,7 +262,7 @@ class PdfHtmlGenerator
         $html .= '
                     </td>
                     <td width="20%">&nbsp;</td>
-                    <td width="40%" style="text-align: right; vertical-align: top;">';
+                    <td width="45%" style="text-align: right; vertical-align: top;">';
 
         // Add logo if exists, otherwise show company name in large font
         if ($company->hasLogo()) {
@@ -276,10 +274,10 @@ class PdfHtmlGenerator
                     $originalWidth = $imageInfo[0];
                     $originalHeight = $imageInfo[1];
                     
-                    // Calculate new dimensions with max height of 120px and max width of 40% of page width
+                    // Calculate new dimensions with max height of 120px and max width of 45% of page width
                     $maxHeight = 120;
-                    // Page width is approximately 595px for A4, so 40% is about 238px
-                    $maxWidth = 238;
+                    // Page width is approximately 595px for A4, so 45% is about 268px
+                    $maxWidth = 268;
                     
                     $ratio = min($maxHeight / $originalHeight, $maxWidth / $originalWidth);
                     $newWidth = $originalWidth * $ratio;
@@ -287,14 +285,14 @@ class PdfHtmlGenerator
                     
                     $html .= '<img src="' . $logoPath . '" width="' . $newWidth . '" height="' . $newHeight . '" alt="Company Logo" style="vertical-align: top;">';
                 } else {
-                    // Fallback with 40% page width limit
-                    $html .= '<img src="' . $logoPath . '" width="238" height="120" alt="Company Logo" style="vertical-align: top;">';
+                    // Fallback with 45% page width limit
+                    $html .= '<img src="' . $logoPath . '" width="268" height="120" alt="Company Logo" style="vertical-align: top;">';
                 }
             }
         } else {
             // No logo - display company name in large font with dynamic sizing
             $companyName = htmlspecialchars($company->company_name);
-            $maxWidth = 238; // Max width in pixels
+            $maxWidth = 268; // Max width in pixels (45% of A4 page width)
             $fontSize = self::calculateFontSize($company->company_name, $maxWidth, 20, 12); // Better balance
             
             // Replace spaces with non-breaking spaces to prevent line breaks
@@ -842,7 +840,7 @@ class PdfHtmlGenerator
             .balance-due-paid { background: #d4edda !important; }
             .balance-due-unpaid { background: #fff3cd !important; }
             .notes-section { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
-            .logo { max-height: 120px; max-width: 360px; height: auto;}
+            .logo { max-height: 120px; max-width: 405px; height: auto;}
             .paid-watermark {
                 position: absolute; top: 50%; left: 50%;
                 transform: translate(-50%, -50%) rotate(-45deg);
@@ -877,7 +875,7 @@ class PdfHtmlGenerator
 <div class="document-header">
 	<table style="width: 100%;">
 		<tr>
-			<td style="width: 40%; vertical-align: top;">
+			<td style="width: 35%; vertical-align: top;">
 				<div class="company-info">
 					<h2><?= $config['title'] ?></h2>
 					<strong><?= htmlspecialchars($company->company_name) ?></strong><br>
@@ -909,14 +907,14 @@ class PdfHtmlGenerator
 				</div>
 			</td>
 			<td style="width: 20%;">&nbsp;</td>
-			<td style="width: 40%; text-align: right; vertical-align: top;">
+			<td style="width: 45%; text-align: right; vertical-align: top;">
 				<div class="logo-section">
 					<?php if ($company->hasLogo()): ?>
 					<img src="<?= $company->getLogoUrl() ?>" alt="Company Logo" class="logo"
-						style="max-height: 120px; max-width: 360px; height: auto;">
+						style="max-height: 120px; max-width: 405px; height: auto;">
 					<?php else: ?>
 					<?php 
-						$maxWidth = 360;
+						$maxWidth = 405; // 45% of web preview width
 						$fontSize = self::calculateFontSize($company->company_name, $maxWidth, 24, 16);
 						$companyNameNoBreak = str_replace(' ', '&nbsp;', htmlspecialchars($company->company_name));
 					?>
