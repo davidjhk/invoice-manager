@@ -322,8 +322,8 @@ class PdfGenerator
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         
-        // Set header data for repeating header
-        $pdf->setCustomHeaderData($invoice->company, self::getTemplateConfig('invoice'), $invoice);
+        // Disable custom header data - we'll handle headers in HTML
+        // $pdf->setCustomHeaderData($invoice->company, self::getTemplateConfig('invoice'), $invoice);
 
         // Set margins (top, left, right) - small top margin for first page
         $pdf->SetMargins(15, 5, 15);
@@ -411,8 +411,6 @@ class PdfGenerator
         return '
         <style>
             body { font-family: ' . $fontFamily . '; font-size: 9px; line-height: 1.4; ' . $letterSpacing . ' }
-            @page { margin-top: 50mm; }
-            @page:first { margin-top: 10mm; }
             p { margin: 0; padding: 5px; text-indent: 0; }
             div { text-indent: 0; }
             br { margin: 0; padding: 0; }
@@ -1717,8 +1715,8 @@ class PdfGenerator
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         
-        // Set header data for repeating header
-        $pdf->setCustomHeaderData($estimate->company, self::getTemplateConfig('estimate'), $estimate);
+        // Disable custom header data - we'll handle headers in HTML
+        // $pdf->setCustomHeaderData($estimate->company, self::getTemplateConfig('estimate'), $estimate);
 
         // Set margins (top, left, right) - small top margin for first page
         $pdf->SetMargins(15, 5, 15);
