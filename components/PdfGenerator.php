@@ -20,17 +20,20 @@ class InvoicePDF extends TCPDF
     public $useCJKFont = false;
     public $headerData = null;
     public $documentType = 'INVOICE';
+    private $headerDrawn = false;
     
     /**
      * Override AddPage to handle different margins for different pages
      */
     public function AddPage($orientation = '', $format = '', $keepmargins = false, $tocpage = false)
     {
+        $this->headerDrawn = false; // Reset flag for new page
         parent::AddPage($orientation, $format, $keepmargins, $tocpage);
         
         // After adding a page, draw header for pages after first
-        if ($this->getPage() > 1 && $this->headerData !== null) {
+        if ($this->getPage() > 1 && $this->headerData !== null && !$this->headerDrawn) {
             $this->drawManualHeader();
+            $this->headerDrawn = true;
         }
     }
     
@@ -42,8 +45,9 @@ class InvoicePDF extends TCPDF
         $result = parent::checkPageBreak($h, $y, $addpage);
         
         // If a page break occurred and we're on page 2+, ensure proper spacing
-        if ($result && $this->getPage() > 1 && $this->headerData !== null) {
+        if ($result && $this->getPage() > 1 && $this->headerData !== null && !$this->headerDrawn) {
             $this->drawManualHeader();
+            $this->headerDrawn = true;
         }
         
         return $result;
@@ -96,7 +100,7 @@ class InvoicePDF extends TCPDF
         $this->Cell(0, 6, $headerText, 0, 1, 'L');
         
         // Force Y position to ensure content starts well below header
-        $this->SetY(35);
+        $this->SetY(45);
     }
     
     /**
@@ -407,7 +411,7 @@ class PdfGenerator
         return '
         <style>
             body { font-family: ' . $fontFamily . '; font-size: 9px; line-height: 1.4; ' . $letterSpacing . ' }
-            @page { margin-top: 40mm; }
+            @page { margin-top: 50mm; }
             @page:first { margin-top: 10mm; }
             p { margin: 0; padding: 5px; text-indent: 0; }
             div { text-indent: 0; }
