@@ -751,12 +751,12 @@ class PdfGenerator
             
             // Add Product/Service name if exists
             if (!empty($item->product_service_name)) {
-                $description .= '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif; letter-spacing: 0.5px;"><strong>' . htmlspecialchars($item->product_service_name) . '</strong></span>';
+                $description .= '<strong>' . htmlspecialchars($item->product_service_name) . '</strong>';
                 if (!empty($item->description)) {
-                    $description .= '<br><span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif; letter-spacing: 0.5px;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
+                    $description .= '<br>' . nl2br(htmlspecialchars($item->description));
                 }
             } else if (!empty($item->description)) {
-                $description = '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif; letter-spacing: 0.5px;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
+                $description = nl2br(htmlspecialchars($item->description));
             }
             
             $html .= '
@@ -1738,12 +1738,12 @@ class PdfGenerator
             
             // Add Product/Service name if exists
             if (!empty($item->product_service_name)) {
-                $description .= '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif; letter-spacing: 0.5px;"><strong>' . htmlspecialchars($item->product_service_name) . '</strong></span>';
+                $description .= '<strong>' . htmlspecialchars($item->product_service_name) . '</strong>';
                 if (!empty($item->description)) {
-                    $description .= '<br><span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif; letter-spacing: 0.5px;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
+                    $description .= '<br>' . nl2br(htmlspecialchars($item->description));
                 }
             } else if (!empty($item->description)) {
-                $description = '<span style="font-family: kozgopromedium, DejaVu Sans, FreeSerif; letter-spacing: 0.5px;">' . nl2br(htmlspecialchars($item->description)) . '</span>';
+                $description = nl2br(htmlspecialchars($item->description));
             }
             
             $html .= '
