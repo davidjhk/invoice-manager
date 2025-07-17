@@ -25,12 +25,12 @@ define('K_TCPDF_EXTERNAL_CONFIG', true);
 define('K_PATH_CACHE', $temp_dir);
 
 // Define other essential configurations
-define('PDF_PAGE_FORMAT', 'A4');
+define('PDF_PAGE_FORMAT', 'LETTER');
 define('PDF_PAGE_ORIENTATION', 'P');
 define('PDF_CREATOR', 'Invoice Manager');
 define('PDF_UNIT', 'mm');
 define('PDF_MARGIN_HEADER', 5);
-define('PDF_MARGIN_FOOTER', 10);
+define('PDF_MARGIN_FOOTER', 15);
 define('PDF_MARGIN_TOP', 27);
 define('PDF_MARGIN_BOTTOM', 25);
 define('PDF_MARGIN_LEFT', 15);
