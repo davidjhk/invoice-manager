@@ -158,7 +158,7 @@ class EstimateController extends Controller
                     $transaction->commit();
                     
                     Yii::$app->session->setFlash('success', 'Estimate created successfully.');
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['preview', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
@@ -203,7 +203,7 @@ class EstimateController extends Controller
                     $transaction->commit();
                     
                     Yii::$app->session->setFlash('success', 'Estimate updated successfully.');
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['preview', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();

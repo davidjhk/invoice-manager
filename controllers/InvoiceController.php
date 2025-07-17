@@ -188,7 +188,7 @@ class InvoiceController extends Controller
                     $transaction->commit();
                     
                     Yii::$app->session->setFlash('success', 'Invoice created successfully.');
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['preview', 'id' => $model->id]);
                 } else {
                     $transaction->rollBack();
                     $errors = [];
@@ -226,7 +226,7 @@ class InvoiceController extends Controller
         
         if (!$model->isEditable()) {
             Yii::$app->session->setFlash('error', 'This invoice cannot be edited.');
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['preview', 'id' => $model->id]);
         }
 
         if ($model->load(Yii::$app->request->post())) {
