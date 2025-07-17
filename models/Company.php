@@ -34,6 +34,7 @@ use yii\behaviors\TimestampBehavior;
  * @property bool $dark_mode
  * @property bool $use_cjk_font
  * @property bool $compact_mode
+ * @property bool $hide_footer
  * @property string $language
  * @property int|null $user_id
  * @property string $created_at
@@ -91,8 +92,8 @@ class Company extends ActiveRecord
             [['tax_rate'], 'number', 'min' => 0, 'max' => 100],
             [['due_date_days', 'estimate_validity_days', 'user_id'], 'integer', 'min' => 1],
             [['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => 'id'],
-            [['is_active', 'dark_mode', 'use_cjk_font', 'compact_mode'], 'boolean'],
-            [['dark_mode', 'use_cjk_font', 'compact_mode'], 'filter', 'filter' => function($value) {
+            [['is_active', 'dark_mode', 'use_cjk_font', 'compact_mode', 'hide_footer'], 'boolean'],
+            [['dark_mode', 'use_cjk_font', 'compact_mode', 'hide_footer'], 'filter', 'filter' => function($value) {
                 return $value ? 1 : 0;
             }],
             [['language'], 'string', 'max' => 10],
@@ -120,6 +121,7 @@ class Company extends ActiveRecord
             [['dark_mode'], 'default', 'value' => false],
             [['use_cjk_font'], 'default', 'value' => false],
             [['compact_mode'], 'default', 'value' => false],
+            [['hide_footer'], 'default', 'value' => false],
             
             // Custom validation for company count limit
             [['user_id'], 'validateCompanyLimit'],
