@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="estimate-view">
 
-	<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 		<h1>
 			<?= Html::encode($model->estimate_number) ?>
 			<span class="badge badge-<?= $model->getStatusClass() ?> ml-2">
