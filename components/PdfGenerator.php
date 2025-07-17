@@ -716,10 +716,10 @@ class PdfGenerator
         <table class="items-table" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 68%; background-color: #667eea; color: white; padding: 20px; text-align: left; font-size: 10px; font-weight: bold;">Description</th>
+                    <th style="width: 64%; background-color: #667eea; color: white; padding: 20px; text-align: left; font-size: 10px; font-weight: bold;">Description</th>
                     <th style="width: 8%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Qty</th>
-                    <th style="width: 12%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Rate</th>
-                    <th style="width: 12%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Amount</th>
+                    <th style="width: 14%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Rate</th>
+                    <th style="width: 14%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Amount</th>
                 </tr>
             </thead>
             <tbody>';
@@ -739,10 +739,10 @@ class PdfGenerator
             
             $html .= '
                 <tr>
-                    <td style="width:68%;">' . $description . '</td>
+                    <td style="width:64%;">' . $description . '</td>
                     <td style="width:8%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
-                    <td style="width:12%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->rate) . '&nbsp;</td>
-                    <td style="width:12%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->amount) . '&nbsp;</td>
+                    <td style="width:14%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->rate) . '&nbsp;</td>
+                    <td style="width:14%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->amount) . '&nbsp;</td>
                 </tr>';
         }
 

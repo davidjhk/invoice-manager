@@ -88,10 +88,51 @@ $this->registerCss("
         }
     }
     
+    /* Estimate preview should always have white background regardless of dark mode */
     .estimate-preview-wrapper {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
+        background: #f8f9fa !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Dark mode override - force white background and black text for preview */
+    body.dark-mode .estimate-preview-wrapper {
+        background: white !important;
+        color: black !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    body.dark-mode .estimate-preview-wrapper *,
+    body.dark-mode .estimate-preview-container *,
+    body.dark-mode .estimate-preview-container,
+    .dark-mode .estimate-preview-wrapper *,
+    .dark-mode .estimate-preview-container * {
+        color: black !important;
+        background: transparent !important;
+    }
+    
+    body.dark-mode .estimate-preview-container .items-table th,
+    .dark-mode .estimate-preview-container .items-table th {
+        background: #667eea !important;
+        color: white !important;
+    }
+    
+    body.dark-mode .estimate-preview-container .total-row,
+    .dark-mode .estimate-preview-container .total-row {
+        background: #f8f9fa !important;
+        color: black !important;
+    }
+    
+    body.dark-mode .estimate-preview-container .paid-row,
+    .dark-mode .estimate-preview-container .paid-row {
+        background: #e8f5e8 !important;
+        color: black !important;
+    }
+    
+    body.dark-mode .estimate-preview-container .notes-section,
+    .dark-mode .estimate-preview-container .notes-section {
+        background: #f8f9fa !important;
+        color: black !important;
     }
 ");
 ?>

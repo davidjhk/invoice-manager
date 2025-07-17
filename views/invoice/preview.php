@@ -96,10 +96,56 @@ $this->registerCss("
         }
     }
     
+    /* Invoice preview should always have white background regardless of dark mode */
     .invoice-preview-wrapper {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
+        background: #f8f9fa !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Dark mode override - force white background and black text for preview */
+    body.dark-mode .invoice-preview-wrapper {
+        background: white !important;
+        color: black !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    body.dark-mode .invoice-preview-wrapper *,
+    body.dark-mode .invoice-preview-container *,
+    body.dark-mode .invoice-preview-container,
+    .dark-mode .invoice-preview-wrapper *,
+    .dark-mode .invoice-preview-container * {
+        color: black !important;
+        background: transparent !important;
+    }
+    
+    body.dark-mode .invoice-preview-container .items-table th,
+    .dark-mode .invoice-preview-container .items-table th {
+        background: #667eea !important;
+        color: white !important;
+    }
+    
+    body.dark-mode .invoice-preview-container .total-row,
+    .dark-mode .invoice-preview-container .total-row {
+        background: #f8f9fa !important;
+        color: black !important;
+    }
+    
+    body.dark-mode .invoice-preview-container .paid-row,
+    .dark-mode .invoice-preview-container .paid-row {
+        background: #e8f5e8 !important;
+        color: black !important;
+    }
+    
+    body.dark-mode .invoice-preview-container .notes-section,
+    .dark-mode .invoice-preview-container .notes-section {
+        background: #f8f9fa !important;
+        color: black !important;
+    }
+    
+    body.dark-mode .invoice-preview-container .paid-watermark,
+    .dark-mode .invoice-preview-container .paid-watermark {
+        color: rgba(220, 220, 220, 0.3) !important;
     }
 ");
 ?>
