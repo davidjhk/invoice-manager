@@ -20,44 +20,30 @@ class InvoicePDF extends TCPDF
     public $useCJKFont = false;
     public $headerData = null;
     public $documentType = 'INVOICE';
-    private $headerDrawn = false;
+    
     
     /**
-     * Override AddPage to handle different margins for different pages
+     * Set custom header data for repeating header
      */
-    public function AddPage($orientation = '', $format = '', $keepmargins = false, $tocpage = false)
+    public function setCustomHeaderData($company, $config, $document = null)
     {
-        $this->headerDrawn = false; // Reset flag for new page
-        parent::AddPage($orientation, $format, $keepmargins, $tocpage);
-        
-        // After adding a page, draw header for pages after first
-        if ($this->getPage() > 1 && $this->headerData !== null && !$this->headerDrawn) {
-            $this->drawManualHeader();
-            $this->headerDrawn = true;
-        }
+        $this->headerData = ['company' => $company, 'config' => $config, 'document' => $document];
+        $this->documentType = $config['title'];
     }
     
-    /**
-     * Override checkPageBreak to handle page breaks with proper header spacing
-     */
-    public function checkPageBreak($h = 0, $y = '', $addpage = true)
-    {
-        $result = parent::checkPageBreak($h, $y, $addpage);
-        
-        // If a page break occurred and we're on page 2+, ensure proper spacing
-        if ($result && $this->getPage() > 1 && $this->headerData !== null && !$this->headerDrawn) {
-            $this->drawManualHeader();
-            $this->headerDrawn = true;
-        }
-        
-        return $result;
-    }
     
     /**
-     * Draw manual header for pages 2+
+     * Header method for repeating header on each page
      */
-    private function drawManualHeader()
+    public function Header()
     {
+        if ($this->headerData === null || $this->getPage() == 1) {
+            return;
+        }
+
+        // Set top margin to make space for the header on subsequent pages
+        $this->SetTopMargin(30);
+        
         $company = $this->headerData['company'];
         $config = $this->headerData['config'];
         $document = $this->headerData['document'] ?? null;
@@ -98,27 +84,6 @@ class InvoicePDF extends TCPDF
         // Draw header text
         $this->SetXY(15, 12);
         $this->Cell(0, 6, $headerText, 0, 1, 'L');
-        
-        // Force Y position to ensure content starts well below header
-        $this->SetY(45);
-    }
-    
-    /**
-     * Set custom header data for repeating header
-     */
-    public function setCustomHeaderData($company, $config, $document = null)
-    {
-        $this->headerData = ['company' => $company, 'config' => $config, 'document' => $document];
-        $this->documentType = $config['title'];
-    }
-    
-    /**
-     * Header method - now disabled since we use manual headers
-     */
-    public function Header()
-    {
-        // Headers are now handled manually in AddPage method
-        // This prevents TCPDF automatic header interference
     }
     
     public function Footer()
@@ -318,18 +283,18 @@ class PdfGenerator
         $pdf->SetTitle('Invoice ' . $invoice->invoice_number);
         $pdf->SetSubject('Invoice');
 
-        // Enable footer only, disable automatic header
-        $pdf->setPrintHeader(false);
+        // Enable custom header and footer
+        $pdf->setPrintHeader(true);
         $pdf->setPrintFooter(true);
         
-        // Disable custom header data - we'll handle headers in HTML
-        // $pdf->setCustomHeaderData($invoice->company, self::getTemplateConfig('invoice'), $invoice);
+        // Set header data for repeating header
+        $pdf->setCustomHeaderData($invoice->company, self::getTemplateConfig('invoice'), $invoice);
 
-        // Set margins (top, left, right) - small top margin for first page
+        // Set margins - different for first page vs subsequent pages
         $pdf->SetMargins(15, 5, 15);
         
-        // Set initial header margin to 0 for first page
-        $pdf->SetHeaderMargin(0);
+        // Set header margin for subsequent pages
+        $pdf->SetHeaderMargin(25);
         
         // Set auto page break with bottom margin for footer
         $pdf->SetAutoPageBreak(true, 15);
@@ -399,7 +364,7 @@ class PdfGenerator
      * @param string $colorScheme Primary color for the template
      * @return string
      */
-    private static function getTemplateStyles($useCJKFont = false, $colorScheme = '#667eea')
+    public static function getTemplateStyles($useCJKFont = false, $colorScheme = '#667eea')
     {
         $fontFamily = $useCJKFont ? 
             '"kozgopromedium", "DejaVu Sans", "FreeSerif", "Times", sans-serif' :
@@ -426,7 +391,7 @@ class PdfGenerator
             .document-details-box table { width: 100%; border-collapse: collapse; margin: 0; padding: 0; }
             .document-details-box td { padding: 13px 0; font-size: 9px; text-indent: 0; margin: 0; }
             .separator { border-top: 3px solid ' . $colorScheme . '; margin: 18px 0; height: 0; }
-            .items-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+            .items-table { width: 100%; border-collapse: collapse; margin: 18px 0; page-break-before: auto; margin-top: 35px; }
             .items-table th { background-color: ' . $colorScheme . '; color: white; padding: 20px; text-align: left; font-size: 10px; font-weight: bold; }
             .items-table td { padding: 20px 11px; border-bottom: 1px solid #eee; font-size: 9px; vertical-align: top; line-height: 1.6; letter-spacing: 0.3px; ' . $letterSpacing . ' }
             .items-table .text-center { text-align: center; }
@@ -463,7 +428,7 @@ class PdfGenerator
      * @param array $config Template configuration
      * @return string
      */
-    private static function generateUnifiedPdfHeader($company, $config)
+    public static function generateUnifiedPdfHeader($company, $config)
     {
         $html = '
         <!-- Header -->
@@ -576,7 +541,7 @@ class PdfGenerator
      * @param array $config Template configuration
      * @return string
      */
-    private static function generateUnifiedPdfSubHeader($customer, $document, $company, $config)
+    public static function generateUnifiedPdfSubHeader($customer, $document, $company, $config)
     {
         $html = '
         <!-- Sub Header with 3 columns -->
@@ -751,10 +716,10 @@ class PdfGenerator
         <table class="items-table" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 68%;">Description</th>
-                    <th style="width: 8%; text-align: right;">Qty</th>
-                    <th style="width: 12%; text-align: right;">Rate</th>
-                    <th style="width: 12%; text-align: right;">Amount</th>
+                    <th style="width: 68%; background-color: #667eea; color: white; padding: 20px; text-align: left; font-size: 10px; font-weight: bold;">Description</th>
+                    <th style="width: 8%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Qty</th>
+                    <th style="width: 12%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Rate</th>
+                    <th style="width: 12%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Amount</th>
                 </tr>
             </thead>
             <tbody>';
@@ -1389,76 +1354,7 @@ class PdfGenerator
         return self::generateUnifiedPreviewHeader($company, self::getTemplateConfig('estimate'));
     }
 
-    /**
-     * Legacy estimate preview header method - removed duplicate code
-     *
-     * @param $company
-     * @return string
-     */
-    private static function generateEstimatePreviewHeaderLegacy($company)
-    {
-        ob_start();
-        ?>
-<!-- Header -->
-<div class="invoice-header">
-	<table style="width: 100%;">
-		<tr>
-			<td style="width: 40%; vertical-align: top;">
-				<div class="company-info">
-					<h2>ESTIMATE</h2>
-					<strong><?= htmlspecialchars($company->company_name) ?></strong><br>
-					<?php if ($company->company_address): ?>
-					<?php foreach (explode("\n", $company->company_address) as $line): ?>
-					<?php $line = trim($line); if (!empty($line)): ?>
-					<?= htmlspecialchars($line) ?><br>
-					<?php endif; ?>
-					<?php endforeach; ?>
-					<?php endif; ?>
-					<?php 
-						$companyLocationParts = [];
-						if ($company->city) $companyLocationParts[] = $company->city;
-						if ($company->state) $companyLocationParts[] = $company->state;
-						if ($company->zip_code) $companyLocationParts[] = $company->zip_code;
-						if (!empty($companyLocationParts)): 
-					?>
-					<?= htmlspecialchars(implode(', ', $companyLocationParts)) ?><br>
-					<?php endif; ?>
-					<?php if ($company->country && $company->country !== 'US'): ?>
-					<?= htmlspecialchars($company->country) ?><br>
-					<?php endif; ?>
-					<?php if ($company->company_phone): ?>
-					Phone: <?= htmlspecialchars($company->company_phone) ?><br>
-					<?php endif; ?>
-					<?php if ($company->company_email): ?>
-					Email: <?= htmlspecialchars($company->company_email) ?>
-					<?php endif; ?>
-				</div>
-			</td>
-			<td style="width: 20%;">&nbsp;</td>
-			<td style="width: 40%; text-align: right; vertical-align: top;">
-				<div class="logo-section">
-					<?php if ($company->hasLogo()): ?>
-					<img src="<?= $company->getLogoUrl() ?>" alt="Company Logo" class="logo"
-						style="max-height: 120px; max-width: 360px; height: auto;">
-					<?php else: ?>
-					<?php 
-						$maxWidth = 360;
-						$fontSize = self::calculateFontSize($company->company_name, $maxWidth, 24, 16);
-						$companyNameNoBreak = str_replace(' ', '&nbsp;', htmlspecialchars($company->company_name));
-					?>
-					<br><br>
-					<div
-						style="font-size: <?= $fontSize ?>px; font-weight: bold; color: #667eea; white-space: nowrap; max-width: <?= $maxWidth ?>px; text-align: right; line-height: 1.2;">
-						<?= $companyNameNoBreak ?></div>
-					<?php endif; ?>
-				</div>
-			</td>
-		</tr>
-	</table>
-</div>
-<?php
-        return ob_get_clean();
-    }
+    
 
     /**
      * Generate estimate preview sub-header section
@@ -1711,18 +1607,18 @@ class PdfGenerator
         $pdf->SetTitle('Estimate ' . $estimate->estimate_number);
         $pdf->SetSubject('Estimate');
 
-        // Enable footer only, disable automatic header
-        $pdf->setPrintHeader(false);
+        // Enable custom header and footer
+        $pdf->setPrintHeader(true);
         $pdf->setPrintFooter(true);
         
-        // Disable custom header data - we'll handle headers in HTML
-        // $pdf->setCustomHeaderData($estimate->company, self::getTemplateConfig('estimate'), $estimate);
+        // Set header data for repeating header
+        $pdf->setCustomHeaderData($estimate->company, self::getTemplateConfig('estimate'), $estimate);
 
-        // Set margins (top, left, right) - small top margin for first page
+        // Set margins - different for first page vs subsequent pages
         $pdf->SetMargins(15, 5, 15);
         
-        // Set initial header margin to 0 for first page
-        $pdf->SetHeaderMargin(0);
+        // Set header margin for subsequent pages
+        $pdf->SetHeaderMargin(25);
         
         // Set auto page break with bottom margin for footer
         $pdf->SetAutoPageBreak(true, 15);
@@ -1817,10 +1713,10 @@ class PdfGenerator
         <table class="items-table" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 68%;">Description</th>
-                    <th style="width: 8%; text-align: right;">Qty</th>
-                    <th style="width: 12%; text-align: right;">Rate</th>
-                    <th style="width: 12%; text-align: right;">Amount</th>
+                    <th style="width: 68%; background-color: #667eea; color: white; padding: 20px; text-align: left; font-size: 10px; font-weight: bold;">Description</th>
+                    <th style="width: 8%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Qty</th>
+                    <th style="width: 12%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Rate</th>
+                    <th style="width: 12%; text-align: right; background-color: #667eea; color: white; padding: 20px; font-size: 10px; font-weight: bold;">Amount</th>
                 </tr>
             </thead>
             <tbody>';
@@ -1946,4 +1842,6 @@ class PdfGenerator
         
         return $html;
     }
+    
+    
 }
