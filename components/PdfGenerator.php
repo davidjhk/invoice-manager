@@ -426,7 +426,7 @@ class PdfGenerator
             .separator { border-top: 3px solid ' . $colorScheme . '; margin: 18px 0; height: 0; }
             .items-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
             .items-table th { background-color: ' . $colorScheme . '; color: white; padding: 20px; text-align: left; font-size: 10px; font-weight: bold; }
-            .items-table td { padding: 20px 11px; border-bottom: 1px solid #eee; font-size: 9px; vertical-align: top; ' . $letterSpacing . ' }
+            .items-table td { padding: 20px 11px; border-bottom: 1px solid #eee; font-size: 9px; vertical-align: top; line-height: 1.6; letter-spacing: 0.3px; ' . $letterSpacing . ' }
             .items-table .text-center { text-align: center; }
             .items-table .text-right { text-align: right; }
             .amount { text-align: right; }
@@ -983,7 +983,7 @@ class PdfGenerator
             .separator { border-top: 3px solid ' . $colorScheme . '; margin: 20px 0; }
             .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
             .items-table th { background: ' . $colorScheme . '; color: white; padding: 12px; text-align: left; }
-            .items-table td { padding: 18px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+            .items-table td { padding: 18px 12px; border-bottom: 1px solid #eee; vertical-align: top; line-height: 1.6; letter-spacing: 0.3px; }
             .items-table .text-right { text-align: right; }
             .totals-section { margin-top: 30px; }
             .totals-table { width: 350px; margin-left: auto; border-collapse: collapse; }
