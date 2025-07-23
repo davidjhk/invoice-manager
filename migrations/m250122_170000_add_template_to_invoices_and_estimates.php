@@ -12,11 +12,11 @@ class m250122_170000_add_template_to_invoices_and_estimates extends Migration
      */
     public function safeUp()
     {
-        // Add template column to invoices table
-        $this->addColumn('{{%jdosa_invoices}}', 'pdf_template', $this->string(50)->defaultValue('classic')->after('shipping_fee'));
+        // Add template column to invoices table (at the end to avoid column dependency issues)
+        $this->addColumn('{{%jdosa_invoices}}', 'pdf_template', $this->string(50)->defaultValue('classic'));
         
-        // Add template column to estimates table
-        $this->addColumn('{{%jdosa_estimates}}', 'pdf_template', $this->string(50)->defaultValue('classic')->after('shipping_fee'));
+        // Add template column to estimates table (at the end to avoid column dependency issues)
+        $this->addColumn('{{%jdosa_estimates}}', 'pdf_template', $this->string(50)->defaultValue('classic'));
         
         // Create index for performance
         $this->createIndex('idx-jdosa_invoices-pdf_template', '{{%jdosa_invoices}}', 'pdf_template');
