@@ -52,7 +52,7 @@ class PdfTemplateManager
             'border_width' => '0px',
             'border_radius' => '12px',
             'company_title_size' => '28px',
-            'section_spacing' => '30px',
+            'section_spacing' => '10px',
             'table_style' => 'minimal',
             'table_header_bg' => '#2563eb',
             'table_header_color' => 'white',
@@ -957,7 +957,7 @@ class PdfTemplateManager
             .document-details-box td { padding: 10px 0; font-size: 10px; border: none; }
             .separator { 
                 margin: ' . $template['section_spacing'] . ' 0; 
-                height: 20px;
+                height: 0px;
                 background: transparent;
                 border: none;
             }
