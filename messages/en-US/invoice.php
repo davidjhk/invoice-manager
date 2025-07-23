@@ -138,6 +138,7 @@ return [
     'Discount' => 'Discount',
     'Taxable Subtotal' => 'Taxable Subtotal',
     'Sales Tax' => 'Sales Tax',
+    'Shipping Fee' => 'Shipping Fee',
     'Deposit' => 'Deposit',
     'Balance Due' => 'Balance Due',
     'invoices' => 'invoices',
@@ -180,4 +181,22 @@ return [
     'Tax rate calculated using fallback rates (tax rate database is empty)' => 'Tax rate calculated using fallback rates (tax rate database is empty)',
     'Tax rate calculated using fallback rates (database connection error)' => 'Tax rate calculated using fallback rates (database connection error)',
     'Tax rate calculated using fallback rates' => 'Tax rate calculated using fallback rates',
+    
+    // Template names
+    'template_classic' => 'Classic',
+    'template_classic_desc' => 'Traditional professional layout with clean lines',
+    'template_modern' => 'Modern',
+    'template_modern_desc' => 'Clean minimalist design with subtle colors',
+    'template_elegant' => 'Elegant',
+    'template_elegant_desc' => 'Sophisticated design with refined typography',
+    'template_corporate' => 'Corporate',
+    'template_corporate_desc' => 'Professional business template with strong branding',
+    'template_creative' => 'Creative',
+    'template_creative_desc' => 'Vibrant and contemporary design for creative businesses',
+    
+    // Template related
+    'PDF Template' => 'PDF Template',
+    'Choose Template' => 'Choose Template',
+    'Template Preview' => 'Template Preview',
+    'Select a template for your invoice PDF' => 'Select a template for your invoice PDF',
 ];

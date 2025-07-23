@@ -33,6 +33,7 @@ use yii\behaviors\TimestampBehavior;
  * @property bool $is_active
  * @property bool $dark_mode
  * @property bool $use_cjk_font
+ * @property string|null $pdf_template
  * @property bool $compact_mode
  * @property bool $hide_footer
  * @property string $language
@@ -109,6 +110,9 @@ class Company extends ActiveRecord
             [['logo_path', 'logo_filename'], 'string', 'max' => 500],
             [['logo_upload'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg, gif', 'maxSize' => 2 * 1024 * 1024],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
+            [['pdf_template'], 'string', 'max' => 50],
+            [['pdf_template'], 'default', 'value' => 'classic'],
+            [['pdf_template'], 'in', 'range' => ['classic', 'modern', 'elegant', 'corporate', 'creative']],
             
             // Set default values
             [['tax_rate'], 'default', 'value' => 10.00],
@@ -159,6 +163,7 @@ class Company extends ActiveRecord
             'is_active' => 'Is Active',
             'dark_mode' => 'Dark Mode',
             'use_cjk_font' => 'Use CJK Fonts for PDF',
+            'pdf_template' => 'PDF Template',
             'compact_mode' => 'Compact Mode',
             'language' => 'Interface Language',
             'user_id' => 'Owner',

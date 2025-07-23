@@ -120,6 +120,7 @@ return [
     'Discount' => 'Discount',
     'Taxable Subtotal' => 'Taxable Subtotal',
     'Sales Tax' => 'Sales Tax',
+    'Shipping Fee' => 'Shipping Fee',
     'estimates' => 'estimates',
     'You haven\'t created any estimates yet.' => 'You haven\'t created any estimates yet.',
     'Create Your First Estimate' => 'Create Your First Estimate',
@@ -154,4 +155,22 @@ return [
     'All' => 'All',
     'Customer not in list?' => 'Customer not in list?',
     'Add New Customer' => 'Add New Customer',
+    
+    // Template names
+    'template_classic' => 'Classic',
+    'template_classic_desc' => 'Traditional professional layout with clean lines',
+    'template_modern' => 'Modern',
+    'template_modern_desc' => 'Clean minimalist design with subtle colors',
+    'template_elegant' => 'Elegant',
+    'template_elegant_desc' => 'Sophisticated design with refined typography',
+    'template_corporate' => 'Corporate',
+    'template_corporate_desc' => 'Professional business template with strong branding',
+    'template_creative' => 'Creative',
+    'template_creative_desc' => 'Vibrant and contemporary design for creative businesses',
+    
+    // Template related
+    'PDF Template' => 'PDF Template',
+    'Choose Template' => 'Choose Template',
+    'Template Preview' => 'Template Preview',
+    'Select a template for your estimate PDF' => 'Select a template for your estimate PDF',
 ];

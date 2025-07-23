@@ -120,6 +120,7 @@ return [
     'Discount' => 'Descuento',
     'Taxable Subtotal' => 'Subtotal gravable',
     'Sales Tax' => 'Impuesto de ventas',
+    'Shipping Fee' => 'Gastos de Envío',
     'estimates' => 'presupuestos',
     'You haven\'t created any estimates yet.' => 'Aún no has creado ningún presupuesto.',
     'Create Your First Estimate' => 'Crear tu primer presupuesto',
@@ -148,4 +149,24 @@ return [
     'Preview' => 'Vista Previa',
     'Email not configured. Configure SMTP2GO in Company Settings.' => 'Correo no configurado. Configure SMTP2GO en Configuración de Empresa.',
     'All' => 'Todos',
+    'Customer not in list?' => '¿Cliente no está en la lista?',
+    'Add New Customer' => 'Agregar Nuevo Cliente',
+    
+    // Template names
+    'template_classic' => 'Clásico',
+    'template_classic_desc' => 'Diseño profesional tradicional con líneas limpias',
+    'template_modern' => 'Moderno',
+    'template_modern_desc' => 'Diseño minimalista y limpio con colores sutiles',
+    'template_elegant' => 'Elegante',
+    'template_elegant_desc' => 'Diseño sofisticado con tipografía refinada',
+    'template_corporate' => 'Corporativo',
+    'template_corporate_desc' => 'Plantilla de negocio profesional con marca fuerte',
+    'template_creative' => 'Creativo',
+    'template_creative_desc' => 'Diseño vibrante y contemporáneo para negocios creativos',
+    
+    // Template related
+    'PDF Template' => 'Plantilla PDF',
+    'Choose Template' => 'Elegir Plantilla',
+    'Template Preview' => 'Vista Previa de Plantilla',
+    'Select a template for your estimate PDF' => 'Seleccione una plantilla para su PDF de presupuesto',
 ];

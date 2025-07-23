@@ -36,10 +36,10 @@ $this->params['breadcrumbs'][] = 'Receive Payment';
 				</div>
 				<div class="col-md-4">
 					<?= $form->field(new app\models\Payment(), 'payment_method')->dropDownList([
+                        'Check' => 'Check',
                         'Cash' => 'Cash',
                         'Credit Card' => 'Credit Card',
                         'Bank Transfer' => 'Bank Transfer',
-                        'Check' => 'Check',
                         'Other' => 'Other',
                     ], ['id' => 'payment-method']) ?>
 				</div>

@@ -4,6 +4,7 @@ namespace app\components;
 
 use app\models\Invoice;
 use app\models\Estimate;
+use app\components\PdfTemplateManager;
 
 class PdfHtmlGenerator
 {
@@ -99,9 +100,10 @@ class PdfHtmlGenerator
 
         // Get template configuration
         $config = self::getTemplateConfig('invoice');
+        $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
         
-        // CSS Styles for PDF
-        $css = self::getTemplateStyles($company->use_cjk_font, $config['color_scheme']);
+        // CSS Styles for PDF using selected template
+        $css = PdfTemplateManager::generateTemplateStyles($templateId, $company->use_cjk_font);
         
         // HTML Content
         $html = $css;
@@ -131,9 +133,10 @@ class PdfHtmlGenerator
 
         // Get template configuration
         $config = self::getTemplateConfig('estimate');
+        $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
         
-        // CSS Styles for PDF
-        $css = self::getTemplateStyles($company->use_cjk_font, $config['color_scheme']);
+        // CSS Styles for PDF using selected template
+        $css = PdfTemplateManager::generateTemplateStyles($templateId, $company->use_cjk_font);
         
         // HTML Content
         $html = $css;
@@ -150,54 +153,17 @@ class PdfHtmlGenerator
     }
 
     /**
-     * Generate CSS styles for PDF based on template
+     * Generate CSS styles for PDF based on template (DEPRECATED - use PdfTemplateManager)
      *
      * @param bool $useCJKFont Whether to use CJK fonts
      * @param string $colorScheme Primary color for the template
      * @return string
+     * @deprecated Use PdfTemplateManager::generateTemplateStyles() instead
      */
     public static function getTemplateStyles($useCJKFont = false, $colorScheme = '#667eea')
     {
-        $fontFamily = '"FreeSans", "DejavuSans", "Arial", sans-serif';
-            
-        // Add letter spacing for CJK fonts to improve readability
-        $letterSpacing = $useCJKFont ? 'letter-spacing: 0.5px;' : '';
-            
-        return '
-        <style>
-            body { font-family: ' . $fontFamily . '; font-size: 9px; line-height: 1.4; ' . $letterSpacing . ' }
-            p { margin: 0; padding: 5px; text-indent: 0; }
-            div { text-indent: 0; }
-            br { margin: 0; padding: 0; }
-            * { text-indent: 0 !important; margin-left: 0 !important; }
-            .address-line { display: block; text-indent: 0; margin-left: 0; }
-            .header { margin-bottom: 15px; page-break-after: avoid; }
-            .company-info { font-size: 10px; line-height: 1.4; text-indent: 0; ' . $letterSpacing . ' }
-            .document-title { font-size: 25px; font-weight: bold; color: ' . $colorScheme . '; margin-bottom: 9px; }
-            .sub-header { margin-bottom: 15px; page-break-after: avoid; }
-            .sub-header-column { vertical-align: top; padding: 0 !important; margin: 0 !important; }
-            .bill-to, .ship-to { background-color: transparent !important; background: none !important; padding: 0 !important; border-radius: 0 !important; text-indent: 0 !important; margin: 0 !important; }
-            .document-details-box { padding: 0; border-radius: 0; text-indent: 0; margin: 0; }
-            .document-details-box table { width: 100%; border-collapse: collapse; margin: 0; padding: 0; }
-            .document-details-box td { padding: 13px 0; font-size: 9px; text-indent: 0; margin: 0; }
-            .separator { border-top: 3px solid ' . $colorScheme . '; margin: 15px 0; height: 0; page-break-after: avoid; }
-            .items-table { width: 100%; border-collapse: collapse; margin: 15px 0; page-break-before: avoid; page-break-inside: avoid; }
-            .items-table th { background-color: ' . $colorScheme . '; color: white; padding: 12px; text-align: left; font-size: 10px; font-weight: bold; page-break-after: avoid; }
-            .items-table td { padding: 12px 8px; border-bottom: 1px solid #eee; font-size: 9px; vertical-align: top; line-height: 1.6; letter-spacing: 0.3px; ' . $letterSpacing . ' }
-            .items-table .text-center { text-align: center; }
-            .items-table .text-right { text-align: right; }
-            .amount { text-align: right; }
-            .totals { margin-top: 15px; page-break-inside: avoid; }
-            .totals-table { border-collapse: collapse; page-break-inside: avoid; }
-            .totals-table td { padding: 8px 11px; font-size: 9px; border-bottom: 1px solid #eee; ' . $letterSpacing . ' }
-            .totals-table .text-right { text-align: right; }
-            .total-row { font-weight: bold; font-size: 11px; background-color: #f8f9fa; }
-            .paid-row { background-color: #e8f5e8; }
-            .balance-row-paid { background-color: #d4edda; }
-            .balance-row-unpaid { background-color: #fff3cd; }
-            .notes { margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 5px; page-break-inside: avoid; ' . $letterSpacing . ' }
-            .logo { max-height: 15px; max-width: 90px; height: auto; }
-        </style>';
+        // Fallback for backward compatibility - use classic template
+        return PdfTemplateManager::generateTemplateStyles('classic', $useCJKFont);
     }
 
     /**
@@ -205,6 +171,7 @@ class PdfHtmlGenerator
      *
      * @param bool $useCJKFont
      * @return string
+     * @deprecated Use PdfTemplateManager::generateTemplateStyles() instead
      */
     public static function getPdfStyles($useCJKFont = false)
     {
@@ -220,6 +187,11 @@ class PdfHtmlGenerator
      */
     public static function generateUnifiedPdfHeader($company, $config)
     {
+        // Get actual template accent color
+        $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
+        $template = PdfTemplateManager::getTemplate($templateId);
+        $accentColor = $template['accent_color'];
+        
         $html = '
         <!-- Header -->
         <div class="header">
@@ -299,7 +271,7 @@ class PdfHtmlGenerator
             $companyNameNoBreak = str_replace(' ', '&nbsp;', $companyName);
             
             // Better positioned and sized company name display with top alignment
-            $html .= '<div style="font-size: ' . $fontSize . 'px; font-weight: bold; color: ' . $config['color_scheme'] . '; margin-bottom: 10px; text-align: right; white-space: nowrap; max-width: ' . $maxWidth . 'px; line-height: 1.2; vertical-align: top;">' . $companyNameNoBreak . '</div>';
+            $html .= '<div style="font-size: ' . $fontSize . 'px; font-weight: bold; color: ' . $accentColor . '; margin-bottom: 10px; text-align: right; white-space: nowrap; max-width: ' . $maxWidth . 'px; line-height: 1.2; vertical-align: top;">' . $companyNameNoBreak . '</div>';
         }
 
         $html .= '
@@ -502,13 +474,13 @@ class PdfHtmlGenerator
     public static function generatePdfItemsTable($items, $invoice)
     {
         $html = '
-        <table class="items-table" cellpadding="8" cellspacing="0">
+        <table class="items-table" cellpadding="0" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="width: 64%; background-color: #667eea; color: white; padding: 12px; text-align: left; font-size: 10px; font-weight: bold;">Description</th>
-                    <th style="width: 8%; text-align: right; background-color: #667eea; color: white; padding: 12px; font-size: 10px; font-weight: bold;">Qty</th>
-                    <th style="width: 14%; text-align: right; background-color: #667eea; color: white; padding: 12px; font-size: 10px; font-weight: bold;">Rate</th>
-                    <th style="width: 14%; text-align: right; background-color: #667eea; color: white; padding: 12px; font-size: 10px; font-weight: bold;">Amount</th>
+                    <th style="width: 62%;">Description</th>
+                    <th style="width: 10%; text-align: center;">Qty</th>
+                    <th style="width: 14%; text-align: right;">Rate</th>
+                    <th style="width: 14%; text-align: right;">Amount</th>
                 </tr>
             </thead>
             <tbody>';
@@ -528,10 +500,10 @@ class PdfHtmlGenerator
             
             $html .= '
                 <tr>
-                    <td style="width:64%;">' . $description . '</td>
-                    <td style="width:8%;text-align: right;">&nbsp;' . $item->getFormattedQuantity() . '&nbsp;</td>
-                    <td style="width:14%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->rate) . '&nbsp;</td>
-                    <td style="width:14%;text-align: right;">&nbsp;' . $invoice->formatAmount($item->amount) . '&nbsp;</td>
+                    <td>' . $description . '</td>
+                    <td style="text-align: center;">' . $item->getFormattedQuantity() . '</td>
+                    <td style="text-align: right;">' . $invoice->formatAmount($item->rate) . '</td>
+                    <td style="text-align: right;">' . $invoice->formatAmount($item->amount) . '</td>
                 </tr>';
         }
 
@@ -564,7 +536,18 @@ class PdfHtmlGenerator
                 <tr>
                     <td>&nbsp;<strong>Tax (' . number_format($invoice->tax_rate, 1) . '%):</strong>&nbsp;</td>
                     <td style="text-align: right;">&nbsp;' . $invoice->formatAmount($invoice->tax_amount) . '&nbsp;</td>
-                </tr>
+                </tr>';
+                
+        // Add shipping fee if exists
+        if ($invoice->shipping_fee > 0) {
+            $html .= '
+                <tr>
+                    <td>&nbsp;<strong>Shipping Fee:</strong>&nbsp;</td>
+                    <td style="text-align: right;">&nbsp;' . $invoice->formatAmount($invoice->shipping_fee) . '&nbsp;</td>
+                </tr>';
+        }
+        
+        $html .= '
                 <tr class="total-row">
                     <td>&nbsp;<strong>TOTAL:</strong>&nbsp;</td>
                     <td style="text-align: right; font-size: 11px;">&nbsp;' . $invoice->formatAmount($invoice->total_amount) . '&nbsp;</td>
@@ -659,6 +642,15 @@ class PdfHtmlGenerator
                     <td style="text-align: right;">&nbsp;' . $estimate->formatAmount($estimate->tax_amount) . '&nbsp;</td>
                 </tr>';
         }
+        
+        // Add shipping fee if exists
+        if ($estimate->shipping_fee > 0) {
+            $html .= '
+                <tr>
+                    <td>&nbsp;<strong>Shipping Fee:</strong>&nbsp;</td>
+                    <td style="text-align: right;">&nbsp;' . $estimate->formatAmount($estimate->shipping_fee) . '&nbsp;</td>
+                </tr>';
+        }
 
         $html .= '
                 <tr class="total-row">
@@ -702,8 +694,8 @@ class PdfHtmlGenerator
         
         if ($estimate->expiry_date) {
             $html .= '
-            <div style="margin-top: 15px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
-                <strong>This estimate is valid until ' . date('F j, Y', strtotime($estimate->expiry_date)) . '</strong>
+            <div style="margin-top: 15px; padding: 15px; background-color: #fff3cd !important; border-left: 4px solid #ffc107; border-radius: 4px;">
+                <strong style="background-color: #fff3cd">This estimate is valid until ' . date('F j, Y', strtotime($estimate->expiry_date)) . '</strong>
             </div>';
         }
         
@@ -780,13 +772,14 @@ class PdfHtmlGenerator
 
         // Get template configuration
         $config = self::getTemplateConfig('invoice');
+        $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
         
         ob_start();
         ?>
 <div class="document-preview-container"
 	style="max-width: 1000px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; position: relative;">
 
-	<?php echo self::getTemplatePreviewStyles($config['color_scheme']); ?>
+	<?php echo PdfTemplateManager::generatePreviewStyles($templateId); ?>
 
 	<?php if ($invoice->status === 'paid' || $invoice->isFullyPaid()): ?>
 	<div class="paid-watermark">PAID</div>
@@ -806,54 +799,23 @@ class PdfHtmlGenerator
     }
 
     /**
-     * Generate CSS styles for web preview based on template
+     * Generate CSS styles for web preview based on template (DEPRECATED - use PdfTemplateManager)
      *
      * @param string $colorScheme Primary color for the template
      * @return string
+     * @deprecated Use PdfTemplateManager::generatePreviewStyles() instead
      */
     public static function getTemplatePreviewStyles($colorScheme = '#667eea')
     {
-        return '
-        <style>
-            .document-preview-container { background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-            .document-header { margin-bottom: 20px; }
-            .document-header table { width: 100%; border-collapse: collapse; }
-			.company-info {padding-top:20px; font-size: 16px;}
-            .company-info h2 { color: ' . $colorScheme . '; margin: 0 0 10px 0; font-size: 32px;}
-            .sub-header { margin-bottom: 20px; }
-            .sub-header table { width: 100%; border-collapse: collapse; }
-            .sub-header-column { vertical-align: top; padding: 0; width: 33.33%; }
-            .bill-to, .ship-to { background: transparent; padding: 0; border-radius: 0; margin: 0; }
-            .document-details-box { padding: 0; border-radius: 0; margin: 0; }
-            .document-details-box table { width: 100%; border-collapse: collapse; margin: 0; padding: 0; }
-            .document-details-box td { padding: 13px 0; text-indent: 0; margin: 0; }
-            .separator { border-top: 3px solid ' . $colorScheme . '; margin: 20px 0; }
-            .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            .items-table th { background: ' . $colorScheme . '; color: white; padding: 12px; text-align: left; }
-            .items-table td { padding: 18px 12px; border-bottom: 1px solid #eee; vertical-align: top; line-height: 1.6; letter-spacing: 0.3px; }
-            .items-table .text-right { text-align: right; }
-            .totals-section { margin-top: 30px; }
-            .totals-table { width: 350px; margin-left: auto; border-collapse: collapse; }
-            .totals-table td { padding: 18px 12px; border-bottom: 1px solid #eee; }
-            .total-row { background: #f8f9fa; font-weight: bold; font-size: 16px; }
-            .paid-row { background: #e8f5e8 !important; }
-            .balance-due-paid { background: #d4edda !important; }
-            .balance-due-unpaid { background: #fff3cd !important; }
-            .notes-section { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
-            .logo { max-height: 120px; max-width: 405px; height: auto;}
-            .paid-watermark {
-                position: absolute; top: 50%; left: 50%;
-                transform: translate(-50%, -50%) rotate(-45deg);
-                font-size: 120px; font-weight: bold; color: rgba(220, 220, 220, 0.3);
-                z-index: 1000; pointer-events: none; user-select: none;
-            }
-        </style>';
+        // Fallback for backward compatibility - use classic template
+        return PdfTemplateManager::generatePreviewStyles('classic');
     }
 
     /**
      * Backward compatibility method
      *
      * @return string
+     * @deprecated Use PdfTemplateManager::generatePreviewStyles() instead
      */
     public static function getPreviewStyles()
     {
@@ -869,6 +831,11 @@ class PdfHtmlGenerator
      */
     public static function generateUnifiedPreviewHeader($company, $config)
     {
+        // Get actual template accent color
+        $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
+        $template = PdfTemplateManager::getTemplate($templateId);
+        $accentColor = $template['accent_color'];
+        
         ob_start();
         ?>
 <!-- Header -->
@@ -877,7 +844,7 @@ class PdfHtmlGenerator
 		<tr>
 			<td style="width: 35%; vertical-align: top;">
 				<div class="company-info">
-					<h2><?= $config['title'] ?></h2>
+					<h2><span><?= $config['title'] ?></span></h2>
 					<strong><?= htmlspecialchars($company->company_name) ?></strong><br>
 					<?php if ($company->company_address): ?>
 					<?php foreach (explode("\n", $company->company_address) as $line): ?>
@@ -920,7 +887,7 @@ class PdfHtmlGenerator
 					?>
 					<br><br>
 					<div
-						style="font-size: <?= $fontSize ?>px; font-weight: bold; color: <?= $config['color_scheme'] ?>; white-space: nowrap; max-width: <?= $maxWidth ?>px; text-align: right; line-height: 1.2;">
+						style="font-size: <?= $fontSize ?>px; font-weight: bold; color: <?= $accentColor ?>; white-space: nowrap; max-width: <?= $maxWidth ?>px; text-align: right; line-height: 1.2;">
 						<?= $companyNameNoBreak ?></div>
 					<?php endif; // $company->hasLogo() ?>
 				</div>
@@ -1109,7 +1076,7 @@ class PdfHtmlGenerator
 	<thead>
 		<tr>
 			<th style="width: 70%;">Description</th>
-			<th style="width: 10%; text-align: ;">Qty</th>
+			<th style="width: 10%; text-align: center;">Qty</th>
 			<th style="width: 10%; text-align: right;">Rate</th>
 			<th style="width: 10%; text-align: right;">Amount</th>
 		</tr>
@@ -1215,7 +1182,7 @@ class PdfHtmlGenerator
     public static function generatePreviewFooter()
     {
         return '
-        <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #eee; padding-top: 20px;">
+        <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #666 !important; border-top: 1px solid #eee; padding-top: 20px;">
             Generated by ' . (\Yii::$app->params['siteName'] ?? 'Invoice Manager') . ' on ' . date('F j, Y \a\t g:i A') . '
         </div>';
     }
@@ -1234,13 +1201,14 @@ class PdfHtmlGenerator
 
         // Get template configuration
         $config = self::getTemplateConfig('estimate');
+        $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
         
         ob_start();
         ?>
 <div class="document-preview-container"
 	style="max-width: 1000px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; position: relative;">
 
-	<?php echo self::getTemplatePreviewStyles($config['color_scheme']); ?>
+	<?php echo PdfTemplateManager::generatePreviewStyles($templateId); ?>
 
 	<?php echo self::generateUnifiedPreviewHeader($company, $config); ?>
 	<?php echo self::generateEstimatePreviewSubHeader($customer, $estimate, $company); ?>
@@ -1400,8 +1368,8 @@ class PdfHtmlGenerator
         
         if ($estimate->expiry_date) {
             $html .= '
-            <div style="margin-top: 30px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
-                <strong>This estimate is valid until ' . date('F j, Y', strtotime($estimate->expiry_date)) . '
+            <div style="margin-top: 30px; padding: 15px; background: #fff3cd !important; border-left: 4px solid #ffc107; border-radius: 4px;">
+                <strong style="background-color: #fff3cd !important">This estimate is valid until ' . date('F j, Y', strtotime($estimate->expiry_date)) . '
             </div>';
         }
         

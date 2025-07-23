@@ -138,6 +138,7 @@ return [
     'Discount' => '할인',
     'Taxable Subtotal' => '과세 소계',
     'Sales Tax' => '판매세',
+    'Shipping Fee' => '배송료',
     'Deposit' => '보증금',
     'Balance Due' => '잔액',
     'invoices' => '인보이스',
@@ -180,4 +181,22 @@ return [
     'Tax rate calculated using fallback rates (tax rate database is empty)' => '폴백 세율을 사용하여 계산됨 (세율 데이터베이스가 비어있음)',
     'Tax rate calculated using fallback rates (database connection error)' => '폴백 세율을 사용하여 계산됨 (데이터베이스 연결 오류)',
     'Tax rate calculated using fallback rates' => '폴백 세율을 사용하여 계산됨',
+    
+    // Template names
+    'template_classic' => '클래식',
+    'template_classic_desc' => '깔끔한 선으로 구성된 전통적이고 전문적인 레이아웃',
+    'template_modern' => '모던',
+    'template_modern_desc' => '미묘한 색상을 사용한 깔끔하고 미니멀한 디자인',
+    'template_elegant' => '우아한',
+    'template_elegant_desc' => '세련된 타이포그래피를 사용한 고급스러운 디자인',
+    'template_corporate' => '기업용',
+    'template_corporate_desc' => '강력한 브랜딩을 가진 전문적인 비즈니스 템플릿',
+    'template_creative' => '창의적',
+    'template_creative_desc' => '창의적인 비즈니스를 위한 생생하고 현대적인 디자인',
+    
+    // Template related
+    'PDF Template' => 'PDF 템플릿',
+    'Choose Template' => '템플릿 선택',
+    'Template Preview' => '템플릿 미리보기',
+    'Select a template for your invoice PDF' => '송장 PDF에 사용할 템플릿을 선택하세요',
 ];

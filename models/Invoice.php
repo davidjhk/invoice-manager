@@ -46,6 +46,7 @@ use app\models\State;
  * @property string|null $discount_type
  * @property float $discount_value
  * @property float $discount_amount
+ * @property float $shipping_fee
  * @property float $deposit_amount
  * @property string $tax_calculation_mode
  * @property float|null $auto_calculated_tax_rate
@@ -107,7 +108,7 @@ class Invoice extends ActiveRecord
             [['invoice_number', 'company_id', 'customer_id', 'invoice_date'], 'required'],
             [['company_id', 'customer_id'], 'integer'],
             [['invoice_date', 'due_date'], 'date', 'format' => 'php:Y-m-d'],
-            [['subtotal', 'tax_rate', 'tax_amount', 'total_amount', 'discount_value', 'discount_amount', 'deposit_amount'], 'number', 'min' => 0],
+            [['subtotal', 'tax_rate', 'tax_amount', 'total_amount', 'discount_value', 'discount_amount', 'shipping_fee', 'deposit_amount'], 'number', 'min' => 0],
             [['notes', 'bill_to_address', 'cc_email', 'ship_to_address', 'ship_from_address', 'payment_instructions', 'customer_notes', 'memo'], 'string'],
             [['bill_to_city', 'ship_to_city'], 'string', 'max' => 100],
             [['bill_to_state', 'ship_to_state'], 'string', 'max' => 50],
@@ -193,6 +194,7 @@ class Invoice extends ActiveRecord
             'discount_type' => 'Discount Type',
             'discount_value' => 'Discount Value',
             'discount_amount' => 'Discount Amount',
+            'shipping_fee' => 'Shipping Fee',
             'deposit_amount' => 'Deposit Amount',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -359,7 +361,9 @@ class Invoice extends ActiveRecord
         
         $this->tax_amount = $afterDiscountTaxable * (($this->tax_rate ?? 0) / 100);
         
-        $this->total_amount = $subtotal - $discountAmount + $this->tax_amount;
+        // Include shipping fee in total amount calculation
+        $shippingFee = $this->shipping_fee ?? 0;
+        $this->total_amount = $subtotal - $discountAmount + $this->tax_amount + $shippingFee;
     }
 
     /**

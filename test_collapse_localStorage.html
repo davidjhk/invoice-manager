@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collapse localStorage Test</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h2>Collapse localStorage Test</h2>
+      <p>
+        Open/close the sections below, then refresh the page to see if the
+        states are preserved.
+      </p>
+
+      <!-- Test Section 1 -->
+      <div class="card mb-4">
+        <div
+          class="card-header p-2"
+          style="cursor: pointer"
+          data-custom-collapse="true"
+          data-target="#test-section-1"
+          aria-expanded="false"
+        >
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span><i class="fas fa-cog mr-2"></i>Test Section 1</span>
+            <i class="fas fa-chevron-down collapse-icon"></i>
+          </h5>
+        </div>
+        <div class="collapse" id="test-section-1">
+          <div class="card-body">
+            <p>
+              This is the content of test section 1. It should remember its
+              state after page refresh.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Section 2 -->
+      <div class="card mb-4">
+        <div
+          class="card-header p-2"
+          style="cursor: pointer"
+          data-custom-collapse="true"
+          data-target="#test-section-2"
+          aria-expanded="false"
+        >
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span><i class="fas fa-file mr-2"></i>Test Section 2</span>
+            <i class="fas fa-chevron-down collapse-icon"></i>
+          </h5>
+        </div>
+        <div class="collapse show" id="test-section-2">
+          <div class="card-body">
+            <p>
+              This is the content of test section 2. It starts expanded and
+              should remember its state.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Section 3 -->
+      <div class="card mb-4">
+        <div
+          class="card-header p-2"
+          style="cursor: pointer"
+          data-custom-collapse="true"
+          data-target="#test-section-3"
+          aria-expanded="false"
+        >
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span><i class="fas fa-envelope mr-2"></i>Test Section 3</span>
+            <i class="fas fa-chevron-down collapse-icon"></i>
+          </h5>
+        </div>
+        <div class="collapse" id="test-section-3">
+          <div class="card-body">
+            <p>
+              This is the content of test section 3. Another collapsible section
+              for testing.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>Instructions:</strong>
+        <ol>
+          <li>Click on the section headers to expand/collapse them</li>
+          <li>Refresh the page (F5 or Ctrl+R)</li>
+          <li>The sections should maintain their open/closed state</li>
+          <li>Check the browser console for debug messages</li>
+        </ol>
+      </div>
+
+      <div class="alert alert-secondary">
+        <strong>Debug Controls:</strong>
+        <button
+          class="btn btn-sm btn-info"
+          onclick="console.log('Current states:', CollapseHelper.getStates())"
+        >
+          Show States
+        </button>
+        <button
+          class="btn btn-sm btn-warning"
+          onclick="CollapseHelper.clearStates(); location.reload()"
+        >
+          Clear States
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="CollapseHelper.debug(false)"
+        >
+          Disable Debug
+        </button>
+      </div>
+    </div>
+
+    <script src="web/js/collapse-helper.js"></script>
+
+    <style>
+      .collapse {
+        display: none;
+        transition: all 0.3s ease;
+      }
+
+      .collapse.show {
+        display: block;
+      }
+
+      .collapse-icon {
+        transition: transform 0.3s ease;
+      }
+
+      .collapse-icon.rotated {
+        transform: rotate(180deg);
+      }
+
+      [data-custom-collapse] {
+        transition: background-color 0.3s ease;
+      }
+
+      [data-custom-collapse]:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </body>
+</html>

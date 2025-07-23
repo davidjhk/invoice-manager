@@ -313,6 +313,12 @@ $this->params['breadcrumbs'][] = $this->title;
 							<td><?= Yii::t('app/invoice', 'Subtotal') ?>:</td>
 							<td class="text-right"><?= $model->formatAmount($model->subtotal) ?></td>
 						</tr>
+						<?php if ($model->shipping_fee > 0): ?>
+						<tr>
+							<td><?= Yii::t('app/invoice', 'Shipping Fee') ?>:</td>
+							<td class="text-right"><?= $model->formatAmount($model->shipping_fee) ?></td>
+						</tr>
+						<?php endif; ?>
 						<tr>
 							<td><?= Yii::t('app/invoice', 'Tax') ?> (<?= number_format($model->tax_rate, 1) ?>%):</td>
 							<td class="text-right"><?= $model->formatAmount($model->tax_amount) ?></td>

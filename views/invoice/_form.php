@@ -269,6 +269,12 @@ $this->registerJsVar('invoiceConfig', [
 							<?php endif; ?>
 						</div>
 
+						<span><?= Yii::t('app/invoice', 'Shipping Fee') ?></span>
+						<div class="text-right d-flex justify-content-end align-items-center">
+							<?= $form->field($model, 'shipping_fee', ['options' => ['class' => 'mb-0'], 'template' => '{input}'])->textInput(['id' => 'shipping-fee-input', 'class' => 'form-control form-control-sm text-right', 'style' => 'width: 120px;', 'placeholder' => '0.00', 'type' => 'number', 'step' => '0.01', 'min' => '0']) ?>
+							<span id="shipping-fee-display" class="ml-2">$0.00</span>
+						</div>
+
 						<span><?= Yii::t('app/invoice', 'Sales Tax') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
 							<input type="number" class="form-control form-control-sm mr-2" id="tax-rate-input"
@@ -486,6 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		discountInput.addEventListener('input', calculateTotals);
 		discountType.addEventListener('change', calculateTotals);
+		document.getElementById('shipping-fee-input').addEventListener('input', calculateTotals);
 		document.getElementById('tax-rate-input').addEventListener('input', calculateTotals);
 		document.getElementById('tax-calculation-mode').addEventListener('change', handleTaxModeChange);
 		document.getElementById('calculate-tax-btn').addEventListener('click', calculateAutomaticTax);
@@ -589,6 +596,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		const discountIsPercentage = discountType.value === 'percentage';
 		const discountAmount = discountIsPercentage ? subtotal * (discountValue / 100) : discountValue;
 
+		const shippingFeeInput = document.getElementById('shipping-fee-input');
+		const shippingFee = parseFloat(shippingFeeInput.value) || 0;
+
 		const subtotalAfterDiscount = subtotal - discountAmount;
 		const taxableRatio = subtotal > 0 ? taxableAmount / subtotal : 0;
 		const taxableSubtotal = taxableAmount - (discountAmount * taxableRatio);
@@ -600,12 +610,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Update hidden tax_rate field
 		document.getElementById('tax-rate-hidden').value = taxRate;
 
-		const total = subtotalAfterDiscount + taxAmount;
+		const total = subtotalAfterDiscount + taxAmount + shippingFee;
 		const deposit = 0; // Placeholder for deposit logic
 		const balance = total - deposit;
 
 		document.getElementById('subtotal-display').textContent = formatCurrency(subtotal);
 		document.getElementById('discount-display').textContent = `-${formatCurrency(discountAmount)}`;
+		document.getElementById('shipping-fee-display').textContent = formatCurrency(shippingFee);
 		document.getElementById('taxable-subtotal-display').textContent = formatCurrency(taxableSubtotal);
 		document.getElementById('tax-display').textContent = formatCurrency(taxAmount);
 		document.getElementById('total-display').textContent = formatCurrency(total);

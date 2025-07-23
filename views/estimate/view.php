@@ -265,6 +265,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     <?php endif; ?>
                     
+                    <?php if ($model->shipping_fee > 0): ?>
+                        <div class="row mb-2">
+                            <div class="col-6"><?= Yii::t('app/estimate', 'Shipping Fee') ?>:</div>
+                            <div class="col-6 text-right"><?= $model->formatAmount($model->shipping_fee) ?></div>
+                        </div>
+                    <?php endif; ?>
+                    
                     <?php if ($model->tax_amount > 0): ?>
                         <div class="row mb-2">
                             <div class="col-6">Tax (<?= $model->tax_rate ?>%):</div>

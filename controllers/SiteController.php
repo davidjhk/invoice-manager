@@ -28,14 +28,14 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password', 'change-language', 'toggle-theme'],
+                'only' => ['logout', 'index', 'check-auth',  'change-password', 'change-language', 'toggle-theme'],
                 'rules' => [
                     [
                         'actions' => ['change-language'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'check-auth', 'invoice-app', 'change-password', 'toggle-theme'],
+                        'actions' => ['logout', 'index', 'check-auth', 'change-password', 'toggle-theme'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -191,16 +191,6 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Invoice app action.
-     *
-     * @return string
-     */
-    public function actionInvoiceApp()
-    {
-        $this->layout = false;
-        return $this->render('invoice-app');
-    }
 
     /**
      * Check authentication status for AJAX requests.

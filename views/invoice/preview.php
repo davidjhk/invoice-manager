@@ -100,7 +100,6 @@ $this->registerCss("
     .invoice-preview-wrapper {
         background: #f8f9fa !important;
         padding: 20px !important;
-        border-radius: 8px !important;
     }
     
     /* Dark mode override - force white background and black text for preview */
@@ -109,20 +108,24 @@ $this->registerCss("
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     }
     
-    body.dark-mode .invoice-preview-wrapper *,
-    body.dark-mode .invoice-preview-container *,
+    body.dark-mode .invoice-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th),
+    body.dark-mode .invoice-preview-container *:not(table):not(thead):not(th):not(.items-table thead th),
     body.dark-mode .invoice-preview-container,
-    .dark-mode .invoice-preview-wrapper *,
-    .dark-mode .invoice-preview-container * {
+    .dark-mode .invoice-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th),
+    .dark-mode .invoice-preview-container *:not(table):not(thead):not(th):not(.items-table thead th) {
         color: black !important;
         background: white !important;
-        border-radius: 10px;
     }
     
+    /* Allow template-specific table header colors */
+    body.dark-mode .invoice-preview-container table thead th,
     body.dark-mode .invoice-preview-container .items-table th,
-    .dark-mode .invoice-preview-container .items-table th {
-        background: #667eea !important;
-        color: white !important;
+    body.dark-mode .invoice-preview-container .items-table thead th,
+    .dark-mode .invoice-preview-container table thead th,
+    .dark-mode .invoice-preview-container .items-table th,
+    .dark-mode .invoice-preview-container .items-table thead th {
+        background: var(--table-header-bg, #667eea) !important;
+        color: var(--table-header-color, white) !important;
     }
     
     body.dark-mode .invoice-preview-container .total-row,

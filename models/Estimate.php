@@ -45,6 +45,7 @@ use app\components\UsSalesTaxCalculator;
  * @property string|null $discount_type
  * @property float $discount_value
  * @property float $discount_amount
+ * @property float $shipping_fee
  * @property bool $converted_to_invoice
  * @property int|null $invoice_id
  * @property string $created_at
@@ -102,7 +103,7 @@ class Estimate extends ActiveRecord
             [['estimate_number', 'company_id', 'customer_id', 'estimate_date'], 'required'],
             [['company_id', 'customer_id', 'invoice_id'], 'integer'],
             [['estimate_date', 'expiry_date', 'shipping_date'], 'date', 'format' => 'php:Y-m-d'],
-            [['subtotal', 'tax_rate', 'tax_amount', 'total_amount', 'discount_value', 'discount_amount'], 'number', 'min' => 0],
+            [['subtotal', 'tax_rate', 'tax_amount', 'total_amount', 'discount_value', 'discount_amount', 'shipping_fee'], 'number', 'min' => 0],
             [['notes', 'ship_to_address', 'ship_from_address', 'payment_instructions', 'customer_notes', 'memo'], 'string'],
             [['bill_to_city', 'ship_to_city'], 'string', 'max' => 100],
             [['bill_to_state', 'ship_to_state'], 'string', 'max' => 50],
@@ -189,6 +190,7 @@ class Estimate extends ActiveRecord
             'discount_type' => 'Discount Type',
             'discount_value' => 'Discount Value',
             'discount_amount' => 'Discount Amount',
+            'shipping_fee' => 'Shipping Fee',
             'converted_to_invoice' => 'Converted to Invoice',
             'invoice_id' => 'Invoice',
             'created_at' => 'Created At',
@@ -348,7 +350,10 @@ class Estimate extends ActiveRecord
         $this->subtotal = $subtotal;
         $this->discount_amount = $discountAmount;
         $this->tax_amount = $taxAmount;
-        $this->total_amount = $subtotal - $discountAmount + $taxAmount;
+        
+        // Include shipping fee in total amount calculation
+        $shippingFee = $this->shipping_fee ?? 0;
+        $this->total_amount = $subtotal - $discountAmount + $taxAmount + $shippingFee;
     }
 
     /**
@@ -436,6 +441,7 @@ class Estimate extends ActiveRecord
                 'discount_type' => $this->discount_type,
                 'discount_value' => $this->discount_value,
                 'discount_amount' => $this->discount_amount,
+                'shipping_fee' => $this->shipping_fee,
             ];
 
             if (!$invoice->save()) {

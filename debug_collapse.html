@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collapse Debug</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h2>Company Settings Collapse Debug</h2>
+
+      <!-- Invoice Settings (같은 구조) -->
+      <div class="card mb-4">
+        <div
+          class="card-header p-2"
+          style="cursor: pointer"
+          data-custom-collapse="true"
+          data-target="#invoice-settings-collapse"
+          aria-expanded="false"
+        >
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span
+              ><i class="fas fa-file-invoice mr-2"></i>Invoice Settings</span
+            >
+            <i class="fas fa-chevron-down collapse-icon"></i>
+          </h5>
+        </div>
+        <div class="collapse" id="invoice-settings-collapse">
+          <div class="card-body">
+            <p>Invoice settings content here...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Language & Display Settings -->
+      <div class="card mb-4">
+        <div
+          class="card-header p-2"
+          style="cursor: pointer"
+          data-custom-collapse="true"
+          data-target="#language-display-collapse"
+          aria-expanded="false"
+        >
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span
+              ><i class="fas fa-language mr-2"></i>Language & Display
+              Settings</span
+            >
+            <i class="fas fa-chevron-down collapse-icon"></i>
+          </h5>
+        </div>
+        <div class="collapse" id="language-display-collapse">
+          <div class="card-body">
+            <p>Language and display settings content here...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Settings -->
+      <div class="card mb-4">
+        <div
+          class="card-header p-2"
+          style="cursor: pointer"
+          data-custom-collapse="true"
+          data-target="#email-settings-collapse"
+          aria-expanded="false"
+        >
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span><i class="fas fa-envelope mr-2"></i>Email Settings</span>
+            <i class="fas fa-chevron-down collapse-icon"></i>
+          </h5>
+        </div>
+        <div class="collapse" id="email-settings-collapse">
+          <div class="card-body">
+            <p>Email settings content here...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>테스트 방법:</strong>
+        <ol>
+          <li>섹션 헤더를 클릭해서 열고 닫기</li>
+          <li>페이지 새로고침 (F5)</li>
+          <li>상태가 유지되는지 확인</li>
+          <li>브라우저 콘솔에서 디버그 메시지 확인</li>
+        </ol>
+      </div>
+
+      <div class="alert alert-secondary">
+        <strong>디버그 컨트롤:</strong>
+        <button class="btn btn-sm btn-info" onclick="showCurrentStates()">
+          현재 상태 보기
+        </button>
+        <button class="btn btn-sm btn-warning" onclick="clearAllStates()">
+          상태 초기화
+        </button>
+        <button class="btn btn-sm btn-success" onclick="testLocalStorage()">
+          localStorage 테스트
+        </button>
+      </div>
+
+      <div id="debug-output" class="mt-3"></div>
+    </div>
+
+    <script src="web/js/collapse-helper.js"></script>
+
+    <script>
+      function showCurrentStates() {
+        const states = CollapseHelper.getStates();
+        document.getElementById("debug-output").innerHTML =
+          '<div class="alert alert-info"><strong>현재 저장된 상태:</strong><pre>' +
+          JSON.stringify(states, null, 2) +
+          "</pre></div>";
+      }
+
+      function clearAllStates() {
+        CollapseHelper.clearStates();
+        document.getElementById("debug-output").innerHTML =
+          '<div class="alert alert-warning">모든 상태가 초기화되었습니다. 페이지를 새로고침하세요.</div>';
+      }
+
+      function testLocalStorage() {
+        try {
+          localStorage.setItem("test", "working");
+          const test = localStorage.getItem("test");
+          localStorage.removeItem("test");
+          document.getElementById("debug-output").innerHTML =
+            '<div class="alert alert-success">localStorage가 정상적으로 작동합니다: ' +
+            test +
+            "</div>";
+        } catch (e) {
+          document.getElementById("debug-output").innerHTML =
+            '<div class="alert alert-danger">localStorage 오류: ' +
+            e.message +
+            "</div>";
+        }
+      }
+    </script>
+
+    <style>
+      .collapse {
+        display: none;
+        transition: all 0.3s ease;
+      }
+
+      .collapse.show {
+        display: block;
+      }
+
+      .collapse-icon {
+        transition: transform 0.3s ease;
+      }
+
+      .collapse-icon.rotated {
+        transform: rotate(180deg);
+      }
+
+      [data-custom-collapse] {
+        transition: background-color 0.3s ease;
+      }
+
+      [data-custom-collapse]:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </body>
+</html>

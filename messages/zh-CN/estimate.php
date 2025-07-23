@@ -120,6 +120,7 @@ return [
     'Discount' => '折扣',
     'Taxable Subtotal' => '应税小计',
     'Sales Tax' => '销售税',
+    'Shipping Fee' => '运费',
     'estimates' => '估价单',
     'You haven\'t created any estimates yet.' => '您还没有创建任何估价单。',
     'Create Your First Estimate' => '创建您的第一张估价单',
@@ -152,4 +153,24 @@ return [
     'Send Email' => '发送邮件',
     'Email not configured. Configure SMTP2GO in Company Settings.' => '邮件未配置。请在公司设置中配置SMTP2GO。',
     'All' => '全部',
+    'Customer not in list?' => '客户不在列表中？',
+    'Add New Customer' => '添加新客户',
+    
+    // Template names
+    'template_classic' => '经典',
+    'template_classic_desc' => '具有清晰线条的传统专业布局',
+    'template_modern' => '现代',
+    'template_modern_desc' => '具有柔和颜色的简洁极简设计',
+    'template_elegant' => '优雅',
+    'template_elegant_desc' => '具有精致排版的精致设计',
+    'template_corporate' => '企业',
+    'template_corporate_desc' => '具有强大品牌的专业商务模板',
+    'template_creative' => '创意',
+    'template_creative_desc' => '为创意企业提供的充满活力的现代设计',
+    
+    // Template related
+    'PDF Template' => 'PDF模板',
+    'Choose Template' => '选择模板',
+    'Template Preview' => '模板预览',
+    'Select a template for your estimate PDF' => '为您的估价单PDF选择模板',
 ];

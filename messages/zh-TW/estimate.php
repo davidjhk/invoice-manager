@@ -120,6 +120,7 @@ return [
     'Discount' => '折扣',
     'Taxable Subtotal' => '應稅小計',
     'Sales Tax' => '銷售稅',
+    'Shipping Fee' => '運費',
     'estimates' => '估價單',
     'You haven\'t created any estimates yet.' => '您還沒有建立任何估價單。',
     'Create Your First Estimate' => '建立您的第一張估價單',
@@ -152,4 +153,24 @@ return [
     'Send Email' => '發送郵件',
     'Email not configured. Configure SMTP2GO in Company Settings.' => '郵件未配置。請在公司設定中配置SMTP2GO。',
     'All' => '全部',
+    'Customer not in list?' => '客戶不在清單中？',
+    'Add New Customer' => '新增客戶',
+    
+    // Template names
+    'template_classic' => '經典',
+    'template_classic_desc' => '具有清晰線條的傳統專業佈局',
+    'template_modern' => '現代',
+    'template_modern_desc' => '具有柔和顏色的簡潔極簡設計',
+    'template_elegant' => '優雅',
+    'template_elegant_desc' => '具有精緻排版的精緻設計',
+    'template_corporate' => '企業',
+    'template_corporate_desc' => '具有強大品牌的專業商務範本',
+    'template_creative' => '創意',
+    'template_creative_desc' => '為創意企業提供的充滿活力的現代設計',
+    
+    // Template related
+    'PDF Template' => 'PDF範本',
+    'Choose Template' => '選擇範本',
+    'Template Preview' => '範本預覽',
+    'Select a template for your estimate PDF' => '為您的估價單PDF選擇範本',
 ];

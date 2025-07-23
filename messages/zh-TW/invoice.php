@@ -71,6 +71,7 @@ return [
     'Discount' => '折扣',
     'Taxable Subtotal' => '應稅小計',
     'Sales Tax' => '銷售稅',
+    'Shipping Fee' => '運費',
     'Deposit' => '訂金',
     'Balance Due' => '應付餘額',
     'Notes & Payment' => '備註和付款',
@@ -96,4 +97,22 @@ return [
     'Tax rate calculated automatically based on customer address' => '根據客戶地址自動計算稅率',
     'Using company default tax rate (address not found or invalid)' => '使用公司預設稅率（地址未找到或無效）',
     'Error calculating tax rate' => '稅率計算錯誤',
+    
+    // Template names
+    'template_classic' => '經典',
+    'template_classic_desc' => '線條簡潔的傳統專業佈局',
+    'template_modern' => '現代',
+    'template_modern_desc' => '色彩柔和的簡潔極簡設計',
+    'template_elegant' => '優雅',
+    'template_elegant_desc' => '字型精緻的複雜設計',
+    'template_corporate' => '企業',
+    'template_corporate_desc' => '品牌力強的專業商務模板',
+    'template_creative' => '創意',
+    'template_creative_desc' => '面向創意企業的充滿活力的當代設計',
+    
+    // Template related
+    'PDF Template' => 'PDF模板',
+    'Choose Template' => '選擇模板',
+    'Template Preview' => '模板預覽',
+    'Select a template for your invoice PDF' => '為您的發票PDF選擇模板',
 ];

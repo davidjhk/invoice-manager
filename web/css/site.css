@@ -1203,44 +1203,86 @@ body.dark-mode .text-secondary {
 body.dark-mode .invoice-preview-container,
 body.dark-mode .estimate-preview-container {
   background: white !important;
-  color: black !important;
+  color: black;
   border-radius: 8px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
-body.dark-mode .invoice-preview-container *,
-body.dark-mode .estimate-preview-container * {
-  color: black !important;
-  background: transparent !important;
-}
-
+/* Allow template-specific table header colors in preview */
+body.dark-mode .invoice-preview-container table thead th,
+body.dark-mode .estimate-preview-container table thead th,
 body.dark-mode .invoice-preview-container .items-table th,
-body.dark-mode .estimate-preview-container .items-table th {
-  background: #667eea !important;
-  color: white !important;
+body.dark-mode .estimate-preview-container .items-table th,
+body.dark-mode .invoice-preview-container .items-table thead th,
+body.dark-mode .estimate-preview-container .items-table thead th,
+body.dark-mode .invoice-preview-wrapper table thead th,
+body.dark-mode .estimate-preview-wrapper table thead th,
+body.dark-mode .invoice-preview-wrapper .items-table th,
+body.dark-mode .estimate-preview-wrapper .items-table th,
+body.dark-mode .invoice-preview-wrapper .items-table thead th,
+body.dark-mode .estimate-preview-wrapper .items-table thead th {
+  background: var(--table-header-bg, #667eea) !important;
+  color: var(--table-header-color, white) !important;
 }
 
 body.dark-mode .invoice-preview-container .total-row,
-body.dark-mode .estimate-preview-container .total-row {
+body.dark-mode .estimate-preview-container .total-row,
+body.dark-mode .invoice-preview-wrapper .total-row,
+body.dark-mode .estimate-preview-wrapper .total-row {
   background: #f8f9fa !important;
-  color: black !important;
+  color: black;
 }
 
 body.dark-mode .invoice-preview-container .paid-row,
-body.dark-mode .estimate-preview-container .paid-row {
+body.dark-mode .estimate-preview-container .paid-row,
+body.dark-mode .invoice-preview-wrapper .paid-row,
+body.dark-mode .estimate-preview-wrapper .paid-row {
   background: #e8f5e8 !important;
-  color: black !important;
+  color: black;
 }
 
 body.dark-mode .invoice-preview-container .notes-section,
-body.dark-mode .estimate-preview-container .notes-section {
+body.dark-mode .estimate-preview-container .notes-section,
+body.dark-mode .invoice-preview-wrapper .notes-section,
+body.dark-mode .estimate-preview-wrapper .notes-section {
   background: #f8f9fa !important;
-  color: black !important;
+  color: black;
 }
 
 body.dark-mode .invoice-preview-container .paid-watermark,
-body.dark-mode .estimate-preview-container .paid-watermark {
+body.dark-mode .estimate-preview-container .paid-watermark,
+body.dark-mode .invoice-preview-wrapper .paid-watermark,
+body.dark-mode .estimate-preview-wrapper .paid-watermark {
   color: rgba(220, 220, 220, 0.3) !important;
+}
+
+/* Override any additional dark mode rules that affect preview containers */
+body.dark-mode
+  .invoice-preview-wrapper
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+body.dark-mode
+  .estimate-preview-wrapper
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+body.dark-mode
+  .invoice-preview-container
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+body.dark-mode
+  .estimate-preview-container
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+.dark-mode
+  .invoice-preview-wrapper
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+.dark-mode
+  .estimate-preview-wrapper
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+.dark-mode
+  .invoice-preview-container
+  *:not(table):not(thead):not(th):not(.items-table thead th),
+.dark-mode
+  .estimate-preview-container
+  *:not(table):not(thead):not(th):not(.items-table thead th) {
+  color: black;
+  background: white !important;
 }
 
 /* jQuery UI Autocomplete Styling for Light Mode */
@@ -1312,6 +1354,14 @@ body.dark-mode .ui-menu-item {
   border: none !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+body.dark-mode .totals-section tbody td,
+body.dark-mode .items-table tbody td,
+body.dark-mode .items-table tbody td small,
+body.dark-mode .sub-header-column td,
+body.dark-mode .sub-header-column div {
+  color: black !important;
 }
 
 body.dark-mode .ui-menu-item .ui-menu-item-wrapper {

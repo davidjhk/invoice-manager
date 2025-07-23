@@ -71,6 +71,7 @@ return [
     'Discount' => 'Descuento',
     'Taxable Subtotal' => 'Subtotal Gravable',
     'Sales Tax' => 'Impuesto sobre Ventas',
+    'Shipping Fee' => 'Gastos de Envío',
     'Deposit' => 'Depósito',
     'Balance Due' => 'Saldo Adeudado',
     'Notes & Payment' => 'Notas y Pago',
@@ -96,4 +97,22 @@ return [
     'Tax rate calculated automatically based on customer address' => 'Tasa de impuesto calculada automáticamente basada en la dirección del cliente',
     'Using company default tax rate (address not found or invalid)' => 'Usando la tasa de impuesto predeterminada de la empresa (dirección no encontrada o inválida)',
     'Error calculating tax rate' => 'Error al calcular la tasa de impuesto',
+    
+    // Template names
+    'template_classic' => 'Clásico',
+    'template_classic_desc' => 'Diseño profesional tradicional con líneas limpias',
+    'template_modern' => 'Moderno',
+    'template_modern_desc' => 'Diseño minimalista limpio con colores sutiles',
+    'template_elegant' => 'Elegante',
+    'template_elegant_desc' => 'Diseño sofisticado con tipografía refinada',
+    'template_corporate' => 'Corporativo',
+    'template_corporate_desc' => 'Plantilla de negocios profesional con marca fuerte',
+    'template_creative' => 'Creativo',
+    'template_creative_desc' => 'Diseño vibrante y contemporáneo para empresas creativas',
+    
+    // Template related
+    'PDF Template' => 'Plantilla PDF',
+    'Choose Template' => 'Elegir Plantilla',
+    'Template Preview' => 'Vista Previa de Plantilla',
+    'Select a template for your invoice PDF' => 'Selecciona una plantilla para tu PDF de factura',
 ];

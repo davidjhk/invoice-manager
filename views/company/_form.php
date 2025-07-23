@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use app\models\State;
+use app\components\PdfTemplateManager;
 
 /** @var yii\web\View $this */
 /** @var app\models\Company $model */
@@ -13,8 +14,7 @@ $mode = $mode ?? 'settings';
 $isSettings = $mode === 'settings';
 $isCreate = $mode === 'create';
 
-// Register collapse helper JavaScript for both modes
-$this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+// collapse-helper.js is loaded via AppAsset
 ?>
 
 <div class="row">
@@ -306,6 +306,28 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 						</div>
 						<small class="form-text text-muted">
 							<?= Yii::t('app/company', 'Hide menu text in the top bar and show icons only') ?>
+						</small>
+					</div>
+
+					<div class="form-group">
+						<?= $form->field($model, 'pdf_template')->dropDownList(
+							PdfTemplateManager::getTemplateOptions(),
+							[
+								'id' => 'pdf-template-select',
+								'class' => 'form-control',
+								'onchange' => 'updateCompanyTemplatePreview(this.value)'
+							]
+						)->label(Yii::t('invoice', 'Choose Template'), ['class' => 'font-weight-bold']) ?>
+						<div class="row">
+							<div class="col-md-12">
+								<div id="company-template-preview" class="border rounded p-3 text-center mt-2" style="min-height: 120px; background: #f8f9fa;">
+									<i class="fas fa-file-pdf fa-3x text-muted mb-2"></i>
+									<div class="text-muted"><?= Yii::t('invoice', 'Template Preview') ?></div>
+								</div>
+							</div>
+						</div>
+						<small class="form-text text-muted">
+							<?= Yii::t('invoice', 'Select a template for your invoice PDF') ?>
 						</small>
 					</div>
 

@@ -10,8 +10,7 @@ use yii\helpers\Url;
 $this->title = Yii::t('app/company', 'Company Settings');
 $this->params['breadcrumbs'][] = $this->title;
 
-// Register collapse helper JavaScript
-$this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+// collapse-helper.js is loaded via AppAsset
 ?>
 
 <div class="company-settings">
@@ -51,3 +50,61 @@ $this->registerJsFile('/js/collapse-helper.js', ['depends' => [\yii\web\JqueryAs
 	<?php ActiveForm::end(); ?>
 
 </div>
+
+<script>
+// Template preview functionality for Company Settings
+function updateCompanyTemplatePreview(templateId) {
+	const previewDiv = document.getElementById('company-template-preview');
+	const templates = {
+		'classic': {
+			name: '<?= Yii::t('invoice', 'template_classic') ?>',
+			desc: '<?= Yii::t('invoice', 'template_classic_desc') ?>',
+			color: '#667eea'
+		},
+		'modern': {
+			name: '<?= Yii::t('invoice', 'template_modern') ?>',
+			desc: '<?= Yii::t('invoice', 'template_modern_desc') ?>',
+			color: '#2563eb'
+		},
+		'elegant': {
+			name: '<?= Yii::t('invoice', 'template_elegant') ?>',
+			desc: '<?= Yii::t('invoice', 'template_elegant_desc') ?>',
+			color: '#059669'
+		},
+		'corporate': {
+			name: '<?= Yii::t('invoice', 'template_corporate') ?>',
+			desc: '<?= Yii::t('invoice', 'template_corporate_desc') ?>',
+			color: '#1e3a8a'
+		},
+		'creative': {
+			name: '<?= Yii::t('invoice', 'template_creative') ?>',
+			desc: '<?= Yii::t('invoice', 'template_creative_desc') ?>',
+			color: '#7c3aed'
+		}
+	};
+
+	const template = templates[templateId] || templates['classic'];
+	
+	previewDiv.innerHTML = `
+		<div class="template-preview-card" style="border: 2px solid ${template.color}; border-radius: 8px; padding: 15px; background: white;">
+			<div style="background: ${template.color}; color: white; padding: 10px; margin: -15px -15px 10px -15px; border-radius: 6px 6px 0 0; font-weight: bold;">
+				${template.name}
+			</div>
+			<div style="color: #666; font-size: 12px; line-height: 1.4;">
+				${template.desc}
+			</div>
+			<div style="margin-top: 10px; padding: 8px; background: ${template.color}15; border-radius: 4px; font-size: 11px; color: ${template.color};">
+				<i class="fas fa-palette mr-1"></i>Preview
+			</div>
+		</div>
+	`;
+}
+
+// Initialize template preview on page load
+document.addEventListener('DOMContentLoaded', function() {
+	const templateSelect = document.getElementById('pdf-template-select');
+	if (templateSelect && templateSelect.value) {
+		updateCompanyTemplatePreview(templateSelect.value);
+	}
+});
+</script>

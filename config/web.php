@@ -82,13 +82,28 @@ $config = [
                         'app/form' => 'form.php',
                     ],
                 ],
+                'invoice' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                    'fileMap' => [
+                        'invoice' => 'invoice.php',
+                    ],
+                ],
+                'estimate' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                    'fileMap' => [
+                        'estimate' => 'estimate.php',
+                    ],
+                ],
             ],
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
 			'rules' => [
-				'invoice-app' => 'site/invoice-app',
 				'request-password-reset' => 'site/request-password-reset',
 				'reset-password/<token:.+>' => 'site/reset-password',
 				'admin' => 'admin/index',

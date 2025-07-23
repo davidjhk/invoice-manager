@@ -120,6 +120,7 @@ return [
     'Discount' => '할인',
     'Taxable Subtotal' => '과세 소계',
     'Sales Tax' => '판매세',
+    'Shipping Fee' => '배송료',
     'estimates' => '견적서',
     'You haven\'t created any estimates yet.' => '아직 견적서를 생성하지 않았습니다.',
     'Create Your First Estimate' => '첫 번째 견적서 생성',
@@ -154,4 +155,22 @@ return [
     'All' => '전체',
     'Customer not in list?' => '고객이 목록에 없나요?',
     'Add New Customer' => '새 고객 추가',
+    
+    // Template names
+    'template_classic' => '클래식',
+    'template_classic_desc' => '깔끔한 선이 있는 전통적이고 전문적인 레이아웃',
+    'template_modern' => '모던',
+    'template_modern_desc' => '미묘한 색상의 깔끔하고 미니멀한 디자인',
+    'template_elegant' => '우아함',
+    'template_elegant_desc' => '세련된 타이포그래피의 세련된 디자인',
+    'template_corporate' => '기업용',
+    'template_corporate_desc' => '강력한 브랜딩이 있는 전문 비즈니스 템플릿',
+    'template_creative' => '창의적',
+    'template_creative_desc' => '창의적인 비즈니스를 위한 생동감 있고 현대적인 디자인',
+    
+    // Template related
+    'PDF Template' => 'PDF 템플릿',
+    'Choose Template' => '템플릿 선택',
+    'Template Preview' => '템플릿 미리보기',
+    'Select a template for your estimate PDF' => '견적서 PDF용 템플릿을 선택하세요',
 ];
