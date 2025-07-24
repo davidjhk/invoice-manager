@@ -62,7 +62,7 @@ class Estimate extends ActiveRecord
     const STATUS_PRINTED = 'printed';
     const STATUS_SENT = 'sent';
     const STATUS_ACCEPTED = 'accepted';
-    const STATUS_REJECTED = 'rejected';
+    const STATUS_DECLINED = 'declined';
     const STATUS_EXPIRED = 'expired';
     const STATUS_VOID = 'void';
     
@@ -118,7 +118,7 @@ class Estimate extends ActiveRecord
             [['currency'], 'string', 'max' => 10],
             [['tracking_number', 'shipping_method', 'terms'], 'string', 'max' => 100],
             [['estimate_number'], 'unique', 'targetAttribute' => ['estimate_number', 'company_id']],
-            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED, self::STATUS_VOID]],
+            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_DECLINED, self::STATUS_EXPIRED, self::STATUS_VOID]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['discount_type'], 'in', 'range' => ['percentage', 'fixed']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
@@ -268,7 +268,7 @@ class Estimate extends ActiveRecord
             self::STATUS_PRINTED => 'Printed',
             self::STATUS_SENT => 'Sent',
             self::STATUS_ACCEPTED => 'Accepted',
-            self::STATUS_REJECTED => 'Rejected',
+            self::STATUS_DECLINED => 'Declined',
             self::STATUS_EXPIRED => 'Expired',
             self::STATUS_VOID => 'Void',
         ];
@@ -297,7 +297,7 @@ class Estimate extends ActiveRecord
             self::STATUS_PRINTED => 'primary',
             self::STATUS_SENT => 'info',
             self::STATUS_ACCEPTED => 'success',
-            self::STATUS_REJECTED => 'danger',
+            self::STATUS_DECLINED => 'danger',
             self::STATUS_EXPIRED => 'warning',
             self::STATUS_VOID => 'dark',
         ];

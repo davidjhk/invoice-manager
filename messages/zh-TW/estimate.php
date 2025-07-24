@@ -20,6 +20,7 @@ return [
     'Sent' => '已發送',
     'Accepted' => '已接受',
     'Declined' => '已拒絕',
+    'Void' => '作廢',
     'Expired' => '已過期',
     'Converted' => '已轉換',
     
@@ -146,7 +147,7 @@ return [
     'This estimate has been converted to invoice' => '此估價單已轉換為發票',
     
     // Preview page translations
-    'Estimate Preview' => '報價單預覽',
+    'Estimate Preview' => '估價單預覽',
     'Preview' => '預覽',
     'Download PDF' => '下載PDF',
     'Print' => '列印',

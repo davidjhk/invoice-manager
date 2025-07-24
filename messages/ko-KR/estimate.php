@@ -20,7 +20,6 @@ return [
     'Sent' => '발송됨',
     'Accepted' => '승인됨',
     'Declined' => '거절됨',
-    'Rejected' => '거절됨',
     'Expired' => '만료됨',
     'Void' => '무효',
     'Converted' => '변환됨',

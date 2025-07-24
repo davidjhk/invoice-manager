@@ -133,4 +133,5 @@ return [
     
     'products' => '產品',
     'Non-Inventory' => '非庫存',
+    'Non-Inventory' => '非庫存',
 ];

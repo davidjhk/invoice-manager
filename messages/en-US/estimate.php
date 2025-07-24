@@ -20,7 +20,6 @@ return [
     'Sent' => 'Sent',
     'Accepted' => 'Accepted',
     'Declined' => 'Declined',
-    'Rejected' => 'Rejected',
     'Expired' => 'Expired',
     'Void' => 'Void',
     'Converted' => 'Converted',

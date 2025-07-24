@@ -100,6 +100,9 @@ return [
     'Tax rate calculated automatically based on customer address' => 'Tasa de impuesto calculada automáticamente basada en la dirección del cliente',
     'Using company default tax rate (address not found or invalid)' => 'Usando la tasa de impuesto predeterminada de la empresa (dirección no encontrada o inválida)',
     'Error calculating tax rate' => 'Error al calcular la tasa de impuesto',
+    'Tax rate calculated using fallback rates (tax rate database is empty)' => 'Tasa de impuesto calculada usando tasas de respaldo (base de datos de tasas de impuesto vacía)',
+    'Tax rate calculated using fallback rates (database connection error)' => 'Tasa de impuesto calculada usando tasas de respaldo (error de conexión de base de datos)',
+    'Tax rate calculated using fallback rates' => 'Tasa de impuesto calculada usando tasas de respaldo',
     
     // Template names
     'template_classic' => 'Clásico',

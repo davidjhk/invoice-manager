@@ -20,7 +20,6 @@ return [
     'Sent' => 'Enviado',
     'Accepted' => 'Aceptado',
     'Declined' => 'Rechazado',
-    'Rejected' => 'Rechazado',
     'Expired' => 'Expirado',
     'Void' => 'Anulado',
     'Converted' => 'Convertido',
@@ -149,7 +148,11 @@ return [
     'This estimate has been converted to invoice' => 'Este presupuesto ha sido convertido a factura',
     
     // Preview page translations
+    'Estimate Preview' => 'Vista Previa del Presupuesto',
     'Preview' => 'Vista Previa',
+    'Download PDF' => 'Descargar PDF',
+    'Print' => 'Imprimir',
+    'Send Email' => 'Enviar Email',
     'Email not configured. Configure SMTP2GO in Company Settings.' => 'Correo no configurado. Configure SMTP2GO en Configuración de Empresa.',
     'All' => 'Todos',
     'Customer not in list?' => '¿Cliente no está en la lista?',

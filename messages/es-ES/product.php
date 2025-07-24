@@ -133,4 +133,5 @@ return [
     
     'products' => 'productos',
     'Non-Inventory' => 'Sin Inventario',
+    'Non-Inventory' => 'Sin Inventario',
 ];

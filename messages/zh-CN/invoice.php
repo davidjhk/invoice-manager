@@ -100,6 +100,9 @@ return [
     'Tax rate calculated automatically based on customer address' => '根据客户地址自动计算税率',
     'Using company default tax rate (address not found or invalid)' => '使用公司默认税率（地址未找到或无效）',
     'Error calculating tax rate' => '税率计算错误',
+    'Tax rate calculated using fallback rates (tax rate database is empty)' => '使用备用税率计算（税率数据库为空）',
+    'Tax rate calculated using fallback rates (database connection error)' => '使用备用税率计算（数据库连接错误）',
+    'Tax rate calculated using fallback rates' => '使用备用税率计算',
     
     // Template names
     'template_classic' => '经典',

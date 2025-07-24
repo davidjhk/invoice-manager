@@ -198,7 +198,7 @@ $this->title = 'Print Estimate: ' . $model->estimate_number;
 		color: white;
 	}
 
-	.status-rejected {
+	.status-declined {
 		background-color: #dc3545;
 		color: white;
 	}

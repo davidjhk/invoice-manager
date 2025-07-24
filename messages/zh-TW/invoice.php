@@ -21,6 +21,7 @@ return [
     'Paid' => '已付款',
     'Overdue' => '逾期',
     'Cancelled' => '已取消',
+    'Void' => '作廢',
     'Partial' => '部分付款',
     
     // Fields
@@ -97,6 +98,9 @@ return [
     'Tax rate calculated automatically based on customer address' => '根據客戶地址自動計算稅率',
     'Using company default tax rate (address not found or invalid)' => '使用公司預設稅率（地址未找到或無效）',
     'Error calculating tax rate' => '稅率計算錯誤',
+    'Tax rate calculated using fallback rates (tax rate database is empty)' => '使用備用稅率計算（稅率資料庫為空）',
+    'Tax rate calculated using fallback rates (database connection error)' => '使用備用稅率計算（資料庫連線錯誤）',
+    'Tax rate calculated using fallback rates' => '使用備用稅率計算',
     
     // Template names
     'template_classic' => '經典',
