@@ -18,6 +18,14 @@ class MpdfGenerator implements PdfGeneratorInterface
      */
     public static function generateInvoicePdf(Invoice $invoice, $mode = 'I')
     {
+        // Clear any existing output buffers to prevent HeadersAlreadySentException
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Start clean output buffering
+        ob_start();
+        
         // Use simple configuration to avoid TTC font issues
         $config = [
             'mode' => 'utf-8',
@@ -26,6 +34,13 @@ class MpdfGenerator implements PdfGeneratorInterface
             'fontDir' => [
                 \Yii::getAlias('@app/fonts/mpdf-fonts'),
                 \Yii::getAlias('@app/vendor/mpdf/mpdf/ttfonts')
+            ],
+            'fontdata' => [
+                'poppins' => [
+                    'R' => 'Poppins-Regular.ttf',
+                    'B' => 'Poppins-Bold.ttf',
+                    'SB' => 'Poppins-SemiBold.ttf',
+                ],
             ],
         ];
 
@@ -65,6 +80,9 @@ class MpdfGenerator implements PdfGeneratorInterface
 
         $filename = 'Invoice_' . $invoice->invoice_number . '.pdf';
 
+        // Clean any buffer content before output
+        ob_end_clean();
+        
         return $mpdf->Output($filename, $mode);
     }
 
@@ -77,6 +95,14 @@ class MpdfGenerator implements PdfGeneratorInterface
      */
     public static function generateEstimatePdf(Estimate $estimate, $mode = 'I')
     {
+        // Clear any existing output buffers to prevent HeadersAlreadySentException
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Start clean output buffering
+        ob_start();
+        
         // Use simple configuration to avoid TTC font issues
         $config = [
             'mode' => 'utf-8',
@@ -85,6 +111,13 @@ class MpdfGenerator implements PdfGeneratorInterface
             'fontDir' => [
                 \Yii::getAlias('@app/fonts/mpdf-fonts'),
                 \Yii::getAlias('@app/vendor/mpdf/mpdf/ttfonts')
+            ],
+            'fontdata' => [
+                'poppins' => [
+                    'R' => 'Poppins-Regular.ttf',
+                    'B' => 'Poppins-Bold.ttf',
+                    'SB' => 'Poppins-SemiBold.ttf',
+                ],
             ],
         ];
 
@@ -124,6 +157,9 @@ class MpdfGenerator implements PdfGeneratorInterface
 
         $filename = 'Estimate_' . $estimate->estimate_number . '.pdf';
 
+        // Clean any buffer content before output
+        ob_end_clean();
+        
         return $mpdf->Output($filename, $mode);
     }
 

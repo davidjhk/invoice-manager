@@ -86,6 +86,7 @@ $config = [
                     'class' => 'yii\i18n\PhpMessageSource',
                     'basePath' => '@app/messages',
                     'sourceLanguage' => 'en-US',
+                    'forceTranslation' => true,
                     'fileMap' => [
                         'invoice' => 'invoice.php',
                     ],
@@ -94,6 +95,7 @@ $config = [
                     'class' => 'yii\i18n\PhpMessageSource',
                     'basePath' => '@app/messages',
                     'sourceLanguage' => 'en-US',
+                    'forceTranslation' => true,
                     'fileMap' => [
                         'estimate' => 'estimate.php',
                     ],

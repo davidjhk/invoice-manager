@@ -98,8 +98,8 @@ $this->registerCss("
     
     /* Invoice preview should always have white background regardless of dark mode */
     .invoice-preview-wrapper {
-        background: #f8f9fa !important;
-        padding: 20px !important;
+        background: #f8f9fa;
+        padding: 40px !important;
     }
     
     /* Dark mode override - force white background and black text for preview */
@@ -113,8 +113,6 @@ $this->registerCss("
     body.dark-mode .invoice-preview-container,
     .dark-mode .invoice-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th),
     .dark-mode .invoice-preview-container *:not(table):not(thead):not(th):not(.items-table thead th) {
-        color: black !important;
-        background: white !important;
     }
     
     /* Allow template-specific table header colors */

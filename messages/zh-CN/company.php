@@ -139,4 +139,6 @@ return [
     'Network error occurred' => '发生网络错误',
     'Please configure SMTP2GO API Key first' => '请先配置SMTP2GO API密钥',
     'Language & Display Settings' => '语言和显示设置',
+    'Display & PDF Settings' => '显示和PDF设置',
+    'Language Settings' => '语言设置',
 ];

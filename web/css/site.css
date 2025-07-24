@@ -1241,12 +1241,12 @@ body.dark-mode .estimate-preview-wrapper .paid-row {
   color: black;
 }
 
-body.dark-mode .invoice-preview-container .notes-section,
-body.dark-mode .estimate-preview-container .notes-section,
-body.dark-mode .invoice-preview-wrapper .notes-section,
-body.dark-mode .estimate-preview-wrapper .notes-section {
-  background: #f8f9fa !important;
-  color: black;
+body.dark-mode .invoice-preview-container div.notes-section,
+body.dark-mode .estimate-preview-container div.notes-section,
+body.dark-mode .invoice-preview-wrapper div.notes-section,
+body.dark-mode .estimate-preview-wrapper div.notes-section {
+  background: #f8f9fa;
+  color: black !important;
 }
 
 body.dark-mode .invoice-preview-container .paid-watermark,
@@ -1282,7 +1282,6 @@ body.dark-mode
   .estimate-preview-container
   *:not(table):not(thead):not(th):not(.items-table thead th) {
   color: black;
-  background: white !important;
 }
 
 /* jQuery UI Autocomplete Styling for Light Mode */

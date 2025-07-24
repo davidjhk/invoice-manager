@@ -198,7 +198,10 @@ class PdfHtmlGenerator
             <table width="100%">
                 <tr>
                     <td width="35%" class="company-info">
-                        <div class="document-title">' . $config['title'] . '</div>
+						<table><tr><td class="document-title">
+						' . $config['title'] . '
+						</td></tr></table>
+						<table><tr><td class="document-subtitle">
                         <strong>' . htmlspecialchars($company->company_name) . '</strong><br>';
         
         // Process company address line by line
@@ -231,7 +234,7 @@ class PdfHtmlGenerator
             $html .= 'Email: ' . htmlspecialchars($company->company_email) . '<br>';
         }
 
-        $html .= '
+        $html .= '</td></tr></table>
                     </td>
                     <td width="20%">&nbsp;</td>
                     <td width="45%" style="text-align: right; vertical-align: top;">';
@@ -305,22 +308,19 @@ class PdfHtmlGenerator
      */
     public static function generateUnifiedPdfSubHeader($customer, $document, $company, $config)
     {
-        $html = '
-        <!-- Sub Header with 3 columns -->
-        <div class="sub-header">
-            <table width="100%">
-                <tr>
-                    <td width="33%" style="vertical-align: top; padding: 0;">
-                        <div style="background: none; padding: 0; margin: 0;">
-                            <strong>Bill To:</strong><br>
-                            <strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
-        // Process customer billing address using structured fields first, then fallback to address field
+        // Get template configuration for border settings
+        $templateId = $company->pdf_template ?? 'classic';
+        $template = PdfTemplateManager::getTemplate($templateId);
+        
+        // Build Bill To content
+        $billToContent = '<strong>Bill To:</strong><br><strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
+        // Process customer billing address
         if ($customer->customer_address) {
             $addressLines = explode("\n", $customer->customer_address);
             foreach ($addressLines as $line) {
                 $line = trim($line);
                 if (!empty($line)) {
-                    $html .= htmlspecialchars($line) . '<br>';
+                    $billToContent .= htmlspecialchars($line) . '<br>';
                 }
             }
         }
@@ -330,48 +330,44 @@ class PdfHtmlGenerator
         if ($customer->state) $locationParts[] = $customer->state;
         if ($customer->zip_code) $locationParts[] = $customer->zip_code;
         if (!empty($locationParts)) {
-            $html .= htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+            $billToContent .= htmlspecialchars(implode(', ', $locationParts)) . '<br>';
         }
         if ($customer->country && $customer->country !== 'US') {
-            $html .= htmlspecialchars($customer->country) . '<br>';
+            $billToContent .= htmlspecialchars($customer->country) . '<br>';
         }
         if ($customer->customer_phone) {
-            $html .= 'Phone: ' . htmlspecialchars($customer->customer_phone) . '<br>';
+            $billToContent .= 'Phone: ' . htmlspecialchars($customer->customer_phone) . '<br>';
         }
         if ($customer->customer_fax && $config['title'] === 'INVOICE') {
-            $html .= 'Fax: ' . htmlspecialchars($customer->customer_fax) . '<br>';
+            $billToContent .= 'Fax: ' . htmlspecialchars($customer->customer_fax) . '<br>';
         }
         if ($customer->customer_mobile && $config['title'] === 'INVOICE') {
-            $html .= 'Mobile: ' . htmlspecialchars($customer->customer_mobile) . '<br>';
+            $billToContent .= 'Mobile: ' . htmlspecialchars($customer->customer_mobile) . '<br>';
         }
         if ($customer->customer_email) {
-            $html .= 'Email: ' . htmlspecialchars($customer->customer_email) . '<br>';
+            $billToContent .= 'Email: ' . htmlspecialchars($customer->customer_email) . '<br>';
         }
-
-        $html .= '
-                        </div>
-                    </td>
-                    <td width="33%" style="vertical-align: top; padding: 0;">
-                        <div style="background: none; padding: 0; margin: 0;">
-                            <strong>Ship To:</strong><br>';
         
+        // Build Ship To content
+        $shipToContent = '<strong>Ship To:</strong><br>';
+
         // Handle shipping address based on document type
         if ($config['title'] === 'ESTIMATE' && isset($document->ship_to_address) && $document->ship_to_address) {
             $shipLines = explode("\n", $document->ship_to_address);
             foreach ($shipLines as $line) {
                 $line = trim($line);
                 if (!empty($line)) {
-                    $html .= htmlspecialchars($line) . '<br>';
+                    $shipToContent .= htmlspecialchars($line) . '<br>';
                 }
             }
         } else {
-            $html .= '<strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
+            $shipToContent .= '<strong>' . htmlspecialchars($customer->customer_name) . '</strong><br>';
             if ($customer->customer_address) {
                 $addressLines = explode("\n", $customer->customer_address);
                 foreach ($addressLines as $line) {
                     $line = trim($line);
                     if (!empty($line)) {
-                        $html .= htmlspecialchars($line) . '<br>';
+                        $shipToContent .= htmlspecialchars($line) . '<br>';
                     }
                 }
             }
@@ -381,55 +377,114 @@ class PdfHtmlGenerator
             if ($customer->state) $locationParts[] = $customer->state;
             if ($customer->zip_code) $locationParts[] = $customer->zip_code;
             if (!empty($locationParts)) {
-                $html .= htmlspecialchars(implode(', ', $locationParts)) . '<br>';
+                $shipToContent .= htmlspecialchars(implode(', ', $locationParts)) . '<br>';
             }
             if ($customer->country && $customer->country !== 'US') {
-                $html .= htmlspecialchars($customer->country) . '<br>';
+                $shipToContent .= htmlspecialchars($customer->country) . '<br>';
             }
         }
+        
+        // Build Document Details content
+        $documentDetailsContent = '<table width="100%">
+                            <tr>
+                                <td><strong>' . ucfirst($config['title']) . ' #:</strong></td>
+                                <td>' . htmlspecialchars($document->{$config['number_field']}) . '</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Date:</strong></td>
+                                <td>' . date('F j, Y', strtotime($document->{$config['date_field']})) . '</td>
+                            </tr>';
 
-        $html .= '
-                        </div>
-                    </td>
-                    <td width="34%" style="vertical-align: top; padding: 0;">
-                        <div style="background: none; padding: 0; margin: 0;">
-                            <table>
-                                <tr>
-                                    <td><strong>' . ucfirst($config['title']) . ' #:</strong></td>
-                                    <td>' . htmlspecialchars($document->{$config['number_field']}) . '</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Date:</strong></td>
-                                    <td>' . date('F j, Y', strtotime($document->{$config['date_field']})) . '</td>
-                                </tr>';
+        // Already handled in previous section
 
         if ($document->{$config['due_date_field']}) {
             $dueDateLabel = $config['title'] === 'INVOICE' ? 'Due Date' : 'Expiry Date';
-            $html .= '
-                                <tr>
-                                    <td><strong>' . $dueDateLabel . ':</strong></td>
-                                    <td>' . date('F j, Y', strtotime($document->{$config['due_date_field']})) . '</td>
-                                </tr>';
+            $documentDetailsContent .= '
+                            <tr>
+                                <td><strong>' . $dueDateLabel . ':</strong></td>
+                                <td>' . date('F j, Y', strtotime($document->{$config['due_date_field']})) . '</td>
+                            </tr>';
         }
 
         if ($config['show_terms']) {
             if ($config['terms_source'] === 'company') {
-                $html .= '
-                                <tr>
-                                    <td><strong>Terms:</strong></td>
-                                    <td>Net ' . $company->due_date_days . ' Days</td>
-                                </tr>';
+                $documentDetailsContent .= '
+                            <tr>
+                                <td><strong>Terms:</strong></td>
+                                <td>Net ' . $company->due_date_days . ' Days</td>
+                            </tr>';
             } elseif ($config['terms_source'] === 'document' && isset($document->terms) && $document->terms) {
-                $html .= '
-                                <tr>
-                                    <td><strong>Terms:</strong></td>
-                                    <td>' . htmlspecialchars($document->terms) . '</td>
-                                </tr>';
+                $documentDetailsContent .= '
+                            <tr>
+                                <td><strong>Terms:</strong></td>
+                                <td>' . htmlspecialchars($document->terms) . '</td>
+                            </tr>';
             }
         }
 
-        $html .= '
-                            </table>
+        $documentDetailsContent .= '</table>';
+        
+        // Build styles based on template settings for td elements
+        $billToTdStyle = '';
+        $shipToTdStyle = '';
+        
+        if ($template && $template['use_address_borders']) {
+            // Check if template uses left-border only style (like elegant)
+            if (strpos($template['bill_to_border'], 'border-left:') !== false) {
+                // Elegant template: left border only, no background, left padding only
+                // Apply border to outer td, not inner nested table
+                $billToTdStyle = 'padding: 5px; font-size: 10px; ';
+                $shipToTdStyle = 'padding: 5px; font-size: 10px; ';
+            } else {
+                // Other templates: full border with background
+                $billToTdStyle = 'border: ' . $template['bill_to_border'] . '; background-color: ' . ($template['secondary_color'] ?? '#f3f4f6') . '; padding: 12px; font-size: 10px; ';
+                $shipToTdStyle = 'border: ' . $template['ship_to_border'] . '; background-color: ' . ($template['secondary_color'] ?? '#f3f4f6') . '; padding: 12px; font-size: 10px; ';
+            }
+        } else {
+            // Without border: minimal padding only
+            $billToTdStyle = 'padding: 5px; font-size: 10px; ';
+            $shipToTdStyle = 'padding: 5px; font-size: 10px; ';
+        }
+        
+        // For elegant template, apply border to outer td instead
+        $billToOuterStyle = '';
+        $shipToOuterStyle = '';
+        if ($template && $template['use_address_borders'] && strpos($template['bill_to_border'], 'border-left:') !== false) {
+            $billToOuterStyle = $template['bill_to_border'] . ' padding-left: 12px; ';
+            $shipToOuterStyle = $template['ship_to_border'] . ' padding-left: 12px; ';
+        }
+        
+        // Build final HTML with proper spacing and structure
+        $html = '
+        <!-- Sub Header with 3 columns -->
+        <div class="sub-header">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="33%" style="vertical-align: top; padding-right: 10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="' . $billToTdStyle . '">
+                                    <div class="bill-to">
+                                        ' . $billToContent . '
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="33%" style="vertical-align: top; padding-right: 10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="' . $shipToTdStyle . '">
+                                    <div class="ship-to">
+                                        ' . $shipToContent . '
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="34%" style="vertical-align: top;">
+                        <div class="document-details-box" style="padding: 0; background-color: transparent; border: none !important; font-size: 10px;">
+                            ' . $documentDetailsContent . '
                         </div>
                     </td>
                 </tr>
@@ -524,7 +579,7 @@ class PdfHtmlGenerator
     {
         $html = '
         <div class="totals">
-            <table width="100%">
+            <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <td width="60%">&nbsp;</td>
                     <td width="40%">
@@ -612,7 +667,7 @@ class PdfHtmlGenerator
     {
         $html = '
         <div class="totals">
-            <table width="100%">
+            <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <td width="60%">&nbsp;</td>
                     <td width="40%">
@@ -777,7 +832,7 @@ class PdfHtmlGenerator
         ob_start();
         ?>
 <div class="document-preview-container"
-	style="max-width: 1000px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; position: relative;">
+	style="max-width: 1000px; margin: 0 auto; padding: 40px; position: relative;">
 
 	<?php echo PdfTemplateManager::generatePreviewStyles($templateId); ?>
 
@@ -885,7 +940,6 @@ class PdfHtmlGenerator
 						$fontSize = self::calculateFontSize($company->company_name, $maxWidth, 24, 16);
 						$companyNameNoBreak = str_replace(' ', '&nbsp;', htmlspecialchars($company->company_name));
 					?>
-					<br><br>
 					<div
 						style="font-size: <?= $fontSize ?>px; font-weight: bold; color: <?= $accentColor ?>; white-space: nowrap; max-width: <?= $maxWidth ?>px; text-align: right; line-height: 1.2;">
 						<?= $companyNameNoBreak ?></div>
@@ -1206,7 +1260,7 @@ class PdfHtmlGenerator
         ob_start();
         ?>
 <div class="document-preview-container"
-	style="max-width: 1000px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; position: relative;">
+	style="max-width: 1000px; margin: 0 auto; padding: 40px; sans-serif; position: relative;">
 
 	<?php echo PdfTemplateManager::generatePreviewStyles($templateId); ?>
 

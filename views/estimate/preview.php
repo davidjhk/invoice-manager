@@ -91,7 +91,7 @@ $this->registerCss("
     /* Estimate preview should always have white background regardless of dark mode */
     .estimate-preview-wrapper {
         background: #f8f9fa !important;
-        padding: 20px !important;
+        padding: 40px !important;
     }
     
     /* Dark mode override - force white background and black text for preview */
@@ -105,7 +105,6 @@ $this->registerCss("
     .dark-mode .estimate-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th),
     .dark-mode .estimate-preview-container *:not(table):not(thead):not(th):not(.items-table thead th) {
         color: black ;
-        background: white ;
     }
     body.dark-mode .estimate-preview-wrapper,
     body.dark-mode .estimate-preview-wrappe document-preview-container {

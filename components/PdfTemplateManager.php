@@ -33,6 +33,9 @@ class PdfTemplateManager
             'notes_style' => 'bordered',
             'notes_bg' => '#f8f9fa',
             'notes_border' => '1px solid #dee2e6',
+            'bill_to_border' => 'none',
+            'ship_to_border' => 'none',
+            'use_address_borders' => false,
             'separator_style' => 'line',
             'header_bg' => '#ffffff',
             'use_shadows' => false,
@@ -42,7 +45,7 @@ class PdfTemplateManager
             'name' => 'Modern',
             'description' => 'Clean minimalist design with subtle shadows and spacing',
             'color_scheme' => '#2563eb',
-            'font_family' => '"FreeSans", "DejavuSans", "Arial", sans-serif',
+            'font_family' => '"Poppins", "Helvetica", "FreeSans", "DejavuSans", "Arial", sans-serif',
             'header_style' => 'minimal',
             'layout_type' => 'spacious',
             'accent_color' => '#2563eb',
@@ -61,6 +64,9 @@ class PdfTemplateManager
             'notes_style' => 'card',
             'notes_bg' => '#f1f5f9',
             'notes_border' => 'none',
+            'bill_to_border' => 'none',
+            'ship_to_border' => 'none',
+            'use_address_borders' => false,
             'separator_style' => 'space',
             'header_bg' => '#ffffff',
             'use_shadows' => true,
@@ -70,7 +76,7 @@ class PdfTemplateManager
             'name' => 'Elegant',
             'description' => 'Sophisticated design with refined typography and subtle dividers',
             'color_scheme' => '#059669',
-            'font_family' => '"FreeSans", "DejavuSans", "Arial", sans-serif',
+            'font_family' => '"Playfair Display","FreeSerif", "Times", "DejavuSerif", serif',
             'header_style' => 'underlined',
             'layout_type' => 'refined',
             'accent_color' => '#059669',
@@ -89,6 +95,9 @@ class PdfTemplateManager
             'notes_style' => 'quote',
             'notes_bg' => '#ecfdf5',
             'notes_border' => '3px solid #059669',
+            'bill_to_border' => 'border-left: 2px solid #059669;',
+            'ship_to_border' => 'border-left: 2px solid #059669;',
+            'use_address_borders' => true,
             'separator_style' => 'gradient',
             'header_bg' => '#ffffff',
             'use_shadows' => false,
@@ -107,7 +116,7 @@ class PdfTemplateManager
             'border_style' => 'solid',
             'border_width' => '3px',
             'border_radius' => '0px',
-            'company_title_size' => '30px',
+            'company_title_size' => '28px',
             'section_spacing' => '18px',
             'table_style' => 'corporate',
             'table_header_bg' => '#1e3a8a',
@@ -117,6 +126,9 @@ class PdfTemplateManager
             'notes_style' => 'block',
             'notes_bg' => '#f1f5f9',
             'notes_border' => '3px solid #1e3a8a',
+            'bill_to_border' => '3px solid #1e3a8a',
+            'ship_to_border' => '3px solid #1e3a8a',
+            'use_address_borders' => false,
             'separator_style' => 'thick',
             'header_bg' => '#f1f5f9',
             'use_shadows' => false,
@@ -145,6 +157,9 @@ class PdfTemplateManager
             'notes_style' => 'artistic',
             'notes_bg' => 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)',
             'notes_border' => '2px dashed #7c3aed',
+            'bill_to_border' => '2px dashed #7c3aed',
+            'ship_to_border' => '2px dashed #7c3aed',
+            'use_address_borders' => true,
             'separator_style' => 'decorative',
             'header_bg' => 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
             'use_shadows' => true,
@@ -241,7 +256,6 @@ class PdfTemplateManager
         
         // Add template-specific styles that are mPDF compatible
         $templateStyles = self::getTemplateSpecificStylesMpdf($template, $letterSpacing);
-        
         return $baseStyles . $templateStyles . '</style>';
     }
 
@@ -312,7 +326,7 @@ class PdfTemplateManager
             }
             .company-info { font-size: 10px; line-height: 1.4; ' . $letterSpacing . ' }
             .document-title { 
-                font-size: ' . $template['company_title_size'] . '; 
+                font-size: ' . $template[''] . '; 
                 font-weight: bold; 
                 color: ' . $template['accent_color'] . '; 
                 margin-bottom: 9px;
@@ -357,7 +371,7 @@ class PdfTemplateManager
                 background: ' . $template['table_header_bg'] . '; 
                 color: ' . $template['table_header_color'] . '; 
                 padding: 12px; 
-                font-size: 10px; 
+                font-size: 12px; 
                 font-weight: bold; 
                 border-bottom: 2px solid ' . $template['accent_color'] . ';
             }
@@ -528,15 +542,6 @@ class PdfTemplateManager
                 background: transparent;
                 position: relative;
             }
-            .bill-to:before, .ship-to:before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 3px;
-                height: 100%;
-                background: ' . $template['accent_color'] . ';
-            }
             .document-details-box { 
                 padding: 15px; 
                 background-color: ' . $template['secondary_color'] . ' !important;
@@ -633,7 +638,6 @@ class PdfTemplateManager
             .sub-header-column { vertical-align: top; padding: 10px; }
             .bill-to, .ship-to { 
                 padding: 10px; 
-                background-color: ' . $template['secondary_color'] . ' !important;
                 border: 1px solid ' . $template['accent_color'] . ';
                 margin-bottom: 10px;
             }
@@ -679,7 +683,7 @@ class PdfTemplateManager
             .totals-table td { 
                 padding: 12px; 
                 font-size: 10px; 
-                border: 1px solid ' . $template['accent_color'] . '; 
+                border: 1px solid #ddd; 
                 font-weight: 500;
             }
             .total-row { 
@@ -747,7 +751,8 @@ class PdfTemplateManager
                 background: linear-gradient(135deg, #ffffff 0%, ' . $template['secondary_color'] . ' 100%);
                 border-radius: ' . $template['border_radius'] . ';
                 border: ' . $template['border_width'] . ' ' . $template['border_style'] . ' ' . $template['accent_color'] . ';
-                ' . $boxShadow . '
+                border-radius: ' . $template['border_radius'] . ';
+                padding: 15px;
                 margin-bottom: 15px;
             }
             .document-details-box { 
@@ -858,7 +863,7 @@ class PdfTemplateManager
             }
             .sub-header-column { vertical-align: top; padding: 10px; }
             .bill-to, .ship-to { 
-//                padding: 10px; 
+                padding: 10px; 
                 border: 1px solid #ddd;
                 background-color: #fafafa !important;
             }
@@ -935,7 +940,7 @@ class PdfTemplateManager
             .company-info { font-size: 11px; line-height: 1.6; ' . $letterSpacing . ' }
             .document-title { 
                 font-size: ' . $template['company_title_size'] . '; 
-                font-weight: 300; 
+                font-weight: bold; 
                 color: ' . $template['accent_color'] . '; 
                 margin-bottom: 15px;
             }
@@ -1034,7 +1039,7 @@ class PdfTemplateManager
             .bill-to, .ship-to { 
                 padding: 0 0 0 10px; 
                 background: transparent;
-                border-left: 3px solid ' . $template['accent_color'] . ';
+                border-left: 0px solid ' . $template['accent_color'] . ';
             }
             .document-details-box { 
                 padding: 15px; 
@@ -1112,11 +1117,13 @@ class PdfTemplateManager
                 font-size: ' . $template['company_title_size'] . '; 
                 font-weight: bold; 
                 color: white; 
-                margin-bottom: 10px;
                 background-color: ' . $template['accent_color'] . ' !important;
-                padding: 10px;
-                margin: -20px -20px 15px -20px;
+                padding: 2px 6px;
+                margin: -20px -20px 20px -20px;
             }
+			.document-subtitle{
+				padding: 10px 6px;
+			}
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 border: 2px solid ' . $template['accent_color'] . ';
@@ -1125,8 +1132,6 @@ class PdfTemplateManager
             .sub-header-column { vertical-align: top; padding: 10px; }
             .bill-to, .ship-to { 
                 padding: 10px; 
-                background-color: ' . $template['secondary_color'] . ' !important;
-                border: 1px solid ' . $template['accent_color'] . ';
                 margin-bottom: 10px;
             }
             .document-details-box { 
@@ -1158,7 +1163,7 @@ class PdfTemplateManager
             }
             .items-table td { 
                 padding: 15px; 
-                border: 1px solid ' . $template['accent_color'] . '; 
+                border: 1px solid #aaa; 
                 font-size: 10px; 
                 ' . $letterSpacing . ';
                 vertical-align: top;
@@ -1170,10 +1175,10 @@ class PdfTemplateManager
             .totals-table td { 
                 padding: 12px; 
                 font-size: 10px; 
-                border: 1px solid ' . $template['accent_color'] . '; 
+                border: 1px solid #aaa; 
                 font-weight: 500;
             }
-            .total-row { 
+            .total-row td { 
                 font-weight: bold; 
                 font-size: 12px; 
                 background: ' . $template['accent_color'] . '; 
@@ -1213,12 +1218,16 @@ class PdfTemplateManager
                 padding: 0;
             }
             .sub-header-column { vertical-align: top; padding: 0 15px 0 0; }
+            .sub-header-column { 
+                vertical-align: top; 
+                padding: 0 15px 0 0; 
+            }
             .bill-to, .ship-to { 
-                padding: 25px; 
-                background: linear-gradient(315deg, #ffffff 0%, ' . $template['secondary_color'] . ' 100%);
-                border: 2px solid ' . $template['accent_color'] . ';
-                border-radius: 8px;
+                background-color: ' . $template['secondary_color'] . ';
                 margin-bottom: 20px;
+                border: 2px dashed ' . $template['accent_color'] . ';
+                padding: 15px;
+                border-radius: 8px;
             }
             .document-details-box { 
                 padding: 20px; 
@@ -1279,6 +1288,7 @@ class PdfTemplateManager
                 padding: 20px; 
                 background-color: ' . $template['notes_bg'] . ' !important; 
                 border: ' . $template['notes_border'] . ';
+                border-radius: 8px;
             }
         ';
     }
@@ -1295,10 +1305,18 @@ class PdfTemplateManager
         
         $baseStyles = '
         <style>
-            .document-preview-container { 
+			body.dark-mode .document-preview-container h2,
+            .document-preview-container h2,
+			body.dark-mode .document-preview-container div,
+            .document-preview-container div,
+			body.dark-mode .document-preview-container span,
+            .document-preview-container span,
+			.document-preview-container { 
+                font-family: ' . $template['font_family'] . ';
+            }
+			.document-preview-container { 
                 background: white; 
                 box-shadow: 0 0 20px rgba(0,0,0,0.1); 
-                font-family: ' . $template['font_family'] . ';
                 color: ' . $template['text_color'] . ';
             }
             .logo { max-height: 120px; max-width: 405px; height: auto; }
@@ -1356,7 +1374,7 @@ class PdfTemplateManager
                 border: ' . $template['border_width'] . ' ' . $template['border_style'] . ' ' . $template['accent_color'] . ';
                 border-radius: ' . $template['border_radius'] . ';
                 padding: 20px;
-                background: ' . $template['header_bg'] . ';
+                background: ' . $template['header_bg'] . ' !important;
             }
             .document-header table { width: 100%; border-collapse: collapse; }
             body.dark-mode .company-info,.company-info, .company-info {
@@ -1452,7 +1470,8 @@ class PdfTemplateManager
                 font-weight: bold; 
                 font-size: 16px; 
             }
-            .notes-section { 
+            body.dark-mode div.notes-section,
+			.notes-section { 
                 margin-top: 30px; 
                 padding: 20px; 
                 background-color: ' . $template['notes_bg'] . ' !important; 
@@ -1474,6 +1493,12 @@ class PdfTemplateManager
             body.dark-mode .invoice-preview-wrapper .document-header,
             body.dark-mode .estimate-preview-wrapper .document-header {
                 border-color: ' . $template['accent_color'] . ' !important;
+                background: ' . $template['header_bg'] . ' !important;
+            }
+            body.dark-mode .invoice-preview-container .document-header td,
+            body.dark-mode .estimate-preview-container .document-header td,
+            body.dark-mode .invoice-preview-wrapper .document-header td,
+            body.dark-mode .estimate-preview-wrapper .document-header td {
                 background: ' . $template['header_bg'] . ' !important;
             }
             body.dark-mode .invoice-preview-container .sub-header,
@@ -1534,10 +1559,10 @@ class PdfTemplateManager
             }
             body.dark-mode .company-info h2 span,
             .company-info h2 span{ 
-                color: ' . $template['accent_color'] . '; 
+                color: ' . $template['accent_color'] . ' !important; 
                 margin: 0 0 15px 0; 
                 font-size: 36px;
-                font-weight: 300;
+                font-weight: bold;
                 letter-spacing: 1px;
             }
 			body.dark-mode .logo-section div,
@@ -1608,6 +1633,7 @@ class PdfTemplateManager
                 font-weight: 600; 
                 font-size: 18px; 
             }
+            body.dark-mode div.notes-section,
             .notes-section { 
                 margin-top: 30px; 
                 padding: 25px; 
@@ -1664,7 +1690,7 @@ class PdfTemplateManager
             }
             body.dark-mode .company-info h2 span,
             .company-info h2 span{ 
-                color: ' . $template['accent_color'] . '; 
+                color: ' . $template['accent_color'] . ' !important; 
                 margin: 0 0 15px 0; 
                 font-size: 34px;
                 font-weight: 400;
@@ -1690,7 +1716,7 @@ class PdfTemplateManager
             .sub-header table { width: 100%;  }
             .sub-header-column { vertical-align: top; padding: 0 20px 0 0; width: 33.33%; }
             .bill-to, .ship-to { 
-                padding: 0 0 0 15px; 
+                padding: 0 0 0 10px; 
                 background: transparent;
                 border-left: 3px solid ' . $template['accent_color'] . ';
                 margin-bottom: 20px;
@@ -1749,6 +1775,7 @@ class PdfTemplateManager
                 font-size: 16px; 
                 border-left: 4px solid ' . $template['accent_color'] . ';
             }
+            body.dark-mode div.notes-section,
             .notes-section { 
                 margin-top: 30px; 
                 padding: 20px; 
@@ -1836,7 +1863,7 @@ class PdfTemplateManager
             body.dark-mode .company-info,.company-info, .company-info { font-size: 18px; font-weight: 500; color: black !important; }
 			.dark-mode .estimate-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th) .company-info h2 span,
             .company-info h2  span{ 
-                color: whit span; 
+                color: white !important; 
                 font-size: 38px;
                 font-weight: bold;
                 text-transform: uppercase;
@@ -1889,7 +1916,7 @@ class PdfTemplateManager
             }
             .items-table td { 
                 padding: 18px; 
-                border: 1px solid ' . $template['accent_color'] . '; 
+                border: 1px solid #ddd; 
             }
             .items-table .text-right { text-align: right; }
             .totals-section { margin-top: 30px; }
@@ -1901,15 +1928,22 @@ class PdfTemplateManager
             }
             .totals-table td { 
                 padding: 18px; 
-                border: 1px solid ' . $template['accent_color'] . '; 
+                border: 1px solid #ddd; 
                 font-weight: 500;
             }
-            .total-row { 
+            body.dark-mode .invoice-preview-container .totals-section tbody .total-row td,
+            body.dark-mode .estimate-preview-container .totals-section tbody .total-row td,
+            body.dark-mode .invoice-preview-wrapper .totals-section tbody .total-row td,
+            body.dark-mode .estimate-preview-wrapper .totals-section tbody .total-row td,
+			body.dark-mode .total-row td strong,
+			.totals-table .total-row td,
+			.totals-table .total-row td strong { 
                 background: ' . $template['accent_color'] . '; 
-                color: white;
+                color: white !important;
                 font-weight: bold; 
                 font-size: 18px; 
             }
+            body.dark-mode div.notes-section,
             .notes-section { 
                 margin-top: 30px; 
                 padding: 20px; 
@@ -1942,7 +1976,6 @@ class PdfTemplateManager
             body.dark-mode .estimate-preview-container .ship-to,
             body.dark-mode .invoice-preview-wrapper .ship-to,
             body.dark-mode .estimate-preview-wrapper .ship-to {
-                background-color: ' . $template['secondary_color'] . ' !important;
                 border-color: ' . $template['accent_color'] . ' !important;
             }
             body.dark-mode .invoice-preview-container .document-details-box,
@@ -2049,8 +2082,8 @@ class PdfTemplateManager
                 background: linear-gradient(135deg, #ffffff 0%, ' . $template['secondary_color'] . ' 100%);
                 border-radius: ' . $template['border_radius'] . ';
                 border: ' . $template['border_width'] . ' dashed ' . $template['accent_color'] . ';
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 margin-bottom: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
             .document-details-box { 
                 padding: 25px;
@@ -2114,6 +2147,7 @@ class PdfTemplateManager
                 font-weight: 700; 
                 font-size: 18px; 
             }
+            body.dark-mode div.notes-section,
             .notes-section { 
                 margin-top: 30px; 
                 padding: 25px; 

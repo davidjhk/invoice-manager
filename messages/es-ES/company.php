@@ -139,4 +139,6 @@ return [
     'Network error occurred' => 'Ocurrió un error de red',
     'Please configure SMTP2GO API Key first' => 'Por favor configure primero la Clave API de SMTP2GO',
     'Language & Display Settings' => 'Configuración de Idioma y Pantalla',
+    'Display & PDF Settings' => 'Configuración de Pantalla y PDF',
+    'Language Settings' => 'Configuración de Idioma',
 ];

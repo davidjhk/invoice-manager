@@ -139,4 +139,6 @@ return [
     'Network error occurred' => '네트워크 오류가 발생했습니다',
     'Please configure SMTP2GO API Key first' => '먼저 SMTP2GO API 키를 설정해 주세요',
     'Language & Display Settings' => '언어 및 화면 설정',
+    'Display & PDF Settings' => '화면 및 PDF 설정',
+    'Language Settings' => '언어 설정',
 ];
