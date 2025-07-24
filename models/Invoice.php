@@ -68,6 +68,7 @@ class Invoice extends ActiveRecord
     const STATUS_PARTIAL = 'partial';
     const STATUS_PAID = 'paid';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_VOID = 'void';
     
     // Tax calculation modes
     const TAX_MODE_AUTOMATIC = 'automatic';
@@ -123,7 +124,7 @@ class Invoice extends ActiveRecord
             [['status'], 'string', 'max' => 20],
             [['currency'], 'string', 'max' => 10],
             [['invoice_number'], 'unique', 'targetAttribute' => ['invoice_number', 'company_id']],
-            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_PAID, self::STATUS_CANCELLED]],
+            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_PARTIAL, self::STATUS_PAID, self::STATUS_CANCELLED, self::STATUS_VOID]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
@@ -283,6 +284,7 @@ class Invoice extends ActiveRecord
             self::STATUS_PARTIAL => 'Partially Paid',
             self::STATUS_PAID => 'Paid',
             self::STATUS_CANCELLED => 'Cancelled',
+            self::STATUS_VOID => 'Void',
         ];
     }
 
@@ -311,6 +313,7 @@ class Invoice extends ActiveRecord
             self::STATUS_PARTIAL => 'warning',
             self::STATUS_PAID => 'success',
             self::STATUS_CANCELLED => 'danger',
+            self::STATUS_VOID => 'dark',
         ];
         return $classes[$this->status] ?? 'secondary';
     }
@@ -400,7 +403,8 @@ class Invoice extends ActiveRecord
      */
     public function isEditable()
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT]);
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT]) && 
+               $this->status !== self::STATUS_VOID;
     }
 
     /**
@@ -411,7 +415,18 @@ class Invoice extends ActiveRecord
     public function canBeSent()
     {
         return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SENT, self::STATUS_PARTIAL, self::STATUS_PRINTED]) && 
+               $this->status !== self::STATUS_VOID &&
                !empty($this->customer->customer_email);
+    }
+
+    /**
+     * Get active (non-void) invoices query
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public static function findActive()
+    {
+        return static::find()->where(['!=', 'status', self::STATUS_VOID]);
     }
 
     /**
@@ -426,6 +441,7 @@ class Invoice extends ActiveRecord
         return static::find()
             ->joinWith(['customer'])
             ->where(['jdosa_invoices.company_id' => $companyId])
+            ->andWhere(['!=', 'jdosa_invoices.status', self::STATUS_VOID])
             ->andWhere(['or',
                 ['like', 'invoice_number', $term],
                 ['like', 'jdosa_customers.customer_name', $term],
@@ -460,6 +476,7 @@ class Invoice extends ActiveRecord
             ->where(['company_id' => $companyId])
             ->andWhere(['!=', 'status', self::STATUS_PAID])
             ->andWhere(['!=', 'status', self::STATUS_CANCELLED])
+            ->andWhere(['!=', 'status', self::STATUS_VOID])
             ->andWhere(['<', 'due_date', date('Y-m-d')])
             ->orderBy(['due_date' => SORT_ASC]);
     }
@@ -595,6 +612,7 @@ class Invoice extends ActiveRecord
     public function canReceivePayment()
     {
         return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_PARTIAL]) && 
+               $this->status !== self::STATUS_VOID &&
                $this->getRemainingBalance() > 0;
     }
 
@@ -677,6 +695,20 @@ class Invoice extends ActiveRecord
     {
         if ($this->status === self::STATUS_DRAFT) {
             $this->status = self::STATUS_PRINTED;
+            return $this->save(false);
+        }
+        return true;
+    }
+
+    /**
+     * Mark invoice as void (soft delete)
+     * 
+     * @return bool
+     */
+    public function markAsVoid()
+    {
+        if ($this->status !== self::STATUS_VOID) {
+            $this->status = self::STATUS_VOID;
             return $this->save(false);
         }
         return true;

@@ -20,7 +20,9 @@ return [
     'Sent' => '발송됨',
     'Accepted' => '승인됨',
     'Declined' => '거절됨',
+    'Rejected' => '거절됨',
     'Expired' => '만료됨',
+    'Void' => '무효',
     'Converted' => '변환됨',
     
     // Fields
@@ -81,6 +83,7 @@ return [
     'Estimate sent successfully' => '견적서가 성공적으로 발송되었습니다',
     'Estimate converted to invoice successfully' => '견적서가 성공적으로 인보이스로 변환되었습니다',
     'Are you sure you want to delete this estimate?' => '이 견적서를 삭제하시겠습니까?',
+    'This will mark the estimate as void. The record will not be deleted from the database.' => '견적서가 무효 상태로 변경됩니다. 데이터베이스에서 레코드가 삭제되지는 않습니다.',
     
     // Navigation
     'Back to Estimates' => '견적서 목록으로',

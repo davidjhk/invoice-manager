@@ -67,6 +67,11 @@ class EstimateController extends Controller
             ->with(['customer', 'estimateItems'])
             ->orderBy(['estimate_number' => SORT_DESC]);
 
+        // Exclude void status by default unless specifically filtering for void
+        if ($statusFilter !== 'void') {
+            $query->andWhere(['!=', 'status', Estimate::STATUS_VOID]);
+        }
+
         // Apply search filter
         if (!empty($searchTerm)) {
             $query->joinWith(['customer'])
@@ -230,11 +235,19 @@ class EstimateController extends Controller
     {
         $model = $this->findModel($id);
         
+        if ($model->status === \app\models\Estimate::STATUS_VOID) {
+            Yii::$app->session->setFlash('error', 'This estimate is already void.');
+            return $this->redirect(['index']);
+        }
+        
         if ($model->converted_to_invoice) {
-            Yii::$app->session->setFlash('error', 'Cannot delete estimate that has been converted to invoice.');
+            Yii::$app->session->setFlash('error', 'Cannot void estimate that has been converted to invoice.');
         } else {
-            $model->delete();
-            Yii::$app->session->setFlash('success', 'Estimate deleted successfully.');
+            if ($model->markAsVoid()) {
+                Yii::$app->session->setFlash('success', 'Estimate marked as void successfully.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Failed to mark estimate as void.');
+            }
         }
 
         return $this->redirect(['index']);

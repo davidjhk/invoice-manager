@@ -21,6 +21,7 @@ return [
     'Paid' => 'Pagado',
     'Overdue' => 'Vencido',
     'Cancelled' => 'Cancelado',
+    'Void' => 'Anulado',
     'Partial' => 'Parcial',
     
     // Fields
@@ -85,6 +86,8 @@ return [
     'You haven\'t created any invoices yet.' => 'Aún no has creado ninguna factura.',
     'Create Your First Invoice' => 'Crear tu Primera Factura',
     'Are you sure you want to duplicate this invoice?' => '¿Estás seguro de que quieres duplicar esta factura?',
+    'Are you sure you want to delete this invoice?' => '¿Estás seguro de que quieres eliminar esta factura?',
+    'This will mark the invoice as void. The record will not be deleted from the database.' => 'Esto marcará la factura como anulada. El registro no será eliminado de la base de datos.',
     'Customer not in list?' => '¿Cliente no está en la lista?',
     'Add New Customer' => 'Agregar Nuevo Cliente',
     

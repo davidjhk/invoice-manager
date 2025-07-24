@@ -64,6 +64,7 @@ class Estimate extends ActiveRecord
     const STATUS_ACCEPTED = 'accepted';
     const STATUS_REJECTED = 'rejected';
     const STATUS_EXPIRED = 'expired';
+    const STATUS_VOID = 'void';
     
     // Tax calculation modes
     const TAX_MODE_AUTOMATIC = 'automatic';
@@ -117,7 +118,7 @@ class Estimate extends ActiveRecord
             [['currency'], 'string', 'max' => 10],
             [['tracking_number', 'shipping_method', 'terms'], 'string', 'max' => 100],
             [['estimate_number'], 'unique', 'targetAttribute' => ['estimate_number', 'company_id']],
-            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED]],
+            [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED, self::STATUS_VOID]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['discount_type'], 'in', 'range' => ['percentage', 'fixed']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
@@ -269,6 +270,7 @@ class Estimate extends ActiveRecord
             self::STATUS_ACCEPTED => 'Accepted',
             self::STATUS_REJECTED => 'Rejected',
             self::STATUS_EXPIRED => 'Expired',
+            self::STATUS_VOID => 'Void',
         ];
     }
 
@@ -297,6 +299,7 @@ class Estimate extends ActiveRecord
             self::STATUS_ACCEPTED => 'success',
             self::STATUS_REJECTED => 'danger',
             self::STATUS_EXPIRED => 'warning',
+            self::STATUS_VOID => 'dark',
         ];
         return $classes[$this->status] ?? 'secondary';
     }
@@ -493,10 +496,21 @@ class Estimate extends ActiveRecord
      * @param int $companyId
      * @return \yii\db\ActiveQuery
      */
+    /**
+     * Get active (non-void) estimates query
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public static function findActive()
+    {
+        return static::find()->where(['!=', 'status', self::STATUS_VOID]);
+    }
+
     public static function findExpiringSoon($companyId)
     {
         return static::find()
             ->where(['company_id' => $companyId])
+            ->andWhere(['!=', 'status', self::STATUS_VOID])
             ->andWhere(['in', 'status', [self::STATUS_SENT]])
             ->andWhere(['>=', 'expiry_date', date('Y-m-d')])
             ->andWhere(['<=', 'expiry_date', date('Y-m-d', strtotime('+7 days'))]);
@@ -542,6 +556,20 @@ class Estimate extends ActiveRecord
     {
         if ($this->status === self::STATUS_DRAFT) {
             $this->status = self::STATUS_PRINTED;
+            return $this->save(false);
+        }
+        return true;
+    }
+
+    /**
+     * Mark estimate as void (soft delete)
+     * 
+     * @return bool
+     */
+    public function markAsVoid()
+    {
+        if ($this->status !== self::STATUS_VOID) {
+            $this->status = self::STATUS_VOID;
             return $this->save(false);
         }
         return true;

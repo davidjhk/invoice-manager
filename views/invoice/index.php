@@ -63,6 +63,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				<?= Html::a(Yii::t('app/invoice', 'Overdue'), ['index', 'status' => 'overdue'], [
                     'class' => 'btn btn-sm ' . ($statusFilter === 'overdue' ? 'btn-danger' : 'btn-outline-danger')
                 ]) ?>
+				<?= Html::a(Yii::t('app/invoice', 'Partial'), ['index', 'status' => 'partial'], [
+                    'class' => 'btn btn-sm ' . ($statusFilter === 'partial' ? 'btn-warning' : 'btn-outline-warning')
+                ]) ?>
+				<?= Html::a(Yii::t('app/invoice', 'Cancelled'), ['index', 'status' => 'cancelled'], [
+                    'class' => 'btn btn-sm ' . ($statusFilter === 'cancelled' ? 'btn-secondary' : 'btn-outline-secondary')
+                ]) ?>
+				<?= Html::a(Yii::t('app/invoice', 'Void'), ['index', 'status' => 'void'], [
+                    'class' => 'btn btn-sm ' . ($statusFilter === 'void' ? 'btn-dark' : 'btn-outline-dark')
+                ]) ?>
 			</div>
 		</div>
 	</div>

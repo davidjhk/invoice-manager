@@ -20,7 +20,9 @@ return [
     'Sent' => 'Sent',
     'Accepted' => 'Accepted',
     'Declined' => 'Declined',
+    'Rejected' => 'Rejected',
     'Expired' => 'Expired',
+    'Void' => 'Void',
     'Converted' => 'Converted',
     
     // Fields
@@ -81,6 +83,7 @@ return [
     'Estimate sent successfully' => 'Estimate sent successfully',
     'Estimate converted to invoice successfully' => 'Estimate converted to invoice successfully',
     'Are you sure you want to delete this estimate?' => 'Are you sure you want to delete this estimate?',
+    'This will mark the estimate as void. The record will not be deleted from the database.' => 'This will mark the estimate as void. The record will not be deleted from the database.',
     
     // Navigation
     'Back to Estimates' => 'Back to Estimates',

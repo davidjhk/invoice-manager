@@ -21,6 +21,7 @@ return [
     'Paid' => '已付款',
     'Overdue' => '逾期',
     'Cancelled' => '已取消',
+    'Void' => '作废',
     'Partial' => '部分付款',
     
     // Fields
@@ -85,6 +86,8 @@ return [
     'You haven\'t created any invoices yet.' => '您还没有创建任何发票。',
     'Create Your First Invoice' => '创建您的第一张发票',
     'Are you sure you want to duplicate this invoice?' => '您确定要复制这张发票吗？',
+    'Are you sure you want to delete this invoice?' => '您确定要删除这张发票吗？',
+    'This will mark the invoice as void. The record will not be deleted from the database.' => '这将把发票标记为作废。记录不会从数据库中删除。',
     'Customer not in list?' => '客户不在列表中？',
     'Add New Customer' => '添加新客户',
     

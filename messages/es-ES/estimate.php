@@ -20,7 +20,9 @@ return [
     'Sent' => 'Enviado',
     'Accepted' => 'Aceptado',
     'Declined' => 'Rechazado',
+    'Rejected' => 'Rechazado',
     'Expired' => 'Expirado',
+    'Void' => 'Anulado',
     'Converted' => 'Convertido',
     
     // Fields
@@ -81,6 +83,7 @@ return [
     'Estimate sent successfully' => 'Presupuesto enviado exitosamente',
     'Estimate converted to invoice successfully' => 'Presupuesto convertido a factura exitosamente',
     'Are you sure you want to delete this estimate?' => '¿Está seguro de que desea eliminar este presupuesto?',
+    'This will mark the estimate as void. The record will not be deleted from the database.' => 'Esto marcará el presupuesto como anulado. El registro no será eliminado de la base de datos.',
     
     // Navigation
     'Back to Estimates' => 'Volver a Presupuestos',

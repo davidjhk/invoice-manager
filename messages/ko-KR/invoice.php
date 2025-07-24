@@ -21,6 +21,7 @@ return [
     'Paid' => '결제완료',
     'Overdue' => '연체',
     'Cancelled' => '취소됨',
+    'Void' => '무효',
     'Partial' => '부분결제',
     
     // Fields
@@ -97,6 +98,7 @@ return [
     'Invoice sent successfully' => '인보이스가 성공적으로 발송되었습니다',
     'Payment recorded successfully' => '결제가 성공적으로 기록되었습니다',
     'Are you sure you want to delete this invoice?' => '이 인보이스를 삭제하시겠습니까?',
+    'This will mark the invoice as void. The record will not be deleted from the database.' => '인보이스가 무효 상태로 변경됩니다. 데이터베이스에서 레코드가 삭제되지는 않습니다.',
     
     // Navigation
     'Back to Invoices' => '인보이스 목록으로',

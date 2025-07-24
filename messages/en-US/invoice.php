@@ -21,6 +21,7 @@ return [
     'Paid' => 'Paid',
     'Overdue' => 'Overdue',
     'Cancelled' => 'Cancelled',
+    'Void' => 'Void',
     'Partial' => 'Partial',
     
     // Fields
@@ -97,6 +98,7 @@ return [
     'Invoice sent successfully' => 'Invoice sent successfully',
     'Payment recorded successfully' => 'Payment recorded successfully',
     'Are you sure you want to delete this invoice?' => 'Are you sure you want to delete this invoice?',
+    'This will mark the invoice as void. The record will not be deleted from the database.' => 'This will mark the invoice as void. The record will not be deleted from the database.',
     
     // Navigation
     'Back to Invoices' => 'Back to Invoices',

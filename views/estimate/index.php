@@ -66,6 +66,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				<?= Html::a(Yii::t('app/estimate', 'Expired'), ['index', 'status' => 'expired'], [
                     'class' => 'btn btn-sm ' . ($statusFilter === 'expired' ? 'btn-danger' : 'btn-outline-danger')
                 ]) ?>
+				<?= Html::a(Yii::t('app/estimate', 'Rejected'), ['index', 'status' => 'rejected'], [
+                    'class' => 'btn btn-sm ' . ($statusFilter === 'rejected' ? 'btn-secondary' : 'btn-outline-secondary')
+                ]) ?>
+				<?= Html::a(Yii::t('app/estimate', 'Void'), ['index', 'status' => 'void'], [
+                    'class' => 'btn btn-sm ' . ($statusFilter === 'void' ? 'btn-dark' : 'btn-outline-dark')
+                ]) ?>
 			</div>
 		</div>
 	</div>

@@ -66,6 +66,11 @@ class InvoiceController extends Controller
             ->joinWith(['customer'])
             ->where(['jdosa_invoices.company_id' => $company->id]);
 
+        // Exclude void status by default unless specifically filtering for void
+        if ($statusFilter !== 'void') {
+            $query->andWhere(['!=', 'jdosa_invoices.status', Invoice::STATUS_VOID]);
+        }
+
         if (!empty($searchTerm)) {
             $query->andWhere(['or',
                 ['like', 'invoice_number', $searchTerm],
@@ -86,10 +91,20 @@ class InvoiceController extends Controller
                 case 'paid':
                     $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_PAID]);
                     break;
+                case 'partial':
+                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_PARTIAL]);
+                    break;
+                case 'cancelled':
+                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_CANCELLED]);
+                    break;
+                case 'void':
+                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_VOID]);
+                    break;
                 case 'overdue':
                     $query->andWhere(['and',
                         ['<', 'jdosa_invoices.due_date', date('Y-m-d')],
-                        ['!=', 'jdosa_invoices.status', Invoice::STATUS_PAID]
+                        ['!=', 'jdosa_invoices.status', Invoice::STATUS_PAID],
+                        ['!=', 'jdosa_invoices.status', Invoice::STATUS_VOID]
                     ]);
                     break;
             }
@@ -284,13 +299,16 @@ class InvoiceController extends Controller
     {
         $model = $this->findModel($id);
         
-        if (!$model->isEditable()) {
-            Yii::$app->session->setFlash('error', 'This invoice cannot be deleted.');
+        if ($model->status === \app\models\Invoice::STATUS_VOID) {
+            Yii::$app->session->setFlash('error', 'This invoice is already void.');
             return $this->redirect(['index']);
         }
 
-        $model->delete();
-        Yii::$app->session->setFlash('success', 'Invoice deleted successfully.');
+        if ($model->markAsVoid()) {
+            Yii::$app->session->setFlash('success', 'Invoice marked as void successfully.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Failed to mark invoice as void.');
+        }
 
         return $this->redirect(['index']);
     }
