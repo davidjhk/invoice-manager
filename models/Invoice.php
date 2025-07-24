@@ -122,7 +122,7 @@ class Invoice extends ActiveRecord
             [['invoice_number'], 'string', 'max' => 100],
             [['status'], 'string', 'max' => 20],
             [['currency'], 'string', 'max' => 10],
-            [['invoice_number'], 'unique'],
+            [['invoice_number'], 'unique', 'targetAttribute' => ['invoice_number', 'company_id']],
             [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_PAID, self::STATUS_CANCELLED]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],

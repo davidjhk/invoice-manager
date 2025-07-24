@@ -260,7 +260,7 @@ class EstimateController extends Controller
         
         if ($invoice) {
             Yii::$app->session->setFlash('success', 'Estimate converted to invoice successfully.');
-            return $this->redirect(['/invoice/view', 'id' => $invoice->id]);
+            return $this->redirect(['/invoice/preview', 'id' => $invoice->id]);
         } else {
             Yii::$app->session->setFlash('error', 'Failed to convert estimate to invoice.');
             return $this->redirect(['view', 'id' => $model->id]);

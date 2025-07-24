@@ -116,7 +116,7 @@ class Estimate extends ActiveRecord
             [['status'], 'string', 'max' => 20],
             [['currency'], 'string', 'max' => 10],
             [['tracking_number', 'shipping_method', 'terms'], 'string', 'max' => 100],
-            [['estimate_number'], 'unique'],
+            [['estimate_number'], 'unique', 'targetAttribute' => ['estimate_number', 'company_id']],
             [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED]],
             [['currency'], 'in', 'range' => ['USD', 'EUR', 'GBP', 'KRW']],
             [['discount_type'], 'in', 'range' => ['percentage', 'fixed']],
