@@ -23,7 +23,7 @@ class SignupForm extends Model
     public function rules()
     {
         return [
-            [['username', 'email', 'password', 'password_repeat'], 'required'],
+            [['username', 'email', 'password', 'password_repeat', 'plan_id'], 'required'],
             [['plan_id'], 'integer'],
             [['plan_id'], 'exist', 'targetClass' => Plan::class, 'targetAttribute' => 'id', 'filter' => ['is_active' => true]],
             [['username'], 'string', 'min' => 3, 'max' => 50],
