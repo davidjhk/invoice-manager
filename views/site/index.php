@@ -97,6 +97,51 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 		</div>
 	</div>
 
+	<!-- Monthly Usage Alert -->
+	<?php 
+	$user = Yii::$app->user->identity;
+	$monthlyCount = $user->getMonthlyInvoiceCount();
+	$remainingInvoices = $user->getRemainingInvoices();
+	$usagePercentage = $user->getInvoiceUsagePercentage();
+	$currentPlan = $user->getCurrentPlan();
+	?>
+	
+	<?php if ($remainingInvoices !== null && $usagePercentage >= 80): ?>
+	<div class="row mb-4">
+		<div class="col-12">
+			<div class="alert <?= $remainingInvoices === 0 ? 'alert-danger' : 'alert-warning' ?> border-0 shadow-sm">
+				<div class="row align-items-center">
+					<div class="col-md-8">
+						<h6 class="alert-heading mb-1">
+							<i class="fas <?= $remainingInvoices === 0 ? 'fa-exclamation-triangle' : 'fa-info-circle' ?> mr-2"></i>
+							<?= $remainingInvoices === 0 ? Yii::t('app', 'Invoice Limit Reached') : Yii::t('app', 'Invoice Limit Warning') ?>
+						</h6>
+						<p class="mb-0">
+							<?php if ($remainingInvoices === 0): ?>
+								<?= Yii::t('app', 'You have used all {limit} invoices for this month on your {plan} plan.', [
+									'limit' => $currentPlan ? $currentPlan->getMonthlyInvoiceLimit() : 5,
+									'plan' => $currentPlan ? $currentPlan->name : 'Free'
+								]) ?>
+							<?php else: ?>
+								<?= Yii::t('app', 'You have {remaining} invoices left this month. Consider upgrading for unlimited invoices.', [
+									'remaining' => $remainingInvoices
+								]) ?>
+							<?php endif; ?>
+						</p>
+					</div>
+					<div class="col-md-4 text-right">
+						<?= Html::a(
+							'<i class="fas fa-arrow-up mr-1"></i>' . Yii::t('app', 'Upgrade Plan'),
+							['/subscription/my-account'],
+							['class' => 'btn ' . ($remainingInvoices === 0 ? 'btn-light' : 'btn-outline-primary')]
+						) ?>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
+
 	<!-- Main Dashboard Grid -->
 	<div class="dashboard-grid">
 		<!-- Left Column -->

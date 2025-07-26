@@ -23,8 +23,10 @@ $this->registerCssFile('@web/css/tax-management.css');
 		<div class="action-buttons tax-action-buttons">
 			<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app', 'Add'), ['create'], ['class' => 'btn btn-success'])
             ?>
-			<?= Html::a('<i class="fas fa-upload mr-2"></i>' . Yii::t('app', 'Import'), ['import-csv'], ['class' => 'btn btn-primary'])
-            ?>
+			<?php if (Yii::$app->user->identity->canUseImport()): ?>
+				<?= Html::a('<i class="fas fa-upload mr-2"></i>' . Yii::t('app', 'Import'), ['import-csv'], ['class' => 'btn btn-primary'])
+	            ?>
+			<?php endif; ?>
 			<?= Html::a('<i class="fas fa-download mr-2"></i>' . Yii::t('app', 'Export'), ['export-csv'], ['class' => 'btn btn-outline-secondary'])
             ?>
 		</div>
@@ -37,7 +39,7 @@ $this->registerCssFile('@web/css/tax-management.css');
 		</div>
 		<div class="card-body tax-card-body">
 			<div class="row">
-				<div class="col-md-3">
+				<div class="<?= Yii::$app->user->identity->canUseImport() ? 'col-md-3' : 'col-md-4' ?>">
 					<?= Html::a('
                         <div class="nav-item-card">
                             <i class="fas fa-map-marker-alt text-primary"></i>
@@ -46,7 +48,7 @@ $this->registerCssFile('@web/css/tax-management.css');
                         </div>
                     ', ['index'], ['class' => 'text-decoration-none']) ?>
 				</div>
-				<div class="col-md-3">
+				<div class="<?= Yii::$app->user->identity->canUseImport() ? 'col-md-3' : 'col-md-4' ?>">
 					<?= Html::a('
                         <div class="nav-item-card">
                             <i class="fas fa-percent text-success"></i>
@@ -55,13 +57,14 @@ $this->registerCssFile('@web/css/tax-management.css');
                         </div>
                     ', ['/state-tax-rate/index'], ['class' => 'text-decoration-none']) ?>
 				</div>
-				<div class="col-md-3">
+				<div class="<?= Yii::$app->user->identity->canUseImport() ? 'col-md-3' : 'col-md-4' ?>">
 					<div class="nav-item-card active">
 						<i class="fas fa-chart-line text-info"></i>
 						<strong><?= Yii::t('app', 'Tax Statistics') ?></strong>
 						<small class="text-muted"><?= Yii::t('app', 'Analysis and reports') ?></small>
 					</div>
 				</div>
+				<?php if (Yii::$app->user->identity->canUseImport()): ?>
 				<div class="col-md-3">
 					<?= Html::a('
                         <div class="nav-item-card">
@@ -71,6 +74,7 @@ $this->registerCssFile('@web/css/tax-management.css');
                         </div>
                     ', ['import-csv'], ['class' => 'text-decoration-none']) ?>
 				</div>
+				<?php endif; ?>
 			</div>
 		</div>
 	</div>

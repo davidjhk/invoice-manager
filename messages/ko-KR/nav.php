@@ -15,6 +15,7 @@ return [
     'Admin' => '관리자',
     'Help' => '도움말',
     'Profile' => '프로필',
+    'My Account' => '내 계정',
     'Logout' => '로그아웃',
     'Login' => '로그인',
     'Register' => '가입',

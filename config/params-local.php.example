@@ -18,4 +18,18 @@ return [
     'googleClientId' => 'your-google-client-id-here.apps.googleusercontent.com',
     'googleClientSecret' => 'your-google-client-secret-here',
     'pdf.generator' => 'mpdf', // Options: 'tcpdf', 'mpdf'
+    
+    // Stripe API Keys
+    'stripe' => [
+        'publishableKey' => $_ENV['STRIPE_PUBLISHABLE_KEY'] ?? 'pk_test_your_key_here',
+        'secretKey' => $_ENV['STRIPE_SECRET_KEY'] ?? 'sk_test_your_key_here',
+        'webhookSecret' => $_ENV['STRIPE_WEBHOOK_SECRET'] ?? 'whsec_your_secret_here',
+    ],
+    
+    // PayPal API Keys
+    'paypal' => [
+        'clientId' => $_ENV['PAYPAL_CLIENT_ID'] ?? 'your_paypal_client_id',
+        'clientSecret' => $_ENV['PAYPAL_CLIENT_SECRET'] ?? 'your_paypal_client_secret',
+        'mode' => $_ENV['PAYPAL_MODE'] ?? 'sandbox', // 'sandbox' or 'live'
+    ]
 ];

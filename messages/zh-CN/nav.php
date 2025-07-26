@@ -15,6 +15,7 @@ return [
     'Admin' => '管理员',
     'Help' => '帮助',
     'Profile' => '个人资料',
+    'My Account' => '我的账户',
     'Logout' => '退出登录',
     'Login' => '登录',
     'Register' => '注册',

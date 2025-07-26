@@ -15,6 +15,7 @@ return [
     'Admin' => 'Administración',
     'Help' => 'Ayuda',
     'Profile' => 'Perfil',
+    'My Account' => 'Mi Cuenta',
     'Logout' => 'Cerrar Sesión',
     'Login' => 'Iniciar Sesión',
     'Register' => 'Registrarse',

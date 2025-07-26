@@ -1630,3 +1630,108 @@ body.dark-mode .card-header[data-toggle="collapse"]:hover {
     display: none !important;
   }
 }
+
+/* Plan Selection Styles */
+.plan-selection-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.plan-section-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.plan-options {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.plan-option {
+  position: relative;
+}
+
+.plan-radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plan-label {
+  display: block;
+  padding: 1rem;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+
+.plan-label:hover {
+  border-color: #4f46e5;
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.plan-radio:checked + .plan-label {
+  border-color: #4f46e5;
+  background: #f8faff;
+  box-shadow: var(--shadow-md);
+}
+
+.plan-info {
+  text-align: center;
+}
+
+.plan-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.plan-price {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #4f46e5;
+  margin-bottom: 0.25rem;
+}
+
+.plan-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Auth form styles */
+.auth-form-full {
+  margin-bottom: 1rem;
+}
+
+.auth-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .auth-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .plan-options {
+    gap: 0.5rem;
+  }
+  
+  .plan-label {
+    padding: 0.75rem;
+  }
+}

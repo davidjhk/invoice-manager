@@ -2130,6 +2130,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 										<li><?= Html::a('<i class="fas fa-refresh mr-2"></i>' . Yii::t('app/nav', 'Reset Demo Data'), ['/demo/reset-demo-data'], ['class' => 'dropdown-item text-danger', 'data' => ['confirm' => Yii::t('app/nav', 'Are you sure you want to reset all demo data?'), 'method' => 'post']]) ?>
 										</li>
 									<?php else: ?>
+										<li><?= Html::a('<i class="fas fa-user-cog mr-2"></i>' . Yii::t('app/nav', 'My Account'), ['/subscription/my-account'], ['class' => 'dropdown-item']) ?>
+										</li>
 										<li><?= Html::a('<i class="fas fa-key mr-2"></i>' . Yii::t('app/nav', 'Change Password'), ['/site/change-password'], ['class' => 'dropdown-item']) ?>
 										</li>
 									<?php endif; ?>

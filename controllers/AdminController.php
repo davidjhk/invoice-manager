@@ -6,6 +6,8 @@ use Yii;
 use app\models\User;
 use app\models\AdminSettings;
 use app\models\ChangePasswordForm;
+use app\models\Plan;
+use app\models\UserSubscription;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
@@ -58,6 +60,8 @@ class AdminController extends Controller
             'activeUsers' => User::find()->where(['is_active' => 1])->count(),
             'inactiveUsers' => User::find()->where(['is_active' => 0])->count(),
             'adminUsers' => User::find()->where(['role' => 'admin'])->count(),
+            'planCount' => Plan::find()->count(),
+            'activeSubscriptions' => UserSubscription::find()->where(['status' => 'active'])->count(),
         ];
 
         return $this->render('index', [
@@ -78,8 +82,8 @@ class AdminController extends Controller
                 $post = Yii::$app->request->post();
                 
                 foreach ($settings as $setting) {
-                    // Handle checkbox settings (allow_signup, site_maintenance, etc.)
-                    if (in_array($setting->setting_key, ['allow_signup', 'site_maintenance'])) {
+                    // Handle checkbox settings (allow_signup, site_maintenance, email_notifications, backup_enabled)
+                    if (in_array($setting->setting_key, ['allow_signup', 'site_maintenance', 'email_notifications', 'backup_enabled'])) {
                         // For checkboxes, set to 1 if checked, 0 if not checked
                         $setting->setting_value = isset($post[$setting->setting_key]) ? '1' : '0';
                         $setting->save();

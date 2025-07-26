@@ -3,9 +3,11 @@
 /** @var yii\web\View $this */
 /** @var yii\bootstrap4\ActiveForm $form */
 /** @var app\models\SignupForm $model */
+/** @var app\models\Plan[] $plans */
 
 use yii\bootstrap4\ActiveForm;
 use yii\bootstrap4\Html;
+use yii\helpers\ArrayHelper;
 
 $this->title = 'Create Account';
 $this->params['breadcrumbs'][] = $this->title;
@@ -69,6 +71,47 @@ $this->context->layout = 'auth';
                 ])->label('Confirm Password') ?>
             </div>
 
+            <?php if (!empty($plans)): ?>
+            <div class="auth-form-full">
+                <div class="plan-selection-section">
+                    <h5 class="plan-section-title">Choose Your Plan</h5>
+                    <div class="plan-options">
+                        <div class="plan-option">
+                            <?= Html::radio('SignupForm[plan_id]', empty($model->plan_id), [
+                                'value' => '',
+                                'id' => 'plan-free',
+                                'class' => 'plan-radio'
+                            ]) ?>
+                            <label for="plan-free" class="plan-label">
+                                <div class="plan-info">
+                                    <div class="plan-name">Free Trial</div>
+                                    <div class="plan-price">$0/month</div>
+                                    <div class="plan-description">Start with our free features</div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <?php foreach ($plans as $plan): ?>
+                        <div class="plan-option">
+                            <?= Html::radio('SignupForm[plan_id]', $model->plan_id == $plan->id, [
+                                'value' => $plan->id,
+                                'id' => 'plan-' . $plan->id,
+                                'class' => 'plan-radio'
+                            ]) ?>
+                            <label for="plan-<?= $plan->id ?>" class="plan-label">
+                                <div class="plan-info">
+                                    <div class="plan-name"><?= Html::encode($plan->name) ?></div>
+                                    <div class="plan-price"><?= $plan->getFormattedPrice() ?>/month</div>
+                                    <div class="plan-description"><?= Html::encode($plan->description) ?></div>
+                                </div>
+                            </label>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <div class="form-actions">
                 <?= Html::submitButton('Create Account', [
                     'class' => 'btn btn-primary btn-block btn-auth',
@@ -108,4 +151,99 @@ $this->context->layout = 'auth';
         </div>
     </div>
 </div>
+
+<style>
+/* Plan selection styling fixes for dark theme */
+.plan-selection-section {
+    margin-top: 1rem;
+}
+
+.plan-section-title {
+    color: #ffffff !important;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.plan-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.plan-option {
+    position: relative;
+}
+
+.plan-radio {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.plan-label {
+    display: block;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+}
+
+.plan-label:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.plan-radio:checked + .plan-label {
+    background: rgba(79, 70, 229, 0.3);
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.plan-info {
+    text-align: center;
+}
+
+.plan-name {
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.plan-price {
+    color: #a5b4fc !important;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.plan-description {
+    color: #cbd5e1 !important;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/* Radio button custom styling */
+.plan-radio:checked + .plan-label::before {
+    content: '✓';
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #4f46e5;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+</style>
 

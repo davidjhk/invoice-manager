@@ -28,18 +28,19 @@
     "yiisoft/yii2-bootstrap5": "^2.0",
     "yiisoft/yii2-jui": "~2.0.0",
     "yiisoft/yii2-httpclient": "~2.0.0",
-    "mpdf/mpdf": "^8.2.5"
+    "mpdf/mpdf": "^8.2.5",
+    "stripe/stripe-php": "^13.0"
   },
   "require-dev": {
-    "yiisoft/yii2-debug": "^2.1",
+    "yiisoft/yii2-debug": "~2.1.0",
     "yiisoft/yii2-gii": "~2.2.0",
     "yiisoft/yii2-faker": "~2.0.0",
+    "codeception/codeception": "^5.0",
     "codeception/verify": "~0.5.0 || ~1.1.0",
     "codeception/specify": "~0.4.6",
     "codeception/module-filesystem": "^3.0",
     "codeception/module-yii2": "^1.1.6",
-    "codeception/module-asserts": "^3.0",
-    "codeception/codeception": "^5.2"
+    "codeception/module-asserts": "^3.0"
   },
   "config": {
     "process-timeout": 1800,

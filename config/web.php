@@ -105,7 +105,7 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-			'rules' => [
+  		'rules' => [
 				'request-password-reset' => 'site/request-password-reset',
 				'reset-password/<token:.+>' => 'site/reset-password',
 				'admin' => 'admin/index',
@@ -116,11 +116,23 @@ $config = [
 				'state-tax-rate/<action:\w+>/<id:\d+>' => 'state-tax-rate/<action>',
 				'demo' => 'demo/index',
 				'demo/<action:\w+>' => 'demo/<action>',
+				'plan' => 'plan/index',
+				'plan/<action:\w+>' => 'plan/<action>',
+				'plan/<action:\w+>/<id:\d+>' => 'plan/<action>',
+				'subscription' => 'subscription/index',
+				'subscription/<action:\w+>' => 'subscription/<action>',
+				'subscription/<action:\w+>/<id:\d+>' => 'subscription/<action>',
 				'<controller:\w+>/<action:\w+>' => '<controller>/<action>',
 				'<controller:\w+>/<id:\d+>' => '<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
 			],
 		],
+        'stripe' => [
+            'class' => 'app\components\StripePayment',
+        ],
+        'paypal' => [
+            'class' => 'app\components\PayPalPayment',
+        ],
     ],
 	'params' => $params,
 ];

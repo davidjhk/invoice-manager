@@ -28,6 +28,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $updated_at
  *
  * @property Company[] $companies
+ * @property UserSubscription[] $subscriptions
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -163,6 +164,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getCompanies()
     {
         return $this->hasMany(Company::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Subscriptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSubscriptions()
+    {
+        return $this->hasMany(UserSubscription::class, ['user_id' => 'id']);
     }
 
     /**
@@ -470,6 +481,129 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Get user's current subscription
+     *
+     * @return \app\models\UserSubscription|null
+     */
+    public function getCurrentSubscription()
+    {
+        return UserSubscription::getActiveSubscription($this->id);
+    }
+
+    /**
+     * Get user's current plan
+     *
+     * @return \app\models\Plan|null
+     */
+    public function getCurrentPlan()
+    {
+        $subscription = $this->getCurrentSubscription();
+        return $subscription ? $subscription->plan : null;
+    }
+
+    /**
+     * Get monthly invoice count for current month
+     *
+     * @return int
+     */
+    public function getMonthlyInvoiceCount()
+    {
+        $startOfMonth = date('Y-m-01 00:00:00');
+        $endOfMonth = date('Y-m-t 23:59:59');
+
+        return Invoice::find()
+            ->where(['user_id' => $this->id])
+            ->andWhere(['>=', 'created_at', $startOfMonth])
+            ->andWhere(['<=', 'created_at', $endOfMonth])
+            ->count();
+    }
+
+    /**
+     * Check if user can create more invoices this month
+     *
+     * @return bool
+     */
+    public function canCreateInvoice()
+    {
+        $plan = $this->getCurrentPlan();
+        
+        // No plan means free tier with limitations
+        if (!$plan) {
+            return $this->getMonthlyInvoiceCount() < 5; // Free users get 5 invoices
+        }
+
+        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        
+        // Unlimited
+        if ($monthlyLimit === null) {
+            return true;
+        }
+
+        return $this->getMonthlyInvoiceCount() < $monthlyLimit;
+    }
+
+    /**
+     * Get remaining invoices for current month
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getRemainingInvoices()
+    {
+        $plan = $this->getCurrentPlan();
+        
+        if (!$plan) {
+            return max(0, 5 - $this->getMonthlyInvoiceCount());
+        }
+
+        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        
+        if ($monthlyLimit === null) {
+            return null; // Unlimited
+        }
+
+        return max(0, $monthlyLimit - $this->getMonthlyInvoiceCount());
+    }
+
+    /**
+     * Get invoice usage percentage for current month
+     *
+     * @return float|null Null means unlimited
+     */
+    public function getInvoiceUsagePercentage()
+    {
+        $plan = $this->getCurrentPlan();
+        
+        if (!$plan) {
+            return ($this->getMonthlyInvoiceCount() / 5) * 100;
+        }
+
+        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        
+        if ($monthlyLimit === null) {
+            return null; // Unlimited
+        }
+
+        return ($this->getMonthlyInvoiceCount() / $monthlyLimit) * 100;
+    }
+
+    /**
+     * Check if user can use import functionality
+     *
+     * @return bool
+     */
+    public function canUseImport()
+    {
+        $plan = $this->getCurrentPlan();
+        
+        // No plan means free tier - no import allowed
+        if (!$plan) {
+            return false;
+        }
+
+        return $plan->canUseImport();
+    }
+
+    /**
      * Check if user is demo
      *
      * @return bool
@@ -512,6 +646,38 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $options = self::getRoleOptions();
         return $options[$this->role] ?? 'Unknown';
+    }
+
+    /**
+     * Get user's active subscription
+     *
+     * @return UserSubscription|null
+     */
+    public function getActiveSubscription()
+    {
+        return UserSubscription::getActiveSubscription($this->id);
+    }
+
+    /**
+     * Check if user has active subscription
+     *
+     * @return bool
+     */
+    public function hasActiveSubscription()
+    {
+        $subscription = $this->getActiveSubscription();
+        return $subscription && $subscription->isActive();
+    }
+
+    /**
+     * Get user's current plan
+     *
+     * @return Plan|null
+     */
+    public function getCurrentPlan()
+    {
+        $subscription = $this->getActiveSubscription();
+        return $subscription ? $subscription->plan : null;
     }
 
     /**

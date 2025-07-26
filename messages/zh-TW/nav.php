@@ -15,6 +15,7 @@ return [
     'Admin' => '管理員',
     'Help' => '說明',
     'Profile' => '個人資料',
+    'My Account' => '我的帳戶',
     'Logout' => '登出',
     'Login' => '登入',
     'Register' => '註冊',

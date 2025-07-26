@@ -24,12 +24,88 @@ $this->params['breadcrumbs'][] = $this->title;
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
-			<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/invoice', 'Create New Invoice'), ['create'], [
-                'class' => 'btn btn-success',
-                'encode' => false
-            ]) ?>
+			<?php if ($remainingInvoices > 0 || $remainingInvoices === null): ?>
+				<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/invoice', 'Create New Invoice'), ['create'], [
+					'class' => 'btn btn-success',
+					'encode' => false
+				]) ?>
+			<?php else: ?>
+				<?= Html::button('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/invoice', 'Create New Invoice'), [
+					'class' => 'btn btn-secondary disabled',
+					'disabled' => true,
+					'encode' => false,
+					'title' => Yii::t('app', 'Monthly invoice limit reached'),
+					'data-toggle' => 'tooltip'
+				]) ?>
+			<?php endif; ?>
 		</div>
 	</div>
+
+	<!-- Monthly Usage Display -->
+	<?php 
+	$user = Yii::$app->user->identity;
+	$monthlyCount = $user->getMonthlyInvoiceCount();
+	$remainingInvoices = $user->getRemainingInvoices();
+	$usagePercentage = $user->getInvoiceUsagePercentage();
+	$currentPlan = $user->getCurrentPlan();
+	?>
+	
+	<?php if ($remainingInvoices !== null): ?>
+	<div class="row mb-4">
+		<div class="col-12">
+			<div class="card border-0 bg-light">
+				<div class="card-body py-3">
+					<div class="row align-items-center">
+						<div class="col-md-6">
+							<h6 class="mb-1">
+								<i class="fas fa-chart-line mr-2 text-primary"></i>
+								<?= Yii::t('app', 'Monthly Invoice Usage') ?> - <?= date('F Y') ?>
+							</h6>
+							<p class="mb-0 text-muted">
+								<?= Yii::t('app', '{used} of {limit} invoices used', [
+									'used' => $monthlyCount,
+									'limit' => $currentPlan ? $currentPlan->getMonthlyInvoiceLimit() : 5
+								]) ?>
+								<?php if ($remainingInvoices > 0): ?>
+									<span class="text-success ml-2">
+										<i class="fas fa-check-circle"></i>
+										<?= Yii::t('app', '{count} remaining', ['count' => $remainingInvoices]) ?>
+									</span>
+								<?php else: ?>
+									<span class="text-danger ml-2">
+										<i class="fas fa-exclamation-triangle"></i>
+										<?= Yii::t('app', 'Limit reached') ?>
+									</span>
+								<?php endif; ?>
+							</p>
+						</div>
+						<div class="col-md-4">
+							<div class="progress" style="height: 10px;">
+								<div class="progress-bar <?= $usagePercentage >= 90 ? 'bg-danger' : ($usagePercentage >= 70 ? 'bg-warning' : 'bg-success') ?>" 
+									 role="progressbar" 
+									 style="width: <?= min(100, $usagePercentage) ?>%"
+									 aria-valuenow="<?= $usagePercentage ?>" 
+									 aria-valuemin="0" 
+									 aria-valuemax="100">
+								</div>
+							</div>
+							<small class="text-muted"><?= round($usagePercentage, 1) ?>% used</small>
+						</div>
+						<div class="col-md-2 text-right">
+							<?php if ($remainingInvoices === 0): ?>
+								<?= Html::a(
+									'<i class="fas fa-arrow-up mr-1"></i>' . Yii::t('app', 'Upgrade Plan'),
+									['/subscription/my-account'],
+									['class' => 'btn btn-primary btn-sm']
+								) ?>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
 
 	<div class="row mb-3">
 		<div class="col-md-6">

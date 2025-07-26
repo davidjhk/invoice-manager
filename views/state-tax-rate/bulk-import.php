@@ -9,6 +9,16 @@ $this->title = Yii::t('app', 'Bulk Import Tax Rates');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Admin'), 'url' => ['/admin/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'State Tax Rates'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// Check if user can use import functionality
+if (!Yii::$app->user->identity->canUseImport()) {
+	echo '<div class="alert alert-warning">';
+	echo '<h4><i class="fas fa-lock mr-2"></i>' . Yii::t('app', 'Feature Not Available') . '</h4>';
+	echo '<p>' . Yii::t('app', 'Import functionality is only available for Pro plan users. Please upgrade your plan to access this feature.') . '</p>';
+	echo Html::a('<i class="fas fa-arrow-up mr-2"></i>' . Yii::t('app', 'Upgrade Plan'), ['/subscription/my-account'], ['class' => 'btn btn-primary']);
+	echo '</div>';
+	return;
+}
 ?>
 <div class="state-tax-rate-bulk-import">
 

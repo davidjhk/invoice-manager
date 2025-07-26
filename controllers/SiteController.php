@@ -15,6 +15,8 @@ use app\models\ChangePasswordForm;
 use app\models\User;
 use app\models\Company;
 use app\models\AdminSettings;
+use app\models\Plan;
+use app\models\UserSubscription;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 
@@ -128,10 +130,35 @@ class SiteController extends Controller
         }
 
         $model = new SignupForm();
+        
+        // Get plan from URL parameter if provided
+        $planParam = Yii::$app->request->get('plan');
+        if ($planParam) {
+            $plan = Plan::findByName($planParam);
+            if ($plan) {
+                $model->plan_id = $plan->id;
+            }
+        }
+        
+        // Get available plans for selection
+        $plans = Plan::getActivePlans()->all();
+        
         if ($model->load(Yii::$app->request->post())) {
             $user = $model->signup();
             if ($user) {
                 Yii::$app->user->login($user);
+                
+                // If a plan was selected, redirect to payment
+                if ($model->plan_id) {
+                    $subscription = UserSubscription::find()
+                        ->where(['user_id' => $user->id, 'plan_id' => $model->plan_id])
+                        ->one();
+                    if ($subscription) {
+                        Yii::$app->session->setFlash('info', 'Account created! Please complete your subscription payment.');
+                        return $this->redirect(['/subscription/subscribe', 'planId' => $model->plan_id]);
+                    }
+                }
+                
                 Yii::$app->session->setFlash('success', 'Account created successfully! Welcome to ' . (Yii::$app->params['siteName'] ?? 'Invoice Manager') . '.');
                 return $this->goHome();
             } else {
@@ -141,6 +168,7 @@ class SiteController extends Controller
 
         return $this->render('signup', [
             'model' => $model,
+            'plans' => $plans,
         ]);
     }
 

@@ -93,6 +93,40 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
     <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title"><?= Yii::t('app', 'Subscription Plans') ?></h5>
+                            <h2 class="card-text"><?= $stats['planCount'] ?></h2>
+                        </div>
+                        <div class="card-icon">
+                            <i class="fas fa-credit-card fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title"><?= Yii::t('app', 'Active Subscriptions') ?></h5>
+                            <h2 class="card-text"><?= $stats['activeSubscriptions'] ?></h2>
+                        </div>
+                        <div class="card-icon">
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">

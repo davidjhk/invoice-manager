@@ -160,6 +160,21 @@ class InvoiceController extends Controller
             return $this->redirect(['company/select']);
         }
 
+        // Check if user can create more invoices this month
+        $user = Yii::$app->user->identity;
+        if (!$user->canCreateInvoice()) {
+            $plan = $user->getCurrentPlan();
+            $planName = $plan ? $plan->name : 'Free';
+            $limit = $plan ? $plan->getMonthlyInvoiceLimit() : 5;
+            
+            Yii::$app->session->setFlash('error', Yii::t('invoice', 'You have reached your monthly invoice limit of {limit} for the {plan} plan. Please upgrade your plan to create more invoices.', [
+                'limit' => $limit,
+                'plan' => $planName
+            ]));
+            
+            return $this->redirect(['index']);
+        }
+
         $model = new Invoice();
         $model->invoice_number = $company->generateInvoiceNumber();
         $model->company_id = $company->id;

@@ -15,6 +15,7 @@ class SignupForm extends Model
     public $password;
     public $password_repeat;
     public $full_name;
+    public $plan_id;
 
     /**
      * {@inheritdoc}
@@ -23,6 +24,8 @@ class SignupForm extends Model
     {
         return [
             [['username', 'email', 'password', 'password_repeat'], 'required'],
+            [['plan_id'], 'integer'],
+            [['plan_id'], 'exist', 'targetClass' => Plan::class, 'targetAttribute' => 'id', 'filter' => ['is_active' => true]],
             [['username'], 'string', 'min' => 3, 'max' => 50],
             [['username'], 'unique', 'targetClass' => User::class, 'message' => 'This username has already been taken.'],
             [['username'], 'validateNotReserved'],
@@ -57,6 +60,7 @@ class SignupForm extends Model
             'password' => 'Password',
             'password_repeat' => 'Confirm Password',
             'full_name' => 'Full Name',
+            'plan_id' => 'Subscription Plan',
         ];
     }
 
@@ -97,6 +101,23 @@ class SignupForm extends Model
             
             if (!$company->save()) {
                 Yii::error('Company creation failed: ' . json_encode($company->errors), 'app');
+            }
+            
+            // Create subscription if plan_id is provided
+            if ($this->plan_id) {
+                $plan = Plan::findOne($this->plan_id);
+                if ($plan && $plan->is_active) {
+                    $subscription = new UserSubscription();
+                    $subscription->user_id = $user->id;
+                    $subscription->plan_id = $plan->id;
+                    $subscription->status = UserSubscription::STATUS_INACTIVE; // Will be activated after payment
+                    $subscription->start_date = date('Y-m-d');
+                    $subscription->is_recurring = true;
+                    
+                    if (!$subscription->save()) {
+                        Yii::error('Subscription creation failed: ' . json_encode($subscription->errors), 'app');
+                    }
+                }
             }
             
             return $user;

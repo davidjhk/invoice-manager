@@ -15,6 +15,7 @@ return [
     'Admin' => 'Admin',
     'Help' => 'Help',
     'Profile' => 'Profile',
+    'My Account' => 'My Account',
     'Logout' => 'Logout',
     'Login' => 'Login',
     'Register' => 'Register',
