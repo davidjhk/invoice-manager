@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Add scheduled plan fields to user subscriptions table for handling downgrades
  */
-class m250126_130000_add_scheduled_plan_fields_to_subscriptions extends Migration
+class m250725_000003_add_scheduled_plan_fields_to_subscriptions extends Migration
 {
     /**
      * {@inheritdoc}
