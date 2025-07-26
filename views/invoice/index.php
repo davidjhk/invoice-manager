@@ -12,6 +12,13 @@ use yii\widgets\LinkPager;
 
 $this->title = Yii::t('app/invoice', 'Invoices');
 $this->params['breadcrumbs'][] = $this->title;
+
+// Get user invoice usage data
+$user = Yii::$app->user->identity;
+$monthlyCount = $user->getMonthlyInvoiceCount();
+$remainingInvoices = $user->getRemainingInvoices();
+$usagePercentage = $user->getInvoiceUsagePercentage();
+$currentPlan = $user->getCurrentPlan();
 ?>
 
 <div class="invoice-index">
@@ -42,14 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 
 	<!-- Monthly Usage Display -->
-	<?php 
-	$user = Yii::$app->user->identity;
-	$monthlyCount = $user->getMonthlyInvoiceCount();
-	$remainingInvoices = $user->getRemainingInvoices();
-	$usagePercentage = $user->getInvoiceUsagePercentage();
-	$currentPlan = $user->getCurrentPlan();
-	?>
-	
 	<?php if ($remainingInvoices !== null): ?>
 	<div class="row mb-4">
 		<div class="col-12">
