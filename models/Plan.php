@@ -198,7 +198,6 @@ class Plan extends ActiveRecord
     public function getMonthlyInvoiceLimit()
     {
         $limits = [
-            'Free' => 10,
             'Standard' => 100,
             'Pro' => null, // Unlimited
         ];

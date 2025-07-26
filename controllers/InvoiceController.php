@@ -11,12 +11,9 @@ use app\models\Payment;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
-use yii\web\Response;
-use yii\helpers\Json;
 use yii\data\ActiveDataProvider;
-use app\components\PdfGenerator;
-use app\components\EmailSender;
+use yii\web\Response;
+use yii\helpers\ArrayHelper;
 
 /**
  * InvoiceController implements the CRUD actions for Invoice model.
@@ -29,19 +26,15 @@ class InvoiceController extends Controller
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'], // Only authenticated users
-                    ],
-                ],
-            ],
             'verbs' => [
-                'class' => VerbFilter::class,
+                'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'send-email' => ['POST'],
+                    'download-pdf' => ['GET'],
+                    'mark-as-paid' => ['POST'],
+                    'receive-payment' => ['GET', 'POST'],
+                    'duplicate' => ['POST'],
                 ],
             ],
         ];
@@ -49,8 +42,7 @@ class InvoiceController extends Controller
 
     /**
      * Lists all Invoice models.
-     *
-     * @return string
+     * @return mixed
      */
     public function actionIndex()
     {
@@ -59,68 +51,31 @@ class InvoiceController extends Controller
             return $this->redirect(['company/select']);
         }
 
-        $searchTerm = Yii::$app->request->get('search', '');
-        $statusFilter = Yii::$app->request->get('status', '');
-        
+        $searchTerm = Yii::$app->request->get('search');
+        $statusFilter = Yii::$app->request->get('status');
+
         $query = Invoice::find()
-            ->joinWith(['customer'])
-            ->where(['jdosa_invoices.company_id' => $company->id]);
+            ->where(['company_id' => $company->id])
+            ->orderBy(['created_at' => SORT_DESC]);
 
-        // Exclude void status by default unless specifically filtering for void
-        if ($statusFilter !== 'void') {
-            $query->andWhere(['!=', 'jdosa_invoices.status', Invoice::STATUS_VOID]);
-        }
-
+        // Apply search filter
         if (!empty($searchTerm)) {
-            $query->andWhere(['or',
+            $query->andWhere([
+                'or',
                 ['like', 'invoice_number', $searchTerm],
-                ['like', 'jdosa_customers.customer_name', $searchTerm],
-                ['like', 'notes', $searchTerm],
+                ['like', 'LOWER(reference)', strtolower($searchTerm)],
             ]);
         }
 
         // Apply status filter
         if (!empty($statusFilter)) {
-            switch ($statusFilter) {
-                case 'draft':
-                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_DRAFT]);
-                    break;
-                case 'sent':
-                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_SENT]);
-                    break;
-                case 'paid':
-                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_PAID]);
-                    break;
-                case 'partial':
-                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_PARTIAL]);
-                    break;
-                case 'cancelled':
-                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_CANCELLED]);
-                    break;
-                case 'void':
-                    $query->andWhere(['jdosa_invoices.status' => Invoice::STATUS_VOID]);
-                    break;
-                case 'overdue':
-                    $query->andWhere(['and',
-                        ['<', 'jdosa_invoices.due_date', date('Y-m-d')],
-                        ['!=', 'jdosa_invoices.status', Invoice::STATUS_PAID],
-                        ['!=', 'jdosa_invoices.status', Invoice::STATUS_VOID]
-                    ]);
-                    break;
-            }
+            $query->andWhere(['status' => $statusFilter]);
         }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
-                'params' => array_merge(
-                    Yii::$app->request->queryParams,
-                    ['search' => $searchTerm, 'status' => $statusFilter]
-                ),
-            ],
-            'sort' => [
-                'defaultOrder' => ['invoice_number' => SORT_DESC],
+                'pageSize' => 20,
             ],
         ]);
 
@@ -134,24 +89,26 @@ class InvoiceController extends Controller
 
     /**
      * Displays a single Invoice model.
-     *
-     * @param int $id ID
-     * @return string
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        $model = $this->findModel($id);
-        
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
         return $this->render('view', [
-            'model' => $model,
+            'model' => $this->findModel($id, $company->id),
         ]);
     }
 
     /**
      * Creates a new Invoice model.
-     *
-     * @return string|Response
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
      */
     public function actionCreate()
     {
@@ -175,6 +132,12 @@ class InvoiceController extends Controller
             return $this->redirect(['index']);
         }
 
+        // Check if user's subscription is cancelled or expired
+        if ($user->hasCancelledOrExpiredSubscription()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Your subscription has been cancelled or expired. Please renew your subscription to create new invoices.'));
+            return $this->redirect(['index']);
+        }
+
         $model = new Invoice();
         $model->invoice_number = $company->generateInvoiceNumber();
         $model->company_id = $company->id;
@@ -191,559 +154,314 @@ class InvoiceController extends Controller
         $model->discount_amount = 0;
         $model->deposit_amount = 0;
 
+        $customers = Customer::findActiveByCompany($company->id)->all();
+
         if ($model->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             
             try {
                 if ($model->save()) {
-                    // Handle invoice items - check both possible data structures
-                    $itemsData = Yii::$app->request->post('items', []);
-                    if (empty($itemsData)) {
-                        $itemsData = Yii::$app->request->post('InvoiceItem', []);
-                    }
-                    
+                    // Handle invoice items
+                    $itemsData = Yii::$app->request->post('InvoiceItem', []);
                     if (!empty($itemsData)) {
-                        $this->saveInvoiceItems($model->id, $itemsData);
+                        foreach ($itemsData as $itemData) {
+                            if (!empty($itemData['description']) || !empty($itemData['product_id'])) {
+                                $item = new InvoiceItem();
+                                $item->invoice_id = $model->id;
+                                $item->description = $itemData['description'] ?? '';
+                                $item->quantity = $itemData['quantity'] ?? 1;
+                                $item->unit_price = $itemData['unit_price'] ?? 0;
+                                $item->product_id = $itemData['product_id'] ?? null;
+                                $item->save();
+                            }
+                        }
                     }
-                    
-                    // Ensure required fields have default values before calculating totals
-                    if ($model->discount_value === null) $model->discount_value = 0;
-                    if ($model->discount_type === null) $model->discount_type = 'percentage';
-                    if ($model->tax_rate === null) $model->tax_rate = 0;
-                    
-                    // Recalculate totals
-                    $model->calculateTotals();
-                    $model->save();
                     
                     $transaction->commit();
-                    
-                    Yii::$app->session->setFlash('success', 'Invoice created successfully.');
-                    return $this->redirect(['preview', 'id' => $model->id]);
-                } else {
-                    $transaction->rollBack();
-                    $errors = [];
-                    foreach ($model->errors as $field => $fieldErrors) {
-                        $errors[] = $field . ': ' . implode(', ', $fieldErrors);
-                    }
-                    Yii::$app->session->setFlash('error', 'Validation failed: ' . implode('; ', $errors));
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Invoice created successfully.'));
+                    return $this->redirect(['view', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                Yii::error('Failed to create invoice: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-                Yii::$app->session->setFlash('error', 'Failed to create invoice: ' . $e->getMessage());
+                Yii::error('Error creating invoice: ' . $e->getMessage(), 'app');
+                Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while creating the invoice. Please try again.'));
             }
         }
 
-        $customers = Customer::findActiveByCompany($company->id)->all();
-
         return $this->render('create', [
             'model' => $model,
-            'company' => $company,
             'customers' => $customers,
         ]);
     }
 
     /**
      * Updates an existing Invoice model.
-     *
-     * @param int $id ID
-     * @return string|Response
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        
-        if (!$model->isEditable()) {
-            Yii::$app->session->setFlash('error', 'This invoice cannot be edited.');
-            return $this->redirect(['preview', 'id' => $model->id]);
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
         }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Prevent editing if invoice is not in draft status
+        if ($model->status !== Invoice::STATUS_DRAFT) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only draft invoices can be edited.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+        
+        $customers = Customer::findActiveByCompany($company->id)->all();
 
         if ($model->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             
             try {
+                // Delete existing items
+                InvoiceItem::deleteAll(['invoice_id' => $model->id]);
+                
+                // Handle invoice items
+                $itemsData = Yii::$app->request->post('InvoiceItem', []);
+                if (!empty($itemsData)) {
+                    foreach ($itemsData as $itemData) {
+                        if (!empty($itemData['description']) || !empty($itemData['product_id'])) {
+                            $item = new InvoiceItem();
+                            $item->invoice_id = $model->id;
+                            $item->description = $itemData['description'] ?? '';
+                            $item->quantity = $itemData['quantity'] ?? 1;
+                            $item->unit_price = $itemData['unit_price'] ?? 0;
+                            $item->product_id = $itemData['product_id'] ?? null;
+                            $item->save();
+                        }
+                    }
+                }
+                
                 if ($model->save()) {
-                    // Handle invoice items - check both possible data structures
-                    $itemsData = Yii::$app->request->post('items', []);
-                    if (empty($itemsData)) {
-                        $itemsData = Yii::$app->request->post('InvoiceItem', []);
-                    }
-                    
-                    if (!empty($itemsData)) {
-                        $this->saveInvoiceItems($model->id, $itemsData);
-                    }
-                    
-                    // Ensure required fields have default values before calculating totals
-                    if ($model->discount_value === null) $model->discount_value = 0;
-                    if ($model->discount_type === null) $model->discount_type = 'percentage';
-                    if ($model->tax_rate === null) $model->tax_rate = 0;
-                    
-                    // Recalculate totals
-                    $model->calculateTotals();
-                    $model->save();
-                    
                     $transaction->commit();
-                    
-                    Yii::$app->session->setFlash('success', 'Invoice updated successfully.');
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Invoice updated successfully.'));
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                Yii::$app->session->setFlash('error', 'Failed to update invoice: ' . $e->getMessage());
+                Yii::error('Error updating invoice: ' . $e->getMessage(), 'app');
+                Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while updating the invoice. Please try again.'));
             }
         }
 
-        $customers = Customer::findActiveByCompany($model->company_id)->all();
-
         return $this->render('update', [
             'model' => $model,
-            'company' => $model->company,
             'customers' => $customers,
         ]);
     }
 
     /**
      * Deletes an existing Invoice model.
-     *
-     * @param int $id ID
-     * @return Response
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
-        
-        if ($model->status === \app\models\Invoice::STATUS_VOID) {
-            Yii::$app->session->setFlash('error', 'This invoice is already void.');
-            return $this->redirect(['index']);
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
         }
 
-        if ($model->markAsVoid()) {
-            Yii::$app->session->setFlash('success', 'Invoice marked as void successfully.');
+        $model = $this->findModel($id, $company->id);
+        
+        // Prevent deletion if invoice is not in draft status
+        if ($model->status !== Invoice::STATUS_DRAFT) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only draft invoices can be deleted.'));
+            return $this->redirect(['index']);
+        }
+        
+        // Delete associated items and payments first
+        InvoiceItem::deleteAll(['invoice_id' => $model->id]);
+        Payment::deleteAll(['invoice_id' => $model->id]);
+        
+        if ($model->delete()) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Invoice deleted successfully.'));
         } else {
-            Yii::$app->session->setFlash('error', 'Failed to mark invoice as void.');
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while deleting the invoice. Please try again.'));
         }
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Preview invoice
-     *
-     * @param int $id
-     * @return string
-     * @throws NotFoundHttpException
-     */
-    public function actionPreview($id)
-    {
-        $model = $this->findModel($id);
-        
-        return $this->render('preview', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Download invoice as PDF
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionDownloadPdf($id)
-    {
-        $model = $this->findModel($id);
-        
-        // Mark as printed if in draft status
-        $model->markAsPrinted();
-        
-        // Generate and output PDF
-        return PdfGenerator::generateInvoicePdf($model, 'D');
-    }
-
-    /**
-     * Print invoice
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionPrint($id)
-    {
-        $model = $this->findModel($id);
-        
-        // Mark as printed if in draft status
-        $model->markAsPrinted();
-        
-        // Generate PDF using PdfGenerator
-        return PdfGenerator::generateInvoicePdf($model, 'D');
-    }
-
-    /**
-     * Send invoice email
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionSendEmail($id)
-    {
-        $model = $this->findModel($id);
-        
-        if (!$model->canBeSent()) {
-            Yii::$app->session->setFlash('error', 'Invoice cannot be sent.');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if (Yii::$app->request->isPost) {
-            $emailData = Yii::$app->request->post();
-            
-            // TODO: Implement email sending logic
-            // This would integrate with SMTP2GO API
-            
-            // Only update status to SENT if it's currently DRAFT
-            if ($model->status === Invoice::STATUS_DRAFT) {
-                $model->status = Invoice::STATUS_SENT;
-                $model->save();
-            }
-            
-            Yii::$app->session->setFlash('success', 'Invoice sent successfully.');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('send-email', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Send invoice email via AJAX
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionSendEmailAjax($id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        
-        $model = $this->findModel($id);
-        
-        if (!$model->canBeSent()) {
-            return [
-                'success' => false,
-                'message' => 'Invoice cannot be sent.',
-            ];
-        }
-
-        $recipientEmail = Yii::$app->request->post('recipient_email');
-        $subject = Yii::$app->request->post('subject');
-        $message = Yii::$app->request->post('message');
-        $attachPdf = (bool) Yii::$app->request->post('attach_pdf', true);
-
-        if (empty($recipientEmail) || empty($subject) || empty($message)) {
-            return [
-                'success' => false,
-                'message' => 'All fields are required.',
-            ];
-        }
-
-        // Send email
-        $result = EmailSender::sendInvoiceEmail($model, $recipientEmail, $subject, $message, $attachPdf);
-        
-        if ($result['success']) {
-            // Update invoice status only if it's currently DRAFT
-            if ($model->status === Invoice::STATUS_DRAFT) {
-                $model->status = Invoice::STATUS_SENT;
-                $model->save();
-            }
-        }
-        
-        return $result;
-    }
-
-    /**
-     * Get invoice data as JSON
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionGetData($id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        
-        $model = $this->findModel($id);
-        
-        return [
-            'invoice' => $model->toArray(),
-            'customer' => $model->customer->toArray(),
-            'company' => $model->company->toArray(),
-            'items' => InvoiceItem::getItemsArray($model->id),
-        ];
-    }
-
-    /**
-     * Calculate invoice totals via AJAX
-     *
-     * @return Response
-     */
-    public function actionCalculateTotals()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        
-        $itemsData = Json::decode(Yii::$app->request->post('items', '[]'));
-        $taxRate = (float) Yii::$app->request->post('taxRate', 10);
-        
-        $subtotal = 0;
-        foreach ($itemsData as $item) {
-            if (!empty($item['quantity']) && !empty($item['rate'])) {
-                $subtotal += (float) $item['quantity'] * (float) $item['rate'];
-            }
-        }
-        
-        $taxAmount = $subtotal * ($taxRate / 100);
-        $total = $subtotal + $taxAmount;
-        
-        return [
-            'subtotal' => number_format($subtotal, 2),
-            'taxAmount' => number_format($taxAmount, 2),
-            'total' => number_format($total, 2),
-        ];
-    }
-
-    /**
-     * Search customers via AJAX
-     *
-     * @return Response
-     */
-    public function actionSearchCustomers()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        
-        $term = Yii::$app->request->get('term', '');
-        $company = Company::getCurrent();
-        
-        if (!$company || empty($term)) {
-            return [];
-        }
-        
-        $customers = Customer::search($term, $company->id)->limit(10)->all();
-        
-        $result = [];
-        foreach ($customers as $customer) {
-            $result[] = [
-                'id' => $customer->id,
-                'text' => $customer->getDisplayName(),
-                'name' => $customer->customer_name,
-                'email' => $customer->customer_email,
-                'phone' => $customer->customer_phone,
-                'address' => $customer->customer_address,
-            ];
-        }
-        
-        return $result;
-    }
-
-    /**
-     * Save invoice items
-     *
-     * @param int $invoiceId
-     * @param array $itemsData
-     */
-    protected function saveInvoiceItems($invoiceId, $itemsData)
-    {
-        // Delete existing items
-        InvoiceItem::deleteAll(['invoice_id' => $invoiceId]);
-        
-        // Log items data for debugging
-        Yii::info('Saving invoice items: ' . print_r($itemsData, true));
-        
-        // Save new items
-        foreach ($itemsData as $index => $itemData) {
-            if (empty($itemData['product_service_name']) && empty($itemData['description'])) {
-                continue; // Skip empty rows
-            }
-            
-            $item = new InvoiceItem();
-            $item->invoice_id = $invoiceId;
-            $item->product_id = !empty($itemData['product_id']) ? $itemData['product_id'] : null;
-            $item->product_service_name = $itemData['product_service_name'] ?? '';
-            $item->description = $itemData['description'] ?? '';
-            $item->quantity = !empty($itemData['quantity']) ? (float)$itemData['quantity'] : 1;
-            $item->rate = !empty($itemData['rate']) ? (float)$itemData['rate'] : 0;
-            $item->amount = $item->quantity * $item->rate;
-            $item->is_taxable = isset($itemData['is_taxable']) ? (bool)$itemData['is_taxable'] : false;
-            $item->sort_order = $index + 1;
-            $item->tax_rate = 0; // Set default tax rate
-            $item->tax_amount = 0; // Set default tax amount
-            
-            if (!$item->save()) {
-                Yii::error('Failed to save invoice item: ' . print_r($item->errors, true));
-                throw new \Exception('Failed to save invoice item: ' . implode(', ', array_map(function($errors) {
-                    return implode(', ', $errors);
-                }, $item->errors)));
-            }
-        }
-    }
-
-    /**
      * Finds the Invoice model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * Also ensures the invoice belongs to the current company.
-     *
-     * @param int $id ID
+     * If the data model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @param integer $companyId
      * @return Invoice the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $companyId)
     {
-        $company = Company::getCurrent();
-        if (!$company) {
-            throw new NotFoundHttpException('No company selected.');
-        }
-        
-        $model = Invoice::find()
-            ->where(['id' => $id, 'company_id' => $company->id])
-            ->with(['invoiceItems'])
-            ->one();
-            
-        if ($model !== null) {
+        if (($model = Invoice::findOne(['id' => $id, 'company_id' => $companyId])) !== null) {
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
     /**
-     * Duplicate an existing Invoice.
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
+     * Preview the Invoice as PDF
+     * @param integer $id
+     * @return mixed
      */
-    public function actionDuplicate($id)
+    public function actionPreview($id)
     {
-        $model = $this->findModel($id);
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
         
-        $newInvoice = $model->duplicate();
+        // Set response format to HTML for PDF generation
+        Yii::$app->response->format = Response::FORMAT_HTML;
         
-        if ($newInvoice) {
-            Yii::$app->session->setFlash('success', 'Invoice duplicated successfully.');
-            return $this->redirect(['update', 'id' => $newInvoice->id]);
-        } else {
-            Yii::$app->session->setFlash('error', 'Failed to duplicate invoice.');
+        return $this->renderPartial('/invoice/print', [
+            'model' => $model,
+            'company' => $company,
+            'isPreview' => true
+        ]);
+    }
+    
+    /**
+     * Send invoice via email
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionSendEmail($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Only send emails for draft/sent invoices
+        if (!in_array($model->status, [Invoice::STATUS_DRAFT, Invoice::STATUS_SENT])) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only draft or sent invoices can be emailed.'));
             return $this->redirect(['view', 'id' => $model->id]);
         }
-    }
-
-
-    /**
-     * View payments for an invoice
-     *
-     * @param int $id
-     * @return string
-     * @throws NotFoundHttpException
-     */
-    public function actionPayments($id)
-    {
-        $invoice = $this->findModel($id);
         
-        return $this->render('payments', [
-            'invoice' => $invoice,
-        ]);
-    }
-
-    /**
-     * Receive payment for one or more invoices for a customer.
-     *
-     * @param int $id The ID of the initial invoice to start the payment from.
-     * @return string|Response
-     * @throws NotFoundHttpException
-     */
-    public function actionReceivePayment($id)
-    {
-        $startInvoice = $this->findModel($id);
-        $customer = $startInvoice->customer;
-
-        if (Yii::$app->request->isPost) {
-            $postData = Yii::$app->request->post();
+        // Check if company has email configuration
+        if (!$company->hasEmailConfiguration()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Email configuration is required. Please configure SMTP2GO in Company Settings.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+        
+        try {
+            // Load email template
+            $emailTemplate = $this->renderPartial('/invoice/email-template', [
+                'model' => $model,
+                'company' => $company,
+            ]);
             
-            // Debug logging
-            Yii::info('Receive payment POST data: ' . print_r($postData, true), __METHOD__);
+            // Send email
+            $result = Yii::$app->emailSender->send(
+                $model->customer->customer_email,
+                Yii::t('app', 'Invoice #{invoiceNumber}', ['invoiceNumber' => $model->invoice_number]),
+                $emailTemplate,
+                $company
+            );
             
-            $totalReceived = (float)($postData['total_amount_received'] ?? 0);
-            $paymentDate = $postData['payment_date'] ?? date('Y-m-d');
-            $paymentMethod = $postData['payment_method'] ?? 'Cash';
-            $notes = $postData['notes'] ?? '';
-            $payments = $postData['payments'] ?? [];
-            
-            Yii::info("Total received: $totalReceived, Payments: " . print_r($payments, true), __METHOD__);
-
-            if ($totalReceived > 0 && !empty($payments)) {
-                Yii::info("Starting payment processing...", __METHOD__);
-                $transaction = Yii::$app->db->beginTransaction();
-                try {
-                    foreach ($payments as $invoiceId => $amount) {
-                        $paymentAmount = (float)$amount;
-                        Yii::info("Processing payment for invoice $invoiceId: $paymentAmount", __METHOD__);
-                        
-                        if ($paymentAmount > 0) {
-                            $invoice = $this->findModel($invoiceId);
-                            if ($invoice->customer_id !== $customer->id) {
-                                throw new \Exception("Invoice {$invoice->invoice_number} does not belong to this customer.");
-                            }
-
-                            $payment = new Payment();
-                            $payment->invoice_id = $invoiceId;
-                            $payment->customer_id = $customer->id;
-                            $payment->company_id = $customer->company_id;
-                            $payment->amount = $paymentAmount;
-                            $payment->payment_date = $paymentDate;
-                            $payment->payment_method = $paymentMethod;
-                            $payment->notes = $notes;
-                            
-                            Yii::info("Payment object created: " . print_r($payment->attributes, true), __METHOD__);
-                            
-                            if (!$payment->save()) {
-                                Yii::error("Payment validation errors: " . print_r($payment->errors, true), __METHOD__);
-                                throw new \Exception("Failed to save payment for invoice {$invoice->invoice_number}: " . implode(', ', array_map(function($errors) {
-                                    return implode(', ', $errors);
-                                }, $payment->errors)));
-                            }
-                            
-                            Yii::info("Payment saved successfully for invoice $invoiceId", __METHOD__);
-                        }
-                    }
-                    $transaction->commit();
-                    Yii::info("All payments committed successfully", __METHOD__);
-                    Yii::$app->session->setFlash('success', 'Payment(s) recorded successfully.');
-                    return $this->redirect(['view', 'id' => $startInvoice->id]);
-                } catch (\Exception $e) {
-                    $transaction->rollBack();
-                    Yii::error("Payment processing failed: " . $e->getMessage(), __METHOD__);
-                    Yii::$app->session->setFlash('error', $e->getMessage());
+            if ($result) {
+                // Update status to sent if it was draft
+                if ($model->status === Invoice::STATUS_DRAFT) {
+                    $model->status = Invoice::STATUS_SENT;
+                    $model->save();
                 }
+                
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Invoice email sent successfully to {email}.', ['email' => $model->customer->customer_email]));
             } else {
-                Yii::info("Payment not processed - totalReceived: $totalReceived, payments empty: " . (empty($payments) ? 'yes' : 'no'), __METHOD__);
-                Yii::$app->session->setFlash('error', 'Please enter a payment amount and select at least one invoice.');
+                Yii::$app->session->setFlash('error', Yii::t('app', 'Failed to send invoice email. Please check your email configuration.'));
             }
+        } catch (\Exception $e) {
+            Yii::error('Error sending invoice email: ' . $e->getMessage(), 'app');
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while sending the invoice email. Please try again.'));
         }
 
-        $outstandingInvoices = $customer->getOutstandingInvoices()->all();
-
-        return $this->render('receive-payment', [
-            'customer' => $customer,
-            'outstandingInvoices' => $outstandingInvoices,
-            'startInvoice' => $startInvoice,
-        ]);
+        return $this->redirect(['view', 'id' => $model->id]);
     }
+    
+    /**
+     * Download invoice as PDF
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDownloadPdf($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
 
+        $model = $this->findModel($id, $company->id);
+        
+        // Generate PDF filename
+        $filename = 'Invoice-' . $model->invoice_number . '.pdf';
+        
+        // Set response headers for PDF download
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        Yii::$app->response->headers->add('Content-Type', 'application/pdf');
+        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        
+        // Render PDF content
+        $content = $this->renderPartial('/invoice/print', [
+            'model' => $model,
+            'company' => $company,
+            'isPreview' => false
+        ]);
+        
+        // Generate PDF using TCPDF
+        $pdf = Yii::$app->pdfGenerator->generate($content, $company);
+        
+        return $pdf->Output($filename, 'D'); // D = Download
+    }
+    
+    /**
+     * Mark invoice as paid
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMarkAsPaid($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Only mark as paid if invoice is not already paid
+        if ($model->status !== Invoice::STATUS_PAID) {
+            $model->status = Invoice::STATUS_PAID;
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Invoice marked as paid successfully.'));
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while marking the invoice as paid. Please try again.'));
+            }
+        } else {
+            Yii::$app->session->setFlash('info', Yii::t('app', 'Invoice is already marked as paid.'));
+        }
+
+        return $this->redirect(['view', 'id' => $model->id]);
+    }
+    
     /**
      * Export invoices to CSV
-     *
-     * @return Response
+     * @return mixed
      */
     public function actionExport()
     {
@@ -752,151 +470,182 @@ class InvoiceController extends Controller
             return $this->redirect(['company/select']);
         }
 
+        // Get all invoices for the company
         $invoices = Invoice::find()
             ->where(['company_id' => $company->id])
-            ->with(['customer'])
+            ->with('customer')
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
-
+        
         // Set response headers for CSV download
+        $filename = 'Invoices-' . date('Y-m-d') . '.csv';
         Yii::$app->response->format = Response::FORMAT_RAW;
-        Yii::$app->response->headers->add('Content-Type', 'text/csv; charset=utf-8');
-        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="invoices.csv"');
-
+        Yii::$app->response->headers->add('Content-Type', 'text/csv');
+        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        
         // Create CSV content
         $output = fopen('php://output', 'w');
         
-        // Add BOM for UTF-8
-        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-        
-        // Add headers
+        // Add CSV headers
         fputcsv($output, [
             'Invoice Number',
-            'Customer',
+            'Customer Name',
             'Invoice Date',
             'Due Date',
+            'Amount',
             'Status',
-            'Total Amount',
-            'Paid Amount',
-            'Balance Due',
-            'Currency',
             'Created At'
         ]);
-
-        // Add data
+        
+        // Add invoice data
         foreach ($invoices as $invoice) {
             fputcsv($output, [
                 $invoice->invoice_number,
-                $invoice->customer->customer_name,
-                $invoice->invoice_date,
-                $invoice->due_date,
+                $invoice->customer ? $invoice->customer->customer_name : '',
+                Yii::$app->formatter->asDate($invoice->invoice_date),
+                Yii::$app->formatter->asDate($invoice->due_date),
+                $invoice->formatAmount($invoice->total_amount),
                 $invoice->getStatusLabel(),
-                $invoice->total_amount,
-                $invoice->getTotalPaidAmount(),
-                $invoice->getRemainingBalance(),
-                $invoice->currency,
-                $invoice->created_at,
+                Yii::$app->formatter->asDatetime($invoice->created_at)
             ]);
         }
-
+        
         fclose($output);
-        return Yii::$app->response;
+        exit;
     }
-
+    
     /**
-     * Calculate automatic tax rate for invoice
-     *
-     * @return Response
+     * Receive payment for invoice
+     * @param integer $id
+     * @return mixed
      */
-    public function actionCalculateTax()
+    public function actionReceivePayment($id)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $invoice = $this->findModel($id, $company->id);
         
-        if (!Yii::$app->request->isPost) {
-            return ['success' => false, 'message' => 'Only POST requests allowed'];
+        // Only receive payments for sent or overdue invoices
+        if (!in_array($invoice->status, [Invoice::STATUS_SENT, Invoice::STATUS_OVERDUE])) {
+            Yii::$app->session->setFlash('error', Yii::t('app/invoice', 'Payments can only be received for sent or overdue invoices.'));
+            return $this->redirect(['view', 'id' => $invoice->id]);
         }
         
-        $data = Json::decode(Yii::$app->request->rawBody);
-        $customerId = $data['customer_id'] ?? null;
-        $companyId = $data['company_id'] ?? null;
-        
-        if (!$customerId || !$companyId) {
-            return [
-                'success' => false, 
-                'message' => Yii::t('app/invoice', 'Customer and company are required')
-            ];
+        $model = new Payment();
+        $model->invoice_id = $invoice->id;
+        $model->payment_date = date('Y-m-d');
+        $model->amount = $invoice->getAmountDue();
+        $model->currency = $invoice->currency;
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            // Update invoice status based on payment
+            $amountDue = $invoice->getAmountDue();
+            if ($amountDue <= 0) {
+                $invoice->status = Invoice::STATUS_PAID;
+            } elseif ($amountDue < $invoice->total_amount) {
+                $invoice->status = Invoice::STATUS_PARTIAL;
+            }
+            
+            if ($invoice->save()) {
+                Yii::$app->session->setFlash('success', Yii::t('app/invoice', 'Payment received successfully.'));
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app/invoice', 'Payment received, but there was an error updating the invoice status.'));
+            }
+            
+            return $this->redirect(['view', 'id' => $invoice->id]);
         }
+
+        return $this->render('receive-payment', [
+            'invoice' => $invoice,
+            'model' => $model,
+        ]);
+    }
+    
+    /**
+     * Duplicate invoice
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDuplicate($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $originalInvoice = $this->findModel($id, $company->id);
+        
+        // Check if user can create more invoices this month
+        $user = Yii::$app->user->identity;
+        if (!$user->canCreateInvoice()) {
+            $plan = $user->getCurrentPlan();
+            $planName = $plan ? $plan->name : 'Free';
+            $limit = $plan ? $plan->getMonthlyInvoiceLimit() : 5;
+            
+            Yii::$app->session->setFlash('error', Yii::t('invoice', 'You have reached your monthly invoice limit of {limit} for the {plan} plan. Please upgrade your plan to create more invoices.', [
+                'limit' => $limit,
+                'plan' => $planName
+            ]));
+            
+            return $this->redirect(['view', 'id' => $originalInvoice->id]);
+        }
+        
+        // Check if user's subscription is cancelled or expired
+        if ($user->hasCancelledOrExpiredSubscription()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Your subscription has been cancelled or expired. Please renew your subscription to create new invoices.'));
+            return $this->redirect(['view', 'id' => $originalInvoice->id]);
+        }
+        
+        $transaction = Yii::$app->db->beginTransaction();
         
         try {
-            $customer = Customer::findOne($customerId);
-            $company = Company::findOne($companyId);
+            // Create new invoice
+            $newInvoice = new Invoice();
+            $newInvoice->company_id = $originalInvoice->company_id;
+            $newInvoice->customer_id = $originalInvoice->customer_id;
+            $newInvoice->invoice_date = date('Y-m-d');
+            $newInvoice->due_date = date('Y-m-d', strtotime('+30 days'));
+            $newInvoice->invoice_number = $company->generateInvoiceNumber();
+            $newInvoice->reference = $originalInvoice->reference;
+            $newInvoice->currency = $originalInvoice->currency;
+            $newInvoice->tax_rate = $originalInvoice->tax_rate;
+            $newInvoice->status = Invoice::STATUS_DRAFT;
+            $newInvoice->subtotal = $originalInvoice->subtotal;
+            $newInvoice->tax_amount = $originalInvoice->tax_amount;
+            $newInvoice->total_amount = $originalInvoice->total_amount;
+            $newInvoice->discount_type = $originalInvoice->discount_type;
+            $newInvoice->discount_value = $originalInvoice->discount_value;
+            $newInvoice->discount_amount = $originalInvoice->discount_amount;
+            $newInvoice->deposit_amount = $originalInvoice->deposit_amount;
             
-            if (!$customer || !$company) {
-                return [
-                    'success' => false, 
-                    'message' => Yii::t('app/invoice', 'Customer or company not found')
-                ];
-            }
-            
-            // Create a temporary invoice to calculate tax
-            $invoice = new Invoice();
-            $invoice->customer_id = $customerId;
-            $invoice->company_id = $companyId;
-            if ($invoice->hasAttribute('tax_calculation_mode')) {
-                $invoice->tax_calculation_mode = Invoice::TAX_MODE_AUTOMATIC;
-            }
-            
-            // Calculate automatic tax rate
-            $taxRate = $invoice->calculateAutomaticTaxRate($customer, $company);
-            
-            if ($taxRate !== null) {
-                $details = Json::decode($invoice->tax_calculation_details);
-                $message = Yii::t('app/invoice', 'Tax rate calculated automatically based on customer address');
-                $messageType = 'success';
-                
-                // Check if fallback was used and modify message accordingly
-                if (!empty($details['used_fallback']) && $details['used_fallback'] === true) {
-                    $fallbackReason = $details['fallback_reason'] ?? 'unknown';
-                    
-                    if ($fallbackReason === 'no_data_in_table') {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (tax rate database is empty)');
-                        $messageType = 'warning';
-                    } elseif ($fallbackReason === 'database_error') {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (database connection error)');
-                        $messageType = 'warning';
-                    } else {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates');
-                        $messageType = 'warning';
-                    }
+            if ($newInvoice->save()) {
+                // Copy invoice items
+                foreach ($originalInvoice->invoiceItems as $originalItem) {
+                    $newItem = new InvoiceItem();
+                    $newItem->invoice_id = $newInvoice->id;
+                    $newItem->description = $originalItem->description;
+                    $newItem->quantity = $originalItem->quantity;
+                    $newItem->unit_price = $originalItem->unit_price;
+                    $newItem->product_id = $originalItem->product_id;
+                    $newItem->save();
                 }
                 
-                return [
-                    'success' => true,
-                    'tax_rate' => $taxRate,
-                    'message' => $message,
-                    'message_type' => $messageType,
-                    'details' => $details
-                ];
+                $transaction->commit();
+                
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Invoice duplicated successfully.'));
+                return $this->redirect(['update', 'id' => $newInvoice->id]);
             } else {
-                // Fallback to company default
-                return [
-                    'success' => true,
-                    'tax_rate' => $company->tax_rate ?? 0,
-                    'message' => Yii::t('app/invoice', 'Using company default tax rate (address not found or invalid)'),
-                    'message_type' => 'info'
-                ];
+                throw new \Exception('Failed to duplicate invoice');
             }
-            
         } catch (\Exception $e) {
-            Yii::error("Tax calculation controller error: " . $e->getMessage() . 
-                      " | Customer ID: " . $customerId . 
-                      " | Company ID: " . $companyId);
-            return [
-                'success' => false,
-                'message' => Yii::t('app/invoice', 'Error calculating tax rate'),
-                'error' => YII_DEBUG ? $e->getMessage() : null,
-                'fallback_rate' => isset($company) ? ($company->tax_rate ?? 0) : 0
-            ];
+            $transaction->rollBack();
+            Yii::error('Error duplicating invoice: ' . $e->getMessage(), 'app');
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while duplicating the invoice. Please try again.'));
         }
+        
+        return $this->redirect(['view', 'id' => $id]);
     }
 }

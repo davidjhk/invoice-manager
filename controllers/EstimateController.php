@@ -7,15 +7,14 @@ use app\models\Estimate;
 use app\models\EstimateItem;
 use app\models\Company;
 use app\models\Customer;
-use app\models\Invoice;
-use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
 use yii\web\Response;
-use yii\helpers\Json;
-use app\components\PdfGenerator;
+use yii\web\UploadedFile;
+use yii\helpers\Url;
 
 /**
  * EstimateController implements the CRUD actions for Estimate model.
@@ -28,20 +27,13 @@ class EstimateController extends Controller
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'], // Only authenticated users
-                    ],
-                ],
-            ],
             'verbs' => [
-                'class' => VerbFilter::class,
+                'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-                    'convert-to-invoice' => ['POST'],
+                    'send-email' => ['POST'],
+                    'download-pdf' => ['GET'],
+                    'duplicate' => ['POST'],
                 ],
             ],
         ];
@@ -49,8 +41,7 @@ class EstimateController extends Controller
 
     /**
      * Lists all Estimate models.
-     *
-     * @return string
+     * @return mixed
      */
     public function actionIndex()
     {
@@ -59,37 +50,25 @@ class EstimateController extends Controller
             return $this->redirect(['company/select']);
         }
 
-        $searchTerm = Yii::$app->request->get('search', '');
-        $statusFilter = Yii::$app->request->get('status', '');
+        $searchTerm = Yii::$app->request->get('search');
+        $statusFilter = Yii::$app->request->get('status');
 
         $query = Estimate::find()
             ->where(['company_id' => $company->id])
-            ->with(['customer', 'estimateItems'])
-            ->orderBy(['estimate_number' => SORT_DESC]);
-
-        // Exclude void status by default unless specifically filtering for void
-        if ($statusFilter !== 'void') {
-            $query->andWhere(['!=', 'status', Estimate::STATUS_VOID]);
-        }
+            ->orderBy(['created_at' => SORT_DESC]);
 
         // Apply search filter
         if (!empty($searchTerm)) {
-            $query->joinWith(['customer'])
-                ->andWhere(['or',
-                    ['like', 'estimate_number', $searchTerm],
-                    ['like', 'jdosa_customers.customer_name', $searchTerm],
-                    ['like', 'notes', $searchTerm],
-                ]);
+            $query->andWhere([
+                'or',
+                ['like', 'estimate_number', $searchTerm],
+                ['like', 'LOWER(reference)', strtolower($searchTerm)],
+            ]);
         }
 
         // Apply status filter
         if (!empty($statusFilter)) {
-            if ($statusFilter === 'expired') {
-                $query->andWhere(['status' => 'sent'])
-                    ->andWhere(['<', 'expiry_date', date('Y-m-d')]);
-            } else {
-                $query->andWhere(['status' => $statusFilter]);
-            }
+            $query->andWhere(['status' => $statusFilter]);
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -101,25 +80,27 @@ class EstimateController extends Controller
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-            'company' => $company,
             'searchTerm' => $searchTerm,
             'statusFilter' => $statusFilter,
+            'company' => $company,
         ]);
     }
 
     /**
      * Displays a single Estimate model.
-     *
-     * @param int $id ID
-     * @return string
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        $model = $this->findModel($id);
-        
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
         return $this->render('view', [
-            'model' => $model,
+            'model' => $this->findModel($id, $company->id),
         ]);
     }
 
@@ -134,6 +115,13 @@ class EstimateController extends Controller
         $company = Company::getCurrent();
         if (!$company) {
             return $this->redirect(['company/select']);
+        }
+
+        // Check if user's subscription is cancelled or expired
+        $user = Yii::$app->user->identity;
+        if ($user->hasCancelledOrExpiredSubscription()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Your subscription has been cancelled or expired. Please renew your subscription to create new estimates.'));
+            return $this->redirect(['index']);
         }
 
         $model = new Estimate();
@@ -153,27 +141,32 @@ class EstimateController extends Controller
                     // Handle estimate items
                     $itemsData = Yii::$app->request->post('EstimateItem', []);
                     if (!empty($itemsData)) {
-                        EstimateItem::createMultiple($model->id, $itemsData);
+                        foreach ($itemsData as $itemData) {
+                            if (!empty($itemData['description']) || !empty($itemData['product_id'])) {
+                                $item = new EstimateItem();
+                                $item->estimate_id = $model->id;
+                                $item->description = $itemData['description'] ?? '';
+                                $item->quantity = $itemData['quantity'] ?? 1;
+                                $item->unit_price = $itemData['unit_price'] ?? 0;
+                                $item->product_id = $itemData['product_id'] ?? null;
+                                $item->save();
+                            }
+                        }
                     }
                     
-                    // Recalculate totals
-                    $model->calculateTotals();
-                    $model->save();
-                    
                     $transaction->commit();
-                    
-                    Yii::$app->session->setFlash('success', 'Estimate created successfully.');
-                    return $this->redirect(['preview', 'id' => $model->id]);
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate created successfully.'));
+                    return $this->redirect(['view', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                Yii::$app->session->setFlash('error', 'Failed to create estimate: ' . $e->getMessage());
+                Yii::error('Error creating estimate: ' . $e->getMessage(), 'app');
+                Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while creating the estimate. Please try again.'));
             }
         }
 
         return $this->render('create', [
             'model' => $model,
-            'company' => $company,
             'customers' => $customers,
         ]);
     }
@@ -181,44 +174,64 @@ class EstimateController extends Controller
     /**
      * Updates an existing Estimate model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     *
-     * @param int $id ID
-     * @return string|Response
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $company = $model->company;
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Prevent editing if estimate is not in draft status
+        if ($model->status !== Estimate::STATUS_DRAFT) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only draft estimates can be edited.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+        
         $customers = Customer::findActiveByCompany($company->id)->all();
 
         if ($model->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             
             try {
+                // Delete existing items
+                EstimateItem::deleteAll(['estimate_id' => $model->id]);
+                
+                // Handle estimate items
+                $itemsData = Yii::$app->request->post('EstimateItem', []);
+                if (!empty($itemsData)) {
+                    foreach ($itemsData as $itemData) {
+                        if (!empty($itemData['description']) || !empty($itemData['product_id'])) {
+                            $item = new EstimateItem();
+                            $item->estimate_id = $model->id;
+                            $item->description = $itemData['description'] ?? '';
+                            $item->quantity = $itemData['quantity'] ?? 1;
+                            $item->unit_price = $itemData['unit_price'] ?? 0;
+                            $item->product_id = $itemData['product_id'] ?? null;
+                            $item->save();
+                        }
+                    }
+                }
+                
                 if ($model->save()) {
-                    // Handle estimate items
-                    $itemsData = Yii::$app->request->post('EstimateItem', []);
-                    EstimateItem::createMultiple($model->id, $itemsData);
-                    
-                    // Recalculate totals
-                    $model->calculateTotals();
-                    $model->save();
-                    
                     $transaction->commit();
-                    
-                    Yii::$app->session->setFlash('success', 'Estimate updated successfully.');
-                    return $this->redirect(['preview', 'id' => $model->id]);
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate updated successfully.'));
+                    return $this->redirect(['view', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                Yii::$app->session->setFlash('error', 'Failed to update estimate: ' . $e->getMessage());
+                Yii::error('Error updating estimate: ' . $e->getMessage(), 'app');
+                Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while updating the estimate. Please try again.'));
             }
         }
 
         return $this->render('update', [
             'model' => $model,
-            'company' => $company,
             'customers' => $customers,
         ]);
     }
@@ -226,514 +239,309 @@ class EstimateController extends Controller
     /**
      * Deletes an existing Estimate model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     *
-     * @param int $id ID
-     * @return Response
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        
-        if ($model->status === \app\models\Estimate::STATUS_VOID) {
-            Yii::$app->session->setFlash('error', 'This estimate is already void.');
-            return $this->redirect(['index']);
-        }
-        
-        if ($model->converted_to_invoice) {
-            Yii::$app->session->setFlash('error', 'Cannot void estimate that has been converted to invoice.');
-        } else {
-            if ($model->markAsVoid()) {
-                Yii::$app->session->setFlash('success', 'Estimate marked as void successfully.');
-            } else {
-                Yii::$app->session->setFlash('error', 'Failed to mark estimate as void.');
-            }
-        }
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Convert estimate to invoice
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionConvertToInvoice($id)
-    {
-        $model = $this->findModel($id);
-        
-        if (!$model->canConvertToInvoice()) {
-            Yii::$app->session->setFlash('error', 'Estimate cannot be converted to invoice. It must be accepted and not already converted.');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        $invoice = $model->convertToInvoice();
-        
-        if ($invoice) {
-            Yii::$app->session->setFlash('success', 'Estimate converted to invoice successfully.');
-            return $this->redirect(['/invoice/preview', 'id' => $invoice->id]);
-        } else {
-            Yii::$app->session->setFlash('error', 'Failed to convert estimate to invoice.');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-    }
-
-    /**
-     * Duplicate an estimate
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionDuplicate($id)
-    {
-        $originalEstimate = $this->findModel($id);
-        $company = $originalEstimate->company;
-        
-        $transaction = Yii::$app->db->beginTransaction();
-        
-        try {
-            // Create new estimate
-            $newEstimate = new Estimate();
-            $newEstimate->attributes = $originalEstimate->attributes;
-            $newEstimate->id = null; // Reset ID
-            $newEstimate->estimate_number = $company->generateEstimateNumber();
-            $newEstimate->estimate_date = date('Y-m-d');
-            $newEstimate->expiry_date = null; // Will be set automatically
-            $newEstimate->status = Estimate::STATUS_DRAFT;
-            $newEstimate->converted_to_invoice = false;
-            $newEstimate->invoice_id = null;
-            
-            if (!$newEstimate->save()) {
-                throw new \Exception('Failed to duplicate estimate: ' . json_encode($newEstimate->errors));
-            }
-            
-            // Copy estimate items
-            foreach ($originalEstimate->estimateItems as $originalItem) {
-                $newItem = new EstimateItem();
-                $newItem->attributes = $originalItem->attributes;
-                $newItem->id = null; // Reset ID
-                $newItem->estimate_id = $newEstimate->id;
-                
-                if (!$newItem->save()) {
-                    throw new \Exception('Failed to duplicate estimate item: ' . json_encode($newItem->errors));
-                }
-            }
-            
-            // Recalculate totals
-            $newEstimate->calculateTotals();
-            $newEstimate->save();
-            
-            $transaction->commit();
-            
-            Yii::$app->session->setFlash('success', 'Estimate duplicated successfully.');
-            return $this->redirect(['view', 'id' => $newEstimate->id]);
-            
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::$app->session->setFlash('error', 'Failed to duplicate estimate: ' . $e->getMessage());
-            return $this->redirect(['view', 'id' => $originalEstimate->id]);
-        }
-    }
-
-    /**
-     * Change estimate status
-     *
-     * @param int $id
-     * @param string $status
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionChangeStatus($id, $status)
-    {
-        $model = $this->findModel($id);
-        
-        if (!in_array($status, array_keys(Estimate::getStatusOptions()))) {
-            throw new NotFoundHttpException('Invalid status.');
-        }
-        
-        $model->status = $status;
-        
-        if ($model->save()) {
-            Yii::$app->session->setFlash('success', 'Estimate status updated successfully.');
-        } else {
-            Yii::$app->session->setFlash('error', 'Failed to update estimate status.');
-        }
-        
-        return $this->redirect(['view', 'id' => $model->id]);
-    }
-
-    /**
-     * Get estimate data for AJAX requests
-     *
-     * @param int $id
-     * @return array
-     * @throws NotFoundHttpException
-     */
-    public function actionGetData($id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        
-        $model = $this->findModel($id);
-        
-        return [
-            'success' => true,
-            'estimate' => [
-                'id' => $model->id,
-                'estimate_number' => $model->estimate_number,
-                'customer_name' => $model->customer->customer_name,
-                'total_amount' => $model->total_amount,
-                'status' => $model->status,
-                'items' => EstimateItem::getItemsArray($model->id),
-            ],
-        ];
-    }
-
-    /**
-     * Preview estimate as PDF
-     *
-     * @param int $id
-     * @return string
-     * @throws NotFoundHttpException
-     */
-    public function actionPreview($id)
-    {
-        $model = $this->findModel($id);
-        
-        return $this->render('preview', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Print estimate
-     *
-     * @param int $id
-     * @return string
-     * @throws NotFoundHttpException
-     */
-    public function actionPrint($id)
-    {
-        $model = $this->findModel($id);
-        
-        // Mark as printed if in draft status
-        $model->markAsPrinted();
-        
-        // Generate PDF using PdfGenerator
-        return PdfGenerator::generateEstimatePdf($model, 'D');
-    }
-
-    /**
-     * Send estimate via email
-     *
-     * @param int $id
-     * @return string|Response
-     * @throws NotFoundHttpException
-     */
-    public function actionSendEmail($id)
-    {
-        $model = $this->findModel($id);
-        
-        if (!$model->customer->customer_email) {
-            Yii::$app->session->setFlash('error', 'Customer does not have an email address.');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        $emailData = [
-            'to' => $model->customer->customer_email,
-            'cc' => '',
-            'bcc' => '',
-            'subject' => 'Estimate ' . $model->estimate_number . ' from ' . $model->company->company_name,
-            'message' => $this->renderEmailTemplate($model),
-        ];
-
-        if (Yii::$app->request->isPost) {
-            $post = Yii::$app->request->post();
-            $emailData = array_merge($emailData, $post);
-            
-            try {
-                $this->sendEstimateEmail($model, $emailData);
-                
-                // Update estimate status to sent if it was draft
-                if ($model->status === Estimate::STATUS_DRAFT) {
-                    $model->status = Estimate::STATUS_SENT;
-                    $model->save();
-                }
-                
-                Yii::$app->session->setFlash('success', 'Estimate sent successfully.');
-                return $this->redirect(['view', 'id' => $model->id]);
-                
-            } catch (\Exception $e) {
-                Yii::$app->session->setFlash('error', 'Failed to send estimate: ' . $e->getMessage());
-            }
-        }
-
-        return $this->render('send-email', [
-            'model' => $model,
-            'emailData' => $emailData,
-        ]);
-    }
-
-    /**
-     * Download estimate as PDF
-     *
-     * @param int $id
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionDownloadPdf($id)
-    {
-        $model = $this->findModel($id);
-        
-        // Mark as printed if in draft status
-        $model->markAsPrinted();
-        
-        // Generate PDF using PdfGenerator
-        return PdfGenerator::generateEstimatePdf($model, 'D');
-    }
-
-
-    /**
-     * Send estimate email
-     *
-     * @param Estimate $model
-     * @param array $emailData
-     * @throws \Exception
-     */
-    protected function sendEstimateEmail($model, $emailData)
-    {
-        $mailer = Yii::$app->mailer;
-        
-        $senderEmail = $model->company->sender_email ?: $model->company->company_email;
-        $senderName = $model->company->sender_name ?: $model->company->company_name;
-        
-        $message = $mailer->compose()
-            ->setFrom([$senderEmail => $senderName])
-            ->setTo($emailData['to'])
-            ->setSubject($emailData['subject'])
-            ->setHtmlBody($emailData['message']);
-        
-        // Add CC if provided
-        if (!empty($emailData['cc'])) {
-            $message->setCc($emailData['cc']);
-        }
-        
-        // Add configured BCC email if available, plus any additional BCC addresses
-        $bccAddresses = [];
-        if (!empty($model->company->bcc_email)) {
-            $bccAddresses[] = $model->company->bcc_email;
-        }
-        if (!empty($emailData['bcc'])) {
-            $bccAddresses = array_merge($bccAddresses, (array)$emailData['bcc']);
-        }
-        if (!empty($bccAddresses)) {
-            $message->setBcc($bccAddresses);
-        }
-        
-        // Attach PDF
-        $pdfContent = PdfGenerator::generateEstimatePdf($model, 'S');
-        $message->attachContent($pdfContent, [
-            'fileName' => 'estimate-' . $model->estimate_number . '.pdf',
-            'contentType' => 'application/pdf'
-        ]);
-        
-        if (!$message->send()) {
-            throw new \Exception('Failed to send email.');
-        }
-    }
-
-    /**
-     * Render email template
-     *
-     * @param Estimate $model
-     * @return string
-     */
-    protected function renderEmailTemplate($model)
-    {
-        return $this->renderPartial('email-template', ['model' => $model]);
-    }
-
-    /**
-     * Export estimates
-     *
-     * @return Response
-     */
-    public function actionExport()
     {
         $company = Company::getCurrent();
         if (!$company) {
             return $this->redirect(['company/select']);
         }
 
-        $estimates = Estimate::find()
-            ->where(['company_id' => $company->id])
-            ->with(['customer'])
-            ->orderBy(['created_at' => SORT_DESC])
-            ->all();
-
-        // Set response headers for CSV download
-        Yii::$app->response->format = Response::FORMAT_RAW;
-        Yii::$app->response->headers->add('Content-Type', 'text/csv; charset=utf-8');
-        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="estimates.csv"');
-
-        // Create CSV content
-        $output = fopen('php://output', 'w');
+        $model = $this->findModel($id, $company->id);
         
-        // Add BOM for UTF-8
-        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+        // Prevent deletion if estimate is not in draft status
+        if ($model->status !== Estimate::STATUS_DRAFT) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only draft estimates can be deleted.'));
+            return $this->redirect(['index']);
+        }
         
-        // Add headers
-        fputcsv($output, [
-            'Estimate Number',
-            'Customer',
-            'Estimate Date',
-            'Expiry Date',
-            'Status',
-            'Total Amount',
-            'Currency',
-            'Converted to Invoice',
-            'Created At'
-        ]);
-
-        // Add data
-        foreach ($estimates as $estimate) {
-            fputcsv($output, [
-                $estimate->estimate_number,
-                $estimate->customer->customer_name,
-                $estimate->estimate_date,
-                $estimate->expiry_date,
-                $estimate->getStatusLabel(),
-                $estimate->total_amount,
-                $estimate->currency,
-                $estimate->converted_to_invoice ? 'Yes' : 'No',
-                $estimate->created_at,
-            ]);
+        // Delete associated items first
+        EstimateItem::deleteAll(['estimate_id' => $model->id]);
+        
+        if ($model->delete()) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate deleted successfully.'));
+        } else {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while deleting the estimate. Please try again.'));
         }
 
-        fclose($output);
-        return Yii::$app->response;
+        return $this->redirect(['index']);
     }
 
     /**
      * Finds the Estimate model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * Also ensures the estimate belongs to the current company.
-     *
-     * @param int $id ID
+     * If the data model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @param integer $companyId
      * @return Estimate the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $companyId)
     {
-        $company = Company::getCurrent();
-        if (!$company) {
-            throw new NotFoundHttpException('No company selected.');
-        }
-        
-        $model = Estimate::findOne(['id' => $id, 'company_id' => $company->id]);
-        if ($model !== null) {
+        if (($model = Estimate::findOne(['id' => $id, 'company_id' => $companyId])) !== null) {
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested estimate does not exist.');
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
     /**
-     * Calculate automatic tax rate for estimate
-     *
-     * @return array
+     * Preview the Estimate as PDF
+     * @param integer $id
+     * @return mixed
      */
-    public function actionCalculateTax()
+    public function actionPreview($id)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
         
-        if (!Yii::$app->request->isPost) {
-            return ['success' => false, 'message' => 'Only POST requests allowed'];
+        // Set response format to HTML for PDF generation
+        Yii::$app->response->format = Response::FORMAT_HTML;
+        
+        return $this->renderPartial('/estimate/print', [
+            'model' => $model,
+            'company' => $company,
+            'isPreview' => true
+        ]);
+    }
+    
+    /**
+     * Send estimate via email
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionSendEmail($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Only send emails for sent estimates
+        if ($model->status !== Estimate::STATUS_SENT) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only sent estimates can be emailed.'));
+            return $this->redirect(['view', 'id' => $model->id]);
         }
         
-        $data = Json::decode(Yii::$app->request->rawBody);
-        $customerId = $data['customer_id'] ?? null;
-        $companyId = $data['company_id'] ?? null;
-        
-        if (!$customerId || !$companyId) {
-            return [
-                'success' => false, 
-                'message' => Yii::t('app/invoice', 'Customer and company are required')
-            ];
+        // Check if company has email configuration
+        if (!$company->hasEmailConfiguration()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Email configuration is required. Please configure SMTP2GO in Company Settings.'));
+            return $this->redirect(['view', 'id' => $model->id]);
         }
         
         try {
-            $customer = Customer::findOne($customerId);
-            $company = Company::findOne($companyId);
+            // Load email template
+            $emailTemplate = $this->renderPartial('/estimate/email-template', [
+                'model' => $model,
+                'company' => $company,
+            ]);
             
-            if (!$customer || !$company) {
-                return [
-                    'success' => false, 
-                    'message' => Yii::t('app/invoice', 'Customer or company not found')
-                ];
+            // Send email
+            $result = Yii::$app->emailSender->send(
+                $model->customer->customer_email,
+                Yii::t('app', 'Estimate #{estimateNumber}', ['estimateNumber' => $model->estimate_number]),
+                $emailTemplate,
+                $company
+            );
+            
+            if ($result) {
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate email sent successfully to {email}.', ['email' => $model->customer->customer_email]));
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app', 'Failed to send estimate email. Please check your email configuration.'));
             }
+        } catch (\Exception $e) {
+            Yii::error('Error sending estimate email: ' . $e->getMessage(), 'app');
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while sending the estimate email. Please try again.'));
+        }
+
+        return $this->redirect(['view', 'id' => $model->id]);
+    }
+    
+    /**
+     * Download estimate as PDF
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDownloadPdf($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Generate PDF filename
+        $filename = 'Estimate-' . $model->estimate_number . '.pdf';
+        
+        // Set response headers for PDF download
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        Yii::$app->response->headers->add('Content-Type', 'application/pdf');
+        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        
+        // Render PDF content
+        $content = $this->renderPartial('/estimate/print', [
+            'model' => $model,
+            'company' => $company,
+            'isPreview' => false
+        ]);
+        
+        // Generate PDF using TCPDF
+        $pdf = Yii::$app->pdfGenerator->generate($content, $company);
+        
+        return $pdf->Output($filename, 'D'); // D = Download
+    }
+    
+    /**
+     * Convert estimate to invoice
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionConvertToInvoice($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $estimate = $this->findModel($id, $company->id);
+        
+        // Only convert accepted estimates
+        if ($estimate->status !== Estimate::STATUS_ACCEPTED) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Only accepted estimates can be converted to invoices.'));
+            return $this->redirect(['view', 'id' => $estimate->id]);
+        }
+        
+        // Check user's invoice creation permissions
+        $user = Yii::$app->user->identity;
+        if (!$user->canCreateInvoice()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'You have reached your monthly invoice limit. Please upgrade your plan to create more invoices.'));
+            return $this->redirect(['view', 'id' => $estimate->id]);
+        }
+        
+        $transaction = Yii::$app->db->beginTransaction();
+        
+        try {
+            // Create new invoice
+            $invoice = new \app\models\Invoice();
+            $invoice->company_id = $estimate->company_id;
+            $invoice->customer_id = $estimate->customer_id;
+            $invoice->invoice_date = date('Y-m-d');
+            $invoice->due_date = date('Y-m-d', strtotime('+30 days'));
+            $invoice->invoice_number = $company->generateInvoiceNumber();
+            $invoice->reference = $estimate->estimate_number;
+            $invoice->currency = $estimate->currency;
+            $invoice->tax_rate = $estimate->tax_rate;
+            $invoice->status = \app\models\Invoice::STATUS_DRAFT;
+            $invoice->subtotal = $estimate->subtotal;
+            $invoice->tax_amount = $estimate->tax_amount;
+            $invoice->total_amount = $estimate->total_amount;
+            $invoice->discount_type = $estimate->discount_type;
+            $invoice->discount_value = $estimate->discount_value;
+            $invoice->discount_amount = $estimate->discount_amount;
             
-            // Create a temporary estimate to calculate tax
-            $estimate = new Estimate();
-            $estimate->customer_id = $customerId;
-            $estimate->company_id = $companyId;
-            if ($estimate->hasAttribute('tax_calculation_mode')) {
-                $estimate->tax_calculation_mode = Estimate::TAX_MODE_AUTOMATIC;
-            }
-            
-            // Calculate automatic tax rate
-            $taxRate = $estimate->calculateAutomaticTaxRate($customer, $company);
-            
-            if ($taxRate !== null) {
-                $details = $estimate->hasAttribute('tax_calculation_details') ? Json::decode($estimate->tax_calculation_details) : null;
-                $message = Yii::t('app/invoice', 'Tax rate calculated automatically based on customer address');
-                $messageType = 'success';
-                
-                // Check if fallback was used and modify message accordingly
-                if (!empty($details['used_fallback']) && $details['used_fallback'] === true) {
-                    $fallbackReason = $details['fallback_reason'] ?? 'unknown';
-                    
-                    if ($fallbackReason === 'no_data_in_table') {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (tax rate database is empty)');
-                        $messageType = 'warning';
-                    } elseif ($fallbackReason === 'database_error') {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (database connection error)');
-                        $messageType = 'warning';
-                    } else {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates');
-                        $messageType = 'warning';
-                    }
+            if ($invoice->save()) {
+                // Copy estimate items to invoice items
+                foreach ($estimate->estimateItems as $estimateItem) {
+                    $invoiceItem = new \app\models\InvoiceItem();
+                    $invoiceItem->invoice_id = $invoice->id;
+                    $invoiceItem->description = $estimateItem->description;
+                    $invoiceItem->quantity = $estimateItem->quantity;
+                    $invoiceItem->unit_price = $estimateItem->unit_price;
+                    $invoiceItem->product_id = $estimateItem->product_id;
+                    $invoiceItem->save();
                 }
                 
-                return [
-                    'success' => true,
-                    'tax_rate' => $taxRate,
-                    'message' => $message,
-                    'message_type' => $messageType,
-                    'details' => $details
-                ];
+                $transaction->commit();
+                
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate successfully converted to invoice #{invoiceNumber}.', ['invoiceNumber' => $invoice->invoice_number]));
+                return $this->redirect(['/invoice/view', 'id' => $invoice->id]);
             } else {
-                // Fallback to company default
-                return [
-                    'success' => true,
-                    'tax_rate' => $company->tax_rate ?? 0,
-                    'message' => Yii::t('app/invoice', 'Using company default tax rate (address not found or invalid)'),
-                    'message_type' => 'info'
-                ];
+                throw new \Exception('Failed to create invoice');
             }
-            
         } catch (\Exception $e) {
-            Yii::error("Tax calculation controller error: " . $e->getMessage() . 
-                      " | Customer ID: " . $customerId . 
-                      " | Company ID: " . $companyId);
-            return [
-                'success' => false,
-                'message' => Yii::t('app/invoice', 'Error calculating tax rate'),
-                'error' => YII_DEBUG ? $e->getMessage() : null,
-                'fallback_rate' => isset($company) ? ($company->tax_rate ?? 0) : 0
-            ];
+            $transaction->rollBack();
+            Yii::error('Error converting estimate to invoice: ' . $e->getMessage(), 'app');
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while converting the estimate to an invoice. Please try again.'));
         }
+        
+        return $this->redirect(['view', 'id' => $estimate->id]);
+    }
+    
+    /**
+     * Duplicate estimate
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDuplicate($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $originalEstimate = $this->findModel($id, $company->id);
+        
+        // Check if user's subscription is cancelled or expired
+        $user = Yii::$app->user->identity;
+        if ($user->hasCancelledOrExpiredSubscription()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Your subscription has been cancelled or expired. Please renew your subscription to create new estimates.'));
+            return $this->redirect(['index']);
+        }
+        
+        $transaction = Yii::$app->db->beginTransaction();
+        
+        try {
+            // Create new estimate
+            $newEstimate = new Estimate();
+            $newEstimate->company_id = $originalEstimate->company_id;
+            $newEstimate->customer_id = $originalEstimate->customer_id;
+            $newEstimate->estimate_date = date('Y-m-d');
+            $newEstimate->estimate_number = $company->generateEstimateNumber();
+            $newEstimate->reference = $originalEstimate->reference;
+            $newEstimate->currency = $originalEstimate->currency;
+            $newEstimate->tax_rate = $originalEstimate->tax_rate;
+            $newEstimate->status = Estimate::STATUS_DRAFT;
+            $newEstimate->subtotal = $originalEstimate->subtotal;
+            $newEstimate->tax_amount = $originalEstimate->tax_amount;
+            $newEstimate->total_amount = $originalEstimate->total_amount;
+            $newEstimate->discount_type = $originalEstimate->discount_type;
+            $newEstimate->discount_value = $originalEstimate->discount_value;
+            $newEstimate->discount_amount = $originalEstimate->discount_amount;
+            
+            if ($newEstimate->save()) {
+                // Copy estimate items
+                foreach ($originalEstimate->estimateItems as $originalItem) {
+                    $newItem = new EstimateItem();
+                    $newItem->estimate_id = $newEstimate->id;
+                    $newItem->description = $originalItem->description;
+                    $newItem->quantity = $originalItem->quantity;
+                    $newItem->unit_price = $originalItem->unit_price;
+                    $newItem->product_id = $originalItem->product_id;
+                    $newItem->save();
+                }
+                
+                $transaction->commit();
+                
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate duplicated successfully.'));
+                return $this->redirect(['update', 'id' => $newEstimate->id]);
+            } else {
+                throw new \Exception('Failed to duplicate estimate');
+            }
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::error('Error duplicating estimate: ' . $e->getMessage(), 'app');
+            Yii::$app->session->setFlash('error', Yii::t('app', 'An error occurred while duplicating the estimate. Please try again.'));
+        }
+        
+        return $this->redirect(['view', 'id' => $id]);
     }
 }

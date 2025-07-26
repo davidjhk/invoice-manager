@@ -3,32 +3,31 @@
 namespace app\models;
 
 use Yii;
+use yii\base\NotSupportedException;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "jdosa_users".
+ * User model
  *
- * @property int $id
- * @property string|null $username
+ * @property integer $id
+ * @property string $username
+ * @property string $password_hash
+ * @property string $password_reset_token
  * @property string $email
- * @property string|null $password_hash
- * @property string|null $full_name
- * @property string|null $google_id
- * @property string|null $avatar_url
- * @property string $login_type
- * @property bool $is_active
- * @property bool $email_verified
  * @property string $auth_key
- * @property string|null $password_reset_token
- * @property int $max_companies
- * @property string $role
  * @property string $created_at
  * @property string $updated_at
- *
- * @property Company[] $companies
- * @property UserSubscription[] $subscriptions
+ * @property string $password write-only password
+ * @property string $full_name
+ * @property string $login_type
+ * @property boolean $is_active
+ * @property boolean $email_verified
+ * @property integer $max_companies
+ * @property string $role
+ * @property string $google_id
+ * @property string $avatar_url
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -189,8 +188,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        // Not implemented for this demo
-        return null;
+        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
 
     /**
@@ -457,6 +455,11 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function canCreateMoreCompanies()
     {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
         return $this->getCompanyCount() < $this->max_companies;
     }
 
@@ -467,6 +470,11 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getRemainingCompanySlots()
     {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return PHP_INT_MAX; // Unlimited
+        }
+        
         return max(0, $this->max_companies - $this->getCompanyCount());
     }
 
@@ -514,6 +522,16 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function canCreateInvoice()
     {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return false;
+        }
+        
         $plan = $this->getCurrentPlan();
         
         // No plan means free tier with limitations
@@ -538,10 +556,21 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getRemainingInvoices()
     {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return null; // Unlimited
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return 0;
+        }
+        
         $plan = $this->getCurrentPlan();
         
+        // No plan means free tier with limitations
         if (!$plan) {
-            return max(0, 5 - $this->getMonthlyInvoiceCount());
+            return max(0, 5 - $this->getMonthlyInvoiceCount()); // Free users get 5 invoices
         }
 
         $monthlyLimit = $plan->getMonthlyInvoiceLimit();
@@ -560,6 +589,16 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getInvoiceUsagePercentage()
     {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return null; // Unlimited
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return 100; // Show as 100% used when subscription is cancelled or expired
+        }
+        
         $plan = $this->getCurrentPlan();
         
         if (!$plan) {
@@ -582,6 +621,16 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function canUseImport()
     {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return false;
+        }
+        
         $plan = $this->getCurrentPlan();
         
         // No plan means free tier - no import allowed
@@ -656,6 +705,38 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $subscription = $this->getActiveSubscription();
         return $subscription && $subscription->isActive();
+    }
+
+    /**
+     * Check if user has valid subscription (active or within grace period)
+     *
+     * @return bool
+     */
+    public function hasValidSubscription()
+    {
+        // Admin users always have valid subscription
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        $subscription = $this->getActiveSubscription();
+        return $subscription && ($subscription->isActive() || $subscription->isCancelled() || $subscription->isExpired());
+    }
+
+    /**
+     * Check if user's subscription is cancelled or expired
+     *
+     * @return bool
+     */
+    public function hasCancelledOrExpiredSubscription()
+    {
+        // Admin users never have cancelled or expired subscription
+        if ($this->isAdmin()) {
+            return false;
+        }
+        
+        $subscription = $this->getActiveSubscription();
+        return $subscription && ($subscription->isCancelled() || $subscription->isExpired());
     }
 
     /**
