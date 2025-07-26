@@ -1,4 +1,4 @@
-<?php
+<![CDATA[<?php
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap4\ActiveForm $form */
@@ -76,21 +76,6 @@ $this->context->layout = 'auth';
                 <div class="plan-selection-section">
                     <h5 class="plan-section-title">Choose Your Plan</h5>
                     <div class="plan-options">
-                        <div class="plan-option">
-                            <?= Html::radio('SignupForm[plan_id]', empty($model->plan_id), [
-                                'value' => '',
-                                'id' => 'plan-free',
-                                'class' => 'plan-radio'
-                            ]) ?>
-                            <label for="plan-free" class="plan-label">
-                                <div class="plan-info">
-                                    <div class="plan-name">Free Trial</div>
-                                    <div class="plan-price">$0/month</div>
-                                    <div class="plan-description">Start with our free features</div>
-                                </div>
-                            </label>
-                        </div>
-                        
                         <?php foreach ($plans as $plan): ?>
                         <div class="plan-option">
                             <?= Html::radio('SignupForm[plan_id]', $model->plan_id == $plan->id, [
@@ -120,26 +105,6 @@ $this->context->layout = 'auth';
             </div>
 
             <?php ActiveForm::end(); ?>
-
-            <?php
-            // Check if Google SSO is properly configured
-            $googleClientId = Yii::$app->params['googleClientId'] ?? '';
-            $googleClientSecret = Yii::$app->params['googleClientSecret'] ?? '';
-            $isGoogleSSOEnabled = !empty($googleClientId) && !empty($googleClientSecret);
-            ?>
-
-            <?php if ($isGoogleSSOEnabled): ?>
-            <div class="auth-divider">
-                <span>or</span>
-            </div>
-
-            <div class="auth-social">
-                <a href="<?= \yii\helpers\Url::to(['site/google-login']) ?>" class="btn btn-google btn-block btn-auth">
-                    <i class="fab fa-google"></i>
-                    Sign up with Google
-                </a>
-            </div>
-            <?php endif; ?>
 
             <div class="auth-divider">
                 <span>Already have an account?</span>
@@ -246,4 +211,4 @@ $this->context->layout = 'auth';
     font-weight: bold;
 }
 </style>
-
+]]>
