@@ -491,17 +491,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Get user's current plan
-     *
-     * @return \app\models\Plan|null
-     */
-    public function getCurrentPlan()
-    {
-        $subscription = $this->getCurrentSubscription();
-        return $subscription ? $subscription->plan : null;
-    }
-
-    /**
      * Get monthly invoice count for current month
      *
      * @return int
