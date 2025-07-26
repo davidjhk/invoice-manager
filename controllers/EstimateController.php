@@ -168,6 +168,7 @@ class EstimateController extends Controller
         return $this->render('create', [
             'model' => $model,
             'customers' => $customers,
+            'company' => $company,
         ]);
     }
 
@@ -233,6 +234,7 @@ class EstimateController extends Controller
         return $this->render('update', [
             'model' => $model,
             'customers' => $customers,
+            'company' => $company,
         ]);
     }
 
