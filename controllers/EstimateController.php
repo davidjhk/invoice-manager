@@ -34,6 +34,8 @@ class EstimateController extends Controller
                     'send-email' => ['POST'],
                     'download-pdf' => ['GET'],
                     'duplicate' => ['POST'],
+                    'mark-as-printed' => ['POST'],
+                    'mark-as-accepted' => ['POST'],
                 ],
             ],
         ];
@@ -318,13 +320,8 @@ class EstimateController extends Controller
 
         $model = $this->findModel($id, $company->id);
         
-        // Set response format to HTML for PDF generation
-        Yii::$app->response->format = Response::FORMAT_HTML;
-        
-        return $this->renderPartial('/estimate/print', [
+        return $this->render('preview', [
             'model' => $model,
-            'company' => $company,
-            'isPreview' => true
         ]);
     }
     
@@ -396,6 +393,9 @@ class EstimateController extends Controller
 
         $model = $this->findModel($id, $company->id);
         
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
+        
         // Generate PDF filename
         $filename = 'Estimate-' . $model->estimate_number . '.pdf';
         
@@ -418,6 +418,62 @@ class EstimateController extends Controller
     }
     
     /**
+     * Mark estimate as printed
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMarkAsPrinted($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
+        
+        // Return JSON response for AJAX calls
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['success' => true, 'status' => $model->status];
+        }
+        
+        return $this->redirect(['preview', 'id' => $model->id]);
+    }
+
+    /**
+     * Mark estimate as accepted
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMarkAsAccepted($id)
+    {
+        $company = Company::getCurrent();
+        if (!$company) {
+            return $this->redirect(['company/select']);
+        }
+
+        $model = $this->findModel($id, $company->id);
+        
+        // Mark as accepted
+        if ($model->markAsAccepted()) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate marked as accepted successfully.'));
+        } else {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Failed to mark estimate as accepted.'));
+        }
+        
+        // Return JSON response for AJAX calls
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['success' => true, 'status' => $model->status];
+        }
+        
+        return $this->redirect(['view', 'id' => $model->id]);
+    }
+
+    /**
      * Convert estimate to invoice
      * @param integer $id
      * @return mixed
@@ -431,17 +487,11 @@ class EstimateController extends Controller
 
         $estimate = $this->findModel($id, $company->id);
         
-        // Only convert accepted estimates
-        if ($estimate->status !== Estimate::STATUS_ACCEPTED) {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Only accepted estimates can be converted to invoices.'));
-            return $this->redirect(['view', 'id' => $estimate->id]);
-        }
-        
         // Check user's invoice creation permissions
         $user = Yii::$app->user->identity;
         if (!$user->canCreateInvoice()) {
             Yii::$app->session->setFlash('error', Yii::t('app', 'You have reached your monthly invoice limit. Please upgrade your plan to create more invoices.'));
-            return $this->redirect(['view', 'id' => $estimate->id]);
+            return $this->redirect(['preview', 'id' => $estimate->id]);
         }
         
         $transaction = Yii::$app->db->beginTransaction();
@@ -451,10 +501,11 @@ class EstimateController extends Controller
             $invoice = new \app\models\Invoice();
             $invoice->company_id = $estimate->company_id;
             $invoice->customer_id = $estimate->customer_id;
+            $invoice->user_id = Yii::$app->user->id;
             $invoice->invoice_date = date('Y-m-d');
             $invoice->due_date = date('Y-m-d', strtotime('+30 days'));
             $invoice->invoice_number = $company->generateInvoiceNumber();
-            $invoice->reference = $estimate->estimate_number;
+            $invoice->memo = 'Converted from estimate: ' . $estimate->estimate_number;
             $invoice->currency = $estimate->currency;
             $invoice->tax_rate = $estimate->tax_rate;
             $invoice->status = \app\models\Invoice::STATUS_DRAFT;
@@ -464,23 +515,60 @@ class EstimateController extends Controller
             $invoice->discount_type = $estimate->discount_type;
             $invoice->discount_value = $estimate->discount_value;
             $invoice->discount_amount = $estimate->discount_amount;
+            $invoice->shipping_fee = $estimate->shipping_fee ?? 0;
+            $invoice->notes = $estimate->notes;
+            $invoice->terms = $estimate->terms;
+            $invoice->payment_instructions = $estimate->payment_instructions;
+            $invoice->customer_notes = $estimate->customer_notes;
+            
+            // Copy billing address
+            $invoice->bill_to_address = $estimate->bill_to_address;
+            $invoice->bill_to_city = $estimate->bill_to_city;
+            $invoice->bill_to_state = $estimate->bill_to_state;
+            $invoice->bill_to_zip_code = $estimate->bill_to_zip_code;
+            $invoice->bill_to_country = $estimate->bill_to_country;
+            
+            // Copy shipping address
+            $invoice->ship_to_address = $estimate->ship_to_address;
+            $invoice->ship_to_city = $estimate->ship_to_city;
+            $invoice->ship_to_state = $estimate->ship_to_state;
+            $invoice->ship_to_zip_code = $estimate->ship_to_zip_code;
+            $invoice->ship_to_country = $estimate->ship_to_country;
+            $invoice->ship_from_address = $estimate->ship_from_address;
+            
+            // Copy other fields
+            $invoice->cc_email = $estimate->cc_email;
+            $invoice->shipping_date = $estimate->shipping_date;
+            $invoice->tracking_number = $estimate->tracking_number;
+            $invoice->shipping_method = $estimate->shipping_method;
             
             if ($invoice->save()) {
                 // Copy estimate items to invoice items
                 foreach ($estimate->estimateItems as $estimateItem) {
                     $invoiceItem = new \app\models\InvoiceItem();
                     $invoiceItem->invoice_id = $invoice->id;
+                    $invoiceItem->product_service_name = $estimateItem->product_service_name;
                     $invoiceItem->description = $estimateItem->description;
                     $invoiceItem->quantity = $estimateItem->quantity;
                     $invoiceItem->rate = $estimateItem->rate;
+                    $invoiceItem->amount = $estimateItem->amount;
+                    $invoiceItem->tax_rate = $estimateItem->tax_rate;
+                    $invoiceItem->tax_amount = $estimateItem->tax_amount;
+                    $invoiceItem->is_taxable = $estimateItem->is_taxable;
+                    $invoiceItem->sort_order = $estimateItem->sort_order;
                     $invoiceItem->product_id = $estimateItem->product_id;
                     $invoiceItem->save();
                 }
                 
+                // Update estimate to mark as converted
+                $estimate->converted_to_invoice = true;
+                $estimate->invoice_id = $invoice->id;
+                $estimate->save(false);
+                
                 $transaction->commit();
                 
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Estimate successfully converted to invoice #{invoiceNumber}.', ['invoiceNumber' => $invoice->invoice_number]));
-                return $this->redirect(['/invoice/view', 'id' => $invoice->id]);
+                return $this->redirect(['/invoice/preview', 'id' => $invoice->id]);
             } else {
                 throw new \Exception('Failed to create invoice');
             }

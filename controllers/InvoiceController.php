@@ -42,6 +42,7 @@ class InvoiceController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
+                    'mark-as-printed' => ['POST'],
                 ],
             ],
         ];
@@ -384,6 +385,28 @@ class InvoiceController extends Controller
         
         // Generate PDF using PdfGenerator
         return PdfGenerator::generateInvoicePdf($model, 'D');
+    }
+
+    /**
+     * Mark invoice as printed
+     * @param int $id
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionMarkAsPrinted($id)
+    {
+        $model = $this->findModel($id);
+        
+        // Mark as printed if in draft status
+        $model->markAsPrinted();
+        
+        // Return JSON response for AJAX calls
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['success' => true, 'status' => $model->status];
+        }
+        
+        return $this->redirect(['preview', 'id' => $model->id]);
     }
 
     /**

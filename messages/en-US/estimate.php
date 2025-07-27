@@ -48,6 +48,7 @@ return [
     'Save as Draft' => 'Save as Draft',
     'Send Estimate' => 'Send Estimate',
     'Mark as Accepted' => 'Mark as Accepted',
+    'Are you sure you want to mark this estimate as accepted?' => 'Are you sure you want to mark this estimate as accepted?',
     'Mark as Declined' => 'Mark as Declined',
     'Convert to Invoice' => 'Convert to Invoice',
     'Download PDF' => 'Download PDF',

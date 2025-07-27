@@ -25,7 +25,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/invoice', 'Preview');
 
             <?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/invoice', 'Print'), '#', [
                 'class' => 'btn btn-info',
-                'onclick' => 'window.print(); return false;',
+                'id' => 'print-btn',
+                'data-url' => \yii\helpers\Url::to(['mark-as-printed', 'id' => $model->id]),
                 'encode' => false
             ]) ?>
 
@@ -148,5 +149,33 @@ $this->registerCss("
     .dark-mode .invoice-preview-container .paid-watermark {
         color: rgba(220, 220, 220, 0.3) !important;
     }
+");
+
+$this->registerJs("
+    $('#print-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        var url = $(this).data('url');
+        
+        // Send AJAX request to mark as printed
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                '_csrf': $('meta[name=csrf-token]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Print after marking as printed
+                    window.print();
+                }
+            },
+            error: function() {
+                // Print anyway if request fails
+                window.print();
+            }
+        });
+    });
 ");
 ?>

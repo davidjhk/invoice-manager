@@ -167,6 +167,8 @@ return [
     'Data saved successfully.' => 'Data saved successfully.',
     'Data deleted successfully.' => 'Data deleted successfully.',
     'Data updated successfully.' => 'Data updated successfully.',
+    'Estimate marked as accepted successfully.' => 'Estimate marked as accepted successfully.',
+    'Failed to mark estimate as accepted.' => 'Failed to mark estimate as accepted.',
     'No data found.' => 'No data found.',
     'Access denied.' => 'Access denied.',
     'Permission denied.' => 'Permission denied.',

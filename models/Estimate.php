@@ -581,6 +581,20 @@ class Estimate extends ActiveRecord
     }
 
     /**
+     * Mark estimate as accepted
+     * 
+     * @return bool
+     */
+    public function markAsAccepted()
+    {
+        if (in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT])) {
+            $this->status = self::STATUS_ACCEPTED;
+            return $this->save(false);
+        }
+        return true;
+    }
+
+    /**
      * Mark estimate as void (soft delete)
      * 
      * @return bool
@@ -611,7 +625,7 @@ class Estimate extends ActiveRecord
      */
     public function canConvertToInvoice()
     {
-        return in_array($this->status, [self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED]);
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT, self::STATUS_ACCEPTED]) && !$this->converted_to_invoice;
     }
 
     /**

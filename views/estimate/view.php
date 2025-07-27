@@ -52,6 +52,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			) ?>
 			<?php endif; ?>
 
+			<?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED, \app\models\Estimate::STATUS_SENT])): ?>
+			<?= Html::a('<i class="fas fa-check mr-1"></i>' . Yii::t('app/estimate', 'Mark as Accepted'), ['mark-as-accepted', 'id' => $model->id], [
+				'class' => 'btn btn-success',
+				'data' => [
+					'confirm' => Yii::t('app/estimate', 'Are you sure you want to mark this estimate as accepted?'),
+					'method' => 'post',
+				],
+				'encode' => false
+			]) ?>
+			<?php endif; ?>
+
 			<?php if ($model->canConvertToInvoice()): ?>
 			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>' . Yii::t('app/estimate', 'Convert to Invoice'), ['convert-to-invoice', 'id' => $model->id], [
 				'class' => 'btn btn-warning',

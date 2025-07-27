@@ -25,7 +25,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/estimate', 'Preview');
 
             <?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/estimate', 'Print'), '#', [
                 'class' => 'btn btn-info',
-                'onclick' => 'window.print(); return false;',
+                'id' => 'print-btn',
+                'data-url' => \yii\helpers\Url::to(['mark-as-printed', 'id' => $model->id]),
                 'encode' => false
             ]) ?>
 
@@ -46,6 +47,17 @@ $this->params['breadcrumbs'][] = Yii::t('app/estimate', 'Preview');
                     'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
                 ]
             ) ?>
+            <?php endif; ?>
+
+            <?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED, \app\models\Estimate::STATUS_SENT])): ?>
+            <?= Html::a('<i class="fas fa-check mr-1"></i>' . Yii::t('app/estimate', 'Mark as Accepted'), ['mark-as-accepted', 'id' => $model->id], [
+                'class' => 'btn btn-success',
+                'data' => [
+                    'confirm' => Yii::t('app/estimate', 'Are you sure you want to mark this estimate as accepted?'),
+                    'method' => 'post',
+                ],
+                'encode' => false
+            ]) ?>
             <?php endif; ?>
 
             <?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], [
@@ -96,19 +108,15 @@ $this->registerCss("
     
     /* Dark mode override - force white background and black text for preview */
     body.dark-mode .estimate-preview-wrapper {
-        background: black
+        background: #111827 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     }
+    
     body.dark-mode .estimate-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th),
     body.dark-mode .estimate-preview-container *:not(table):not(thead):not(th):not(.items-table thead th),
     body.dark-mode .estimate-preview-container,
     .dark-mode .estimate-preview-wrapper *:not(table):not(thead):not(th):not(.items-table thead th),
     .dark-mode .estimate-preview-container *:not(table):not(thead):not(th):not(.items-table thead th) {
-        color: black ;
-    }
-    body.dark-mode .estimate-preview-wrapper,
-    body.dark-mode .estimate-preview-wrappe document-preview-container {
-        background: #111827;
     }
     
     /* Allow template-specific table header colors */
@@ -139,5 +147,33 @@ $this->registerCss("
         background: #f8f9fa !important;
         color: black !important;
     }
+");
+
+$this->registerJs("
+    $('#print-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        var url = $(this).data('url');
+        
+        // Send AJAX request to mark as printed
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                '_csrf': $('meta[name=csrf-token]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Print after marking as printed
+                    window.print();
+                }
+            },
+            error: function() {
+                // Print anyway if request fails
+                window.print();
+            }
+        });
+    });
 ");
 ?>
