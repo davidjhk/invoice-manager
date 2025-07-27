@@ -113,7 +113,7 @@ return [
     'Up to {limit} estimates per month' => '월 최대 {limit}개 견적서',
     'Up to {limit} company' => '최대 {limit}개 회사',
     'Upgrade to unlock premium features' => '프리미엄 기능을 사용하려면 업그레이드하세요',
-    'Get unlimited invoices, API access, import functionality and more.' => '무제한 인보이스, API 접근, 가져오기 기능 등을 이용하세요.',
+    'Get unlimited invoices, import functionality and more.' => '무제한 인보이스, 가져오기 기능 등을 이용하세요.',
     'Active' => '활성',
     'Choose Your Plan' => '플랜을 선택하세요',
     'Select the perfect plan for your business needs' => '비즈니스 요구사항에 맞는 완벽한 플랜을 선택하세요',

@@ -96,7 +96,7 @@ return [
     'Up to {limit} estimates per month' => '每月最多{limit}份报价单',
     'Up to {limit} company' => '最多{limit}家公司',
     'Upgrade to unlock premium features' => '升级以解锁高级功能',
-    'Get unlimited invoices, API access, import functionality and more.' => '获得无限发票、API访问、导入功能等。',
+    'Get unlimited invoices, import functionality and more.' => '获得无限发票、导入功能等。',
     'Active' => '活跃',
     'Choose Your Plan' => '选择您的计划',
     'Select the perfect plan for your business needs' => '为您的业务需求选择完美的计划',

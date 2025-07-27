@@ -113,7 +113,7 @@ return [
     'Up to {limit} estimates per month' => 'Up to {limit} estimates per month',
     'Up to {limit} company' => 'Up to {limit} company',
     'Upgrade to unlock premium features' => 'Upgrade to unlock premium features',
-    'Get unlimited invoices, API access, import functionality and more.' => 'Get unlimited invoices, API access, import functionality and more.',
+    'Get unlimited invoices, import functionality and more.' => 'Get unlimited invoices, import functionality and more.',
     'Active' => 'Active',
     'Choose Your Plan' => 'Choose Your Plan',
     'Select the perfect plan for your business needs' => 'Select the perfect plan for your business needs',

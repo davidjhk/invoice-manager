@@ -113,7 +113,7 @@ return [
     'Up to {limit} estimates per month' => 'Hasta {limit} presupuestos por mes',
     'Up to {limit} company' => 'Hasta {limit} empresa',
     'Upgrade to unlock premium features' => 'Actualiza para desbloquear características premium',
-    'Get unlimited invoices, API access, import functionality and more.' => 'Obtén facturas ilimitadas, acceso a API, funcionalidad de importación y más.',
+    'Get unlimited invoices, import functionality and more.' => 'Obtén facturas ilimitadas, funcionalidad de importación y más.',
     'Active' => 'Activo',
     'Choose Your Plan' => 'Elige Tu Plan',
     'Select the perfect plan for your business needs' => 'Selecciona el plan perfecto para las necesidades de tu negocio',
