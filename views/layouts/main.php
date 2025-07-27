@@ -978,6 +978,7 @@ AppAsset::register($this);
 		min-width: 200px !important;
 		z-index: 1001 !important;
 		visibility: hidden !important;
+		pointer-events: none !important;
 	}
 
 	.top-bar .dropdown-submenu-down > .dropdown-menu.show {
@@ -985,6 +986,7 @@ AppAsset::register($this);
 		opacity: 1 !important;
 		transform: translateY(0) !important;
 		visibility: visible !important;
+		pointer-events: auto !important;
 	}
 
 	.top-bar .dropdown-submenu-down > .dropdown-toggle::after {
@@ -2334,7 +2336,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 								?>
 								<?php if (count($userCompanies) > 1): ?>
 								<li class="dropdown-submenu dropdown-submenu-down">
-									<a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">
+									<a class="dropdown-item dropdown-toggle" href="#" data-submenu-toggle="true">
 										<i class="fas fa-exchange-alt mr-2"></i><?= Yii::t('app/nav', 'Switch Company') ?>
 									</a>
 									<ul class="dropdown-menu">
@@ -2825,12 +2827,13 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		});
 
 		// Dropdown submenu functionality
-		$('.dropdown-submenu > .dropdown-toggle').on('click', function(e) {
+		$(document).on('click', '.dropdown-submenu > .dropdown-toggle', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			
-			var $submenu = $(this).next('.dropdown-menu');
-			var $parentDropdown = $(this).closest('.dropdown-submenu');
+			var $this = $(this);
+			var $submenu = $this.next('.dropdown-menu');
+			var $parentDropdown = $this.closest('.dropdown-submenu');
 			
 			// Close other submenus
 			$('.dropdown-submenu .dropdown-menu').not($submenu).removeClass('show');
@@ -2885,6 +2888,16 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		// Close submenus when parent dropdown closes
 		$('.dropdown').on('hidden.bs.dropdown', function() {
 			$(this).find('.dropdown-submenu .dropdown-menu').removeClass('show');
+		});
+
+		// Prevent Bootstrap dropdown from closing when clicking on submenu toggle
+		$(document).on('click', '.dropdown-submenu > .dropdown-toggle', function(e) {
+			e.stopPropagation();
+		});
+
+		// Prevent Bootstrap dropdown from closing when clicking inside submenu
+		$(document).on('click', '.dropdown-submenu .dropdown-menu', function(e) {
+			e.stopPropagation();
 		});
 	});
 	</script>
