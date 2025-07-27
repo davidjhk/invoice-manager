@@ -432,6 +432,15 @@ $this->registerJsVar('estimateConfig', [
 							<option value="zh-tw">中文繁體 (Chinese Traditional)</option>
 						</select>
 					</div>
+					<div class="form-group">
+						<label for="ai-project-complexity"><?= Yii::t('app', 'Project Complexity') ?>:</label>
+						<select class="form-control" id="ai-project-complexity">
+							<option value="simple"><?= Yii::t('app', 'Simple Service') ?> ($100-$2,000)</option>
+							<option value="small"><?= Yii::t('app', 'Small Project') ?> ($2,000-$8,000)</option>
+							<option value="medium" selected><?= Yii::t('app', 'Medium Project') ?> ($8,000-$25,000)</option>
+							<option value="complex"><?= Yii::t('app', 'Complex Project') ?> ($25,000-$50,000)</option>
+						</select>
+					</div>
 				</div>
 				
 				<!-- Results Section -->
@@ -1129,6 +1138,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const customerId = customerSelect.value || '';
 			const businessType = '<?= $company->industry ?? '' ?>';
 			const responseLanguage = document.getElementById('ai-response-language').value;
+			const projectComplexity = document.getElementById('ai-project-complexity').value;
 
 			// Language mapping for AI prompts
 			const languageNames = {
@@ -1166,7 +1176,8 @@ Please provide only the work scope description in ${languageNames[responseLangua
 					question: workScopePrompt,
 					customer_id: customerId,
 					business_type: businessType,
-					response_language: responseLanguage
+					response_language: responseLanguage,
+					project_complexity: projectComplexity
 				})
 			});
 

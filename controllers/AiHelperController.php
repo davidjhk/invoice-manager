@@ -159,6 +159,53 @@ class AiHelperController extends Controller
     }
 
     /**
+     * Get configuration based on project complexity
+     */
+    private function getComplexityConfig($complexity)
+    {
+        $configs = [
+            'simple' => [
+                'name' => 'Simple Service',
+                'description' => 'Basic task or consultation requiring minimal resources',
+                'scope_guidelines' => '1-3 bullet points, straightforward deliverables, minimal technical complexity',
+                'price_min' => 100,
+                'price_max' => 2000,
+                'bullet_points' => '2-3',
+                'detail_level' => 'concise'
+            ],
+            'small' => [
+                'name' => 'Small Project',
+                'description' => 'Limited scope project with defined requirements',
+                'scope_guidelines' => '3-4 bullet points, standard implementation, some customization',
+                'price_min' => 2000,
+                'price_max' => 8000,
+                'bullet_points' => '3-4',
+                'detail_level' => 'moderate'
+            ],
+            'medium' => [
+                'name' => 'Medium Project',
+                'description' => 'Comprehensive project with multiple phases and deliverables',
+                'scope_guidelines' => '4-6 bullet points, complex implementation, significant customization',
+                'price_min' => 8000,
+                'price_max' => 25000,
+                'bullet_points' => '4-6',
+                'detail_level' => 'detailed'
+            ],
+            'complex' => [
+                'name' => 'Complex Project',
+                'description' => 'Enterprise-level project with extensive requirements and integration',
+                'scope_guidelines' => '6-8 bullet points, advanced technical implementation, enterprise features',
+                'price_min' => 25000,
+                'price_max' => 50000,
+                'bullet_points' => '6-8',
+                'detail_level' => 'comprehensive'
+            ]
+        ];
+        
+        return $configs[$complexity] ?? $configs['medium'];
+    }
+    
+    /**
      * Extract prices from work scope description and sum them up
      */
     private function extractPricesFromDescription($description)
@@ -378,13 +425,15 @@ Quantity: {$quantity}";
         $customerId = Yii::$app->request->post('customer_id');
         $businessType = Yii::$app->request->post('business_type', '');
         $responseLanguage = Yii::$app->request->post('response_language', 'en');
+        $projectComplexity = Yii::$app->request->post('project_complexity', 'medium');
         
         // Log the incoming request for debugging
         Yii::info('AI Helper answer-question request: ' . json_encode([
             'question_length' => strlen($question),
             'customer_id' => $customerId,
             'business_type' => $businessType,
-            'response_language' => $responseLanguage
+            'response_language' => $responseLanguage,
+            'project_complexity' => $projectComplexity
         ]), 'ai-helper');
         
         if (empty($question)) {
@@ -420,19 +469,27 @@ Quantity: {$quantity}";
             $selectedLanguage = $languageNames[$responseLanguage] ?? 'English';
             $businessContext = $businessType ? " for a {$businessType} business" : '';
             
+            // Define complexity-based parameters
+            $complexityConfig = $this->getComplexityConfig($projectComplexity);
+            
             // Create comprehensive work scope prompt
             $dollarSign = chr(36); // ASCII code for $ symbol
             $workScopePrompt = "Based on the service/product keywords '{$question}'{$businessContext}, generate a comprehensive and professional work scope description suitable for invoice documentation.
 
+PROJECT COMPLEXITY LEVEL: {$complexityConfig['name']} ({$complexityConfig['description']})
+TARGET SCOPE: {$complexityConfig['scope_guidelines']}
+PRICING RANGE: {$dollarSign}{$complexityConfig['price_min']}-{$dollarSign}{$complexityConfig['price_max']}";
+
+
 REQUIREMENTS:
 - Write in {$selectedLanguage} language
-- Create detailed, professional work scope using industry-specific terminology
+- Create {$complexityConfig['detail_level']} professional work scope using industry-specific terminology
 - Structure as bullet points with line breaks
-- Include specific deliverables, methodologies, and technical processes
+- Include specific deliverables, methodologies, and technical processes appropriate for {$complexityConfig['name']} level
 - Use appropriate professional jargon and technical terms for the field
-- Make it comprehensive enough to justify professional pricing
-- Minimum 4-6 detailed bullet points
-- Each bullet point should be substantive (2-3 lines when possible)
+- Generate exactly {$complexityConfig['bullet_points']} detailed bullet points
+- Each bullet point should be substantive and match the complexity level
+- Price individual components within the {$dollarSign}{$complexityConfig['price_min']}-{$dollarSign}{$complexityConfig['price_max']} range
 
 CONTENT STRUCTURE WITH PRICING:
 • Discovery & Analysis Phase: Include research, requirement gathering, stakeholder interviews (with estimated costs)
@@ -484,8 +541,8 @@ Generate comprehensive work scope in {$selectedLanguage} with professional termi
                     Yii::info('Extracted price from description: $' . $extractedPrice, 'ai-helper');
                     $pricingRecommendation = $extractedPrice;
                 } else {
-                    // If no prices found in description, use AI-based pricing
-                    $pricingRecommendation = $this->generatePricingRecommendation($question, $businessType, $responseLanguage, $openRouter);
+                    // If no prices found in description, use AI-based pricing with complexity
+                    $pricingRecommendation = $this->generatePricingRecommendation($question, $businessType, $responseLanguage, $openRouter, $complexityConfig);
                 }
                 
                 if ($pricingRecommendation !== null) {
@@ -544,7 +601,7 @@ Generate comprehensive work scope in {$selectedLanguage} with professional termi
     /**
      * Generate pricing recommendation for a service/product
      */
-    private function generatePricingRecommendation($question, $businessType = '', $responseLanguage = 'en', $openRouter = null)
+    private function generatePricingRecommendation($question, $businessType = '', $responseLanguage = 'en', $openRouter = null, $complexityConfig = null)
     {
         if (!$openRouter) {
             $openRouter = new OpenRouterClient();
@@ -561,7 +618,15 @@ Generate comprehensive work scope in {$selectedLanguage} with professional termi
         
         $businessContext = $businessType ? " for a {$businessType} business" : '';
         
+        // Use complexity config if provided, otherwise use medium defaults
+        if (!$complexityConfig) {
+            $complexityConfig = $this->getComplexityConfig('medium');
+        }
+        
         $pricingPrompt = "Based on the service/product '{$question}'{$businessContext}, calculate a reasonable market price by breaking down individual work scopes.
+
+PROJECT COMPLEXITY: {$complexityConfig['name']} - {$complexityConfig['description']}
+TARGET PRICE RANGE: \${$complexityConfig['price_min']}-\${$complexityConfig['price_max']}";
 
 PRICING METHODOLOGY:
 1. Identify individual work scopes/tasks within the service
@@ -585,16 +650,16 @@ PRICING GUIDELINES BY SCOPE TYPE:
 - Consultation: $100-$200/hour (1-5 hours typical)
 - Project management: $75-$125/hour (5-20% of total work)
 
-TOTAL PRICE LIMITS:
-- Simple services: $100-$2,000
-- Medium projects: $2,000-$15,000  
-- Complex projects: $15,000-$50,000
-- NEVER exceed $50,000 for any recommendation
-- If calculation exceeds $50,000, cap at $50,000
+COMPLEXITY-BASED PRICING CONSTRAINTS:
+- Target this project as: {$complexityConfig['name']}
+- Price range: \${$complexityConfig['price_min']}-\${$complexityConfig['price_max']}
+- NEVER exceed \${$complexityConfig['price_max']} for this complexity level
+- If calculation exceeds maximum, cap at \${$complexityConfig['price_max']}
+- Ensure pricing aligns with {$complexityConfig['description']}
 
 Service/Product: {$question}
 
-Calculate total price by summing individual scope estimates. Respond with only the final numeric USD value.";
+Calculate total price by summing individual scope estimates within the specified complexity range. Respond with only the final numeric USD value.";
 
         Yii::info('Sending pricing prompt for: ' . $question, 'ai-helper');
         
@@ -621,16 +686,16 @@ Calculate total price by summing individual scope estimates. Respond with only t
             $price = (float) $priceResponse;
             Yii::info('Parsed price: ' . $price, 'ai-helper');
             
-            // Apply strict price validation and caps
-            if ($price > 50000) {
-                Yii::warning("Price recommendation too high: $price, capping at 50000", 'ai-helper');
-                $price = 50000;
+            // Apply complexity-based price validation and caps
+            if ($price > $complexityConfig['price_max']) {
+                Yii::warning("Price recommendation too high: $price, capping at {$complexityConfig['price_max']} for {$complexityConfig['name']}", 'ai-helper');
+                $price = $complexityConfig['price_max'];
             }
             
             // Additional sanity checks
-            if ($price < 1) {
-                Yii::warning("Price recommendation too low: $price, setting minimum to 25", 'ai-helper');
-                $price = 25;
+            if ($price < $complexityConfig['price_min']) {
+                Yii::warning("Price recommendation too low: $price, setting minimum to {$complexityConfig['price_min']} for {$complexityConfig['name']}", 'ai-helper');
+                $price = $complexityConfig['price_min'];
             }
             
             // Round to 2 decimal places
