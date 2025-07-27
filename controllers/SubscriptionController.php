@@ -105,7 +105,8 @@ class SubscriptionController extends Controller
         if ($paymentMethod === 'stripe') {
             return $this->processStripeSubscription($plan, $user);
         } elseif ($paymentMethod === 'paypal') {
-            return $this->processPayPalSubscription($plan, $user);
+            Yii::$app->session->setFlash('error', 'PayPal payment is currently unavailable. Please use credit card payment.');
+            return $this->redirect(['index']);
         } else {
             throw new BadRequestHttpException('Invalid payment method.');
         }

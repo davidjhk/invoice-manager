@@ -25,7 +25,7 @@ class m250727_105000_add_free_plan extends Migration
                 'customers' => 'Unlimited',
                 'products' => 'Unlimited',
                 'companies' => 1,
-                'storage' => '100MB',
+                'storage' => '20MB',
                 'support' => 'Community support',
                 'import' => 'No',
                 'api_access' => 'No',

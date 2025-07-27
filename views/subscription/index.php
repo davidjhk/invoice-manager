@@ -85,18 +85,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ['class' => 'btn btn-primary']
                             ) ?>
 					<?php elseif (!$currentSubscription || !$currentSubscription->isActive()): ?>
-					<div class="btn-group-vertical w-100">
-						<?= Html::a(
-                                    '<i class="fab fa-stripe"></i> ' . Yii::t('app', 'Subscribe with Stripe'),
-                                    ['/subscription/subscribe', 'planId' => $plan->id, 'paymentMethod' => 'stripe'],
-                                    ['class' => 'btn btn-primary mb-2']
-                                ) ?>
-						<?= Html::a(
-                                    '<i class="fab fa-paypal"></i> ' . Yii::t('app', 'Subscribe with PayPal'),
-                                    ['/subscription/subscribe', 'planId' => $plan->id, 'paymentMethod' => 'paypal'],
-                                    ['class' => 'btn btn-outline-primary']
-                                ) ?>
-					</div>
+					<?= Html::a(
+                                '<i class="fas fa-credit-card"></i> ' . Yii::t('app', 'Subscribe with Credit Card'),
+                                ['/subscription/subscribe', 'planId' => $plan->id, 'paymentMethod' => 'stripe'],
+                                ['class' => 'btn btn-primary btn-block']
+                            ) ?>
 					<?php else: ?>
 					<span class="text-muted"><?= Yii::t('app', 'Contact support for plan changes') ?></span>
 					<?php endif; ?>
@@ -139,7 +132,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						</div>
 						<div id="collapse2" class="collapse" data-parent="#faqAccordion">
 							<div class="card-body">
-								<?= Yii::t('app', 'We accept all major credit cards through Stripe and PayPal payments.') ?>
+								<?= Yii::t('app', 'We accept all major credit cards through our secure payment processor.') ?>
 							</div>
 						</div>
 					</div>
