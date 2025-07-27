@@ -398,7 +398,8 @@ $this->registerJsVar('invoiceConfig', [
 
 <?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseAiHelper()): ?>
 <!-- AI Helper Modal -->
-<div class="modal fade" id="aiHelperModal" tabindex="-1" role="dialog" aria-labelledby="aiHelperModalLabel" aria-hidden="true">
+<div class="modal fade" id="aiHelperModal" tabindex="-1" role="dialog" aria-labelledby="aiHelperModalLabel"
+	aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -415,7 +416,9 @@ $this->registerJsVar('invoiceConfig', [
 					<div class="form-group">
 						<label for="ai-question"><?= Yii::t('app', 'Ask AI Helper') ?>:</label>
 						<div class="input-group">
-							<input type="text" id="ai-question" class="form-control" placeholder="<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>" autofocus>
+							<input type="text" id="ai-question" class="form-control"
+								placeholder="<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>"
+								autofocus>
 							<div class="input-group-append">
 								<button type="button" class="btn btn-primary" id="ask-ai-btn">
 									<i class="fas fa-paper-plane"></i>
@@ -427,26 +430,28 @@ $this->registerJsVar('invoiceConfig', [
 						</small>
 					</div>
 					<div class="form-group">
+						<label for="ai-project-complexity"><?= Yii::t('app', 'Project Complexity') ?>:</label>
+						<select class="form-control" id="ai-project-complexity">
+							<option value="simple"><?= Yii::t('app', 'Simple Service') ?> ($100-$2,000)</option>
+							<option value="small"><?= Yii::t('app', 'Small Project') ?> ($2,000-$8,000)</option>
+							<option value="medium" selected><?= Yii::t('app', 'Medium Project') ?> ($8,000-$25,000)
+							</option>
+							<option value="complex"><?= Yii::t('app', 'Complex Project') ?> ($25,000-$50,000)</option>
+						</select>
+					</div>
+					<div class="form-group">
 						<label for="ai-response-language"><?= Yii::t('app', 'Response Language') ?>:</label>
 						<select class="form-control" id="ai-response-language">
 							<option value="en">English</option>
-							<option value="ko" <?= (Yii::$app->language === 'ko-KR') ? 'selected' : '' ?>>한국어 (Korean)</option>
+							<option value="ko" <?= (Yii::$app->language === 'ko-KR') ? 'selected' : '' ?>>한국어 (Korean)
+							</option>
 							<option value="es">Español (Spanish)</option>
 							<option value="zh-cn">中文简体 (Chinese Simplified)</option>
 							<option value="zh-tw">中文繁體 (Chinese Traditional)</option>
 						</select>
 					</div>
-					<div class="form-group">
-						<label for="ai-project-complexity"><?= Yii::t('app', 'Project Complexity') ?>:</label>
-						<select class="form-control" id="ai-project-complexity">
-							<option value="simple"><?= Yii::t('app', 'Simple Service') ?> ($100-$2,000)</option>
-							<option value="small"><?= Yii::t('app', 'Small Project') ?> ($2,000-$8,000)</option>
-							<option value="medium" selected><?= Yii::t('app', 'Medium Project') ?> ($8,000-$25,000)</option>
-							<option value="complex"><?= Yii::t('app', 'Complex Project') ?> ($25,000-$50,000)</option>
-						</select>
-					</div>
 				</div>
-				
+
 				<!-- Results Section -->
 				<div id="ai-helper-content" style="display: none;">
 					<div class="ai-loading">
@@ -454,7 +459,7 @@ $this->registerJsVar('invoiceConfig', [
 						<p class="mt-2"><?= Yii::t('app', 'Generating suggestions...') ?></p>
 					</div>
 				</div>
-				
+
 				<!-- Pricing Recommendation Section -->
 				<div id="ai-pricing-section" style="display: none;">
 					<div class="card border-success mt-3">
@@ -479,7 +484,8 @@ $this->registerJsVar('invoiceConfig', [
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
+				<button type="button" class="btn btn-secondary"
+					data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
 				<button type="button" class="btn btn-outline-secondary" id="ask-another-btn" style="display: none;">
 					<i class="fas fa-question mr-1"></i><?= Yii::t('app', 'Ask Another Question') ?>
 				</button>
@@ -959,7 +965,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (!customerId) {
 			alert(
 				'<?= Yii::t('app/invoice', 'Please select a customer first to calculate automatic tax.') ?>'
-				);
+			);
 			return;
 		}
 
@@ -1051,10 +1057,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (currentAiRow) {
 			const descriptionInput = currentAiRow.querySelector('.description-input');
 			const rateInput = currentAiRow.querySelector('.rate-input');
-			
+
 			// Update description
 			descriptionInput.value = description;
-			
+
 			// Update price if available
 			const priceValueElement = document.getElementById('recommended-price-value');
 			if (priceValueElement && priceValueElement.textContent) {
@@ -1065,7 +1071,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					calculateTotals();
 				}
 			}
-			
+
 			$('#aiHelperModal').modal('hide');
 		}
 	};
@@ -1077,11 +1083,11 @@ document.addEventListener('DOMContentLoaded', function() {
 				const btn = e.target.closest('.ai-helper-btn');
 				const row = btn.closest('tr');
 				const rowIndex = btn.getAttribute('data-row-index');
-				
+
 				// Store current row information globally
 				currentAiRow = row;
 				window.currentAiHelperRowIndex = parseInt(rowIndex);
-				
+
 				showAiHelper(row);
 			}
 		});
@@ -1090,12 +1096,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		document.getElementById('ask-ai-btn')?.addEventListener('click', () => {
 			const questionInput = document.getElementById('ai-question');
 			const question = questionInput.value.trim();
-			
+
 			if (!question) {
 				alert('<?= Yii::t('app', 'Please enter a question or product name') ?>');
 				return;
 			}
-			
+
 			askAiQuestion(question);
 		});
 
@@ -1114,22 +1120,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// Show modal
 		$('#aiHelperModal').modal('show');
-		
+
 		// Show input section and hide content
 		document.getElementById('ai-input-section').style.display = 'block';
 		document.getElementById('ai-helper-content').style.display = 'none';
 		document.getElementById('ai-pricing-section').style.display = 'none';
-		
+
 		// Pre-fill question input with product name if available
 		const questionInput = document.getElementById('ai-question');
 		if (productName) {
 			questionInput.value = productName;
-			questionInput.placeholder = '<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>';
+			questionInput.placeholder =
+				'<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>';
 		} else {
 			questionInput.value = '';
-			questionInput.placeholder = '<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>';
+			questionInput.placeholder =
+				'<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>';
 		}
-		
+
 		// Focus on input
 		setTimeout(() => questionInput.focus(), 100);
 	}
@@ -1196,10 +1204,10 @@ Please provide only the work scope description in ${languageNames[responseLangua
 			});
 
 			const data = await response.json();
-			
+
 			if (data.success && data.answer) {
 				displayAnswer(data.answer, question, responseLanguage);
-				
+
 				// Display pricing recommendation if available
 				if (data.recommended_price && data.recommended_price > 0) {
 					displayPricingRecommendation(data.recommended_price);
@@ -1209,12 +1217,13 @@ Please provide only the work scope description in ${languageNames[responseLangua
 				if (data.debug) {
 					console.warn('AI Helper Debug Info:', data.debug);
 				}
-				
+
 				// Show more helpful error message with debug info if available
 				if (data.debug && data.debug.api_configured === false) {
-					errorMessage = '<?= Yii::t('app', 'AI Helper is not configured. Please check settings.') ?>';
+					errorMessage =
+						'<?= Yii::t('app', 'AI Helper is not configured. Please check settings.') ?>';
 				}
-				
+
 				displayError(errorMessage);
 			}
 		} catch (error) {
@@ -1225,7 +1234,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 
 	function displayAnswer(answer, originalQuestion, responseLanguage) {
 		const content = document.getElementById('ai-helper-content');
-		
+
 		// Language flags for better UX
 		const languageFlags = {
 			'en': '🇺🇸',
@@ -1242,7 +1251,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 			'zh-cn': '中文简体',
 			'zh-tw': '中文繁體'
 		};
-		
+
 		let html = `
 			<h6 class="mb-3">
 				<i class="fas fa-magic text-warning mr-2"></i>
@@ -1282,7 +1291,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 		`;
 
 		content.innerHTML = html;
-		
+
 		// Add event listener for "Add to Description" button
 		const addToDescBtn = document.getElementById('add-to-description-btn');
 		if (addToDescBtn) {
@@ -1290,7 +1299,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 				useSuggestion(answer);
 			});
 		}
-		
+
 		// Add event listener for "Add to Description & Price" button
 		const addToDescAndPriceBtn = document.getElementById('add-to-description-and-price-btn');
 		if (addToDescAndPriceBtn) {
@@ -1306,7 +1315,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 		document.getElementById('ai-pricing-section').style.display = 'none';
 		document.getElementById('ai-question').value = '';
 		document.getElementById('ai-question').focus();
-		
+
 		// Hide the "Add to Description & Price" button
 		const addToDescAndPriceBtn = document.getElementById('add-to-description-and-price-btn');
 		if (addToDescAndPriceBtn) {
@@ -1317,23 +1326,23 @@ Please provide only the work scope description in ${languageNames[responseLangua
 	function displayPricingRecommendation(price) {
 		const pricingSection = document.getElementById('ai-pricing-section');
 		const priceValueElement = document.getElementById('recommended-price-value');
-		
+
 		// Format price to 2 decimal places
 		const formattedPrice = parseFloat(price).toFixed(2);
 		priceValueElement.textContent = formattedPrice;
-		
+
 		// Store the price globally for combined action
 		window.currentRecommendedPrice = formattedPrice;
-		
+
 		// Show the pricing section
 		pricingSection.style.display = 'block';
-		
+
 		// Show the "Add to Description & Price" button
 		const addToDescAndPriceBtn = document.getElementById('add-to-description-and-price-btn');
 		if (addToDescAndPriceBtn) {
 			addToDescAndPriceBtn.style.display = 'inline-block';
 		}
-		
+
 		// Add event listener for "Add to Rate" button
 		const addPriceBtn = document.getElementById('add-price-to-rate-btn');
 		addPriceBtn.onclick = function() {
@@ -1344,17 +1353,19 @@ Please provide only the work scope description in ${languageNames[responseLangua
 	function addPricingToRate(price) {
 		// Get the currently active row index (stored when AI Helper button was clicked)
 		const currentRowIndex = window.currentAiHelperRowIndex;
-		
+
 		if (currentRowIndex !== undefined) {
 			// Find the rate input for the current row
 			const rateInput = document.querySelector(`input[name="InvoiceItem[${currentRowIndex}][rate]"]`);
-			
+
 			if (rateInput) {
 				rateInput.value = price;
-				
+
 				// Trigger change event to update calculations
-				rateInput.dispatchEvent(new Event('input', { bubbles: true }));
-				
+				rateInput.dispatchEvent(new Event('input', {
+					bubbles: true
+				}));
+
 				// Show success feedback
 				const addPriceBtn = document.getElementById('add-price-to-rate-btn');
 				const originalText = addPriceBtn.innerHTML;
@@ -1362,7 +1373,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 				addPriceBtn.classList.remove('btn-success');
 				addPriceBtn.classList.add('btn-outline-success');
 				addPriceBtn.disabled = true;
-				
+
 				// Reset button after 2 seconds
 				setTimeout(() => {
 					addPriceBtn.innerHTML = originalText;
@@ -1370,7 +1381,7 @@ Please provide only the work scope description in ${languageNames[responseLangua
 					addPriceBtn.classList.add('btn-success');
 					addPriceBtn.disabled = false;
 				}, 2000);
-				
+
 				// Close modal after adding
 				setTimeout(() => {
 					$('#aiHelperModal').modal('hide');
