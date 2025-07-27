@@ -975,6 +975,11 @@ AppAsset::register($this);
 		display: none !important;
 	}
 
+	/* Force all submenus to be hidden by default */
+	.dropdown-submenu .dropdown-menu:not(.show) {
+		display: none !important;
+	}
+
 	.dropdown-submenu-down .dropdown-menu.show {
 		display: block !important;
 	}
@@ -2562,6 +2567,9 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 
 	// Initialize Bootstrap 4 dropdowns and navigation
 	$(document).ready(function() {
+		// Initialize all submenus to closed state on page load
+		$('.dropdown-submenu .dropdown-menu').removeClass('show');
+		
 		// Run debug function
 
 		// Debug main navbar dropdowns
@@ -2609,6 +2617,9 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 					$dropdown.addClass('show');
 					$menu.addClass('show');
 					console.log('Dropdown opened');
+					
+					// Initialize all submenus to closed state when dropdown opens
+					$dropdown.find('.dropdown-submenu .dropdown-menu').removeClass('show');
 				}
 			});
 
@@ -2629,6 +2640,11 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			// Toggle current dropdown
 			$dropdown.toggleClass('show');
 			$menu.toggleClass('show');
+			
+			// Initialize all submenus to closed state when dropdown opens
+			if ($dropdown.hasClass('show')) {
+				$dropdown.find('.dropdown-submenu .dropdown-menu').removeClass('show');
+			}
 		});
 
 		// Test with mousedown event (excluding submenu toggles)
@@ -2816,6 +2832,11 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			if (!$(e.target).closest('.dropdown-submenu').length) {
 				$('.dropdown-submenu .dropdown-menu').removeClass('show');
 			}
+		});
+
+		// Initialize submenus when parent dropdown opens
+		$('.dropdown').on('shown.bs.dropdown', function() {
+			$(this).find('.dropdown-submenu .dropdown-menu').removeClass('show');
 		});
 
 		// Close submenus when parent dropdown closes
