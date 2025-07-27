@@ -292,7 +292,7 @@ class InvoiceController extends Controller
                     $transaction->commit();
                     
                     Yii::$app->session->setFlash('success', 'Invoice updated successfully.');
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['preview', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();

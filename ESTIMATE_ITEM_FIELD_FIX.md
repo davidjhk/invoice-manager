@@ -1,41 +1,50 @@
-# Estimate Item Field Name Fix
+# Estimate Item Field Name Fix - unit_price를 rate로 통일
 
-## Problem
+## 문제점
 
-When creating estimates, the system was throwing an error:
+Estimate 생성 시 다음 에러가 발생:
 
 ```
 Setting unknown property: app\models\EstimateItem::unit_price
 ```
 
-## Root Cause
+## 원인
 
-The `EstimateController` was trying to set a `unit_price` property on `EstimateItem` objects, but the actual field name in the `EstimateItem` model is `rate`, not `unit_price`.
+`EstimateController`에서 `EstimateItem` 객체에 `unit_price` 속성을 설정하려고 했지만, 실제 `EstimateItem` 모델의 필드명은 `rate`입니다.
 
-## Solution
+## 해결방법
 
-Updated the `EstimateController` to use the correct field name `rate` instead of `unit_price` in the following methods:
+`EstimateController`에서 `unit_price` 대신 올바른 필드명 `rate`를 사용하도록 다음 메서드들을 수정:
 
-1. **actionCreate()** - When creating new estimate items
-2. **actionUpdate()** - When updating estimate items
-3. **actionDuplicate()** - When copying estimate items
-4. **actionConvertToInvoice()** - When converting estimate items to invoice items
+1. **actionCreate()** - 새 estimate item 생성 시
+2. **actionUpdate()** - estimate item 업데이트 시
+3. **actionDuplicate()** - estimate item 복사 시
+4. **actionConvertToInvoice()** - estimate item을 invoice item으로 변환 시
 
-The fix includes backward compatibility by checking for both `rate` and `unit_price` in the form data:
+하위 호환성을 위해 폼 데이터에서 `rate`와 `unit_price` 모두 확인:
 
 ```php
 $item->rate = $itemData['rate'] ?? ($itemData['unit_price'] ?? 0);
 ```
 
-## Files Modified
+## 수정된 파일
 
 - `controllers/EstimateController.php`
 
-## Verification
+## 확인사항
 
-After applying the fix:
+수정 후 다음 기능들이 에러 없이 작동해야 함:
 
-1. Try creating a new estimate with items - it should work without errors
-2. Try updating an existing estimate - it should work without errors
-3. Try duplicating an estimate - it should work without errors
-4. Try converting an estimate to invoice - it should work without errors
+1. 새 estimate 생성 (아이템 포함)
+2. 기존 estimate 수정
+3. estimate 복제
+4. estimate를 invoice로 변환
+
+## 필드명 통일 현황
+
+- ✅ `EstimateItem` 모델: `rate` 필드 사용
+- ✅ `InvoiceItem` 모델: `rate` 필드 사용
+- ✅ `EstimateController`: `rate` 사용 (unit_price는 fallback으로만)
+- ✅ `InvoiceController`: `rate` 사용
+- ✅ 뷰 파일들: `rate` 사용
+- ✅ JavaScript 파일들: `rate` 사용
