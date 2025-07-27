@@ -242,10 +242,42 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     <?php else: ?>
                         <div class="subscription-inactive">
-                            <div class="text-center py-4">
-                                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
-                                <h5><?= Yii::t('app', 'No Active Subscription') ?></h5>
-                                <p class="text-muted"><?= Yii::t('app', 'You are currently using the free tier. Upgrade to unlock premium features.') ?></p>
+                            <!-- Free Plan Display -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label><?= Yii::t('app', 'Current Plan') ?></label>
+                                        <p class="form-control-plaintext">
+                                            <strong><?= Yii::t('app', 'Free') ?></strong>
+                                            <span class="text-success ml-2">$0/month</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label><?= Yii::t('app', 'Status') ?></label>
+                                        <p class="form-control-plaintext">
+                                            <span class="badge badge-secondary"><?= Yii::t('app', 'Active') ?></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Free Plan Features -->
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle mr-2"></i><?= Yii::t('app', 'Free Plan Features') ?></h6>
+                                <ul class="mb-0">
+                                    <li><?= Yii::t('app', 'Up to {limit} invoices per month', ['limit' => 10]) ?></li>
+                                    <li><?= Yii::t('app', 'Up to {limit} estimates per month', ['limit' => 10]) ?></li>
+                                    <li><?= Yii::t('app', 'Up to {limit} company', ['limit' => 1]) ?></li>
+                                    <li><?= Yii::t('app', '{size} storage', ['size' => '100MB']) ?></li>
+                                    <li><?= Yii::t('app', 'Email support') ?></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="text-center py-3">
+                                <h5><?= Yii::t('app', 'Upgrade to unlock premium features') ?></h5>
+                                <p class="text-muted"><?= Yii::t('app', 'Get unlimited invoices, API access, import functionality and more.') ?></p>
                                 <?= Html::a(
                                     '<i class="fas fa-arrow-up"></i> ' . Yii::t('app', 'Choose a Plan'),
                                     ['/subscription/index'],

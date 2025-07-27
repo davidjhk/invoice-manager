@@ -151,6 +151,9 @@ class Plan extends ActiveRecord
      */
     public function getFormattedPrice()
     {
+        if ($this->price == 0) {
+            return Yii::t('app', 'Free');
+        }
         return '$' . number_format($this->price, 2);
     }
 
@@ -197,12 +200,7 @@ class Plan extends ActiveRecord
      */
     public function getMonthlyInvoiceLimit()
     {
-        $limits = [
-            'Standard' => 100,
-            'Pro' => null, // Unlimited
-        ];
-
-        return $limits[$this->name] ?? null;
+        return $this->monthly_invoice_limit;
     }
 
     /**
@@ -222,34 +220,15 @@ class Plan extends ActiveRecord
      */
     public function getFeatureLimits()
     {
-        $limits = [
-            'Free' => [
-                'monthly_invoices' => 10,
-                'companies' => 1,
-                'storage_mb' => 500,
-                'email_support' => true,
-                'api_access' => false,
-                'custom_templates' => false,
-            ],
-            'Standard' => [
-                'monthly_invoices' => 100,
-                'companies' => 3,
-                'storage_mb' => 5000, // 5GB
-                'email_support' => true,
-                'api_access' => true,
-                'custom_templates' => false,
-            ],
-            'Pro' => [
-                'monthly_invoices' => null, // Unlimited
-                'companies' => null, // Unlimited
-                'storage_mb' => null, // Unlimited
-                'email_support' => true,
-                'api_access' => true,
-                'custom_templates' => true,
-            ],
+        return [
+            'monthly_invoices' => $this->monthly_invoice_limit,
+            'monthly_estimates' => $this->monthly_estimate_limit,
+            'companies' => $this->max_companies,
+            'storage_mb' => $this->storage_limit_mb,
+            'api_access' => $this->can_use_api,
+            'import' => $this->can_use_import,
+            'custom_templates' => $this->can_use_custom_templates,
         ];
-
-        return $limits[$this->name] ?? [];
     }
 
     /**
@@ -271,8 +250,67 @@ class Plan extends ActiveRecord
      */
     public function canUseImport()
     {
-        // Only Pro plan can use import features
-        return $this->name === 'Pro';
+        return (bool) $this->can_use_import;
+    }
+
+    /**
+     * Check if plan allows API access
+     *
+     * @return bool
+     */
+    public function canUseApi()
+    {
+        return (bool) $this->can_use_api;
+    }
+
+    /**
+     * Check if plan allows custom templates
+     *
+     * @return bool
+     */
+    public function canUseCustomTemplates()
+    {
+        return (bool) $this->can_use_custom_templates;
+    }
+
+    /**
+     * Get storage limit in MB
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getStorageLimit()
+    {
+        return $this->storage_limit_mb;
+    }
+
+    /**
+     * Get maximum companies allowed
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getMaxCompanies()
+    {
+        return $this->max_companies;
+    }
+
+    /**
+     * Get monthly estimate limit for this plan
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getMonthlyEstimateLimit()
+    {
+        return $this->monthly_estimate_limit;
+    }
+
+    /**
+     * Check if plan has unlimited estimates
+     *
+     * @return bool
+     */
+    public function hasUnlimitedEstimates()
+    {
+        return $this->getMonthlyEstimateLimit() === null;
     }
 
     /**

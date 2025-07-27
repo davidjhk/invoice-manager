@@ -25,6 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
+            <?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseImport()): ?>
+                <?= Html::a('<i class="fas fa-upload mr-1"></i>' . Yii::t('app', 'Import') . ' CSV', ['product-import/index'], [
+                    'class' => 'btn btn-outline-primary',
+                    'encode' => false
+                ]) ?>
+            <?php endif; ?>
             <?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/product', 'Create New Product'), ['create'], [
                 'class' => 'btn btn-success',
                 'encode' => false

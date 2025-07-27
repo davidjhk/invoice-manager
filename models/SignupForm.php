@@ -20,10 +20,24 @@ class SignupForm extends Model
     /**
      * {@inheritdoc}
      */
+    public function init()
+    {
+        parent::init();
+        
+        // Set Free Plan as default
+        $freePlan = Plan::findByName('Free');
+        if ($freePlan) {
+            $this->plan_id = $freePlan->id;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['username', 'email', 'password', 'password_repeat', 'plan_id'], 'required'],
+            [['username', 'email', 'password', 'password_repeat'], 'required'],
             [['plan_id'], 'integer'],
             [['plan_id'], 'exist', 'targetClass' => Plan::class, 'targetAttribute' => 'id', 'filter' => ['is_active' => true]],
             [['username'], 'string', 'min' => 3, 'max' => 50],
@@ -110,9 +124,17 @@ class SignupForm extends Model
                     $subscription = new UserSubscription();
                     $subscription->user_id = $user->id;
                     $subscription->plan_id = $plan->id;
-                    $subscription->status = UserSubscription::STATUS_INACTIVE; // Will be activated after payment
+                    
+                    // Free Plan is activated immediately, other plans need payment
+                    if ($plan->name === 'Free') {
+                        $subscription->status = UserSubscription::STATUS_ACTIVE;
+                        $subscription->is_recurring = false; // Free plan is not recurring
+                    } else {
+                        $subscription->status = UserSubscription::STATUS_INACTIVE; // Will be activated after payment
+                        $subscription->is_recurring = true;
+                    }
+                    
                     $subscription->start_date = date('Y-m-d');
-                    $subscription->is_recurring = true;
                     
                     if (!$subscription->save()) {
                         Yii::error('Subscription creation failed: ' . json_encode($subscription->errors), 'app');

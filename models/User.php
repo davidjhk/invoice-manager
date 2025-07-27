@@ -572,13 +572,13 @@ class User extends ActiveRecord implements IdentityInterface
         
         $plan = $this->getCurrentPlan();
         
-        // No plan means free tier with limitations
+        // No subscription means free tier with limitations
         if (!$plan) {
-            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 10;
             return $this->getMonthlyInvoiceCount() < $freeLimit; // Free users get limited invoices
         }
 
-        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        $monthlyLimit = $plan->getMonthlyEstimateLimit();
         
         // Unlimited
         if ($monthlyLimit === null) {
@@ -607,13 +607,13 @@ class User extends ActiveRecord implements IdentityInterface
         
         $plan = $this->getCurrentPlan();
         
-        // No plan means free tier with limitations
+        // No subscription means free tier with limitations
         if (!$plan) {
-            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 10;
             return $this->getMonthlyEstimateCount() < $freeLimit; // Free users get limited estimates
         }
 
-        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        $monthlyLimit = $plan->getMonthlyEstimateLimit();
         
         // Unlimited
         if ($monthlyLimit === null) {
@@ -621,6 +621,73 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return $this->getMonthlyEstimateCount() < $monthlyLimit;
+    }
+
+    /**
+     * Get remaining estimates for current month
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getRemainingEstimates()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return null; // Unlimited
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return 0;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means free tier with limitations
+        if (!$plan) {
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 10;
+            return max(0, $freeLimit - $this->getMonthlyEstimateCount()); // Free users get limited estimates
+        }
+
+        $monthlyLimit = $plan->getMonthlyEstimateLimit();
+        
+        if ($monthlyLimit === null) {
+            return null; // Unlimited
+        }
+
+        return max(0, $monthlyLimit - $this->getMonthlyEstimateCount());
+    }
+
+    /**
+     * Get estimate usage percentage for current month
+     *
+     * @return float|null Null means unlimited
+     */
+    public function getEstimateUsagePercentage()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return null; // Unlimited
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return 100; // Show as 100% used when subscription is cancelled or expired
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        if (!$plan) {
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 10;
+            return ($this->getMonthlyEstimateCount() / $freeLimit) * 100;
+        }
+
+        $monthlyLimit = $plan->getMonthlyEstimateLimit();
+        
+        if ($monthlyLimit === null) {
+            return null; // Unlimited
+        }
+
+        return ($this->getMonthlyEstimateCount() / $monthlyLimit) * 100;
     }
 
     /**
@@ -642,13 +709,13 @@ class User extends ActiveRecord implements IdentityInterface
         
         $plan = $this->getCurrentPlan();
         
-        // No plan means free tier with limitations
+        // No subscription means free tier with limitations
         if (!$plan) {
-            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 10;
             return max(0, $freeLimit - $this->getMonthlyInvoiceCount()); // Free users get limited invoices
         }
 
-        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        $monthlyLimit = $plan->getMonthlyEstimateLimit();
         
         if ($monthlyLimit === null) {
             return null; // Unlimited
@@ -677,11 +744,11 @@ class User extends ActiveRecord implements IdentityInterface
         $plan = $this->getCurrentPlan();
         
         if (!$plan) {
-            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 10;
             return ($this->getMonthlyInvoiceCount() / $freeLimit) * 100;
         }
 
-        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        $monthlyLimit = $plan->getMonthlyEstimateLimit();
         
         if ($monthlyLimit === null) {
             return null; // Unlimited
@@ -709,12 +776,131 @@ class User extends ActiveRecord implements IdentityInterface
         
         $plan = $this->getCurrentPlan();
         
-        // No plan means free tier - no import allowed
+        // No subscription means free tier - no import allowed
         if (!$plan) {
             return false;
         }
 
         return $plan->canUseImport();
+    }
+
+    /**
+     * Check if user can use API functionality
+     *
+     * @return bool
+     */
+    public function canUseApi()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return false;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means free tier - no API access
+        if (!$plan) {
+            return false;
+        }
+
+        return $plan->canUseApi();
+    }
+
+    /**
+     * Check if user can use custom templates
+     *
+     * @return bool
+     */
+    public function canUseCustomTemplates()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return false;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means free tier - no custom templates
+        if (!$plan) {
+            return false;
+        }
+
+        return $plan->canUseCustomTemplates();
+    }
+
+    /**
+     * Get storage limit in MB
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getStorageLimit()
+    {
+        // Admin users have unlimited storage
+        if ($this->isAdmin()) {
+            return null;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means free tier storage limit
+        if (!$plan) {
+            return 100; // 100MB for free tier
+        }
+
+        return $plan->getStorageLimit();
+    }
+
+    /**
+     * Get maximum companies allowed
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getMaxCompaniesLimit()
+    {
+        // Admin users have unlimited companies
+        if ($this->isAdmin()) {
+            return null;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means free tier company limit
+        if (!$plan) {
+            return 1; // 1 company for free tier
+        }
+
+        return $plan->getMaxCompanies();
+    }
+
+    /**
+     * Get plan name for display
+     *
+     * @return string
+     */
+    public function getPlanName()
+    {
+        $plan = $this->getCurrentPlan();
+        return $plan ? $plan->name : 'Free';
+    }
+
+    /**
+     * Check if user is on free tier (no active subscription)
+     *
+     * @return bool
+     */
+    public function isFreeTier()
+    {
+        return !$this->hasActiveSubscription() && !$this->isAdmin();
     }
 
     /**

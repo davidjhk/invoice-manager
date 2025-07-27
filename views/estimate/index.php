@@ -12,6 +12,13 @@ use yii\widgets\LinkPager;
 
 $this->title = Yii::t('app/estimate', 'Estimates');
 $this->params['breadcrumbs'][] = $this->title;
+
+// Get user estimate usage data
+$user = Yii::$app->user->identity;
+$monthlyCount = $user->getMonthlyEstimateCount();
+$remainingEstimates = $user->getRemainingEstimates();
+$usagePercentage = $user->getEstimateUsagePercentage();
+$currentPlan = $user->getCurrentPlan();
 ?>
 
 <div class="estimate-index">
@@ -24,12 +31,80 @@ $this->params['breadcrumbs'][] = $this->title;
                 'target' => '_blank',
                 'encode' => false
             ]) ?>
-			<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', 'Create New Estimate'), ['create'], [
-                'class' => 'btn btn-success',
-                'encode' => false
-            ]) ?>
+			<?php if ($remainingEstimates > 0 || $remainingEstimates === null): ?>
+				<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', 'Create New Estimate'), ['create'], [
+	                'class' => 'btn btn-success',
+	                'encode' => false
+	            ]) ?>
+			<?php else: ?>
+				<?= Html::button('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', 'Create New Estimate'), [
+					'class' => 'btn btn-secondary disabled',
+					'disabled' => true,
+					'encode' => false,
+					'title' => Yii::t('app', 'Monthly estimate limit reached'),
+					'data-toggle' => 'tooltip'
+				]) ?>
+			<?php endif; ?>
 		</div>
 	</div>
+
+	<!-- Monthly Usage Display -->
+	<?php if ($remainingEstimates !== null): ?>
+	<div class="row mb-4">
+		<div class="col-12">
+			<div class="card border-0 bg-light">
+				<div class="card-body py-3">
+					<div class="row align-items-center">
+						<div class="col-md-6">
+							<h6 class="mb-1">
+								<i class="fas fa-chart-line mr-2 text-primary"></i>
+								<?= Yii::t('app', 'Monthly Estimate Usage') ?> - <?= date('F Y') ?>
+							</h6>
+							<p class="mb-0 text-muted">
+								<?= Yii::t('app', '{used} of {limit} estimates used', [
+									'used' => $monthlyCount,
+									'limit' => $currentPlan ? $currentPlan->getMonthlyInvoiceLimit() : (Yii::$app->params['freeUserMonthlyLimit'] ?? 5)
+								]) ?>
+								<?php if ($remainingEstimates > 0): ?>
+									<span class="text-success ml-2">
+										<i class="fas fa-check-circle"></i>
+										<?= Yii::t('app', '{count} remaining', ['count' => $remainingEstimates]) ?>
+									</span>
+								<?php else: ?>
+									<span class="text-danger ml-2">
+										<i class="fas fa-exclamation-triangle"></i>
+										<?= Yii::t('app', 'Limit reached') ?>
+									</span>
+								<?php endif; ?>
+							</p>
+						</div>
+						<div class="col-md-4">
+							<div class="progress" style="height: 10px;">
+								<div class="progress-bar <?= $usagePercentage >= 90 ? 'bg-danger' : ($usagePercentage >= 70 ? 'bg-warning' : 'bg-success') ?>" 
+									 role="progressbar" 
+									 style="width: <?= min(100, $usagePercentage) ?>%"
+									 aria-valuenow="<?= $usagePercentage ?>" 
+									 aria-valuemin="0" 
+									 aria-valuemax="100">
+								</div>
+							</div>
+							<small class="text-muted"><?= round($usagePercentage, 1) ?>% used</small>
+						</div>
+						<div class="col-md-2 text-right">
+							<?php if ($remainingEstimates === 0): ?>
+								<?= Html::a(
+									'<i class="fas fa-arrow-up mr-1"></i>' . Yii::t('app', 'Upgrade Plan'),
+									['/subscription/my-account'],
+									['class' => 'btn btn-primary btn-sm']
+								) ?>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
 
 	<div class="row mb-3">
 		<div class="col-md-6">

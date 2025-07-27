@@ -148,14 +148,17 @@ class SiteController extends Controller
             if ($user) {
                 Yii::$app->user->login($user);
                 
-                // If a plan was selected, redirect to payment
+                // If a plan was selected, redirect to payment (except for Free Plan)
                 if ($model->plan_id) {
-                    $subscription = UserSubscription::find()
-                        ->where(['user_id' => $user->id, 'plan_id' => $model->plan_id])
-                        ->one();
-                    if ($subscription) {
-                        Yii::$app->session->setFlash('info', 'Account created! Please complete your subscription payment.');
-                        return $this->redirect(['/subscription/subscribe', 'planId' => $model->plan_id]);
+                    $plan = Plan::findOne($model->plan_id);
+                    if ($plan && $plan->name !== 'Free') {
+                        $subscription = UserSubscription::find()
+                            ->where(['user_id' => $user->id, 'plan_id' => $model->plan_id])
+                            ->one();
+                        if ($subscription) {
+                            Yii::$app->session->setFlash('info', 'Account created! Please complete your subscription payment.');
+                            return $this->redirect(['/subscription/subscribe', 'planId' => $model->plan_id]);
+                        }
                     }
                 }
                 
