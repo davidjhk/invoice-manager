@@ -376,6 +376,14 @@ Quantity: {$quantity}";
                 ]);
             }
             
+            // Generate pricing recommendation separately
+            $pricingRecommendation = null;
+            try {
+                $pricingRecommendation = $this->generatePricingRecommendation($question, $businessType, $responseLanguage, $openRouter);
+            } catch (\Exception $e) {
+                Yii::warning('Failed to generate pricing recommendation: ' . $e->getMessage(), 'ai-helper');
+            }
+            
             // Log the API response
             Yii::info('OpenRouter API response received, answer length: ' . strlen($answer ?: ''), 'ai-helper');
             
@@ -393,10 +401,17 @@ Quantity: {$quantity}";
             }
 
             Yii::info('AI Helper answer-question completed successfully', 'ai-helper');
-            return [
+            $result = [
                 'success' => true,
                 'answer' => $answer
             ];
+            
+            // Add pricing recommendation if available
+            if ($pricingRecommendation !== null) {
+                $result['recommended_price'] = $pricingRecommendation;
+            }
+            
+            return $result;
 
         } catch (\Exception $e) {
             Yii::error('AI Helper Error in answerQuestion: ' . $e->getMessage() . "\nTrace: " . $e->getTraceAsString(), 'ai-helper');
@@ -411,6 +426,62 @@ Quantity: {$quantity}";
                 ]
             ];
         }
+    }
+
+    /**
+     * Generate pricing recommendation for a service/product
+     */
+    private function generatePricingRecommendation($question, $businessType = '', $responseLanguage = 'en', $openRouter = null)
+    {
+        if (!$openRouter) {
+            $openRouter = new OpenRouterClient();
+        }
+        
+        // Language mapping
+        $languageNames = [
+            'en' => 'English',
+            'ko' => 'Korean', 
+            'es' => 'Spanish',
+            'zh-cn' => 'Chinese Simplified',
+            'zh-tw' => 'Chinese Traditional'
+        ];
+        
+        $businessContext = $businessType ? " for a {$businessType} business" : '';
+        
+        $pricingPrompt = "Based on the service/product '{$question}'{$businessContext}, suggest a reasonable market price.
+
+Requirements:
+- Provide ONLY a single number (the price in USD)
+- ALWAYS use USD currency as the base reference
+- Consider standard US market rates and international pricing
+- No currency symbols, no explanations, just the number
+- For hourly services, provide hourly rate in USD
+- For project-based work, provide project price in USD
+- Be realistic and competitive based on global USD standards
+- Convert any local currency considerations to USD equivalent
+
+Service/Product: {$question}
+
+Respond with only the numeric USD price value.";
+
+        $priceResponse = $openRouter->generateCompletion($pricingPrompt, [
+            'max_tokens' => 50,
+            'temperature' => 0.3
+        ]);
+        
+        if (!$priceResponse) {
+            return null;
+        }
+        
+        // Extract numeric value from response
+        $priceResponse = trim($priceResponse);
+        $priceResponse = preg_replace('/[^\d\.]/', '', $priceResponse); // Remove non-numeric characters except decimal point
+        
+        if (is_numeric($priceResponse) && $priceResponse > 0) {
+            return (float) $priceResponse;
+        }
+        
+        return null;
     }
 
     /**

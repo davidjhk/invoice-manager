@@ -403,7 +403,7 @@ $this->registerJsVar('invoiceConfig', [
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="aiHelperModalLabel">
-					<i class="fas fa-magic mr-2"></i><?= Yii::t('app', 'AI Helper') ?>
+					<i class="fas fa-robot mr-2"></i><?= Yii::t('app', 'AI Helper') ?>
 				</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
@@ -443,6 +443,29 @@ $this->registerJsVar('invoiceConfig', [
 					<div class="ai-loading">
 						<i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
 						<p class="mt-2"><?= Yii::t('app', 'Generating suggestions...') ?></p>
+					</div>
+				</div>
+				
+				<!-- Pricing Recommendation Section -->
+				<div id="ai-pricing-section" style="display: none;">
+					<div class="card border-success mt-3">
+						<div class="card-header bg-light">
+							<h6 class="mb-0">
+								<i class="fas fa-dollar-sign text-success mr-2"></i>
+								<?= Yii::t('app', 'Recommended Price') ?>
+							</h6>
+						</div>
+						<div class="card-body text-center">
+							<div class="display-4 text-success font-weight-bold" id="recommended-price-display">
+								$<span id="recommended-price-value">0</span>
+							</div>
+							<small class="text-muted"><?= Yii::t('app', 'USD (Market rate recommendation)') ?></small>
+							<div class="mt-3">
+								<button type="button" class="btn btn-success" id="add-price-to-rate-btn">
+									<i class="fas fa-plus mr-2"></i><?= Yii::t('app', 'Add to Rate') ?>
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -611,7 +634,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseAiHelper()): ?>
                     <div class="input-group-append">
                         <button type="button" class="btn btn-outline-info ai-helper-btn" title="<?= Yii::t('app', 'AI Helper') ?>" data-row-index="${rowIndex}">
-                            <i class="fas fa-magic"></i>
+                            <i class="fas fa-robot"></i>
                         </button>
                     </div>
                     <?php endif; ?>
@@ -1014,13 +1037,42 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	};
 
+	// Make useSuggestionWithPrice globally accessible
+	window.useSuggestionWithPrice = function(description) {
+		if (currentAiRow) {
+			const descriptionInput = currentAiRow.querySelector('.description-input');
+			const rateInput = currentAiRow.querySelector('.rate-input');
+			
+			// Update description
+			descriptionInput.value = description;
+			
+			// Update price if available
+			const priceValueElement = document.getElementById('recommended-price-value');
+			if (priceValueElement && priceValueElement.textContent) {
+				const recommendedPrice = parseFloat(priceValueElement.textContent) || 0;
+				if (recommendedPrice > 0) {
+					rateInput.value = recommendedPrice.toFixed(2);
+					calculateRowAmount(currentAiRow);
+					calculateTotals();
+				}
+			}
+			
+			$('#aiHelperModal').modal('hide');
+		}
+	};
+
 	function initAiHelper() {
 		// Add event listeners for AI helper buttons
 		itemsTbody.addEventListener('click', (e) => {
 			if (e.target.closest('.ai-helper-btn')) {
 				const btn = e.target.closest('.ai-helper-btn');
 				const row = btn.closest('tr');
+				const rowIndex = btn.getAttribute('data-row-index');
+				
+				// Store current row information globally
 				currentAiRow = row;
+				window.currentAiHelperRowIndex = parseInt(rowIndex);
+				
 				showAiHelper(row);
 			}
 		});
@@ -1057,6 +1109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Show input section and hide content
 		document.getElementById('ai-input-section').style.display = 'block';
 		document.getElementById('ai-helper-content').style.display = 'none';
+		document.getElementById('ai-pricing-section').style.display = 'none';
 		
 		// Pre-fill question input with product name if available
 		const questionInput = document.getElementById('ai-question');
@@ -1110,6 +1163,8 @@ Requirements:
 - Professional business language
 - 2-3 sentences maximum
 - Suitable for ${businessType ? businessType + ' business' : 'business'} context
+- Output format MUST be in bullet point format with line breaks
+- Each major point should be on a separate line starting with a bullet (•) or dash (-)
 
 Keywords/Service: ${question}
 
@@ -1133,6 +1188,11 @@ Please provide only the work scope description in ${languageNames[responseLangua
 			
 			if (data.success && data.answer) {
 				displayAnswer(data.answer, question, responseLanguage);
+				
+				// Display pricing recommendation if available
+				if (data.recommended_price && data.recommended_price > 0) {
+					displayPricingRecommendation(data.recommended_price);
+				}
 			} else {
 				let errorMessage = data.error || '<?= Yii::t('app', 'Unable to generate answer') ?>';
 				if (data.debug) {
@@ -1189,10 +1249,16 @@ Please provide only the work scope description in ${languageNames[responseLangua
 				</div>
 			</div>
 			<div class="text-center mb-3">
-				<button type="button" class="btn btn-success btn-lg" onclick="useSuggestion('${escapeHtml(answer)}')">
-					<i class="fas fa-plus mr-2"></i><?= Yii::t('app', 'Add to Description') ?>
-				</button>
-				<button type="button" class="btn btn-outline-secondary ml-2" onclick="showNewQuestion()">
+				<div class="btn-group mb-2" role="group">
+					<button type="button" class="btn btn-success" id="add-to-description-btn">
+						<i class="fas fa-file-text mr-1"></i><?= Yii::t('app', 'Add to Description') ?>
+					</button>
+					<button type="button" class="btn btn-primary" id="add-to-description-and-price-btn" style="display: none;">
+						<i class="fas fa-layer-group mr-1"></i><?= Yii::t('app', 'Add to Description & Price') ?>
+					</button>
+				</div>
+				<br>
+				<button type="button" class="btn btn-outline-secondary" onclick="showNewQuestion()">
 					<i class="fas fa-redo mr-1"></i><?= Yii::t('app', 'Generate Another') ?>
 				</button>
 			</div>
@@ -1205,14 +1271,102 @@ Please provide only the work scope description in ${languageNames[responseLangua
 		`;
 
 		content.innerHTML = html;
+		
+		// Add event listener for "Add to Description" button
+		const addToDescBtn = document.getElementById('add-to-description-btn');
+		if (addToDescBtn) {
+			addToDescBtn.addEventListener('click', function() {
+				useSuggestion(answer);
+			});
+		}
+		
+		// Add event listener for "Add to Description & Price" button
+		const addToDescAndPriceBtn = document.getElementById('add-to-description-and-price-btn');
+		if (addToDescAndPriceBtn) {
+			addToDescAndPriceBtn.addEventListener('click', function() {
+				useSuggestionWithPrice(answer);
+			});
+		}
 	}
 
 	window.showNewQuestion = function() {
 		document.getElementById('ai-input-section').style.display = 'block';
 		document.getElementById('ai-helper-content').style.display = 'none';
+		document.getElementById('ai-pricing-section').style.display = 'none';
 		document.getElementById('ai-question').value = '';
 		document.getElementById('ai-question').focus();
+		
+		// Hide the "Add to Description & Price" button
+		const addToDescAndPriceBtn = document.getElementById('add-to-description-and-price-btn');
+		if (addToDescAndPriceBtn) {
+			addToDescAndPriceBtn.style.display = 'none';
+		}
 	};
+
+	function displayPricingRecommendation(price) {
+		const pricingSection = document.getElementById('ai-pricing-section');
+		const priceValueElement = document.getElementById('recommended-price-value');
+		
+		// Format price to 2 decimal places
+		const formattedPrice = parseFloat(price).toFixed(2);
+		priceValueElement.textContent = formattedPrice;
+		
+		// Store the price globally for combined action
+		window.currentRecommendedPrice = formattedPrice;
+		
+		// Show the pricing section
+		pricingSection.style.display = 'block';
+		
+		// Show the "Add to Description & Price" button
+		const addToDescAndPriceBtn = document.getElementById('add-to-description-and-price-btn');
+		if (addToDescAndPriceBtn) {
+			addToDescAndPriceBtn.style.display = 'inline-block';
+		}
+		
+		// Add event listener for "Add to Rate" button
+		const addPriceBtn = document.getElementById('add-price-to-rate-btn');
+		addPriceBtn.onclick = function() {
+			addPricingToRate(formattedPrice);
+		};
+	}
+
+	function addPricingToRate(price) {
+		// Get the currently active row index (stored when AI Helper button was clicked)
+		const currentRowIndex = window.currentAiHelperRowIndex;
+		
+		if (currentRowIndex !== undefined) {
+			// Find the rate input for the current row
+			const rateInput = document.querySelector(`input[name="InvoiceItem[${currentRowIndex}][rate]"]`);
+			
+			if (rateInput) {
+				rateInput.value = price;
+				
+				// Trigger change event to update calculations
+				rateInput.dispatchEvent(new Event('input', { bubbles: true }));
+				
+				// Show success feedback
+				const addPriceBtn = document.getElementById('add-price-to-rate-btn');
+				const originalText = addPriceBtn.innerHTML;
+				addPriceBtn.innerHTML = '<i class="fas fa-check mr-2"></i><?= Yii::t('app', 'Added!') ?>';
+				addPriceBtn.classList.remove('btn-success');
+				addPriceBtn.classList.add('btn-outline-success');
+				addPriceBtn.disabled = true;
+				
+				// Reset button after 2 seconds
+				setTimeout(() => {
+					addPriceBtn.innerHTML = originalText;
+					addPriceBtn.classList.remove('btn-outline-success');
+					addPriceBtn.classList.add('btn-success');
+					addPriceBtn.disabled = false;
+				}, 2000);
+				
+				// Close modal after adding
+				setTimeout(() => {
+					$('#aiHelperModal').modal('hide');
+				}, 1500);
+			}
+		}
+	}
 
 	function displayError(errorMessage) {
 		const content = document.getElementById('ai-helper-content');
