@@ -448,21 +448,40 @@ Quantity: {$quantity}";
         
         $businessContext = $businessType ? " for a {$businessType} business" : '';
         
-        $pricingPrompt = "Based on the service/product '{$question}'{$businessContext}, suggest a reasonable market price.
+        $pricingPrompt = "Based on the service/product '{$question}'{$businessContext}, calculate a reasonable market price by breaking down individual work scopes.
 
-Requirements:
-- Provide ONLY a single number (the price in USD)
+PRICING METHODOLOGY:
+1. Identify individual work scopes/tasks within the service
+2. Estimate time/effort for each scope
+3. Apply appropriate hourly rates or fixed pricing
+4. Sum up all scope prices for total recommendation
+
+CRITICAL REQUIREMENTS:
+- Provide ONLY a single number (the total price in USD)
 - ALWAYS use USD currency as the base reference
-- Consider standard US market rates and international pricing
 - No currency symbols, no explanations, just the number
-- For hourly services, provide hourly rate in USD
-- For project-based work, provide project price in USD
-- Be realistic and competitive based on global USD standards
-- Convert any local currency considerations to USD equivalent
+- Be REALISTIC and CONSERVATIVE with pricing
+- Consider scope breakdown and effort estimation
+
+PRICING GUIDELINES BY SCOPE TYPE:
+- Planning/Strategy: $75-$150/hour (2-8 hours typical)
+- Design work: $50-$125/hour (5-20 hours typical)
+- Development: $75-$175/hour (10-100 hours typical)
+- Content creation: $25-$75/hour (2-10 hours typical)
+- Testing/QA: $50-$100/hour (2-15 hours typical)
+- Consultation: $100-$200/hour (1-5 hours typical)
+- Project management: $75-$125/hour (5-20% of total work)
+
+TOTAL PRICE LIMITS:
+- Simple services: $100-$2,000
+- Medium projects: $2,000-$15,000  
+- Complex projects: $15,000-$50,000
+- NEVER exceed $50,000 for any recommendation
+- If calculation exceeds $50,000, cap at $50,000
 
 Service/Product: {$question}
 
-Respond with only the numeric USD price value.";
+Calculate total price by summing individual scope estimates. Respond with only the final numeric USD value.";
 
         $priceResponse = $openRouter->generateCompletion($pricingPrompt, [
             'max_tokens' => 50,
@@ -478,7 +497,22 @@ Respond with only the numeric USD price value.";
         $priceResponse = preg_replace('/[^\d\.]/', '', $priceResponse); // Remove non-numeric characters except decimal point
         
         if (is_numeric($priceResponse) && $priceResponse > 0) {
-            return (float) $priceResponse;
+            $price = (float) $priceResponse;
+            
+            // Apply strict price validation and caps
+            if ($price > 50000) {
+                Yii::warning("Price recommendation too high: $price, capping at 50000", 'ai-helper');
+                $price = 50000;
+            }
+            
+            // Additional sanity checks
+            if ($price < 1) {
+                Yii::warning("Price recommendation too low: $price, setting minimum to 25", 'ai-helper');
+                $price = 25;
+            }
+            
+            // Round to 2 decimal places
+            return round($price, 2);
         }
         
         return null;
