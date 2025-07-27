@@ -113,26 +113,6 @@ $this->context->layout = 'auth';
 
             <?php ActiveForm::end(); ?>
 
-            <?php
-            // Check if Google SSO is properly configured
-            $googleClientId = Yii::$app->params['googleClientId'] ?? '';
-            $googleClientSecret = Yii::$app->params['googleClientSecret'] ?? '';
-            $isGoogleSSOEnabled = !empty($googleClientId) && !empty($googleClientSecret);
-            ?>
-
-            <?php if ($isGoogleSSOEnabled): ?>
-            <div class="auth-divider">
-                <span>or</span>
-            </div>
-
-            <div class="auth-social">
-                <a href="<?= \yii\helpers\Url::to(['site/google-login']) ?>" class="btn btn-google btn-block btn-auth">
-                    <i class="fab fa-google"></i>
-                    Sign up with Google
-                </a>
-            </div>
-            <?php endif; ?>
-
             <div class="auth-divider">
                 <span>Already have an account?</span>
             </div>

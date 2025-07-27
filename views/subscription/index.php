@@ -99,63 +99,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?php endforeach; ?>
 	</div>
 
-	<!-- FAQ Section -->
-	<div class="mt-5">
-		<h3 class="text-center mb-4"><?= Yii::t('app', 'Frequently Asked Questions') ?></h3>
-		<div class="row">
-			<div class="col-lg-8 offset-lg-2">
-				<div class="accordion" id="faqAccordion">
-					<div class="card">
-						<div class="card-header" id="faq1">
-							<h5 class="mb-0">
-								<button class="btn btn-link" type="button" data-toggle="collapse"
-									data-target="#collapse1">
-									<?= Yii::t('app', 'Can I change my plan anytime?') ?>
-								</button>
-							</h5>
-						</div>
-						<div id="collapse1" class="collapse" data-parent="#faqAccordion">
-							<div class="card-body">
-								<?= Yii::t('app', 'Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.') ?>
-							</div>
-						</div>
-					</div>
-
-					<div class="card">
-						<div class="card-header" id="faq2">
-							<h5 class="mb-0">
-								<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
-									data-target="#collapse2">
-									<?= Yii::t('app', 'What payment methods do you accept?') ?>
-								</button>
-							</h5>
-						</div>
-						<div id="collapse2" class="collapse" data-parent="#faqAccordion">
-							<div class="card-body">
-								<?= Yii::t('app', 'We accept all major credit cards through our secure payment processor.') ?>
-							</div>
-						</div>
-					</div>
-
-					<div class="card">
-						<div class="card-header" id="faq3">
-							<h5 class="mb-0">
-								<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
-									data-target="#collapse3">
-									<?= Yii::t('app', 'Can I cancel my subscription?') ?>
-								</button>
-							</h5>
-						</div>
-						<div id="collapse3" class="collapse" data-parent="#faqAccordion">
-							<div class="card-body">
-								<?= Yii::t('app', 'Yes, you can cancel your subscription at any time. You will continue to have access to paid features until the end of your billing period.') ?>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 
 <style>
