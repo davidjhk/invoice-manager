@@ -35,18 +35,33 @@ AppAsset::register($this);
 	(function() {
 		if (typeof(Storage) !== "undefined") {
 			var selectedCompanyId = localStorage.getItem("selectedCompanyId");
-			var currentCompanyId = "<?= Yii::$app->session->get('user.current_company_id') ?>";
+			var currentCompanyId = "<?= Yii::$app->session->get('current_company_id') ?>";
 			var isLoggedIn = <?= !Yii::$app->user->isGuest ? 'true' : 'false' ?>;
 			var isOnLoginPage = window.location.pathname.includes('site/login');
 			var isOnSelectCompanyPage = window.location.pathname.includes('company/select');
 
 			if (isLoggedIn && selectedCompanyId && !isOnLoginPage && !isOnSelectCompanyPage) {
-				if (selectedCompanyId !== currentCompanyId) {
+				if (selectedCompanyId !== currentCompanyId && currentCompanyId !== "") {
 					console.log("Redirecting to company " + selectedCompanyId);
-					window.location.href =
-						"<?= Yii::$app->urlManager->createUrl(['company/set-current', 'id' => '']) ?>" +
-						selectedCompanyId;
+					// Add a flag to prevent infinite redirects
+					var redirectCount = parseInt(localStorage.getItem("companyRedirectCount") || "0");
+					if (redirectCount < 3) {
+						localStorage.setItem("companyRedirectCount", (redirectCount + 1).toString());
+						window.location.href =
+							"<?= Yii::$app->urlManager->createUrl(['company/set-current', 'id' => '']) ?>" +
+							selectedCompanyId;
+					} else {
+						// Clear the redirect count and selected company to prevent infinite loop
+						localStorage.removeItem("companyRedirectCount");
+						localStorage.removeItem("selectedCompanyId");
+						console.warn("Too many company redirects, clearing localStorage");
+					}
 				}
+			}
+			
+			// Reset redirect count on successful page load
+			if (isLoggedIn && !isOnLoginPage) {
+				localStorage.removeItem("companyRedirectCount");
 			}
 		}
 	})();
@@ -2715,9 +2730,10 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			var companyId = $(this).data('company-id');
 			var url = $(this).attr('href');
 			
-			// Store selected company in localStorage
+			// Store selected company in localStorage and reset redirect count
 			if (typeof(Storage) !== "undefined") {
 				localStorage.setItem("selectedCompanyId", companyId);
+				localStorage.removeItem("companyRedirectCount");
 			}
 			
 			// Navigate to the URL

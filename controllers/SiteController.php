@@ -68,10 +68,17 @@ class SiteController extends Controller
     /**
      * Displays homepage.
      *
-     * @return string
+     * @return string|Response
      */
     public function actionIndex()
     {
+        // Check if user has a current company selected
+        $company = Company::getCurrent();
+        if (!$company) {
+            // Redirect to company selection if no company is selected
+            return $this->redirect(['company/select']);
+        }
+        
         return $this->render('index');
     }
 

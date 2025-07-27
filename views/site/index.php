@@ -12,10 +12,6 @@ $this->title = (Yii::$app->params['siteName'] ?? Yii::t('app', 'Invoice Manager'
 
 // Get company and statistics
 $company = Company::getCurrent();
-if (!$company) {
-    // Redirect to company selection if no company is selected
-    return Yii::$app->response->redirect(['company/select']);
-}
 
 $totalInvoices = Invoice::find()->where(['company_id' => $company->id])->count();
 $draftInvoices = Invoice::find()->where(['company_id' => $company->id, 'status' => 'draft'])->count();
