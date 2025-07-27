@@ -2588,26 +2588,10 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 	</script>
 
 	<script>
-	// Debug function to check if elements exist
-	function debugDropdowns() {
-		console.log('=== Dropdown Debug Info ===');
-		console.log('jQuery loaded:', typeof jQuery !== 'undefined');
-		console.log('Bootstrap loaded:', typeof bootstrap !== 'undefined');
-		console.log('Top bar dropdowns found:', $('.top-bar .dropdown').length);
-		console.log('Dropdown toggles found:', $('.top-bar .dropdown-toggle').length);
-		console.log('Dropdown menus found:', $('.top-bar .dropdown-menu').length);
-		console.log('Language switcher found:', $('.language-switcher').length);
-		console.log('Language switcher items found:', $('.language-switcher .dropdown-item').length);
-
-		$('.top-bar .dropdown-toggle').each(function(i) {
-			console.log('Dropdown toggle ' + i + ':', $(this).text().trim());
-		});
-	}
 
 	// Initialize Bootstrap 4 dropdowns and navigation
 	$(document).ready(function() {
 		// Run debug function
-		debugDropdowns();
 
 		// Debug main navbar dropdowns
 		console.log('Main navbar dropdown toggles found:', $('.main-navbar .dropdown-toggle').length);
@@ -2622,7 +2606,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		}
 
 		// Test all possible event handlers for top bar dropdowns (excluding language switcher)
-		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').off('click').on('click',
+		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').not('[data-submenu-toggle]').off('click').on('click',
 			function(e) {
 				console.log('=== Top bar dropdown clicked ===');
 				console.log('Target element:', this);
@@ -2657,8 +2641,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 				}
 			});
 
-		// Alternative event binding methods (excluding language switcher)
-		$('.top-bar').on('click', '.dropdown-toggle:not(.language-switcher .dropdown-toggle)', function(e) {
+		// Alternative event binding methods (excluding language switcher and submenu toggles)
+		$('.top-bar').on('click', '.dropdown-toggle:not(.language-switcher .dropdown-toggle):not([data-submenu-toggle])', function(e) {
 			console.log('=== Alternative click handler triggered ===');
 			e.preventDefault();
 			e.stopPropagation();
@@ -2676,8 +2660,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			$menu.toggleClass('show');
 		});
 
-		// Test with mousedown event
-		$('.top-bar .dropdown-toggle').on('mousedown', function(e) {
+		// Test with mousedown event (excluding submenu toggles)
+		$('.top-bar .dropdown-toggle').not('[data-submenu-toggle]').on('mousedown', function(e) {
 			console.log('=== Mousedown event on dropdown toggle ===');
 		});
 
@@ -2827,7 +2811,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		});
 
 		// Dropdown submenu functionality
-		$(document).on('click', '.dropdown-submenu > .dropdown-toggle', function(e) {
+		$(document).on('click', '[data-submenu-toggle]', function(e) {
+			console.log('=== Submenu toggle clicked ===');
 			e.preventDefault();
 			e.stopPropagation();
 			
@@ -2835,11 +2820,17 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			var $submenu = $this.next('.dropdown-menu');
 			var $parentDropdown = $this.closest('.dropdown-submenu');
 			
+			console.log('Submenu element:', $submenu.length);
+			console.log('Parent dropdown:', $parentDropdown.length);
+			
 			// Close other submenus
 			$('.dropdown-submenu .dropdown-menu').not($submenu).removeClass('show');
 			
 			// Toggle current submenu
+			var wasShown = $submenu.hasClass('show');
 			$submenu.toggleClass('show');
+			
+			console.log('Submenu toggled from', wasShown, 'to', !wasShown);
 			
 			// Position submenu based on type
 			if ($parentDropdown.hasClass('dropdown-submenu-down')) {
@@ -2890,15 +2881,28 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			$(this).find('.dropdown-submenu .dropdown-menu').removeClass('show');
 		});
 
+		// Prevent Bootstrap from handling submenu toggles
+		$(document).on('click.bs.dropdown.data-api', '[data-submenu-toggle]', function(e) {
+			e.stopImmediatePropagation();
+		});
+
 		// Prevent Bootstrap dropdown from closing when clicking on submenu toggle
-		$(document).on('click', '.dropdown-submenu > .dropdown-toggle', function(e) {
+		$(document).on('click', '[data-submenu-toggle]', function(e) {
+			console.log('=== Preventing submenu toggle propagation ===');
 			e.stopPropagation();
 		});
 
 		// Prevent Bootstrap dropdown from closing when clicking inside submenu
 		$(document).on('click', '.dropdown-submenu .dropdown-menu', function(e) {
+			console.log('=== Preventing submenu content propagation ===');
 			e.stopPropagation();
 		});
+
+		// Additional protection for submenu area
+		$(document).on('click', '.dropdown-submenu', function(e) {
+			if ($(e.target).closest('[data-submenu-toggle]').length || 
+				$(e.target).closest('.dropdown-menu').length) {
+				e.stopPropagati
 	});
 	</script>
 
