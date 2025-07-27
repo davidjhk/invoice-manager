@@ -260,17 +260,6 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 					</div>
 				</div>
 			</div>
-
-			<!-- Management Links -->
-			<div class="management-links">
-				<h3><?= Yii::t('app', 'Manage') ?></h3>
-				<div class="link-list">
-					<?= Html::a('<i class="fas fa-users"></i>' . Yii::t('app/customer', 'Customers'), ['/customer/index'], ['class' => 'mgmt-link']) ?>
-					<?= Html::a('<i class="fas fa-cube"></i>' . Yii::t('app/product', 'Products'), ['/product/index'], ['class' => 'mgmt-link']) ?>
-					<?= Html::a('<i class="fas fa-cog"></i>' . Yii::t('app', 'Settings'), ['/company/settings'], ['class' => 'mgmt-link']) ?>
-					<?= Html::a('<i class="fas fa-download"></i>' . Yii::t('app', 'Export'), ['/invoice/export'], ['class' => 'mgmt-link']) ?>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

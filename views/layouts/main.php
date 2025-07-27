@@ -962,6 +962,69 @@ AppAsset::register($this);
 	body.dark-mode .dropdown-submenu > .dropdown-toggle:hover::after {
 		border-left-color: #a5b4fc !important;
 	}
+
+	/* Dropdown Submenu Down Styles */
+	.dropdown-submenu-down > .dropdown-menu {
+		position: absolute !important;
+		top: 100% !important;
+		left: 0 !important;
+		margin-top: 0 !important;
+		margin-left: 0 !important;
+		border-radius: 0.375rem !important;
+		display: none !important;
+		opacity: 0 !important;
+		transform: translateY(-10px) !important;
+		transition: all 0.2s ease !important;
+		min-width: 200px !important;
+		z-index: 1001 !important;
+	}
+
+	.dropdown-submenu-down > .dropdown-menu.show {
+		display: block !important;
+		opacity: 1 !important;
+		transform: translateY(0) !important;
+	}
+
+	.dropdown-submenu-down > .dropdown-toggle::after {
+		display: inline-block !important;
+		margin-left: auto !important;
+		vertical-align: 0.255em !important;
+		content: "" !important;
+		border-top: 0.3em solid !important;
+		border-right: 0.3em solid transparent !important;
+		border-bottom: 0 !important;
+		border-left: 0.3em solid transparent !important;
+		float: right !important;
+		margin-top: 0.5em !important;
+	}
+
+	.dropdown-submenu-down > .dropdown-toggle:hover::after {
+		border-top-color: #4f46e5 !important;
+	}
+
+	/* Light mode submenu down styles */
+	body:not(.dark-mode) .dropdown-submenu-down > .dropdown-menu {
+		background: rgba(255, 255, 255, 0.98) !important;
+		border: 1px solid rgba(229, 231, 235, 0.8) !important;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+		backdrop-filter: blur(10px) !important;
+	}
+
+	/* Dark mode submenu down styles */
+	body.dark-mode .dropdown-submenu-down > .dropdown-menu {
+		background: rgba(31, 41, 55, 0.98) !important;
+		border: 1px solid rgba(75, 85, 99, 0.8) !important;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+		backdrop-filter: blur(10px) !important;
+	}
+
+	body.dark-mode .dropdown-submenu-down > .dropdown-toggle::after {
+		border-top-color: #d1d5db !important;
+	}
+
+	body.dark-mode .dropdown-submenu-down > .dropdown-toggle:hover::after {
+		border-top-color: #a5b4fc !important;
+	}
 	</style>
 
 	<!-- Suppress PageSpeed errors -->
@@ -2264,10 +2327,25 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 									->all();
 								?>
 								<?php if (count($userCompanies) > 1): ?>
-								<li class="dropdown-submenu">
-									<a class="dropdown-item dropdown-toggle" href="company/select" data-toggle="dropdown">
+								<li class="dropdown-submenu dropdown-submenu-down">
+									<a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">
 										<i class="fas fa-exchange-alt mr-2"></i><?= Yii::t('app/nav', 'Switch Company') ?>
 									</a>
+									<ul class="dropdown-menu dropdown-menu-down">
+										<?php foreach ($userCompanies as $company): ?>
+										<li>
+											<?php if ($company->id == $currentCompany->id): ?>
+											<a class="dropdown-item active" href="#">
+												<i class="fas fa-check mr-2"></i><?= Html::encode($company->company_name) ?>
+											</a>
+											<?php else: ?>
+											<?= Html::a('<i class="fas fa-building mr-2"></i>' . Html::encode($company->company_name), 
+												['/company/set-current', 'id' => $company->id], 
+												['class' => 'dropdown-item company-switch-item', 'data-company-id' => $company->id]) ?>
+											<?php endif; ?>
+										</li>
+										<?php endforeach; ?>
+									</ul>
 								</li>
 								<?php endif; ?>
 								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
@@ -2754,16 +2832,40 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			// Toggle current submenu
 			$submenu.toggleClass('show');
 			
-			// Position submenu
-			var rect = this.getBoundingClientRect();
-			var submenuWidth = $submenu.outerWidth();
-			var windowWidth = $(window).width();
-			
-			// Check if submenu would go off-screen to the right
-			if (rect.right + submenuWidth > windowWidth) {
-				$submenu.addClass('dropdown-menu-left');
+			// Position submenu based on type
+			if ($parentDropdown.hasClass('dropdown-submenu-down')) {
+				// For down submenus, check if it would go off-screen at the bottom
+				var rect = this.getBoundingClientRect();
+				var submenuHeight = $submenu.outerHeight();
+				var windowHeight = $(window).height();
+				
+				// If submenu would go off-screen at bottom, position it above
+				if (rect.bottom + submenuHeight > windowHeight) {
+					$submenu.css({
+						'top': 'auto',
+						'bottom': '100%',
+						'margin-bottom': '0',
+						'margin-top': '0'
+					});
+				} else {
+					$submenu.css({
+						'top': '100%',
+						'bottom': 'auto',
+						'margin-top': '0',
+						'margin-bottom': '0'
+					});
+				}
 			} else {
-				$submenu.removeClass('dropdown-menu-left');
+				// For right submenus, check if it would go off-screen to the right
+				var rect = this.getBoundingClientRect();
+				var submenuWidth = $submenu.outerWidth();
+				var windowWidth = $(window).width();
+				
+				if (rect.right + submenuWidth > windowWidth) {
+					$submenu.addClass('dropdown-menu-left');
+				} else {
+					$submenu.removeClass('dropdown-menu-left');
+				}
 			}
 		});
 
