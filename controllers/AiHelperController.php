@@ -159,6 +159,57 @@ class AiHelperController extends Controller
     }
 
     /**
+     * Extract prices from work scope description and sum them up
+     */
+    private function extractPricesFromDescription($description)
+    {
+        if (empty($description)) {
+            return null;
+        }
+        
+        Yii::info('Extracting prices from description: ' . substr($description, 0, 200) . '...', 'ai-helper');
+        
+        // Regular expressions to match various price formats
+        $patterns = [
+            '/\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i', // $1,000.00, $500, $10,000
+            '/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*(?:USD|dollars?|usd)/i', // 1000 USD, 500 dollars
+            '/(?:USD|dollars?)\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i', // USD 1000, dollar 500
+            '/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*(?:per hour|\/hour|hourly)/i', // 100 per hour, 75/hour
+        ];
+        
+        $totalPrice = 0;
+        $foundPrices = [];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match_all($pattern, $description, $matches)) {
+                foreach ($matches[1] as $priceString) {
+                    // Remove commas and convert to float
+                    $price = (float) str_replace(',', '', $priceString);
+                    if ($price > 0 && $price <= 50000) { // Reasonable price range check
+                        $foundPrices[] = $price;
+                        $totalPrice += $price;
+                    }
+                }
+            }
+        }
+        
+        if (!empty($foundPrices)) {
+            Yii::info('Found prices in description: ' . implode(', ', $foundPrices) . ' = Total: $' . $totalPrice, 'ai-helper');
+            
+            // Apply reasonable caps
+            if ($totalPrice > 50000) {
+                Yii::warning("Extracted total price too high: $totalPrice, capping at 50000", 'ai-helper');
+                $totalPrice = 50000;
+            }
+            
+            return round($totalPrice, 2);
+        }
+        
+        Yii::info('No prices found in description', 'ai-helper');
+        return null;
+    }
+    
+    /**
      * Generate payment terms suggestions
      */
     public function actionGeneratePaymentTerms()
@@ -357,29 +408,90 @@ Quantity: {$quantity}";
             // Log before API call
             Yii::info('Calling OpenRouter API with question length: ' . strlen($question), 'ai-helper');
             
-            // Try with the full question first
-            $answer = $openRouter->generateCompletion($question, [
-                'max_tokens' => 800,
+            // Language mapping for responses
+            $languageNames = [
+                'en' => 'English',
+                'ko' => 'Korean', 
+                'es' => 'Spanish',
+                'zh-cn' => 'Chinese Simplified',
+                'zh-tw' => 'Chinese Traditional'
+            ];
+            
+            $selectedLanguage = $languageNames[$responseLanguage] ?? 'English';
+            $businessContext = $businessType ? " for a {$businessType} business" : '';
+            
+            // Create comprehensive work scope prompt
+            $workScopePrompt = "Based on the service/product keywords '{$question}'{$businessContext}, generate a comprehensive and professional work scope description suitable for invoice documentation.
+
+REQUIREMENTS:
+- Write in {$selectedLanguage} language
+- Create detailed, professional work scope using industry-specific terminology
+- Structure as bullet points with line breaks
+- Include specific deliverables, methodologies, and technical processes
+- Use appropriate professional jargon and technical terms for the field
+- Make it comprehensive enough to justify professional pricing
+- Minimum 4-6 detailed bullet points
+- Each bullet point should be substantive (2-3 lines when possible)
+
+CONTENT STRUCTURE WITH PRICING:
+• Discovery & Analysis Phase: Include research, requirement gathering, stakeholder interviews (with estimated costs)
+• Strategic Planning & Architecture: Cover system design, user experience planning, technical specifications (with time estimates and rates)
+• Implementation & Development: Detail technical execution, coding standards, quality assurance processes (with development costs)
+• Testing & Quality Assurance: Comprehensive testing methodologies, performance optimization (with testing costs)
+• Deployment & Integration: Go-live procedures, system integration, data migration (with deployment costs)
+• Documentation & Training: Technical documentation, user manuals, training materials (with documentation costs)
+• Post-Launch Support: Maintenance protocols, ongoing optimization, performance monitoring (with support costs)
+
+PRICING INCLUSION REQUIREMENTS:
+- Include specific USD pricing for major phases/deliverables
+- Use format like \"Phase X: $X,XXX\" or \"Development: $X,XXX\" 
+- Break down costs for different components when applicable
+- Ensure pricing is realistic and reflects market rates
+- Total pricing should align with project complexity
+
+INDUSTRY-SPECIFIC TERMINOLOGY EXAMPLES:
+- Web Development: Frontend/backend architecture, responsive design, API integration, database optimization
+- Marketing: Brand positioning, target audience segmentation, conversion rate optimization, analytics implementation
+- Design: Information architecture, user interface design, brand identity systems, design system development
+- Consulting: Strategic advisory, business process optimization, stakeholder engagement, change management
+- Content: Content strategy development, editorial calendar, SEO optimization, content distribution channels
+
+OUTPUT FORMAT:
+• [Detailed professional description with technical terms and specific pricing: $X,XXX]
+• [Specific deliverables and methodologies with costs: $X,XXX]
+• [Quality assurance and testing procedures with pricing: $X,XXX]
+• [Documentation and handover processes with costs: $X,XXX]
+
+Service/Product: {$question}
+
+Generate comprehensive work scope in {$selectedLanguage} with professional terminology, detailed bullet points, and SPECIFIC PRICING for each major component. Include dollar amounts like $2,500, $5,000, etc. for different phases/deliverables.";
+
+            $answer = $openRouter->generateCompletion($workScopePrompt, [
+                'max_tokens' => 1200,
                 'temperature' => 0.7
             ]);
-            
-            // If that fails, try with a simpler prompt as fallback
-            if (empty($answer)) {
-                Yii::warning('First attempt failed, trying simpler prompt', 'ai-helper');
-                $simplePrompt = "Create a professional invoice description for: " . 
-                    str_replace('Based on the keywords or service "', '', 
-                    str_replace('", generate a professional work scope description suitable for an invoice.', '', $question));
-                
-                $answer = $openRouter->generateCompletion($simplePrompt, [
-                    'max_tokens' => 300,
-                    'temperature' => 0.5
-                ]);
-            }
             
             // Generate pricing recommendation separately
             $pricingRecommendation = null;
             try {
-                $pricingRecommendation = $this->generatePricingRecommendation($question, $businessType, $responseLanguage, $openRouter);
+                Yii::info('Attempting to generate pricing recommendation for: ' . $question, 'ai-helper');
+                
+                // First, try to extract prices from the generated work scope description
+                $extractedPrice = $this->extractPricesFromDescription($answer);
+                
+                if ($extractedPrice !== null && $extractedPrice > 0) {
+                    Yii::info('Extracted price from description: $' . $extractedPrice, 'ai-helper');
+                    $pricingRecommendation = $extractedPrice;
+                } else {
+                    // If no prices found in description, use AI-based pricing
+                    $pricingRecommendation = $this->generatePricingRecommendation($question, $businessType, $responseLanguage, $openRouter);
+                }
+                
+                if ($pricingRecommendation !== null) {
+                    Yii::info('Final pricing recommendation: $' . $pricingRecommendation, 'ai-helper');
+                } else {
+                    Yii::warning('Pricing recommendation returned null', 'ai-helper');
+                }
             } catch (\Exception $e) {
                 Yii::warning('Failed to generate pricing recommendation: ' . $e->getMessage(), 'ai-helper');
             }
@@ -483,21 +595,30 @@ Service/Product: {$question}
 
 Calculate total price by summing individual scope estimates. Respond with only the final numeric USD value.";
 
+        Yii::info('Sending pricing prompt for: ' . $question, 'ai-helper');
+        
         $priceResponse = $openRouter->generateCompletion($pricingPrompt, [
-            'max_tokens' => 50,
+            'max_tokens' => 100,
             'temperature' => 0.3
         ]);
         
+        Yii::info('Pricing API response: ' . ($priceResponse ?: 'null/empty'), 'ai-helper');
+        
         if (!$priceResponse) {
+            Yii::warning('Empty pricing response from OpenRouter', 'ai-helper');
             return null;
         }
         
         // Extract numeric value from response
+        $originalResponse = $priceResponse;
         $priceResponse = trim($priceResponse);
         $priceResponse = preg_replace('/[^\d\.]/', '', $priceResponse); // Remove non-numeric characters except decimal point
         
+        Yii::info('Price extraction - Original: "' . $originalResponse . '", Cleaned: "' . $priceResponse . '"', 'ai-helper');
+        
         if (is_numeric($priceResponse) && $priceResponse > 0) {
             $price = (float) $priceResponse;
+            Yii::info('Parsed price: ' . $price, 'ai-helper');
             
             // Apply strict price validation and caps
             if ($price > 50000) {
@@ -512,9 +633,12 @@ Calculate total price by summing individual scope estimates. Respond with only t
             }
             
             // Round to 2 decimal places
-            return round($price, 2);
+            $finalPrice = round($price, 2);
+            Yii::info('Final price recommendation: $' . $finalPrice, 'ai-helper');
+            return $finalPrice;
         }
         
+        Yii::warning('Could not parse numeric price from response: "' . $priceResponse . '"', 'ai-helper');
         return null;
     }
 
