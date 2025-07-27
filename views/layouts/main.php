@@ -2902,7 +2902,9 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		$(document).on('click', '.dropdown-submenu', function(e) {
 			if ($(e.target).closest('[data-submenu-toggle]').length || 
 				$(e.target).closest('.dropdown-menu').length) {
-				e.stopPropagati
+				e.stopPropagation();
+			}
+		});
 	});
 	</script>
 
