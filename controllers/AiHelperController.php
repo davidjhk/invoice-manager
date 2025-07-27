@@ -421,6 +421,7 @@ Quantity: {$quantity}";
             $businessContext = $businessType ? " for a {$businessType} business" : '';
             
             // Create comprehensive work scope prompt
+            $dollarSign = chr(36); // ASCII code for $ symbol
             $workScopePrompt = "Based on the service/product keywords '{$question}'{$businessContext}, generate a comprehensive and professional work scope description suitable for invoice documentation.
 
 REQUIREMENTS:
@@ -444,7 +445,7 @@ CONTENT STRUCTURE WITH PRICING:
 
 PRICING INCLUSION REQUIREMENTS:
 - Include specific USD pricing for major phases/deliverables
-- Use format like \"Phase X: \\$2,500\" or \"Development: \\$5,000\" 
+- Use format like \"Phase X: {$dollarSign}2,500\" or \"Development: {$dollarSign}5,000\"
 - Break down costs for different components when applicable
 - Ensure pricing is realistic and reflects market rates
 - Total pricing should align with project complexity
@@ -457,14 +458,14 @@ INDUSTRY-SPECIFIC TERMINOLOGY EXAMPLES:
 - Content: Content strategy development, editorial calendar, SEO optimization, content distribution channels
 
 OUTPUT FORMAT:
-• [Detailed professional description with technical terms and specific pricing: \\$2,500]
-• [Specific deliverables and methodologies with costs: \\$3,000]
-• [Quality assurance and testing procedures with pricing: \\$1,500]
-• [Documentation and handover processes with costs: \\$1,000]
+• [Detailed professional description with technical terms and specific pricing: {$dollarSign}2,500]
+• [Specific deliverables and methodologies with costs: {$dollarSign}3,000]
+• [Quality assurance and testing procedures with pricing: {$dollarSign}1,500]
+• [Documentation and handover processes with costs: {$dollarSign}1,000]
 
 Service/Product: {$question}
 
-Generate comprehensive work scope in {$selectedLanguage} with professional terminology, detailed bullet points, and SPECIFIC PRICING for each major component. Include dollar amounts like \\$2,500, \\$5,000, etc. for different phases/deliverables.";
+Generate comprehensive work scope in {$selectedLanguage} with professional terminology, detailed bullet points, and SPECIFIC PRICING for each major component. Include dollar amounts like {$dollarSign}2,500, {$dollarSign}5,000, etc. for different phases/deliverables.";
 
             $answer = $openRouter->generateCompletion($workScopePrompt, [
                 'max_tokens' => 1200,
