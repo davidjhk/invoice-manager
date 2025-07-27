@@ -66,7 +66,7 @@ $this->registerJsVar('estimateConfig', [
 	<div class="row">
 		<div class="col-lg-7">
 			<div class="card card-default">
-				<div class="card-header">
+				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-file-invoice mr-2"></i><?= strtoupper(Yii::t('app/estimate', 'Estimate')) ?>
 					</h5>
@@ -127,7 +127,7 @@ $this->registerJsVar('estimateConfig', [
 
 		<div class="col-lg-5">
 			<div class="card card-default">
-				<div class="card-header">
+				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-info-circle mr-2"></i><?= Yii::t('app/estimate', 'Estimate Details') ?>
 					</h5>
@@ -152,7 +152,7 @@ $this->registerJsVar('estimateConfig', [
 			</div>
 
 			<!-- Help Information -->
-			<div class="card mt-3">
+			<div class="card mt-3" style="display: none;">
 				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse"
 					data-target="#estimate-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
@@ -186,7 +186,7 @@ $this->registerJsVar('estimateConfig', [
 	</div>
 
 	<div class="card card-default mt-4">
-		<div class="card-header">
+		<div class="card-header" style="display: none;">
 			<h5 class="card-title mb-0">
 				<i class="fas fa-list mr-2"></i><?= Yii::t('app/estimate', 'Items') ?>
 			</h5>
@@ -219,7 +219,7 @@ $this->registerJsVar('estimateConfig', [
 	<div class="row mt-4">
 		<div class="col-lg-6">
 			<div class="card card-default">
-				<div class="card-header">
+				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-comment mr-2"></i><?= Yii::t('app/estimate', 'Notes') ?>
 					</h5>
@@ -233,7 +233,7 @@ $this->registerJsVar('estimateConfig', [
 
 		<div class="col-lg-6">
 			<div class="card card-default">
-				<div class="card-header">
+				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-calculator mr-2"></i><?= Yii::t('app/estimate', 'Total') ?>
 					</h5>

@@ -24,8 +24,7 @@ use app\models\ProductCategory;
     ]); ?>
 
 	<div class="row">
-		<!-- Left Column -->
-		<div class="col-lg-8">
+		<div class="col-lg-12">
 
 			<!-- Basic Information -->
 			<div class="card mb-4">
@@ -55,10 +54,12 @@ use app\models\ProductCategory;
 										'id' => 'product-category_id'
 									]) ?>
 									<div class="input-group-append">
-										<button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#categoryModal" title="Add New Category">
+										<button type="button" class="btn btn-outline-secondary" data-toggle="modal"
+											data-target="#categoryModal" title="Add New Category">
 											<i class="fas fa-plus"></i>
 										</button>
-										<a href="<?= \yii\helpers\Url::to(['/category/index']) ?>" class="btn btn-outline-info" title="Manage Categories">
+										<a href="<?= \yii\helpers\Url::to(['/category/index']) ?>"
+											class="btn btn-outline-info" title="Manage Categories">
 											<i class="fas fa-cog"></i>
 										</a>
 									</div>
@@ -73,6 +74,9 @@ use app\models\ProductCategory;
 					<?= $form->field($model, 'description')->label(Yii::t('app/product', 'Description'))->textarea(['rows' => 3]) ?>
 				</div>
 			</div>
+		</div>
+		<!-- Left Column -->
+		<div class="col-lg-8">
 
 			<!-- Pricing Information -->
 			<div class="card mb-4">
@@ -167,7 +171,7 @@ use app\models\ProductCategory;
 			</div>
 
 			<!-- Company Information -->
-			<div class="card mb-4">
+			<div class="card mb-4" style="display: none;">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-building mr-2"></i>Company
@@ -183,8 +187,9 @@ use app\models\ProductCategory;
 			</div>
 
 			<!-- Help Information -->
-			<div class="card mb-4">
-				<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true" data-target="#product-help-collapse" aria-expanded="false">
+			<div class="card mb-4" style="display: none;">
+				<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+					data-target="#product-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
 						<span><i class="fas fa-question-circle mr-2"></i>Product Help</span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
@@ -196,7 +201,8 @@ use app\models\ProductCategory;
 							<small>
 								<strong>Name:</strong> Product or service name for identification.<br>
 								<strong>Type:</strong> Product or Service classification.<br>
-								<strong>Category:</strong> Select from categories or add new ones using the + button.<br>
+								<strong>Category:</strong> Select from categories or add new ones using the +
+								button.<br>
 								<strong>SKU:</strong> Stock Keeping Unit for inventory tracking.<br>
 								<strong>Price:</strong> Selling price charged to customers.<br>
 								<strong>Cost:</strong> Your cost for profit margin calculation.<br>
@@ -225,7 +231,8 @@ use app\models\ProductCategory;
 </div>
 
 <!-- Category Modal -->
-<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true" data-backdrop="true" data-keyboard="true">
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel"
+	aria-hidden="true" data-backdrop="true" data-keyboard="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -239,17 +246,20 @@ use app\models\ProductCategory;
 			<div class="modal-body">
 				<form id="categoryForm">
 					<input type="hidden" id="modal-company-id" value="<?= $company->id ?>">
-					
+
 					<div class="form-group">
 						<label for="modal-category-name" class="form-label font-weight-bold">Category Name</label>
-						<input type="text" class="form-control" id="modal-category-name" required maxlength="100" placeholder="Enter category name">
+						<input type="text" class="form-control" id="modal-category-name" required maxlength="100"
+							placeholder="Enter category name">
 					</div>
-					
+
 					<div class="form-group">
-						<label for="modal-category-description" class="form-label font-weight-bold">Description (Optional)</label>
-						<textarea class="form-control" id="modal-category-description" rows="2" placeholder="Optional description for this category"></textarea>
+						<label for="modal-category-description" class="form-label font-weight-bold">Description
+							(Optional)</label>
+						<textarea class="form-control" id="modal-category-description" rows="2"
+							placeholder="Optional description for this category"></textarea>
 					</div>
-					
+
 					<div class="form-check">
 						<input type="checkbox" class="form-check-input" id="modal-category-active" checked>
 						<label class="form-check-label" for="modal-category-active">

@@ -24,7 +24,7 @@ use app\models\State;
     ]); ?>
 
 	<div class="row">
-		<div class="col-lg-8">
+		<div class="col-lg-12">
 			<div class="card">
 				<div class="card-header">
 					<h5 class="card-title mb-0">
@@ -160,10 +160,11 @@ use app\models\State;
 			</div>
 		</div>
 
-		<div class="col-lg-4">
+		<div class="col-lg-4" style="display: none;">
 			<!-- Help Information -->
 			<div class="card">
-				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse" data-target="#customer-help-collapse" aria-expanded="false">
+				<div class="card-header p-2" style="cursor: pointer;" data-toggle="collapse"
+					data-target="#customer-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
 						<span><i class="fas fa-question-circle mr-2"></i>Customer Help</span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
