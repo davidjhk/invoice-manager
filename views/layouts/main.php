@@ -2250,24 +2250,9 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 								?>
 								<?php if (count($userCompanies) > 1): ?>
 								<li class="dropdown-submenu">
-									<a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">
+									<a class="dropdown-item dropdown-toggle" href="company/select" data-toggle="dropdown">
 										<i class="fas fa-exchange-alt mr-2"></i><?= Yii::t('app/nav', 'Switch Company') ?>
 									</a>
-									<ul class="dropdown-menu">
-										<?php foreach ($userCompanies as $company): ?>
-										<li>
-											<?php if ($company->id == $currentCompany->id): ?>
-											<a class="dropdown-item active" href="#">
-												<i class="fas fa-check mr-2"></i><?= Html::encode($company->company_name) ?>
-											</a>
-											<?php else: ?>
-											<?= Html::a('<i class="fas fa-building mr-2"></i>' . Html::encode($company->company_name), 
-												['/company/set-current', 'id' => $company->id], 
-												['class' => 'dropdown-item company-switch-item', 'data-company-id' => $company->id]) ?>
-											<?php endif; ?>
-										</li>
-										<?php endforeach; ?>
-									</ul>
 								</li>
 								<?php endif; ?>
 								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
