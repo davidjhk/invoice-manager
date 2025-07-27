@@ -228,6 +228,7 @@ class Plan extends ActiveRecord
             'api_access' => $this->can_use_api,
             'import' => $this->can_use_import,
             'custom_templates' => $this->can_use_custom_templates,
+            'ai_helper' => $this->can_use_ai_helper,
         ];
     }
 
@@ -311,6 +312,16 @@ class Plan extends ActiveRecord
     public function hasUnlimitedEstimates()
     {
         return $this->getMonthlyEstimateLimit() === null;
+    }
+
+    /**
+     * Check if plan allows AI Helper functionality
+     *
+     * @return bool
+     */
+    public function canUseAiHelper()
+    {
+        return (bool) $this->can_use_ai_helper;
     }
 
     /**

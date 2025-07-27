@@ -105,4 +105,33 @@ class AdminSettings extends ActiveRecord
     {
         return (bool) static::getSetting('site_maintenance', false);
     }
+
+    /**
+     * Get the current AI model for OpenRouter
+     * @return string
+     */
+    public static function getAiModel()
+    {
+        $defaultModel = Yii::$app->params['defaultAiModel'] ?? 'anthropic/claude-3.5-sonnet';
+        return static::getSetting('ai_model', $defaultModel);
+    }
+
+    /**
+     * Set the AI model for OpenRouter
+     * @param string $model
+     * @return bool
+     */
+    public static function setAiModel($model)
+    {
+        return static::setSetting('ai_model', $model, 'Selected AI model for OpenRouter API');
+    }
+
+    /**
+     * Get available AI models from params
+     * @return array
+     */
+    public static function getAvailableAiModels()
+    {
+        return Yii::$app->params['openRouterModels'] ?? [];
+    }
 }

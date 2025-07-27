@@ -396,6 +396,57 @@ $this->registerJsVar('invoiceConfig', [
 	</div>
 </div>
 
+<?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseAiHelper()): ?>
+<!-- AI Helper Modal -->
+<div class="modal fade" id="aiHelperModal" tabindex="-1" role="dialog" aria-labelledby="aiHelperModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="aiHelperModalLabel">
+					<i class="fas fa-magic mr-2"></i><?= Yii::t('app', 'AI Helper') ?>
+				</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- Input Section -->
+				<div id="ai-input-section">
+					<div class="form-group">
+						<label for="ai-question"><?= Yii::t('app', 'Ask AI Helper') ?>:</label>
+						<div class="input-group">
+							<input type="text" id="ai-question" class="form-control" placeholder="<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>" autofocus>
+							<div class="input-group-append">
+								<button type="button" class="btn btn-primary" id="ask-ai-btn">
+									<i class="fas fa-paper-plane"></i>
+								</button>
+							</div>
+						</div>
+						<small class="form-text text-muted">
+							<?= Yii::t('app', 'Examples: "Website development", "Consulting services", "How to write professional invoice descriptions?"') ?>
+						</small>
+					</div>
+				</div>
+				
+				<!-- Results Section -->
+				<div id="ai-helper-content" style="display: none;">
+					<div class="ai-loading">
+						<i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+						<p class="mt-2"><?= Yii::t('app', 'Generating suggestions...') ?></p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
+				<button type="button" class="btn btn-outline-secondary" id="ask-another-btn" style="display: none;">
+					<i class="fas fa-question mr-1"></i><?= Yii::t('app', 'Ask Another Question') ?>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 	// --- FORM VALIDATION ---
@@ -544,7 +595,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="text" class="form-control product-input" name="InvoiceItem[${rowIndex}][product_service_name]" placeholder="Product or Service" value="${item.product_service_name || ''}">
                 <input type="hidden" class="product-id-input" name="InvoiceItem[${rowIndex}][product_id]" value="${item.product_id || ''}">
             </td>
-            <td><textarea class="form-control description-input" name="InvoiceItem[${rowIndex}][description]" rows="4" placeholder="Description">${item.description || ''}</textarea></td>
+            <td>
+                <div class="input-group">
+                    <textarea class="form-control description-input" name="InvoiceItem[${rowIndex}][description]" rows="4" placeholder="Description">${item.description || ''}</textarea>
+                    <?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseAiHelper()): ?>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-info ai-helper-btn" title="<?= Yii::t('app', 'AI Helper') ?>" data-row-index="${rowIndex}">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </td>
             <td><input type="number" class="form-control quantity-input text-right" name="InvoiceItem[${rowIndex}][quantity]" value="${item.quantity || 1}" min="0" step="1"></td>
             <td><input type="number" class="form-control rate-input text-right" name="InvoiceItem[${rowIndex}][rate]" value="${item.rate || '0.00'}" min="0" step="0.01"></td>
             <td class="align-middle text-right amount-display">$0.00</td>
@@ -928,6 +990,195 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	// Collapse functionality is handled by collapse-helper.js
+
+	<?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseAiHelper()): ?>
+	// --- AI HELPER FUNCTIONALITY ---
+	let currentAiRow = null;
+
+	// Make useSuggestion globally accessible to fix JavaScript error
+	window.useSuggestion = function(description) {
+		if (currentAiRow) {
+			const descriptionInput = currentAiRow.querySelector('.description-input');
+			descriptionInput.value = description;
+			$('#aiHelperModal').modal('hide');
+		}
+	};
+
+	function initAiHelper() {
+		// Add event listeners for AI helper buttons
+		itemsTbody.addEventListener('click', (e) => {
+			if (e.target.closest('.ai-helper-btn')) {
+				const btn = e.target.closest('.ai-helper-btn');
+				const row = btn.closest('tr');
+				currentAiRow = row;
+				showAiHelper(row);
+			}
+		});
+
+		// Ask AI button click handler
+		document.getElementById('ask-ai-btn')?.addEventListener('click', () => {
+			const questionInput = document.getElementById('ai-question');
+			const question = questionInput.value.trim();
+			
+			if (!question) {
+				alert('<?= Yii::t('app', 'Please enter a question or product name') ?>');
+				return;
+			}
+			
+			askAiQuestion(question);
+		});
+
+		// Enter key handler for question input
+		document.getElementById('ai-question')?.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				document.getElementById('ask-ai-btn').click();
+			}
+		});
+	}
+
+	function showAiHelper(row) {
+		currentAiRow = row;
+		const productInput = row.querySelector('.product-input');
+		const productName = productInput.value.trim();
+
+		// Show modal
+		$('#aiHelperModal').modal('show');
+		
+		// Show input section and hide content
+		document.getElementById('ai-input-section').style.display = 'block';
+		document.getElementById('ai-helper-content').style.display = 'none';
+		
+		// Pre-fill question input with product name if available
+		const questionInput = document.getElementById('ai-question');
+		if (productName) {
+			questionInput.value = productName;
+			questionInput.placeholder = '<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>';
+		} else {
+			questionInput.value = '';
+			questionInput.placeholder = '<?= Yii::t('app', 'Enter product/service name or ask a question...') ?>';
+		}
+		
+		// Focus on input
+		setTimeout(() => questionInput.focus(), 100);
+	}
+
+	async function askAiQuestion(question) {
+		try {
+			// Show loading in content area
+			const content = document.getElementById('ai-helper-content');
+			content.style.display = 'block';
+			content.innerHTML = `
+				<div class="ai-loading text-center">
+					<i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+					<p class="mt-2"><?= Yii::t('app', 'Thinking...') ?></p>
+				</div>
+			`;
+
+			// Hide input section
+			document.getElementById('ai-input-section').style.display = 'none';
+
+			const customerId = customerSelect.value || '';
+			const businessType = '<?= $company->industry ?? '' ?>';
+
+			// Create a more conversational prompt
+			const conversationalPrompt = `Based on the question or product/service "${question}", provide a professional description that could be used in an invoice or estimate. Consider this is for ${businessType ? 'a ' + businessType + ' business' : 'a business'}. Please provide a clear, concise description suitable for billing purposes.`;
+
+			const response = await fetch('<?= Url::to(['/ai-helper/answer-question']) ?>', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+				},
+				body: new URLSearchParams({
+					question: conversationalPrompt,
+					customer_id: customerId,
+					business_type: businessType
+				})
+			});
+
+			const data = await response.json();
+			
+			if (data.success && data.answer) {
+				displayAnswer(data.answer, question);
+			} else {
+				let errorMessage = data.error || '<?= Yii::t('app', 'Unable to generate answer') ?>';
+				if (data.debug && typeof data.debug === 'string') {
+					console.warn('AI Helper Debug Info:', data.debug);
+				}
+				displayError(errorMessage);
+			}
+		} catch (error) {
+			console.error('AI Helper Network Error:', error);
+			displayError('<?= Yii::t('app', 'Network error. Please try again.') ?>');
+		}
+	}
+
+	function displayAnswer(answer, originalQuestion) {
+		const content = document.getElementById('ai-helper-content');
+		
+		let html = `
+			<h6 class="mb-3">
+				<i class="fas fa-lightbulb text-warning mr-2"></i>
+				<?= Yii::t('app', 'AI Response') ?>
+			</h6>
+			<div class="card mb-3">
+				<div class="card-body">
+					<h6 class="card-subtitle mb-2 text-muted"><?= Yii::t('app', 'Your Question') ?>:</h6>
+					<p class="card-text"><em>"${escapeHtml(originalQuestion)}"</em></p>
+					<h6 class="card-subtitle mb-2 text-muted"><?= Yii::t('app', 'AI Answer') ?>:</h6>
+					<p class="card-text">${escapeHtml(answer)}</p>
+				</div>
+			</div>
+			<div class="text-center mb-3">
+				<button type="button" class="btn btn-primary" onclick="useSuggestion('${escapeHtml(answer)}')">
+					<i class="fas fa-plus mr-1"></i><?= Yii::t('app', 'Add to Description') ?>
+				</button>
+				<button type="button" class="btn btn-outline-secondary ml-2" onclick="showNewQuestion()">
+					<i class="fas fa-question mr-1"></i><?= Yii::t('app', 'Ask Another Question') ?>
+				</button>
+			</div>
+			<div class="mt-3 pt-3 border-top">
+				<small class="text-muted">
+					<i class="fas fa-info-circle mr-1"></i>
+					<?= Yii::t('app', 'This response is AI-generated. Please review and edit as needed.') ?>
+				</small>
+			</div>
+		`;
+
+		content.innerHTML = html;
+	}
+
+	window.showNewQuestion = function() {
+		document.getElementById('ai-input-section').style.display = 'block';
+		document.getElementById('ai-helper-content').style.display = 'none';
+		document.getElementById('ai-question').value = '';
+		document.getElementById('ai-question').focus();
+	};
+
+	function displayError(errorMessage) {
+		const content = document.getElementById('ai-helper-content');
+		content.innerHTML = `
+			<div class="alert alert-warning">
+				<i class="fas fa-exclamation-triangle mr-2"></i>
+				${escapeHtml(errorMessage)}
+			</div>
+			<p class="text-center">
+				<button type="button" class="btn btn-outline-primary" onclick="showNewQuestion()">
+					<i class="fas fa-redo mr-1"></i><?= Yii::t('app', 'Try Again') ?>
+				</button>
+			</p>
+		`;
+	}
+
+	function escapeHtml(text) {
+		const div = document.createElement('div');
+		div.textContent = text;
+		return div.innerHTML;
+	}
+
+	// Initialize AI Helper
+	initAiHelper();
+	<?php endif; ?>
 });
 </script>
 <style>
@@ -965,5 +1216,31 @@ document.addEventListener('DOMContentLoaded', function() {
 		max-width: calc(800px + 100px);
 		/* Bootstrap modal-xl is 800px, adding 100px */
 	}
+}
+
+/* AI Helper Styles */
+.ai-helper-btn {
+	min-height: 100%;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.ai-suggestion {
+	cursor: pointer;
+	padding: 0.5rem;
+	border: 1px solid #dee2e6;
+	border-radius: 0.25rem;
+	margin-bottom: 0.5rem;
+	transition: all 0.2s;
+}
+
+.ai-suggestion:hover {
+	background-color: #f8f9fa;
+	border-color: #007bff;
+}
+
+.ai-loading {
+	text-align: center;
+	padding: 2rem;
 }
 </style>

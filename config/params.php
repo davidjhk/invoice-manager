@@ -17,6 +17,64 @@ $defaultParams = [
     'freeUserMonthlyLimit' => 10, // 10 invoices/estimates per month for free users
     'freeUserStorageLimit' => 100, // 100MB storage for free users
     'freeUserMaxCompanies' => 1, // 1 company for free users
+    
+    // AI Helper settings
+    'openRouterApiKey' => null, // Set in params-local.php for production
+    
+    // Available OpenRouter AI models
+    'openRouterModels' => [
+        'anthropic/claude-3.5-sonnet' => [
+            'name' => 'Claude 3.5 Sonnet',
+            'description' => 'Most intelligent model with excellent reasoning capabilities',
+            'provider' => 'Anthropic',
+            'pricing' => 'Premium'
+        ],
+        'anthropic/claude-3-haiku' => [
+            'name' => 'Claude 3 Haiku',
+            'description' => 'Fast and efficient model for quick responses',
+            'provider' => 'Anthropic',
+            'pricing' => 'Budget'
+        ],
+        'openai/gpt-4o' => [
+            'name' => 'GPT-4 Omni',
+            'description' => 'Latest GPT-4 model with multimodal capabilities',
+            'provider' => 'OpenAI',
+            'pricing' => 'Premium'
+        ],
+        'openai/gpt-4o-mini' => [
+            'name' => 'GPT-4 Omni Mini',
+            'description' => 'Smaller, faster version of GPT-4 Omni',
+            'provider' => 'OpenAI',
+            'pricing' => 'Standard'
+        ],
+        'openai/gpt-3.5-turbo' => [
+            'name' => 'GPT-3.5 Turbo',
+            'description' => 'Cost-effective model for general tasks',
+            'provider' => 'OpenAI',
+            'pricing' => 'Budget'
+        ],
+        'google/gemini-pro' => [
+            'name' => 'Gemini Pro',
+            'description' => 'Google\'s advanced AI model for complex tasks',
+            'provider' => 'Google',
+            'pricing' => 'Standard'
+        ],
+        'meta-llama/llama-3.1-70b-instruct' => [
+            'name' => 'Llama 3.1 70B',
+            'description' => 'Open-source model with strong performance',
+            'provider' => 'Meta',
+            'pricing' => 'Standard'
+        ],
+		'qwen/qwen3-235b-a22b-2507:free' => [
+			'name' => 'Qwen 3.5 235B',
+			'description' => 'High-performance model with advanced capabilities',
+			'provider' => 'Qwen AI',
+			'pricing' => 'Free'
+		]
+    ],
+    
+    // Default AI model
+    'defaultAiModel' => 'anthropic/claude-3.5-sonnet'
 ];
 
 $localParams = __DIR__ . '/params-local.php';

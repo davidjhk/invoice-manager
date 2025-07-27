@@ -32,5 +32,6 @@ return [
         'clientId' => $_ENV['PAYPAL_CLIENT_ID'] ?? 'your_paypal_client_id',
         'clientSecret' => $_ENV['PAYPAL_CLIENT_SECRET'] ?? 'your_paypal_client_secret',
         'mode' => $_ENV['PAYPAL_MODE'] ?? 'sandbox', // 'sandbox' or 'live'
-    ]
+    ],
+    'openRouterApiKey' => 'your-openrouter-api-key-here'
 ];

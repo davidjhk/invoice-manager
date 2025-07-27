@@ -75,6 +75,20 @@ class AdminController extends Controller
      */
     public function actionSettings()
     {
+        // Check if admin settings table exists
+        if (!$this->isAdminSettingsTableExists()) {
+            Yii::$app->session->setFlash('error', 'Admin settings table is missing. Please run the migration: "php yii migrate"');
+            
+            return $this->render('settings-error', [
+                'error' => 'Admin settings table does not exist. Please run migrations to create the table.',
+                'suggestions' => [
+                    'Run migration command: php yii migrate',
+                    'Check database connection in config/db-local.php',
+                    'Verify table prefix settings in database configuration',
+                ]
+            ]);
+        }
+
         try {
             $settings = AdminSettings::find()->all();
             
@@ -94,19 +108,33 @@ class AdminController extends Controller
                     }
                 }
                 
+                // Handle AI model setting separately
+                if (isset($post['ai_model'])) {
+                    AdminSettings::setAiModel($post['ai_model']);
+                }
+                
                 Yii::$app->session->setFlash('success', 'Settings updated successfully.');
                 return $this->redirect(['settings']);
             }
 
             return $this->render('settings', [
                 'settings' => $settings,
+                'aiModels' => AdminSettings::getAvailableAiModels(),
+                'currentAiModel' => AdminSettings::getAiModel(),
             ]);
         } catch (\Exception $e) {
-            // Admin settings table doesn't exist
-            Yii::$app->session->setFlash('error', 'Admin settings table is missing. Please run the migration or create the table manually.');
+            // Log the specific error for debugging
+            Yii::error('Admin settings error: ' . $e->getMessage(), __METHOD__);
+            
+            Yii::$app->session->setFlash('error', 'Error accessing admin settings: ' . $e->getMessage());
             
             return $this->render('settings-error', [
                 'error' => $e->getMessage(),
+                'suggestions' => [
+                    'Check database connection',
+                    'Verify admin_settings table exists with correct name',
+                    'Run migrations if needed: php yii migrate',
+                ]
             ]);
         }
     }
@@ -264,6 +292,35 @@ class AdminController extends Controller
         return $this->render('reset-user-password', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Check if admin settings table exists
+     * @return bool
+     */
+    protected function isAdminSettingsTableExists()
+    {
+        try {
+            $tableName = AdminSettings::tableName();
+            
+            // Remove Yii2 table name wrapper if present
+            if (strpos($tableName, '{{%') === 0) {
+                $tableName = str_replace(['{{%', '}}'], '', $tableName);
+                // Apply table prefix if configured
+                $tablePrefix = Yii::$app->db->tablePrefix;
+                if ($tablePrefix) {
+                    $tableName = $tablePrefix . $tableName;
+                }
+            }
+            
+            // Check if table exists in database schema
+            $schema = Yii::$app->db->schema->getTableSchema($tableName, true);
+            return $schema !== null;
+        } catch (\Exception $e) {
+            // If any error occurs during table check, assume table doesn't exist
+            Yii::error('Error checking admin settings table existence: ' . $e->getMessage(), __METHOD__);
+            return false;
+        }
     }
 
     /**

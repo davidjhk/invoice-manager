@@ -839,6 +839,33 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Check if user can use AI Helper functionality
+     *
+     * @return bool
+     */
+    public function canUseAiHelper()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return false;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // Check AI Helper permission from plan
+        if (!$plan) {
+            return false; // No plan = no AI Helper
+        }
+        
+        return $plan->canUseAiHelper();
+    }
+
+    /**
      * Get storage limit in MB
      *
      * @return int|null Null means unlimited

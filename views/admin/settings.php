@@ -97,6 +97,22 @@ $this->params['breadcrumbs'][] = $this->title;
 					<hr>
 					<?php endforeach; ?>
 
+					<!-- AI Model Selection -->
+					<div class="form-group">
+						<label for="ai_model" class="form-label">
+							<strong><i class="fas fa-robot mr-2"></i>AI Model for OpenRouter</strong>
+						</label>
+						<?= Html::dropDownList('ai_model', $currentAiModel, array_map(function($model) {
+                            return $model['name'] . ' (' . $model['provider'] . ' - ' . $model['pricing'] . ')';
+                        }, $aiModels), [
+                            'class' => 'form-control',
+                            'id' => 'ai_model',
+                            'prompt' => 'Select AI Model...'
+                        ]) ?>
+						<small class="form-text text-muted">Choose the AI model to use for generating invoice descriptions and suggestions</small>
+					</div>
+					<hr>
+
 					<div class="form-group">
 						<?= Html::submitButton('<i class="fas fa-save mr-2"></i>Save Settings', [
                             'class' => 'btn btn-primary',
@@ -125,6 +141,9 @@ $this->params['breadcrumbs'][] = $this->title;
 					<h6>Maintenance Mode</h6>
 					<p class="text-muted small">When enabled, the site will show a maintenance message to regular users.
 						Admins can still access the system.</p>
+
+					<h6>AI Model</h6>
+					<p class="text-muted small">Select the AI model used by OpenRouter for generating invoice descriptions, payment terms, and pricing suggestions. Different models offer varying levels of performance, accuracy, and cost.</p>
 				</div>
 			</div>
 		</div>
