@@ -478,8 +478,7 @@ Quantity: {$quantity}";
 
 PROJECT COMPLEXITY LEVEL: {$complexityConfig['name']} ({$complexityConfig['description']})
 TARGET SCOPE: {$complexityConfig['scope_guidelines']}
-PRICING RANGE: {$dollarSign}{$complexityConfig['price_min']}-{$dollarSign}{$complexityConfig['price_max']}";
-
+PRICING RANGE: {$dollarSign}{$complexityConfig['price_min']}-{$dollarSign}{$complexityConfig['price_max']}
 
 REQUIREMENTS:
 - Write in {$selectedLanguage} language
@@ -626,7 +625,7 @@ Generate comprehensive work scope in {$selectedLanguage} with professional termi
         $pricingPrompt = "Based on the service/product '{$question}'{$businessContext}, calculate a reasonable market price by breaking down individual work scopes.
 
 PROJECT COMPLEXITY: {$complexityConfig['name']} - {$complexityConfig['description']}
-TARGET PRICE RANGE: \${$complexityConfig['price_min']}-\${$complexityConfig['price_max']}";
+TARGET PRICE RANGE: \${$complexityConfig['price_min']}-\${$complexityConfig['price_max']}
 
 PRICING METHODOLOGY:
 1. Identify individual work scopes/tasks within the service
