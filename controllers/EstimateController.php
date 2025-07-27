@@ -123,9 +123,24 @@ class EstimateController extends Controller
             Yii::$app->session->setFlash('error', Yii::t('app', 'Your subscription has been cancelled or expired. Please renew your subscription to create new estimates.'));
             return $this->redirect(['index']);
         }
+        
+        // Check if user can create more estimates this month
+        if (!$user->canCreateEstimate()) {
+            $plan = $user->getCurrentPlan();
+            $planName = $plan ? $plan->name : 'Free';
+            $limit = $plan ? $plan->getMonthlyInvoiceLimit() : (Yii::$app->params['freeUserMonthlyLimit'] ?? 5);
+            
+            Yii::$app->session->setFlash('error', Yii::t('estimate', 'You have reached your monthly estimate limit of {limit} for the {plan} plan. Please upgrade your plan to create more estimates.', [
+                'limit' => $limit,
+                'plan' => $planName
+            ]));
+            
+            return $this->redirect(['index']);
+        }
 
         $model = new Estimate();
         $model->company_id = $company->id;
+        $model->user_id = Yii::$app->user->id;
         $model->estimate_date = date('Y-m-d');
         $model->estimate_number = $company->generateEstimateNumber();
         $model->currency = $company->currency;
@@ -147,7 +162,7 @@ class EstimateController extends Controller
                                 $item->estimate_id = $model->id;
                                 $item->description = $itemData['description'] ?? '';
                                 $item->quantity = $itemData['quantity'] ?? 1;
-                                $item->unit_price = $itemData['unit_price'] ?? 0;
+                                $item->rate = $itemData['rate'] ?? ($itemData['unit_price'] ?? 0);
                                 $item->product_id = $itemData['product_id'] ?? null;
                                 $item->save();
                             }
@@ -212,7 +227,7 @@ class EstimateController extends Controller
                             $item->estimate_id = $model->id;
                             $item->description = $itemData['description'] ?? '';
                             $item->quantity = $itemData['quantity'] ?? 1;
-                            $item->unit_price = $itemData['unit_price'] ?? 0;
+                            $item->rate = $itemData['rate'] ?? ($itemData['unit_price'] ?? 0);
                             $item->product_id = $itemData['product_id'] ?? null;
                             $item->save();
                         }
@@ -457,7 +472,7 @@ class EstimateController extends Controller
                     $invoiceItem->invoice_id = $invoice->id;
                     $invoiceItem->description = $estimateItem->description;
                     $invoiceItem->quantity = $estimateItem->quantity;
-                    $invoiceItem->unit_price = $estimateItem->unit_price;
+                    $invoiceItem->rate = $estimateItem->rate;
                     $invoiceItem->product_id = $estimateItem->product_id;
                     $invoiceItem->save();
                 }
@@ -499,6 +514,20 @@ class EstimateController extends Controller
             return $this->redirect(['index']);
         }
         
+        // Check if user can create more estimates this month
+        if (!$user->canCreateEstimate()) {
+            $plan = $user->getCurrentPlan();
+            $planName = $plan ? $plan->name : 'Free';
+            $limit = $plan ? $plan->getMonthlyInvoiceLimit() : (Yii::$app->params['freeUserMonthlyLimit'] ?? 5);
+            
+            Yii::$app->session->setFlash('error', Yii::t('estimate', 'You have reached your monthly estimate limit of {limit} for the {plan} plan. Please upgrade your plan to create more estimates.', [
+                'limit' => $limit,
+                'plan' => $planName
+            ]));
+            
+            return $this->redirect(['view', 'id' => $originalEstimate->id]);
+        }
+        
         $transaction = Yii::$app->db->beginTransaction();
         
         try {
@@ -506,6 +535,7 @@ class EstimateController extends Controller
             $newEstimate = new Estimate();
             $newEstimate->company_id = $originalEstimate->company_id;
             $newEstimate->customer_id = $originalEstimate->customer_id;
+            $newEstimate->user_id = Yii::$app->user->id;
             $newEstimate->estimate_date = date('Y-m-d');
             $newEstimate->estimate_number = $company->generateEstimateNumber();
             $newEstimate->reference = $originalEstimate->reference;
@@ -526,7 +556,7 @@ class EstimateController extends Controller
                     $newItem->estimate_id = $newEstimate->id;
                     $newItem->description = $originalItem->description;
                     $newItem->quantity = $originalItem->quantity;
-                    $newItem->unit_price = $originalItem->unit_price;
+                    $newItem->rate = $originalItem->rate;
                     $newItem->product_id = $originalItem->product_id;
                     $newItem->save();
                 }

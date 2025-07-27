@@ -516,6 +516,44 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Get monthly estimate count for current month
+     *
+     * @return int
+     */
+    public function getMonthlyEstimateCount()
+    {
+        $startOfMonth = date('Y-m-01 00:00:00');
+        $endOfMonth = date('Y-m-t 23:59:59');
+
+        // Check if user_id column exists in estimates table
+        $estimateModel = new Estimate();
+        if ($estimateModel->hasAttribute('user_id')) {
+            return Estimate::find()
+                ->where(['user_id' => $this->id])
+                ->andWhere(['>=', 'created_at', $startOfMonth])
+                ->andWhere(['<=', 'created_at', $endOfMonth])
+                ->count();
+        } else {
+            // Fallback: count estimates through company ownership
+            // Get companies owned by this user
+            $companyIds = Company::find()
+                ->select('id')
+                ->where(['user_id' => $this->id])
+                ->column();
+            
+            if (empty($companyIds)) {
+                return 0;
+            }
+            
+            return Estimate::find()
+                ->where(['in', 'company_id', $companyIds])
+                ->andWhere(['>=', 'created_at', $startOfMonth])
+                ->andWhere(['<=', 'created_at', $endOfMonth])
+                ->count();
+        }
+    }
+
+    /**
      * Check if user can create more invoices this month
      *
      * @return bool
@@ -536,7 +574,8 @@ class User extends ActiveRecord implements IdentityInterface
         
         // No plan means free tier with limitations
         if (!$plan) {
-            return $this->getMonthlyInvoiceCount() < 5; // Free users get 5 invoices
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            return $this->getMonthlyInvoiceCount() < $freeLimit; // Free users get limited invoices
         }
 
         $monthlyLimit = $plan->getMonthlyInvoiceLimit();
@@ -547,6 +586,41 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return $this->getMonthlyInvoiceCount() < $monthlyLimit;
+    }
+
+    /**
+     * Check if user can create more estimates this month
+     *
+     * @return bool
+     */
+    public function canCreateEstimate()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Check if subscription is cancelled or expired
+        if ($this->hasCancelledOrExpiredSubscription()) {
+            return false;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No plan means free tier with limitations
+        if (!$plan) {
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            return $this->getMonthlyEstimateCount() < $freeLimit; // Free users get limited estimates
+        }
+
+        $monthlyLimit = $plan->getMonthlyInvoiceLimit();
+        
+        // Unlimited
+        if ($monthlyLimit === null) {
+            return true;
+        }
+
+        return $this->getMonthlyEstimateCount() < $monthlyLimit;
     }
 
     /**
@@ -570,7 +644,8 @@ class User extends ActiveRecord implements IdentityInterface
         
         // No plan means free tier with limitations
         if (!$plan) {
-            return max(0, 5 - $this->getMonthlyInvoiceCount()); // Free users get 5 invoices
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            return max(0, $freeLimit - $this->getMonthlyInvoiceCount()); // Free users get limited invoices
         }
 
         $monthlyLimit = $plan->getMonthlyInvoiceLimit();
@@ -602,7 +677,8 @@ class User extends ActiveRecord implements IdentityInterface
         $plan = $this->getCurrentPlan();
         
         if (!$plan) {
-            return ($this->getMonthlyInvoiceCount() / 5) * 100;
+            $freeLimit = Yii::$app->params['freeUserMonthlyLimit'] ?? 5;
+            return ($this->getMonthlyInvoiceCount() / $freeLimit) * 100;
         }
 
         $monthlyLimit = $plan->getMonthlyInvoiceLimit();

@@ -6,6 +6,7 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use app\components\UsSalesTaxCalculator;
+use app\models\User;
 
 /**
  * This is the model class for table "jdosa_estimates".
@@ -14,6 +15,7 @@ use app\components\UsSalesTaxCalculator;
  * @property string $estimate_number
  * @property int $company_id
  * @property int $customer_id
+ * @property int|null $user_id
  * @property string|null $bill_to_address
  * @property string|null $bill_to_city
  * @property string|null $bill_to_state
@@ -102,7 +104,7 @@ class Estimate extends ActiveRecord
     {
         $rules = [
             [['estimate_number', 'company_id', 'customer_id', 'estimate_date'], 'required'],
-            [['company_id', 'customer_id', 'invoice_id'], 'integer'],
+            [['company_id', 'customer_id', 'invoice_id', 'user_id'], 'integer'],
             [['estimate_date', 'expiry_date', 'shipping_date'], 'date', 'format' => 'php:Y-m-d'],
             [['subtotal', 'tax_rate', 'tax_amount', 'total_amount', 'discount_value', 'discount_amount', 'shipping_fee'], 'number', 'min' => 0],
             [['notes', 'ship_to_address', 'ship_from_address', 'payment_instructions', 'customer_notes', 'memo'], 'string'],
@@ -124,6 +126,7 @@ class Estimate extends ActiveRecord
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
             [['invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => Invoice::class, 'targetAttribute' => ['invoice_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
         
         // Add rules for new tax fields only if they exist in the table
@@ -194,6 +197,7 @@ class Estimate extends ActiveRecord
             'shipping_fee' => 'Shipping Fee',
             'converted_to_invoice' => 'Converted to Invoice',
             'invoice_id' => 'Invoice',
+            'user_id' => 'User',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -254,6 +258,16 @@ class Estimate extends ActiveRecord
     {
         return $this->hasMany(EstimateItem::class, ['estimate_id' => 'id'])
             ->orderBy(['sort_order' => SORT_ASC]);
+    }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**
@@ -524,6 +538,11 @@ class Estimate extends ActiveRecord
      */
     public function beforeSave($insert)
     {
+        // Set user_id if not set and user is logged in
+        if ($insert && empty($this->user_id) && !Yii::$app->user->isGuest) {
+            $this->user_id = Yii::$app->user->id;
+        }
+
         // Auto-expire estimates past expiry date
         if ($this->expiry_date && $this->expiry_date < date('Y-m-d') && $this->status === self::STATUS_SENT) {
             $this->status = self::STATUS_EXPIRED;

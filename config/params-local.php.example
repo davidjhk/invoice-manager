@@ -18,6 +18,7 @@ return [
     'googleClientId' => 'your-google-client-id-here.apps.googleusercontent.com',
     'googleClientSecret' => 'your-google-client-secret-here',
     'pdf.generator' => 'mpdf', // Options: 'tcpdf', 'mpdf'
+    'freeUserMonthlyLimit' => 5, // Free users monthly limit for invoices/estimates
     
     // Stripe API Keys
     'stripe' => [
