@@ -472,7 +472,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         // Admin users have unlimited access
         if ($this->isAdmin()) {
-            return PHP_INT_MAX; // Unlimited
+//            return PHP_INT_MAX; // Unlimited
         }
         
         return max(0, $this->max_companies - $this->getCompanyCount());

@@ -903,10 +903,6 @@ AppAsset::register($this);
 		margin-top: 0.5em !important;
 	}
 
-	.dropdown-submenu > .dropdown-toggle:hover::after {
-		border-left-color: #4f46e5 !important;
-	}
-
 	/* Light mode submenu styles */
 	body:not(.dark-mode) .dropdown-submenu > .dropdown-menu {
 		background: rgba(255, 255, 255, 0.98) !important;
@@ -983,7 +979,6 @@ AppAsset::register($this);
 	.dropdown-submenu-down .dropdown-menu.show {
 		display: block !important;
 	}
-
 
 	/* Light mode submenu down styles */
 	body:not(.dark-mode) .dropdown-submenu-down .dropdown-menu {

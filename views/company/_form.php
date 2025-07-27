@@ -74,6 +74,45 @@ $isCreate = $mode === 'create';
 				</div>
 			</div>
 		</div>
+		<!-- Language Settings -->
+		<div class="card mb-4">
+			<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
+				data-target="#language-settings-collapse" aria-expanded="false">
+				<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+					<span><i class="fas fa-language mr-2"></i><?= Yii::t('app/company', 'Language Settings') ?></span>
+					<i class="fas fa-chevron-down collapse-icon"></i>
+				</h5>
+			</div>
+			<div class="collapse" id="language-settings-collapse">
+				<div class="card-body">
+					<div class="form-group">
+						<?= $form->field($model, 'language')->dropDownList(
+							\app\models\Company::getLanguageOptions(),
+							[
+								'prompt' => Yii::t('app/company', 'Select your preferred language for the interface'),
+								'class' => 'form-control'
+							]
+						)->label(Yii::t('app/company', 'Interface Language')) ?>
+						<small class="form-text text-muted">
+							<?= $isSettings 
+								? Yii::t('app/company', 'Changing the language will update the interface immediately after saving settings.')
+								: Yii::t('app/company', 'This will be your default interface language.') ?>
+						</small>
+					</div>
+
+					<div class="alert alert-info">
+						<small>
+							<strong><?= Yii::t('app', 'Available Languages') ?>:</strong>
+							<br>• <?= Yii::t('app/company', 'English') ?> (English)
+							<br>• <?= Yii::t('app/company', 'Spanish') ?> (Español)
+							<br>• <?= Yii::t('app/company', 'Korean') ?> (한국어)
+							<br>• <?= Yii::t('app/company', 'Chinese (Simplified)') ?> (简체중문)
+							<br>• <?= Yii::t('app/company', 'Chinese (Traditional)') ?> (繁體中文)
+						</small>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<div class="col-lg-6">
@@ -135,45 +174,6 @@ $isCreate = $mode === 'create';
 							<img id="logo-preview-img" src="#" alt="Logo Preview" class="img-thumbnail"
 								style="max-height: 150px;">
 						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- Language Settings -->
-		<div class="card mb-4">
-			<div class="card-header p-2" style="cursor: pointer;" data-custom-collapse="true"
-				data-target="#language-settings-collapse" aria-expanded="false">
-				<h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-					<span><i class="fas fa-language mr-2"></i><?= Yii::t('app/company', 'Language Settings') ?></span>
-					<i class="fas fa-chevron-down collapse-icon"></i>
-				</h5>
-			</div>
-			<div class="collapse" id="language-settings-collapse">
-				<div class="card-body">
-					<div class="form-group">
-						<?= $form->field($model, 'language')->dropDownList(
-							\app\models\Company::getLanguageOptions(),
-							[
-								'prompt' => Yii::t('app/company', 'Select your preferred language for the interface'),
-								'class' => 'form-control'
-							]
-						)->label(Yii::t('app/company', 'Interface Language')) ?>
-						<small class="form-text text-muted">
-							<?= $isSettings 
-								? Yii::t('app/company', 'Changing the language will update the interface immediately after saving settings.')
-								: Yii::t('app/company', 'This will be your default interface language.') ?>
-						</small>
-					</div>
-
-					<div class="alert alert-info">
-						<small>
-							<strong><?= Yii::t('app', 'Available Languages') ?>:</strong>
-							<br>• <?= Yii::t('app/company', 'English') ?> (English)
-							<br>• <?= Yii::t('app/company', 'Spanish') ?> (Español)
-							<br>• <?= Yii::t('app/company', 'Korean') ?> (한국어)
-							<br>• <?= Yii::t('app/company', 'Chinese (Simplified)') ?> (简체중문)
-							<br>• <?= Yii::t('app/company', 'Chinese (Traditional)') ?> (繁體中文)
-						</small>
 					</div>
 				</div>
 			</div>

@@ -8,6 +8,18 @@ use yii\bootstrap4\ActiveForm;
 
 $this->title = Yii::t('app/company', 'Select Company');
 $this->params['breadcrumbs'][] = $this->title;
+
+// JavaScript variables for translations
+$this->registerJs("
+    var translations = {
+        error: " . json_encode(Yii::t('app', 'Error')) . ",
+        unknownError: " . json_encode(Yii::t('app', 'Unknown error')) . ",
+        requestFailed: " . json_encode(Yii::t('app', 'Request failed')) . ",
+        status: " . json_encode(Yii::t('app', 'Status')) . ",
+        select: " . json_encode(Yii::t('app/company', 'Select')) . ",
+        indexUrl: " . json_encode(\yii\helpers\Url::to(['site/index'])) . "
+    };
+", \yii\web\View::POS_HEAD);
 ?>
 
 <div class="company-select">
@@ -116,10 +128,17 @@ $this->registerJs("
             .done(function(response) {
                 console.log('Success response:', response);
                 if (response && response.success) {
-                    window.location.href = '" . Url::to(['site/index']) . "';
+                    // Save the selected company ID to local storage
+                    if (typeof(Storage) !== 'undefined') {
+                        localStorage.setItem('selectedCompanyId', companyId);
+                        console.log('Saved companyId to localStorage: ' + companyId);
+                    } else {
+                        console.log('Sorry, your browser does not support web storage.');
+                    }
+                    window.location.href = translations.indexUrl;
                 } else {
-                    alert('<?= Yii::t('app', 'Error') ?>: ' + (response.message || '<?= Yii::t('app', 'Unknown error') ?>'));
-                    btn.prop('disabled', false).text('<?= Yii::t('app/company', 'Select') ?>');
+                    alert(translations.error + ': ' + (response.message || translations.unknownError));
+                    btn.prop('disabled', false).text(translations.select);
                 }
             })
             .fail(function(xhr, status, error) {
@@ -129,8 +148,8 @@ $this->registerJs("
                 console.log('Response:', xhr.responseText);
                 console.log('Status Code:', xhr.status);
                 
-                alert('<?= Yii::t('app', 'Request failed') ?>. <?= Yii::t('app', 'Status') ?>: ' + status + ' (' + xhr.status + ')');
-                btn.prop('disabled', false).text('<?= Yii::t('app/company', 'Select') ?>');
+                alert(translations.requestFailed + '. ' + translations.status + ': ' + status + ' (' + xhr.status + ')');
+                btn.prop('disabled', false).text(translations.select);
             });
         });
     });

@@ -175,7 +175,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			<!-- Invoice Items -->
 			<div class="card mb-4">
-				<div class="card-header">
+				<div class="card-header" style="display:none;">
 					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Invoice Items') ?></h5>
 				</div>
 				<div class="card-body">
