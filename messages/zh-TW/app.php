@@ -489,8 +489,7 @@ return [
     'Active Only' => '僅活躍',
     'All Records' => '所有記錄',
     'Clear' => '清除',
-    'Add' => '添加'
-}
+    'Add' => '添加',
     
     // State Tax Rate Management
     'State Tax Rates' => '州稅率',
