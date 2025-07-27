@@ -984,13 +984,6 @@ AppAsset::register($this);
 		display: block !important;
 	}
 
-	.dropdown-submenu-down .dropdown-toggle::after {
-		display: inline-block !important;
-		margin-left: auto !important;
-		content: "▼" !important;
-		font-size: 0.8em !important;
-		float: right !important;
-	}
 
 	/* Light mode submenu down styles */
 	body:not(.dark-mode) .dropdown-submenu-down .dropdown-menu {
