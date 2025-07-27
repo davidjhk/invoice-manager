@@ -964,7 +964,7 @@ AppAsset::register($this);
 	}
 
 	/* Dropdown Submenu Down Styles */
-	.dropdown-submenu-down > .dropdown-menu {
+	.top-bar .dropdown-submenu-down > .dropdown-menu {
 		position: absolute !important;
 		top: 100% !important;
 		left: 0 !important;
@@ -977,15 +977,17 @@ AppAsset::register($this);
 		transition: all 0.2s ease !important;
 		min-width: 200px !important;
 		z-index: 1001 !important;
+		visibility: hidden !important;
 	}
 
-	.dropdown-submenu-down > .dropdown-menu.show {
+	.top-bar .dropdown-submenu-down > .dropdown-menu.show {
 		display: block !important;
 		opacity: 1 !important;
 		transform: translateY(0) !important;
+		visibility: visible !important;
 	}
 
-	.dropdown-submenu-down > .dropdown-toggle::after {
+	.top-bar .dropdown-submenu-down > .dropdown-toggle::after {
 		display: inline-block !important;
 		margin-left: auto !important;
 		vertical-align: 0.255em !important;
@@ -998,31 +1000,35 @@ AppAsset::register($this);
 		margin-top: 0.5em !important;
 	}
 
-	.dropdown-submenu-down > .dropdown-toggle:hover::after {
+	.top-bar .dropdown-submenu-down > .dropdown-toggle:hover::after {
 		border-top-color: #4f46e5 !important;
 	}
 
 	/* Light mode submenu down styles */
-	body:not(.dark-mode) .dropdown-submenu-down > .dropdown-menu {
+	body:not(.dark-mode) .top-bar .dropdown-submenu-down > .dropdown-menu {
 		background: rgba(255, 255, 255, 0.98) !important;
 		border: 1px solid rgba(229, 231, 235, 0.8) !important;
 		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 		backdrop-filter: blur(10px) !important;
+		display: none !important;
+		visibility: hidden !important;
 	}
 
 	/* Dark mode submenu down styles */
-	body.dark-mode .dropdown-submenu-down > .dropdown-menu {
+	body.dark-mode .top-bar .dropdown-submenu-down > .dropdown-menu {
 		background: rgba(31, 41, 55, 0.98) !important;
 		border: 1px solid rgba(75, 85, 99, 0.8) !important;
 		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
 		backdrop-filter: blur(10px) !important;
+		display: none !important;
+		visibility: hidden !important;
 	}
 
-	body.dark-mode .dropdown-submenu-down > .dropdown-toggle::after {
+	body.dark-mode .top-bar .dropdown-submenu-down > .dropdown-toggle::after {
 		border-top-color: #d1d5db !important;
 	}
 
-	body.dark-mode .dropdown-submenu-down > .dropdown-toggle:hover::after {
+	body.dark-mode .top-bar .dropdown-submenu-down > .dropdown-toggle:hover::after {
 		border-top-color: #a5b4fc !important;
 	}
 	</style>
@@ -2331,7 +2337,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 									<a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">
 										<i class="fas fa-exchange-alt mr-2"></i><?= Yii::t('app/nav', 'Switch Company') ?>
 									</a>
-									<ul class="dropdown-menu dropdown-menu-down">
+									<ul class="dropdown-menu">
 										<?php foreach ($userCompanies as $company): ?>
 										<li>
 											<?php if ($company->id == $currentCompany->id): ?>
