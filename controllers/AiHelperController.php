@@ -54,6 +54,7 @@ class AiHelperController extends Controller
                     'answer-question' => ['POST'],
                     'test' => ['GET', 'POST'],
                     'status' => ['GET', 'POST'],
+                    'debug-question' => ['GET', 'POST'],
                 ],
             ],
         ];
@@ -325,6 +326,15 @@ Quantity: {$quantity}";
         $question = Yii::$app->request->post('question');
         $customerId = Yii::$app->request->post('customer_id');
         $businessType = Yii::$app->request->post('business_type', '');
+        $responseLanguage = Yii::$app->request->post('response_language', 'en');
+        
+        // Log the incoming request for debugging
+        Yii::info('AI Helper answer-question request: ' . json_encode([
+            'question_length' => strlen($question),
+            'customer_id' => $customerId,
+            'business_type' => $businessType,
+            'response_language' => $responseLanguage
+        ]), 'ai-helper');
         
         if (empty($question)) {
             return [
@@ -337,22 +347,52 @@ Quantity: {$quantity}";
             $openRouter = new OpenRouterClient();
             
             if (!$openRouter->isConfigured()) {
+                Yii::warning('AI Helper not configured during answer-question', 'ai-helper');
                 return [
                     'success' => false,
                     'error' => Yii::t('app', 'AI Helper is not configured. Please check API key settings.')
                 ];
             }
 
-            // Generate answer using the question directly
-            $answer = $openRouter->generateCompletion($question, ['max_tokens' => 500]);
+            // Log before API call
+            Yii::info('Calling OpenRouter API with question length: ' . strlen($question), 'ai-helper');
+            
+            // Try with the full question first
+            $answer = $openRouter->generateCompletion($question, [
+                'max_tokens' => 800,
+                'temperature' => 0.7
+            ]);
+            
+            // If that fails, try with a simpler prompt as fallback
+            if (empty($answer)) {
+                Yii::warning('First attempt failed, trying simpler prompt', 'ai-helper');
+                $simplePrompt = "Create a professional invoice description for: " . 
+                    str_replace('Based on the keywords or service "', '', 
+                    str_replace('", generate a professional work scope description suitable for an invoice.', '', $question));
+                
+                $answer = $openRouter->generateCompletion($simplePrompt, [
+                    'max_tokens' => 300,
+                    'temperature' => 0.5
+                ]);
+            }
+            
+            // Log the API response
+            Yii::info('OpenRouter API response received, answer length: ' . strlen($answer ?: ''), 'ai-helper');
             
             if (empty($answer)) {
+                Yii::warning('OpenRouter returned empty answer', 'ai-helper');
                 return [
                     'success' => false,
-                    'error' => Yii::t('app', 'Unable to generate answer. The AI service may be temporarily unavailable.')
+                    'error' => Yii::t('app', 'Unable to generate answer. The AI service may be temporarily unavailable.'),
+                    'debug' => [
+                        'api_configured' => $openRouter->isConfigured(),
+                        'question_length' => strlen($question),
+                        'response_empty' => true
+                    ]
                 ];
             }
 
+            Yii::info('AI Helper answer-question completed successfully', 'ai-helper');
             return [
                 'success' => true,
                 'answer' => $answer
@@ -363,7 +403,12 @@ Quantity: {$quantity}";
             
             return [
                 'success' => false,
-                'error' => Yii::t('app', 'AI service error: {message}', ['message' => $e->getMessage()])
+                'error' => Yii::t('app', 'AI service error: {message}', ['message' => $e->getMessage()]),
+                'debug' => [
+                    'exception_class' => get_class($e),
+                    'exception_message' => $e->getMessage(),
+                    'question_length' => strlen($question)
+                ]
             ];
         }
     }
@@ -411,6 +456,58 @@ Quantity: {$quantity}";
                     'exception_class' => get_class($e),
                     'trace' => $e->getTraceAsString()
                 ]
+            ];
+        }
+    }
+
+    /**
+     * Debug question endpoint for testing
+     */
+    public function actionDebugQuestion()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        try {
+            $openRouter = new OpenRouterClient();
+            
+            if (!$openRouter->isConfigured()) {
+                return [
+                    'success' => false,
+                    'error' => 'AI Helper is not configured'
+                ];
+            }
+
+            // Simple test question
+            $testQuestion = "website development";
+            
+            Yii::info('Debug test starting with question: ' . $testQuestion, 'ai-helper');
+            
+            // Test connection first
+            $connectionTest = $openRouter->testConnection();
+            
+            $answer = $openRouter->generateCompletion($testQuestion, [
+                'max_tokens' => 100,
+                'temperature' => 0.7
+            ]);
+            
+            return [
+                'success' => !empty($answer),
+                'question' => $testQuestion,
+                'answer' => $answer,
+                'answer_length' => strlen($answer ?: ''),
+                'configured' => $openRouter->isConfigured(),
+                'model' => $openRouter->model,
+                'connection_test' => $connectionTest,
+                'api_key_prefix' => substr($openRouter->apiKey ?: '', 0, 10) . '...',
+                'available_models' => array_keys(Yii::$app->params['openRouterModels'] ?? [])
+            ];
+
+        } catch (\Exception $e) {
+            Yii::error('Debug test failed: ' . $e->getMessage(), 'ai-helper');
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'exception_class' => get_class($e)
             ];
         }
     }

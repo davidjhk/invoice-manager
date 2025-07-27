@@ -24,9 +24,27 @@ class OpenRouterClient extends Component
             $this->apiKey = Yii::$app->params['openRouterApiKey'] ?? null;
         }
         
-        // Get AI model from admin settings
+        // Get AI model from admin settings with fallback
         if (class_exists('\app\models\AdminSettings')) {
-            $this->model = \app\models\AdminSettings::getAiModel();
+            $configuredModel = \app\models\AdminSettings::getAiModel();
+            
+            // Check if the configured model exists in available models list
+            $availableModels = array_keys(Yii::$app->params['openRouterModels'] ?? []);
+            
+            if (in_array($configuredModel, $availableModels)) {
+                $this->model = $configuredModel;
+            } else {
+                // Fallback to default model if configured model is not available
+                $defaultModel = Yii::$app->params['defaultAiModel'] ?? 'anthropic/claude-3.5-sonnet';
+                $this->model = $defaultModel;
+                
+                Yii::warning("Configured AI model '{$configuredModel}' not found in available models. Using default: '{$defaultModel}'", 'ai-helper');
+                
+                // Update admin settings to use the default model
+                if (method_exists('\app\models\AdminSettings', 'setValue')) {
+                    \app\models\AdminSettings::setValue('ai_model', $defaultModel);
+                }
+            }
         }
     }
 
@@ -50,6 +68,14 @@ class OpenRouterClient extends Component
             $maxTokens = $options['max_tokens'] ?? $this->maxTokens;
             $temperature = $options['temperature'] ?? $this->temperature;
 
+            // Validate model is in available list
+            $availableModels = array_keys(Yii::$app->params['openRouterModels'] ?? []);
+            if (!in_array($model, $availableModels)) {
+                $defaultModel = Yii::$app->params['defaultAiModel'] ?? 'anthropic/claude-3.5-sonnet';
+                Yii::warning("Model '{$model}' not available, using fallback: '{$defaultModel}'", 'ai-helper');
+                $model = $defaultModel;
+            }
+
             $requestData = [
                 'model' => $model,
                 'messages' => [
@@ -63,22 +89,51 @@ class OpenRouterClient extends Component
                 'stream' => false,
             ];
 
-            Yii::info('OpenRouter API request started for model: ' . $model, 'ai-helper');
+            Yii::info('OpenRouter API request started', 'ai-helper');
+            Yii::info('Request details: ' . json_encode([
+                'model' => $model,
+                'max_tokens' => $maxTokens,
+                'temperature' => $temperature,
+                'prompt_length' => strlen($prompt)
+            ]), 'ai-helper');
 
-            // Use cURL directly for better compatibility
+            // Try the primary model first
             $response = $this->makeCurlRequest('/chat/completions', $requestData);
+            
+            // If primary model fails, try fallback with default model
+            if (!$response || !isset($response['choices'][0]['message']['content'])) {
+                if ($model !== 'anthropic/claude-3.5-sonnet') {
+                    Yii::warning("Primary model '{$model}' failed, trying fallback: anthropic/claude-3.5-sonnet", 'ai-helper');
+                    $requestData['model'] = 'anthropic/claude-3.5-sonnet';
+                    $response = $this->makeCurlRequest('/chat/completions', $requestData);
+                }
+            }
+            
+            // Log the raw response for debugging
+            Yii::info('Raw API response: ' . json_encode($response), 'ai-helper');
             
             if ($response && isset($response['choices'][0]['message']['content'])) {
                 $content = trim($response['choices'][0]['message']['content']);
-                Yii::info('OpenRouter API response received: ' . substr($content, 0, 100), 'ai-helper');
+                Yii::info('OpenRouter API response received successfully, length: ' . strlen($content), 'ai-helper');
                 return $content;
             }
 
-            Yii::error('OpenRouter API Error: Invalid response structure', 'ai-helper');
+            // More detailed error logging
+            if ($response) {
+                Yii::error('OpenRouter API Error: Invalid response structure. Response: ' . json_encode($response), 'ai-helper');
+                
+                // Check for API error messages
+                if (isset($response['error'])) {
+                    Yii::error('OpenRouter API returned error: ' . json_encode($response['error']), 'ai-helper');
+                }
+            } else {
+                Yii::error('OpenRouter API Error: No response received', 'ai-helper');
+            }
+            
             return null;
 
         } catch (\Exception $e) {
-            Yii::error('OpenRouter API Exception: ' . $e->getMessage(), 'ai-helper');
+            Yii::error('OpenRouter API Exception: ' . $e->getMessage() . "\nTrace: " . $e->getTraceAsString(), 'ai-helper');
             return null;
         }
     }
@@ -94,6 +149,8 @@ class OpenRouterClient extends Component
     {
         $url = $this->baseUrl . $endpoint;
         
+        Yii::info('Making cURL request to: ' . $url, 'ai-helper');
+        
         $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL => $url,
@@ -101,38 +158,44 @@ class OpenRouterClient extends Component
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTPHEADER => [
                 'Authorization: Bearer ' . $this->apiKey,
-                'Content-Type: application/json',
-                'User-Agent: Invoice Manager/1.0',
-                'HTTP-Referer: ' . (Yii::$app->request->hostInfo ?? 'https://localhost'),
-                'X-Title: Invoice Manager AI Helper'
+                'Content-Type: application/json'
             ],
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
         ]);
 
         if ($data) {
+            $jsonData = json_encode($data);
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+            Yii::info('Request payload size: ' . strlen($jsonData) . ' bytes', 'ai-helper');
         }
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
+        $info = curl_getinfo($ch);
         curl_close($ch);
+
+        Yii::info('cURL request completed', 'ai-helper');
+        Yii::info('HTTP Code: ' . $httpCode, 'ai-helper');
+        Yii::info('Response size: ' . strlen($response ?: '') . ' bytes', 'ai-helper');
 
         if ($error) {
             Yii::error('cURL Error: ' . $error, 'ai-helper');
+            Yii::error('cURL Info: ' . json_encode($info), 'ai-helper');
             return null;
         }
 
         if ($httpCode !== 200) {
-            Yii::error('HTTP Error ' . $httpCode . ': ' . $response, 'ai-helper');
+            Yii::error('HTTP Error ' . $httpCode . ': ' . substr($response, 0, 500), 'ai-helper');
             return null;
         }
 
         $decoded = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             Yii::error('JSON decode error: ' . json_last_error_msg(), 'ai-helper');
+            Yii::error('Raw response: ' . substr($response, 0, 500), 'ai-helper');
             return null;
         }
 

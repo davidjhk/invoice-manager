@@ -426,6 +426,16 @@ $this->registerJsVar('invoiceConfig', [
 							<?= Yii::t('app', 'Examples: "Website development", "Consulting services", "How to write professional invoice descriptions?"') ?>
 						</small>
 					</div>
+					<div class="form-group">
+						<label for="ai-response-language"><?= Yii::t('app', 'Response Language') ?>:</label>
+						<select class="form-control" id="ai-response-language">
+							<option value="en">English</option>
+							<option value="ko" <?= (Yii::$app->language === 'ko-KR') ? 'selected' : '' ?>>한국어 (Korean)</option>
+							<option value="es">Español (Spanish)</option>
+							<option value="zh-cn">中文简体 (Chinese Simplified)</option>
+							<option value="zh-tw">中文繁體 (Chinese Traditional)</option>
+						</select>
+					</div>
 				</div>
 				
 				<!-- Results Section -->
@@ -1079,9 +1089,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			const customerId = customerSelect.value || '';
 			const businessType = '<?= $company->industry ?? '' ?>';
+			const responseLanguage = document.getElementById('ai-response-language').value;
 
-			// Create a more conversational prompt
-			const conversationalPrompt = `Based on the question or product/service "${question}", provide a professional description that could be used in an invoice or estimate. Consider this is for ${businessType ? 'a ' + businessType + ' business' : 'a business'}. Please provide a clear, concise description suitable for billing purposes.`;
+			// Language mapping for AI prompts
+			const languageNames = {
+				'en': 'English',
+				'ko': 'Korean',
+				'es': 'Spanish',
+				'zh-cn': 'Chinese Simplified',
+				'zh-tw': 'Chinese Traditional'
+			};
+
+			// Create work scope prompt with language specification
+			const workScopePrompt = `Based on the keywords or service "${question}", generate a professional work scope description suitable for an invoice. 
+
+Requirements:
+- Respond in ${languageNames[responseLanguage]} language
+- Format as a concise work scope for billing purposes
+- Include key deliverables and services
+- Professional business language
+- 2-3 sentences maximum
+- Suitable for ${businessType ? businessType + ' business' : 'business'} context
+
+Keywords/Service: ${question}
+
+Please provide only the work scope description in ${languageNames[responseLanguage]}.`;
 
 			const response = await fetch('<?= Url::to(['/ai-helper/answer-question']) ?>', {
 				method: 'POST',
@@ -1090,21 +1122,28 @@ document.addEventListener('DOMContentLoaded', function() {
 					'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
 				},
 				body: new URLSearchParams({
-					question: conversationalPrompt,
+					question: workScopePrompt,
 					customer_id: customerId,
-					business_type: businessType
+					business_type: businessType,
+					response_language: responseLanguage
 				})
 			});
 
 			const data = await response.json();
 			
 			if (data.success && data.answer) {
-				displayAnswer(data.answer, question);
+				displayAnswer(data.answer, question, responseLanguage);
 			} else {
 				let errorMessage = data.error || '<?= Yii::t('app', 'Unable to generate answer') ?>';
-				if (data.debug && typeof data.debug === 'string') {
+				if (data.debug) {
 					console.warn('AI Helper Debug Info:', data.debug);
 				}
+				
+				// Show more helpful error message with debug info if available
+				if (data.debug && data.debug.api_configured === false) {
+					errorMessage = '<?= Yii::t('app', 'AI Helper is not configured. Please check settings.') ?>';
+				}
+				
 				displayError(errorMessage);
 			}
 		} catch (error) {
@@ -1113,34 +1152,54 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	function displayAnswer(answer, originalQuestion) {
+	function displayAnswer(answer, originalQuestion, responseLanguage) {
 		const content = document.getElementById('ai-helper-content');
+		
+		// Language flags for better UX
+		const languageFlags = {
+			'en': '🇺🇸',
+			'ko': '🇰🇷',
+			'es': '🇪🇸',
+			'zh-cn': '🇨🇳',
+			'zh-tw': '🇹🇼'
+		};
+
+		const languageNames = {
+			'en': 'English',
+			'ko': '한국어',
+			'es': 'Español',
+			'zh-cn': '中文简体',
+			'zh-tw': '中文繁體'
+		};
 		
 		let html = `
 			<h6 class="mb-3">
-				<i class="fas fa-lightbulb text-warning mr-2"></i>
-				<?= Yii::t('app', 'AI Response') ?>
+				<i class="fas fa-magic text-warning mr-2"></i>
+				<?= Yii::t('app', 'Work Scope Generated') ?>
+				<span class="badge badge-info ml-2">${languageFlags[responseLanguage]} ${languageNames[responseLanguage]}</span>
 			</h6>
 			<div class="card mb-3">
 				<div class="card-body">
-					<h6 class="card-subtitle mb-2 text-muted"><?= Yii::t('app', 'Your Question') ?>:</h6>
+					<h6 class="card-subtitle mb-2 text-muted"><?= Yii::t('app', 'Input Keywords') ?>:</h6>
 					<p class="card-text"><em>"${escapeHtml(originalQuestion)}"</em></p>
-					<h6 class="card-subtitle mb-2 text-muted"><?= Yii::t('app', 'AI Answer') ?>:</h6>
-					<p class="card-text">${escapeHtml(answer)}</p>
+					<h6 class="card-subtitle mb-2 text-muted"><?= Yii::t('app', 'Work Scope Description') ?>:</h6>
+					<div class="p-3 bg-light rounded">
+						<p class="card-text mb-0 font-weight-medium">${escapeHtml(answer)}</p>
+					</div>
 				</div>
 			</div>
 			<div class="text-center mb-3">
-				<button type="button" class="btn btn-primary" onclick="useSuggestion('${escapeHtml(answer)}')">
-					<i class="fas fa-plus mr-1"></i><?= Yii::t('app', 'Add to Description') ?>
+				<button type="button" class="btn btn-success btn-lg" onclick="useSuggestion('${escapeHtml(answer)}')">
+					<i class="fas fa-plus mr-2"></i><?= Yii::t('app', 'Add to Description') ?>
 				</button>
 				<button type="button" class="btn btn-outline-secondary ml-2" onclick="showNewQuestion()">
-					<i class="fas fa-question mr-1"></i><?= Yii::t('app', 'Ask Another Question') ?>
+					<i class="fas fa-redo mr-1"></i><?= Yii::t('app', 'Generate Another') ?>
 				</button>
 			</div>
 			<div class="mt-3 pt-3 border-top">
 				<small class="text-muted">
 					<i class="fas fa-info-circle mr-1"></i>
-					<?= Yii::t('app', 'This response is AI-generated. Please review and edit as needed.') ?>
+					<?= Yii::t('app', 'AI-generated work scope. Review and customize as needed for your invoice.') ?>
 				</small>
 			</div>
 		`;

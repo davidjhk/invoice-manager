@@ -47,6 +47,12 @@ $defaultParams = [
             'provider' => 'OpenAI',
             'pricing' => 'Standard'
         ],
+		'openai/o3-mini' => [
+			'name' => 'O3 Mini',
+			'description' => 'Optimized for speed and efficiency',
+			'provider' => 'OpenAI',
+			'pricing' => 'Budget'
+		],
         'openai/gpt-3.5-turbo' => [
             'name' => 'GPT-3.5 Turbo',
             'description' => 'Cost-effective model for general tasks',
