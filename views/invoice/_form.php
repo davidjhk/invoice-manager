@@ -74,7 +74,7 @@ $this->registerJsVar('invoiceConfig', [
 				</div>
 				<div class="card-body">
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-12">
 							<?= $form->field($model, 'customer_id')->dropDownList(
                                 ArrayHelper::map($customers, 'id', 'customer_name'),
                                 [
@@ -93,9 +93,11 @@ $this->registerJsVar('invoiceConfig', [
 									'data-target' => '#addCustomerModal'
 								]) ?>
 							</div>
+						</div>
+						<div class="col-md-6">
 
 							<div id="customer-details" class="mb-3">
-								<label class="form-label"><?= Yii::t('app/invoice', 'Customer Information') ?></label>
+								<label class="form-label font-weight-bold"><?= Yii::t('app/invoice', 'Customer Information') ?></label>
 								<div id="bill-to-address" class="border p-2 bg-light min-h-100 rounded">
 									<?php if (!empty($model->bill_to_address)): ?>
 									<?= nl2br(Html::encode($model->bill_to_address)) ?>
@@ -657,9 +659,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td><input type="number" class="form-control quantity-input text-right" name="InvoiceItem[${rowIndex}][quantity]" value="${item.quantity || 1}" min="0" step="1"></td>
             <td><input type="number" class="form-control rate-input text-right" name="InvoiceItem[${rowIndex}][rate]" value="${item.rate || '0.00'}" min="0" step="0.01"></td>
-            <td class="align-middle text-right amount-display">$0.00</td>
-            <td class="align-middle text-center"><input type="checkbox" class="form-check-input tax-checkbox" name="InvoiceItem[${rowIndex}][is_taxable]" value="1" ${item.is_taxable === false ? '' : 'checked'}></td>
-            <td class="align-middle text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-item-btn"><i class="fas fa-trash"></i></button></td>
+            <td class="text-right amount-display">$0.00</td>
+            <td class="text-center"><input type="checkbox" class="form-check-input tax-checkbox" name="InvoiceItem[${rowIndex}][is_taxable]" value="1" ${item.is_taxable === false ? '' : 'checked'}></td>
+            <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-item-btn"><i class="fas fa-trash"></i></button></td>
         `;
 
 		itemsTbody.appendChild(newRow);

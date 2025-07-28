@@ -84,7 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			<!-- Pricing Information -->
 			<div class="card mb-4">
-				<div class="card-header">
+				<div class="card-header" style="display:none;">
 					<h6 class="mb-0"><?= Yii::t('app/product', 'Pricing Information') ?></h6>
 				</div>
 				<div class="card-body">
@@ -157,24 +157,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     '<span class="badge badge-success">' . Yii::t('app/product', 'Active') . '</span>' : 
                                     '<span class="badge badge-secondary">' . Yii::t('app/product', 'Inactive') . '</span>'
                             ],
-                        ],
-                    ]) ?>
-				</div>
-			</div>
-
-			<!-- Company Information -->
-			<div class="card mb-4">
-				<div class="card-header">
-					<h6 class="mb-0"><?= Yii::t('app', 'Company') ?></h6>
-				</div>
-				<div class="card-body">
-					<?= DetailView::widget([
-                        'model' => $model,
-                        'attributes' => [
-                            [
-                                'attribute' => 'company.company_name',
-                                'label' => Yii::t('app', 'Company'),
-                            ],
                             [
                                 'attribute' => 'created_at',
                                 'label' => Yii::t('app', 'Created At'),
@@ -184,23 +166,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'label' => Yii::t('app', 'Updated At'),
                             ],
                         ],
-                    ]) ?>
-				</div>
-			</div>
-
-			<!-- Actions -->
-			<div class="card">
-				<div class="card-header">
-					<h6 class="mb-0"><?= Yii::t('app', 'Actions') ?></h6>
-				</div>
-				<div class="card-body">
-					<?= Html::a(Yii::t('app', 'Toggle Status'), ['toggle-status', 'id' => $model->id], [
-                        'class' => 'btn btn-outline-' . ($model->is_active ? 'warning' : 'success') . ' btn-block',
-                        'data-method' => 'post',
-                        'data-confirm' => Yii::t('app', 'Are you sure you want to {action} this product?', ['action' => $model->is_active ? Yii::t('app', 'deactivate') : Yii::t('app', 'activate')])
-                    ]) ?>
-					<?= Html::a(Yii::t('app/product', 'Edit') . ' ' . Yii::t('app/product', 'Product'), ['update', 'id' => $model->id], [
-                        'class' => 'btn btn-primary btn-block'
                     ]) ?>
 				</div>
 			</div>

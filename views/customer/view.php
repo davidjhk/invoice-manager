@@ -98,19 +98,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'ntext',  
                                 'value' => $model->shipping_address ?: Yii::t('app/customer', 'Not provided'),
                             ],
-                            [
-                                'attribute' => 'is_active',
-                                'value' => function($model) {
-                                    return Html::tag('span', $model->is_active ? Yii::t('app', 'Active') : Yii::t('app', 'Inactive'), [
-                                        'class' => 'badge badge-' . ($model->is_active ? 'success' : 'secondary')
-                                    ]);
-                                },
-                                'format' => 'html',
-                            ],
-                            [
-                                'attribute' => 'created_at',
-                                'format' => ['date', 'php:F j, Y g:i A'],
-                            ],
                         ],
                     ]) ?>
                 </div>
@@ -133,9 +120,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <div class="display-4 text-success">
+                                <h2 class="text-success">
                                     <?= $model->company->formatAmount($model->getTotalAmount()) ?>
-                                </div>
+								</h2>
                                 <h6 class="text-muted"><?= Yii::t('app/customer', 'Total Amount') ?></h6>
                             </div>
                         </div>
@@ -155,26 +142,27 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php if ($model->customer_phone || $model->customer_email): ?>
             <div class="card">
                 <div class="card-header">
-                    <h6 class="card-title mb-0"><?= Yii::t('app/customer', 'Quick Contact') ?></h6>
+                    <h6 class="card-title mb-0"><?= Yii::t('app/customer', 'Settings') ?></h6>
                 </div>
                 <div class="card-body">
-                    <?php if ($model->customer_phone): ?>
-                        <div class="mb-2">
-                            <i class="fas fa-phone text-primary mr-2"></i>
-                            <a href="tel:<?= Html::encode($model->customer_phone) ?>" class="text-decoration-none">
-                                <?= Html::encode($model->customer_phone) ?>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($model->customer_email): ?>
-                        <div class="mb-2">
-                            <i class="fas fa-envelope text-primary mr-2"></i>
-                            <a href="mailto:<?= Html::encode($model->customer_email) ?>" class="text-decoration-none">
-                                <?= Html::encode($model->customer_email) ?>
-                            </a>
-                        </div>
-                    <?php endif; ?>
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            [
+                                'attribute' => 'is_active',
+                                'value' => function($model) {
+                                    return Html::tag('span', $model->is_active ? Yii::t('app', 'Active') : Yii::t('app', 'Inactive'), [
+                                        'class' => 'badge badge-' . ($model->is_active ? 'success' : 'secondary')
+                                    ]);
+                                },
+                                'format' => 'html',
+                            ],
+                            [
+                                'attribute' => 'created_at',
+                                'format' => ['date', 'php:F j, Y g:i A'],
+                            ],
+                        ],
+                    ]) ?>
                 </div>
             </div>
             <?php endif; ?>

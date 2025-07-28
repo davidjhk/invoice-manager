@@ -80,7 +80,7 @@ use app\models\ProductCategory;
 
 			<!-- Pricing Information -->
 			<div class="card mb-4">
-				<div class="card-header">
+				<div class="card-header" style="display:none;">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-dollar-sign mr-2"></i>Pricing & Cost
 					</h5>
@@ -142,7 +142,7 @@ use app\models\ProductCategory;
 
 			<!-- Settings -->
 			<div class="card mb-4">
-				<div class="card-header">
+				<div class="card-header" style="display:none;">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-cog mr-2"></i>Settings
 					</h5>

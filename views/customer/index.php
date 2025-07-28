@@ -15,7 +15,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="customer-index">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><?= Html::encode($this->title) ?></h1>
+		<div class="header-info">
+			<h1 class="title"><?= Html::encode($this->title) ?></h1>
+			<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
+		</div>
         <div class="action-buttons">
             <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export') . ' CSV', ['export'], [
                 'class' => 'btn btn-outline-info',

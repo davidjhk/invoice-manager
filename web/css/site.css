@@ -74,7 +74,9 @@ h1.title {
   letter-spacing: -0.02em !important;
   line-height: 1.2 !important;
 }
-
+h1.title {
+  margin-bottom: 5px !important;
+}
 h2 {
   font-size: 1.75rem;
   font-weight: 600;
@@ -85,6 +87,12 @@ h3 {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
+}
+.subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 /* Top Bar - Modern Gradient Design */
@@ -1726,11 +1734,11 @@ body.dark-mode .card-header[data-toggle="collapse"]:hover {
   .auth-form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .plan-options {
     gap: 0.5rem;
   }
-  
+
   .plan-label {
     padding: 0.75rem;
   }

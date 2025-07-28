@@ -24,7 +24,10 @@ $currentPlan = $user->getCurrentPlan();
 <div class="invoice-index">
 
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1><?= Html::encode($this->title) ?></h1>
+		<div class="header-info">
+			<h1 class="title"><?= Html::encode($this->title) ?></h1>
+			<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
+		</div>
 		<div class="action-buttons">
 			<?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export'), ['export'], [
                 'class' => 'btn btn-outline-info',
@@ -107,7 +110,7 @@ $currentPlan = $user->getCurrentPlan();
 	<?php endif; ?>
 
 	<div class="row mb-3">
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<?= Html::beginForm(['index'], 'get', ['class' => 'form-inline']) ?>
 			<div class="input-group">
 				<?= Html::input('text', 'search', $searchTerm, [
@@ -121,7 +124,7 @@ $currentPlan = $user->getCurrentPlan();
 			</div>
 			<?= Html::endForm() ?>
 		</div>
-		<div class="col-md-6 text-right">
+		<div class="col-md-8 text-right">
 			<div class="btn-group" role="group">
 				<?= Html::a(Yii::t('app/invoice', 'All'), ['index'], [
                     'class' => 'btn btn-sm ' . (empty($statusFilter) ? 'btn-primary' : 'btn-outline-primary')

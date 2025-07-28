@@ -45,8 +45,8 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 	<div class="dashboard-header">
 		<div class="header-content">
 			<div class="header-info">
-				<h1 class="dashboard-title"><?= Yii::t('app', 'Dashboard') ?></h1>
-				<p class="dashboard-subtitle"><?= Html::encode($company->company_name) ?></p>
+				<h1 class="dashboard-title title"><?= Yii::t('app', 'Dashboard') ?></h1>
+				<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
 			</div>
 			<div class="header-actions">
 				<?= Html::a('<i class="fas fa-plus"></i>' . Yii::t('app/invoice', 'New Invoice'), ['/invoice/create'], [
@@ -283,20 +283,6 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 	align-items: center;
 	padding: 1rem 0;
 	border-bottom: 1px solid var(--border-color);
-}
-
-.dashboard-title {
-	font-size: 1.8rem;
-	font-weight: 700;
-	color: var(--text-primary);
-	margin: 0;
-}
-
-.dashboard-subtitle {
-	color: var(--text-secondary);
-	margin: 0;
-	font-size: 0.9rem;
-	font-weight: 500;
 }
 
 .header-actions .btn {
