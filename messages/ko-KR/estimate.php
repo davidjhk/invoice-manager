@@ -130,6 +130,18 @@ return [
     
     // View page
     'Not set' => '설정되지 않음',
+    'Not provided' => '제공되지 않음',
+    'Not specified' => '지정되지 않음',
+    'None' => '없음',
+    'Contact' => '연락처',
+    'No Items' => '항목 없음',
+    'This estimate doesn\'t have any items yet.' => '이 견적서에는 아직 항목이 없습니다.',
+    '#' => '#',
+    'Qty' => '수량',
+    'Rate' => '단가',
+    'Billing Address' => '청구 주소',
+    'Estimate Totals' => '견적서 합계',
+    'Fixed' => '고정',
     'EXPIRED' => '만료됨',
     'No items found for this estimate.' => '이 견적서에 항목이 없습니다.',
     'From' => '발신인',

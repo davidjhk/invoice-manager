@@ -153,11 +153,17 @@ return [
     'OVERDUE' => '연체',
     'No items found for this invoice.' => '이 인보이스에 항목이 없습니다.',
     'From' => '발신인',
+    'Customer Information' => '고객 정보',
     'Payment Status' => '결제 상태',
     'Invoice Total' => '인보이스 총액',
     'Amount Paid' => '결제된 금액',
+    'Balance Due' => '미결제 잔액',
+    'Receive Payment' => '결제 받기',
     'Payment History' => '결제 내역',
+    'Payment Date' => '결제 날짜',
+    'Payment Method' => '결제 방법',
     'Summary' => '요약',
+    'Shipping Fee' => '배송비',
     'Paid' => '결제완료',
     
     // Preview page translations

@@ -119,4 +119,23 @@ return [
     'Choose Template' => '選擇模板',
     'Template Preview' => '模板預覽',
     'Select a template for your invoice PDF' => '為您的發票PDF選擇模板',
+    
+    // View page
+    'Not set' => '未設定',
+    'OVERDUE' => '逾期',
+    'No items found for this invoice.' => '此發票沒有找到項目。',
+    'From' => '發件人',
+    'Customer Information' => '客戶資訊',
+    'Payment Status' => '付款狀態',
+    'Invoice Total' => '發票總額',
+    'Amount Paid' => '已付金額',
+    'Balance Due' => '應付餘額',
+    'Receive Payment' => '收款',
+    'Payment History' => '付款歷史',
+    'Payment Date' => '付款日期',
+    'Payment Method' => '付款方式',
+    'Summary' => '摘要',
+    'Shipping Fee' => '運費',
+    'Paid' => '已付款',
+    'Email not configured. Configure SMTP2GO in Company Settings.' => '郵件未設定。請在公司設定中設定SMTP2GO。',
 ];

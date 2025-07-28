@@ -121,4 +121,23 @@ return [
     'Choose Template' => '选择模板',
     'Template Preview' => '模板预览',
     'Select a template for your invoice PDF' => '为您的发票PDF选择模板',
+    
+    // View page
+    'Not set' => '未设置',
+    'OVERDUE' => '逾期',
+    'No items found for this invoice.' => '此发票没有找到项目。',
+    'From' => '发件人',
+    'Customer Information' => '客户信息',
+    'Payment Status' => '付款状态',
+    'Invoice Total' => '发票总额',
+    'Amount Paid' => '已付金额',
+    'Balance Due' => '应付余额',
+    'Receive Payment' => '收款',
+    'Payment History' => '付款历史',
+    'Payment Date' => '付款日期',
+    'Payment Method' => '付款方式',
+    'Summary' => '摘要',
+    'Shipping Fee' => '运费',
+    'Paid' => '已付款',
+    'Email not configured. Configure SMTP2GO in Company Settings.' => '邮件未配置。请在公司设置中配置SMTP2GO。',
 ];

@@ -151,6 +151,48 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 				</div>
 			</div>
 
+			<!-- Invoice Items -->
+			<div class="card mb-4">
+				<div class="card-header" style="display:none;">
+					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Invoice Items') ?></h5>
+				</div>
+				<div class="card-body">
+					<?php if (!empty($model->invoiceItems)): ?>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+                                    <th><?= Yii::t('app/estimate', 'Product/Service') ?></th>
+									<th><?= Yii::t('app/invoice', 'Description') ?></th>
+									<th class="text-center"><?= Yii::t('app/invoice', 'Quantity') ?></th>
+									<th class="text-right"><?= Yii::t('app/invoice', 'Price') ?></th>
+									<th class="text-right"><?= Yii::t('app/invoice', 'Amount') ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($model->invoiceItems as $item): ?>
+								<tr>
+                                    <td><?= Html::encode($item->product_service_name ?: '-') ?></td>
+									<td><?= nl2br(Html::encode($item->description)) ?></td>
+									<td class="text-center"><?= $item->getFormattedQuantity() ?></td>
+									<td class="text-right"><?= $item->getFormattedRate() ?></td>
+									<td class="text-right font-weight-bold"><?= $item->getFormattedAmount() ?></td>
+								</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
+					<?php else: ?>
+					<div class="alert alert-warning">
+						<?= Yii::t('app/invoice', 'No items found for this invoice.') ?>
+					</div>
+					<?php endif; ?>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-4">
+
 			<!-- Customer Details -->
 			<div class="card mb-4">
 				<div class="card-header">
@@ -197,76 +239,6 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 							<?php endif; ?>
 						</div>
 					</div>
-				</div>
-			</div>
-
-			<!-- Invoice Items -->
-			<div class="card mb-4">
-				<div class="card-header" style="display:none;">
-					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'Invoice Items') ?></h5>
-				</div>
-				<div class="card-body">
-					<?php if (!empty($model->invoiceItems)): ?>
-					<div class="table-responsive">
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th><?= Yii::t('app/invoice', 'Description') ?></th>
-									<th class="text-center"><?= Yii::t('app/invoice', 'Quantity') ?></th>
-									<th class="text-right"><?= Yii::t('app/invoice', 'Price') ?></th>
-									<th class="text-right"><?= Yii::t('app/invoice', 'Amount') ?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php foreach ($model->invoiceItems as $item): ?>
-								<tr>
-									<td><?= nl2br(Html::encode($item->description)) ?></td>
-									<td class="text-center"><?= $item->getFormattedQuantity() ?></td>
-									<td class="text-right"><?= $item->getFormattedRate() ?></td>
-									<td class="text-right font-weight-bold"><?= $item->getFormattedAmount() ?></td>
-								</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					</div>
-					<?php else: ?>
-					<div class="alert alert-warning">
-						<?= Yii::t('app/invoice', 'No items found for this invoice.') ?>
-					</div>
-					<?php endif; ?>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-lg-4">
-			<!-- Company Information -->
-			<div class="card mb-4">
-				<div class="card-header">
-					<h5 class="card-title mb-0"><?= Yii::t('app/invoice', 'From') ?></h5>
-				</div>
-				<div class="card-body">
-					<strong><?= Html::encode($model->company->company_name) ?></strong>
-					<?php if ($model->company->company_address): ?>
-					<br><?= nl2br(Html::encode($model->company->company_address)) ?>
-					<?php endif; ?>
-					<?php 
-						$locationParts = [];
-						if ($model->company->city) $locationParts[] = $model->company->city;
-						if ($model->company->state) $locationParts[] = $model->company->state;
-						if ($model->company->zip_code) $locationParts[] = $model->company->zip_code;
-						if (!empty($locationParts)): 
-					?>
-					<br><?= Html::encode(implode(', ', $locationParts)) ?>
-					<?php endif; ?>
-					<?php if ($model->company->country && $model->company->country !== 'US'): ?>
-					<br><?= Html::encode($model->company->country) ?>
-					<?php endif; ?>
-					<?php if ($model->company->company_phone): ?>
-					<br><i class="fas fa-phone mr-2"></i><?= Html::encode($model->company->company_phone) ?>
-					<?php endif; ?>
-					<?php if ($model->company->company_email): ?>
-					<br><i class="fas fa-envelope mr-2"></i><?= Html::encode($model->company->company_email) ?>
-					<?php endif; ?>
 				</div>
 			</div>
 

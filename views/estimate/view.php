@@ -156,7 +156,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                             [
                                 'attribute' => 'expiry_date',
                                 'format' => ['date', 'php:F j, Y'],
-                                'value' => $model->expiry_date ?: 'Not set',
+                                'value' => $model->expiry_date ?: Yii::t('app/estimate', 'Not set'),
                             ],
                             [
                                 'attribute' => 'status',
@@ -166,16 +166,16 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                             [
                                 'attribute' => 'ship_to_address',
                                 'format' => 'ntext',
-                                'value' => $model->ship_to_address ?: 'Not provided',
+                                'value' => $model->ship_to_address ?: Yii::t('app/estimate', 'Not provided'),
                             ],
                             [
                                 'attribute' => 'shipping_method',
-                                'value' => $model->shipping_method ?: 'Not specified',
+                                'value' => $model->shipping_method ?: Yii::t('app/estimate', 'Not specified'),
                             ],
                             [
                                 'attribute' => 'customer_notes',
                                 'format' => 'ntext',
-                                'value' => $model->customer_notes ?: 'None',
+                                'value' => $model->customer_notes ?: Yii::t('app/estimate', 'None'),
                             ],
                         ],
                     ]) ?>
@@ -193,19 +193,17 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>Product/Service</th>
-                                        <th>Description</th>
-                                        <th class="text-right">Qty</th>
-                                        <th class="text-right">Rate</th>
-                                        <th class="text-right">Amount</th>
-                                        <th class="text-center">Tax</th>
+                                        <th><?= Yii::t('app/estimate', 'Product/Service') ?></th>
+                                        <th><?= Yii::t('app/estimate', 'Description') ?></th>
+                                        <th class="text-right"><?= Yii::t('app/estimate', 'Qty') ?></th>
+                                        <th class="text-right"><?= Yii::t('app/estimate', 'Rate') ?></th>
+                                        <th class="text-right"><?= Yii::t('app/estimate', 'Amount') ?></th>
+                                        <th class="text-center"><?= Yii::t('app/estimate', 'Tax') ?></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($model->estimateItems as $index => $item): ?>
                                         <tr>
-                                            <td><?= $index + 1 ?></td>
                                             <td><?= Html::encode($item->product_service_name ?: '-') ?></td>
                                             <td><?= Html::encode($item->description) ?></td>
                                             <td class="text-right"><?= $item->getFormattedQuantity() ?></td>
@@ -226,8 +224,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                     <?php else: ?>
                         <div class="text-center py-4">
                             <i class="fas fa-list fa-3x text-muted mb-3"></i>
-                            <h5>No Items</h5>
-                            <p class="text-muted">This estimate doesn't have any items yet.</p>
+                            <h5><?= Yii::t('app/estimate', 'No Items') ?></h5>
+                            <p class="text-muted"><?= Yii::t('app/estimate', 'This estimate doesn\'t have any items yet.') ?></p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -238,13 +236,13 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
             <!-- Customer Information -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h6 class="card-title mb-0">Customer Information</h6>
+                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Customer Information') ?></h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <strong><?= Html::encode($model->customer->customer_name) ?></strong>
                         <?php if ($model->customer->contact_name): ?>
-                            <br><small class="text-muted">Contact: <?= Html::encode($model->customer->contact_name) ?></small>
+                            <br><small class="text-muted"><?= Yii::t('app/estimate', 'Contact') ?>: <?= Html::encode($model->customer->contact_name) ?></small>
                         <?php endif; ?>
                     </div>
                     
@@ -268,7 +266,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                     
                     <?php if ($model->customer->billing_address): ?>
                         <div class="mt-3">
-                            <small class="text-muted">Billing Address:</small><br>
+                            <small class="text-muted"><?= Yii::t('app/estimate', 'Billing Address') ?>:</small><br>
                             <?= nl2br(Html::encode($model->customer->billing_address)) ?>
                         </div>
                     <?php endif; ?>
@@ -278,22 +276,22 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
             <!-- Estimate Totals -->
             <div class="card">
                 <div class="card-header">
-                    <h6 class="card-title mb-0">Estimate Totals</h6>
+                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Totals') ?></h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                        <div class="col-6">Subtotal:</div>
+                        <div class="col-6"><?= Yii::t('app/estimate', 'Subtotal') ?>:</div>
                         <div class="col-6 text-right"><?= $model->formatAmount($model->subtotal) ?></div>
                     </div>
                     
                     <?php if ($model->discount_amount > 0): ?>
                         <div class="row mb-2">
                             <div class="col-6">
-                                Discount 
+                                <?= Yii::t('app/estimate', 'Discount') ?> 
                                 <?php if ($model->discount_type == 'percentage'): ?>
                                     (<?= $model->discount_value ?>%):
                                 <?php else: ?>
-                                    (Fixed):
+                                    (<?= Yii::t('app/estimate', 'Fixed') ?>):
                                 <?php endif; ?>
                             </div>
                             <div class="col-6 text-right text-danger">
@@ -311,14 +309,14 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                     
                     <?php if ($model->tax_amount > 0): ?>
                         <div class="row mb-2">
-                            <div class="col-6">Tax (<?= $model->tax_rate ?>%):</div>
+                            <div class="col-6"><?= Yii::t('app/estimate', 'Tax') ?> (<?= $model->tax_rate ?>%):</div>
                             <div class="col-6 text-right"><?= $model->formatAmount($model->tax_amount) ?></div>
                         </div>
                     <?php endif; ?>
                     
                     <hr>
                     <div class="row">
-                        <div class="col-6"><strong>Total:</strong></div>
+                        <div class="col-6"><strong><?= Yii::t('app/estimate', 'Total') ?>:</strong></div>
                         <div class="col-6 text-right"><strong><?= $model->formatAmount($model->total_amount) ?></strong></div>
                     </div>
                 </div>

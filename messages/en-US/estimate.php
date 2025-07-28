@@ -131,6 +131,18 @@ return [
     
     // View page
     'Not set' => 'Not set',
+    'Not provided' => 'Not provided',
+    'Not specified' => 'Not specified',
+    'None' => 'None',
+    'Contact' => 'Contact',
+    'No Items' => 'No Items',
+    'This estimate doesn\'t have any items yet.' => 'This estimate doesn\'t have any items yet.',
+    '#' => '#',
+    'Qty' => 'Qty',
+    'Rate' => 'Rate',
+    'Billing Address' => 'Billing Address',
+    'Estimate Totals' => 'Estimate Totals',
+    'Fixed' => 'Fixed',
     'EXPIRED' => 'EXPIRED',
     'No items found for this estimate.' => 'No items found for this estimate.',
     'From' => 'From',

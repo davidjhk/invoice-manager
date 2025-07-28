@@ -130,6 +130,18 @@ return [
     
     // View page
     'Not set' => 'No establecido',
+    'Not provided' => 'No proporcionado',
+    'Not specified' => 'No especificado',
+    'None' => 'Ninguno',
+    'Contact' => 'Contacto',
+    'No Items' => 'Sin Artículos',
+    'This estimate doesn\'t have any items yet.' => 'Este presupuesto aún no tiene artículos.',
+    '#' => '#',
+    'Qty' => 'Cant.',
+    'Rate' => 'Precio',
+    'Billing Address' => 'Dirección de Facturación',
+    'Estimate Totals' => 'Totales del Presupuesto',
+    'Fixed' => 'Fijo',
     'EXPIRED' => 'EXPIRADO',
     'No items found for this estimate.' => 'No se encontraron artículos para este presupuesto.',
     'From' => 'De',

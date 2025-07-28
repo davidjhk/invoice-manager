@@ -121,4 +121,23 @@ return [
     'Choose Template' => 'Elegir Plantilla',
     'Template Preview' => 'Vista Previa de Plantilla',
     'Select a template for your invoice PDF' => 'Selecciona una plantilla para tu PDF de factura',
+    
+    // View page
+    'Not set' => 'No establecido',
+    'OVERDUE' => 'VENCIDO',
+    'No items found for this invoice.' => 'No se encontraron artículos para esta factura.',
+    'From' => 'De',
+    'Customer Information' => 'Información del Cliente',
+    'Payment Status' => 'Estado del Pago',
+    'Invoice Total' => 'Total de la Factura',
+    'Amount Paid' => 'Cantidad Pagada',
+    'Balance Due' => 'Saldo Adeudado',
+    'Receive Payment' => 'Recibir Pago',
+    'Payment History' => 'Historial de Pagos',
+    'Payment Date' => 'Fecha de Pago',
+    'Payment Method' => 'Método de Pago',
+    'Summary' => 'Resumen',
+    'Shipping Fee' => 'Gastos de Envío',
+    'Paid' => 'Pagado',
+    'Email not configured. Configure SMTP2GO in Company Settings.' => 'Correo no configurado. Configure SMTP2GO en Configuración de Empresa.',
 ];

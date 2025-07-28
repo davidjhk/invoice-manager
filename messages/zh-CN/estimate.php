@@ -129,6 +129,18 @@ return [
     
     // View page
     'Not set' => '未设置',
+    'Not provided' => '未提供',
+    'Not specified' => '未指定',
+    'None' => '无',
+    'Contact' => '联系人',
+    'No Items' => '无项目',
+    'This estimate doesn\'t have any items yet.' => '此估价单还没有任何项目。',
+    '#' => '#',
+    'Qty' => '数量',
+    'Rate' => '单价',
+    'Billing Address' => '账单地址',
+    'Estimate Totals' => '估价单总计',
+    'Fixed' => '固定',
     'EXPIRED' => '已过期',
     'No items found for this estimate.' => '此估价单没有找到项目。',
     'From' => '发件人',
