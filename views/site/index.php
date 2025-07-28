@@ -181,7 +181,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			<!-- Recent Invoices Compact -->
 			<div class="recent-section">
 				<div class="section-header">
-					<h3><?= Yii::t('app', 'Recent Invoices') ?></h3>
+					<h5><?= Yii::t('app', 'Recent Invoices') ?></h5>
 					<?= Html::a(Yii::t('app', 'View All'), ['/invoice/index'], ['class' => 'btn-link']) ?>
 				</div>
 				<div class="recent-list">
@@ -214,10 +214,10 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 		<div class="dashboard-right">
 			<!-- Quick Actions Compact -->
 			<div class="quick-actions">
-				<h3><?= Yii::t('app', 'Quick Actions') ?></h3>
+				<h5 class="mb-4"><?= Yii::t('app', 'Quick Actions') ?></h5>
 				<div class="action-grid">
 					<?= Html::a('<i class="fas fa-file-invoice"></i>' . Yii::t('app/invoice', 'Invoice'), ['/invoice/create'], [
-                        'class' => 'action-btn primary'
+                        'class' => 'action-btn secondary'
                     ]) ?>
 					<?= Html::a('<i class="fas fa-file-alt"></i>' . Yii::t('app/estimate', 'Estimate'), ['/estimate/create'], [
                         'class' => 'action-btn secondary'
