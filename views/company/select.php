@@ -86,8 +86,10 @@ $this->registerJs("
 </div>
 
 <?php
+use Yii;
 use yii\helpers\Url;
 use yii\web\JsExpression;
+$user_id = Yii::$app->user->isGuest ? Yii::$app->user->id : '';
 
 $this->registerJs("
     $(document).ready(function() {
@@ -128,10 +130,12 @@ $this->registerJs("
             .done(function(response) {
                 console.log('Success response:', response);
                 if (response && response.success) {
-                    // Save the selected company ID to local storage
+                    // Save the selected company ID to local storage with user-specific key
                     if (typeof(Storage) !== 'undefined') {
-                        localStorage.setItem('selectedCompanyId', companyId);
-                        console.log('Saved companyId to localStorage: ' + companyId);
+                        var userId = '{$user_id}';
+                        var selectedCompanyKey = 'selectedCompanyId_' + userId;
+                        localStorage.setItem(selectedCompanyKey, companyId);
+                        console.log('Saved companyId to localStorage with key: ' + selectedCompanyKey + ', value: ' + companyId);
                     } else {
                         console.log('Sorry, your browser does not support web storage.');
                     }

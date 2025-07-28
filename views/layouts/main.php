@@ -34,7 +34,11 @@ AppAsset::register($this);
 	<script>
 	(function() {
 		if (typeof(Storage) !== "undefined") {
-			var selectedCompanyId = localStorage.getItem("selectedCompanyId");
+			var userId = "<?= !Yii::$app->user->isGuest ? Yii::$app->user->id : '' ?>";
+			var selectedCompanyKey = "selectedCompanyId_" + userId;
+			var redirectCountKey = "companyRedirectCount_" + userId;
+			
+			var selectedCompanyId = localStorage.getItem(selectedCompanyKey);
 			var currentCompanyId = "<?= Yii::$app->session->get('current_company_id') ?>";
 			var isLoggedIn = <?= !Yii::$app->user->isGuest ? 'true' : 'false' ?>;
 			var isOnLoginPage = window.location.pathname.includes('site/login');
@@ -44,16 +48,16 @@ AppAsset::register($this);
 				if (selectedCompanyId !== currentCompanyId && currentCompanyId !== "") {
 					console.log("Redirecting to company " + selectedCompanyId);
 					// Add a flag to prevent infinite redirects
-					var redirectCount = parseInt(localStorage.getItem("companyRedirectCount") || "0");
+					var redirectCount = parseInt(localStorage.getItem(redirectCountKey) || "0");
 					if (redirectCount < 3) {
-						localStorage.setItem("companyRedirectCount", (redirectCount + 1).toString());
+						localStorage.setItem(redirectCountKey, (redirectCount + 1).toString());
 						window.location.href =
 							"<?= Yii::$app->urlManager->createUrl(['company/set-current', 'id' => '']) ?>" +
 							selectedCompanyId;
 					} else {
 						// Clear the redirect count and selected company to prevent infinite loop
-						localStorage.removeItem("companyRedirectCount");
-						localStorage.removeItem("selectedCompanyId");
+						localStorage.removeItem(redirectCountKey);
+						localStorage.removeItem(selectedCompanyKey);
 						console.warn("Too many company redirects, clearing localStorage");
 					}
 				}
@@ -61,7 +65,22 @@ AppAsset::register($this);
 			
 			// Reset redirect count on successful page load
 			if (isLoggedIn && !isOnLoginPage) {
-				localStorage.removeItem("companyRedirectCount");
+				localStorage.removeItem(redirectCountKey);
+			}
+			
+			// Clean up localStorage for other users when logging in
+			if (isLoggedIn && userId) {
+				// Remove localStorage entries for other users (keep only current user's data)
+				var keysToRemove = [];
+				for (var i = 0; i < localStorage.length; i++) {
+					var key = localStorage.key(i);
+					if (key && (key.startsWith("selectedCompanyId_") || key.startsWith("companyRedirectCount_")) && !key.endsWith("_" + userId)) {
+						keysToRemove.push(key);
+					}
+				}
+				keysToRemove.forEach(function(key) {
+					localStorage.removeItem(key);
+				});
 			}
 		}
 	})();
@@ -2777,8 +2796,12 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			
 			// Store selected company in localStorage and reset redirect count
 			if (typeof(Storage) !== "undefined") {
-				localStorage.setItem("selectedCompanyId", companyId);
-				localStorage.removeItem("companyRedirectCount");
+				var userId = "<?= !Yii::$app->user->isGuest ? Yii::$app->user->id : '' ?>";
+				var selectedCompanyKey = "selectedCompanyId_" + userId;
+				var redirectCountKey = "companyRedirectCount_" + userId;
+				
+				localStorage.setItem(selectedCompanyKey, companyId);
+				localStorage.removeItem(redirectCountKey);
 			}
 			
 			// Navigate to the URL
@@ -2848,6 +2871,21 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			if ($(e.target).closest('[data-submenu-toggle]').length || 
 				$(e.target).closest('.dropdown-menu').length) {
 				e.stopPropagation();
+			}
+		});
+
+		// Clean up localStorage on logout
+		$('.logout-btn').on('click', function() {
+			if (typeof(Storage) !== "undefined") {
+				var userId = "<?= !Yii::$app->user->isGuest ? Yii::$app->user->id : '' ?>";
+				if (userId) {
+					var selectedCompanyKey = "selectedCompanyId_" + userId;
+					var redirectCountKey = "companyRedirectCount_" + userId;
+					
+					localStorage.removeItem(selectedCompanyKey);
+					localStorage.removeItem(redirectCountKey);
+					console.log("Cleared localStorage for user: " + userId);
+				}
 			}
 		});
 	});
