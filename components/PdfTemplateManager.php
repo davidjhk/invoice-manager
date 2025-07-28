@@ -336,9 +336,8 @@ class PdfTemplateManager
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 page-break-after: avoid; 
-                border: 1px solid ' . $template['accent_color'] . ';
                 border-radius: ' . $template['border_radius'] . ';
-                padding: 15px;
+                padding: 5px;
             }
             .sub-header-column { vertical-align: top; padding: 10px; }
 			.bill-to, .ship-to { 
@@ -844,7 +843,6 @@ class PdfTemplateManager
             .header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 background-color: ' . $template['header_bg'] . ' !important;
-                border: ' . $template['border_width'] . ' ' . $template['border_style'] . ' ' . $template['accent_color'] . ';
                 padding: 15px;
             }
             .company-info { font-size: 10px; line-height: 1.4; ' . $letterSpacing . ' }
@@ -858,17 +856,14 @@ class PdfTemplateManager
             }
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
-                border: 1px solid ' . $template['accent_color'] . ';
                 padding: 15px;
             }
             .sub-header-column { vertical-align: top; padding: 10px; }
             .bill-to, .ship-to { 
                 padding: 10px; 
-                border: 1px solid #ddd;
                 background-color: #fafafa !important;
             }
             .document-details-box { 
-                border: 1px solid ' . $template['accent_color'] . '; 
                 padding: 10px;
                 background-color: ' . $template['secondary_color'] . ' !important;
             }
@@ -1371,7 +1366,6 @@ class PdfTemplateManager
         return '
             .document-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
-                border: ' . $template['border_width'] . ' ' . $template['border_style'] . ' ' . $template['accent_color'] . ';
                 border-radius: ' . $template['border_radius'] . ';
                 padding: 20px;
                 background: ' . $template['header_bg'] . ' !important;
@@ -1380,12 +1374,15 @@ class PdfTemplateManager
             body.dark-mode .company-info,.company-info, .company-info {
                font-size: 16px;color: black !important;
             }
+			.company-info h2{
+                margin: 0 0 20px 0; 
+			}
             /* Dark Mode Styles - maintain template colors */
             body.dark-mode .company-info h2 span,
 			.company-info h2 span{
                 color: ' . $template['accent_color'] . ' !important; 
-                margin: 0 0 10px 0; 
                 font-size: 32px;
+				font-weight: bold;
                 border-bottom: 2px solid ' . $template['accent_color'] . ';
                 padding-bottom: 8px;
             }
@@ -1395,9 +1392,8 @@ class PdfTemplateManager
             }
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
-                border: 1px solid ' . $template['accent_color'] . ';
                 border-radius: ' . $template['border_radius'] . ';
-                padding: 20px;
+                padding: 5px;
             }
             .sub-header table { width: 100%; border-collapse: collapse; }
             .sub-header-column { vertical-align: top; padding: 15px; width: 33.33%; }
