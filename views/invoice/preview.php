@@ -10,6 +10,17 @@ $this->title = Yii::t('app/invoice', 'Invoice Preview') . ': ' . $model->invoice
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/invoice', 'Invoices'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->invoice_number, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app/invoice', 'Preview');
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 
 <div class="invoice-preview">
@@ -17,17 +28,21 @@ $this->params['breadcrumbs'][] = Yii::t('app/invoice', 'Preview');
     <div class="d-flex justify-content-between align-items-center mb-4 print-hidden">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/invoice', 'Download PDF'), ['download-pdf', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Download PDF'), ['download-pdf', 'id' => $model->id], [
                 'class' => 'btn btn-primary',
                 'target' => '_blank',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/invoice', 'Download PDF') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 
-            <?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/invoice', 'Print'), '#', [
+            <?= Html::a('<i class="fas fa-print mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Print'), '#', [
                 'class' => 'btn btn-info',
                 'id' => 'print-btn',
                 'data-url' => \yii\helpers\Url::to(['mark-as-printed', 'id' => $model->id]),
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/invoice', 'Print') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 
             <?php if ($model->canBeSent()): ?>
@@ -36,29 +51,33 @@ $this->params['breadcrumbs'][] = Yii::t('app/invoice', 'Preview');
                 $hasEmailConfig = $company && $company->hasEmailConfiguration();
             ?>
             <?= Html::a(
-                '<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', 'Send Email'), 
+                '<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Send Email'), 
                 $hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
                 [
                     'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
                     'encode' => false,
                     'disabled' => !$hasEmailConfig,
-                    'title' => $hasEmailConfig ? '' : Yii::t('app/invoice', 'Email not configured. Configure SMTP2GO in Company Settings.'),
-                    'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
+                    'title' => $hasEmailConfig ? ($isCompactMode ? Yii::t('app/invoice', 'Send Email') : '') : Yii::t('app/invoice', 'Email not configured. Configure SMTP2GO in Company Settings.'),
+                    'data-toggle' => 'tooltip',
                     'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
                 ]
             ) ?>
             <?php endif; ?>
 
             <?php if ($model->isEditable()): ?>
-            <?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/invoice', 'Edit'), ['update', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Edit'), ['update', 'id' => $model->id], [
                     'class' => 'btn btn-secondary',
-                    'encode' => false
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app/invoice', 'Edit') : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
             <?php endif; ?>
 
-            <?= Html::a('<i class="fas fa-arrow-left mr-1"></i>' . Yii::t('app', 'Back'), ['view', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-arrow-left mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Back'), ['view', 'id' => $model->id], [
                 'class' => 'btn btn-outline-secondary',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app', 'Back') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
         </div>
     </div>

@@ -4,6 +4,7 @@
  */
 return [
     'Company Settings' => 'Company Settings',
+    'Switch Company' => 'Switch Company',
     'Company Information' => 'Company Information',
     'Company Name' => 'Company Name',
     'Company Address' => 'Company Address',

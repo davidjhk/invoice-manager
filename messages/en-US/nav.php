@@ -12,6 +12,7 @@ return [
     'Companies' => 'Companies',
     'Reports' => 'Reports',
     'Settings' => 'Settings',
+    'Company Settings' => 'Company Settings',
     'Admin' => 'Admin',
     'Help' => 'Help',
     'Profile' => 'Profile',

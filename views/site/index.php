@@ -50,10 +50,10 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			</div>
 			<div class="header-actions">
 				<?= Html::a('<i class="fas fa-plus"></i>' . Yii::t('app/invoice', 'New Invoice'), ['/invoice/create'], [
-                    'class' => 'btn btn-primary btn-sm'
+                    'class' => 'btn btn-primary btn-md'
                 ]) ?>
 				<?= Html::a('<i class="fas fa-chart-line"></i>' . Yii::t('app', 'Reports'), ['/invoice/index'], [
-                    'class' => 'btn btn-outline-secondary btn-sm ml-2'
+                    'class' => 'btn btn-outline-secondary btn-md ml-2'
                 ]) ?>
 			</div>
 		</div>

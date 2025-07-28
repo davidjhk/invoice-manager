@@ -12,6 +12,7 @@ return [
     'Companies' => 'Empresas',
     'Reports' => 'Reportes',
     'Settings' => 'Configuración',
+    'Company Settings' => 'Configuración de Empresa',
     'Admin' => 'Administración',
     'Help' => 'Ayuda',
     'Profile' => 'Perfil',

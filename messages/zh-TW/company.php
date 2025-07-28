@@ -4,6 +4,7 @@
  */
 return [
     'Company Settings' => '公司設定',
+    'Switch Company' => '切換公司',
     'Company Information' => '公司資訊',
     'Company Name' => '公司名稱',
     'Company Address' => '公司地址',

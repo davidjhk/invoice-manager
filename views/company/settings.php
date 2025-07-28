@@ -10,6 +10,17 @@ use yii\helpers\Url;
 $this->title = Yii::t('app/company', 'Company Settings');
 $this->params['breadcrumbs'][] = $this->title;
 
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
+
 // collapse-helper.js is loaded via AppAsset
 ?>
 
@@ -19,10 +30,25 @@ $this->params['breadcrumbs'][] = $this->title;
 		<h1><?= Html::encode($this->title) ?></h1>
 		<div>
 			<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
-				<?= Html::a(Yii::t('app/company', 'Create New Company'), ['/company/create'], ['class' => 'btn btn-success me-2']) ?>
+				<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Create New Company'), ['/company/create'], [
+					'class' => 'btn btn-success me-2',
+					'encode' => false,
+					'title' => $isCompactMode ? Yii::t('app/company', 'Create New Company') : '',
+					'data-toggle' => $isCompactMode ? 'tooltip' : ''
+				]) ?>
 			<?php endif; ?>
-			<?= Html::a(Yii::t('app/company', 'Switch Company'), ['/company/select'], ['class' => 'btn btn-outline-primary me-2']) ?>
-			<?= Html::a(Yii::t('app/company', 'Back to Dashboard'), ['/site/index'], ['class' => 'btn btn-secondary']) ?>
+			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Switch Company'), ['/company/select'], [
+				'class' => 'btn btn-outline-primary me-2',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/company', 'Switch Company') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
+			<?= Html::a('<i class="fas fa-arrow-left mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Back to Dashboard'), ['/site/index'], [
+				'class' => 'btn btn-secondary',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/company', 'Back to Dashboard') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
 		</div>
 	</div>
 
@@ -43,13 +69,20 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= $this->render('_form', [
         'model' => $model,
         'form' => $form,
-        'mode' => 'settings'
+        'mode' => 'settings',
+        'isCompactMode' => $isCompactMode
     ]) ?>
 
 
 	<?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+?>
 
 <script>
 // Template preview functionality for Company Settings

@@ -10,6 +10,17 @@ use app\models\Product;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/product', 'Products'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="product-view">
 
@@ -18,13 +29,21 @@ $this->params['breadcrumbs'][] = $this->title;
 			<h1><?= Html::encode($this->title) ?></h1>
 		</div>
 		<div class="col-md-4 text-right">
-			<?= Html::a(Yii::t('app/product', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-			<?= Html::a(Yii::t('app/product', 'Delete'), ['delete', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/product', $isCompactMode ? '' : 'Edit'), ['update', 'id' => $model->id], [
+				'class' => 'btn btn-primary',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/product', 'Edit') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
+			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/product', $isCompactMode ? '' : 'Delete'), ['delete', 'id' => $model->id], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => Yii::t('app/product', 'Are you sure you want to delete this product?'),
                     'method' => 'post',
                 ],
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/product', 'Delete') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 		</div>
 	</div>
@@ -174,3 +193,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 
 </div>
+
+<?php
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+?>

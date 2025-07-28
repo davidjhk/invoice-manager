@@ -10,6 +10,17 @@ use yii\widgets\DetailView;
 $this->title = $model->customer_name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/customer', 'Customers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="customer-view">
 
@@ -23,36 +34,53 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php endif; ?>
         </h1>
         <div class="btn-group" role="group">
-            <?= Html::a(Yii::t('app', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Edit'), ['update', 'id' => $model->id], [
+                'class' => 'btn btn-primary',
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app', 'Edit') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
+            ]) ?>
             
-            <?= Html::a(Yii::t('app/customer', 'Create Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
-                'class' => 'btn btn-success'
+            <?= Html::a('<i class="fas fa-file-invoice mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Create Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
+                'class' => 'btn btn-success',
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/customer', 'Create Invoice') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
             
             <?php if ($model->is_active): ?>
-                <?= Html::a(Yii::t('app/customer', 'Deactivate'), ['toggle-status', 'id' => $model->id], [
+                <?= Html::a('<i class="fas fa-ban mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Deactivate'), ['toggle-status', 'id' => $model->id], [
                     'class' => 'btn btn-warning',
                     'data' => [
                         'confirm' => Yii::t('app/customer', 'Are you sure you want to deactivate this customer?'),
                         'method' => 'post',
                     ],
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app/customer', 'Deactivate') : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
             <?php else: ?>
-                <?= Html::a(Yii::t('app/customer', 'Activate'), ['toggle-status', 'id' => $model->id], [
+                <?= Html::a('<i class="fas fa-check mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Activate'), ['toggle-status', 'id' => $model->id], [
                     'class' => 'btn btn-success',
                     'data' => [
                         'method' => 'post',
                     ],
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app/customer', 'Activate') : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
             <?php endif; ?>
             
             <?php if ($model->getInvoicesCount() == 0): ?>
-                <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
+                <?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
                         'confirm' => Yii::t('app/customer', 'Are you sure you want to delete this customer?'),
                         'method' => 'post',
                     ],
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app', 'Delete') : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
             <?php endif; ?>
         </div>
@@ -130,8 +158,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     
                     <?php if ($model->customer_email): ?>
                         <div class="text-center">
-                            <?= Html::a(Yii::t('app/customer', 'Send Email'), 'mailto:' . $model->customer_email, [
-                                'class' => 'btn btn-outline-primary'
+                            <?= Html::a('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Send Email'), 'mailto:' . $model->customer_email, [
+                                'class' => 'btn btn-outline-primary',
+                                'encode' => false,
+                                'title' => $isCompactMode ? Yii::t('app/customer', 'Send Email') : '',
+                                'data-toggle' => $isCompactMode ? 'tooltip' : ''
                             ]) ?>
                         </div>
                     <?php endif; ?>
@@ -173,8 +204,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0"><?= Yii::t('app/customer', 'Customer Invoices') ?></h5>
-            <?= Html::a(Yii::t('app/customer', 'Create New Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
-                'class' => 'btn btn-success btn-sm'
+            <?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Create New Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
+                'class' => 'btn btn-success btn-sm',
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/customer', 'Create New Invoice') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
         </div>
         <div class="card-body">
@@ -247,8 +281,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
                     <h5><?= Yii::t('app/customer', 'No Invoices') ?></h5>
                     <p class="text-muted"><?= Yii::t('app/customer', 'This customer doesn\'t have any invoices yet.') ?></p>
-                    <?= Html::a(Yii::t('app/customer', 'Create First Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
-                        'class' => 'btn btn-primary'
+                    <?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Create First Invoice'), ['/invoice/create', 'customer_id' => $model->id], [
+                        'class' => 'btn btn-primary',
+                        'encode' => false,
+                        'title' => $isCompactMode ? Yii::t('app/customer', 'Create First Invoice') : '',
+                        'data-toggle' => $isCompactMode ? 'tooltip' : ''
                     ]) ?>
                 </div>
             <?php endif; ?>
@@ -256,3 +293,9 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 </div>
+
+<?php
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+?>

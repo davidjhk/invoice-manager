@@ -10,6 +10,17 @@ use yii\helpers\Url;
 
 $this->title = Yii::t('app/customer', 'Customers');
 $this->params['breadcrumbs'][] = $this->title;
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 
 <div class="customer-index">
@@ -20,20 +31,26 @@ $this->params['breadcrumbs'][] = $this->title;
 			<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
 		</div>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export') . ' CSV', ['export'], [
+            <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Export') . ' CSV', ['export'], [
                 'class' => 'btn btn-outline-info',
                 'target' => '_blank',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app', 'Export') . ' CSV' : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
             <?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseImport()): ?>
-                <?= Html::a('<i class="fas fa-upload mr-1"></i>' . Yii::t('app', 'Import') . ' CSV', ['customer-import/index'], [
+                <?= Html::a('<i class="fas fa-upload mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Import') . ' CSV', ['customer-import/index'], [
                     'class' => 'btn btn-outline-primary',
-                    'encode' => false
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app', 'Import') . ' CSV' : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
             <?php endif; ?>
-            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>' . Yii::t('app/customer', 'Create New Customer'), ['create'], [
+            <?= Html::a('<i class="fas fa-user-plus mr-1"></i>' . Yii::t('app/customer', $isCompactMode ? '' : 'Create New Customer'), ['create'], [
                 'class' => 'btn btn-success',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/customer', 'Create New Customer') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
         </div>
     </div>
@@ -48,7 +65,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'id' => 'searchInput'
                     ]) ?>
                     <div class="input-group-append">
-                        <?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', 'Search'), ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
+                        <?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', $isCompactMode ? '' : 'Search'), [
+                        'class' => 'btn btn-outline-secondary', 
+                        'encode' => false,
+                        'title' => $isCompactMode ? Yii::t('app', 'Search') : '',
+                        'data-toggle' => $isCompactMode ? 'tooltip' : ''
+                    ]) ?>
                     </div>
                 </div>
             <?= Html::endForm() ?>

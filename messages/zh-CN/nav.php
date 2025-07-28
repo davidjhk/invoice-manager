@@ -12,6 +12,7 @@ return [
     'Companies' => '公司',
     'Reports' => '报告',
     'Settings' => '设置',
+    'Company Settings' => '公司设置',
     'Admin' => '管理员',
     'Help' => '帮助',
     'Profile' => '个人资料',

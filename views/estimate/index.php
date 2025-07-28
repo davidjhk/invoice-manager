@@ -19,6 +19,16 @@ $monthlyCount = $user->getMonthlyEstimateCount();
 $remainingEstimates = $user->getRemainingEstimates();
 $usagePercentage = $user->getEstimateUsagePercentage();
 $currentPlan = $user->getCurrentPlan();
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 
 <div class="estimate-index">
@@ -29,22 +39,26 @@ $currentPlan = $user->getCurrentPlan();
 			<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
 		</div>
 		<div class="action-buttons">
-			<?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', 'Export'), ['export'], [
+			<?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Export'), ['export'], [
                 'class' => 'btn btn-outline-info',
                 'target' => '_blank',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app', 'Export') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 			<?php if ($remainingEstimates > 0 || $remainingEstimates === null): ?>
-				<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', 'Create New Estimate'), ['create'], [
+				<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Create New Estimate'), ['create'], [
 	                'class' => 'btn btn-success',
-	                'encode' => false
+	                'encode' => false,
+	                'title' => $isCompactMode ? Yii::t('app/estimate', 'Create New Estimate') : '',
+	                'data-toggle' => $isCompactMode ? 'tooltip' : ''
 	            ]) ?>
 			<?php else: ?>
-				<?= Html::button('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', 'Create New Estimate'), [
+				<?= Html::button('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Create New Estimate'), [
 					'class' => 'btn btn-secondary disabled',
 					'disabled' => true,
 					'encode' => false,
-					'title' => Yii::t('app', 'Monthly estimate limit reached'),
+					'title' => $isCompactMode ? Yii::t('app/estimate', 'Create New Estimate') . ' - ' . Yii::t('app', 'Monthly estimate limit reached') : Yii::t('app', 'Monthly estimate limit reached'),
 					'data-toggle' => 'tooltip'
 				]) ?>
 			<?php endif; ?>
@@ -119,7 +133,12 @@ $currentPlan = $user->getCurrentPlan();
                         'id' => 'searchInput'
                     ]) ?>
 				<div class="input-group-append">
-					<?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', 'Search'), ['class' => 'btn btn-outline-secondary', 'encode' => false]) ?>
+					<?= Html::submitButton('<i class="fas fa-search"></i> ' . Yii::t('app', $isCompactMode ? '' : 'Search'), [
+						'class' => 'btn btn-outline-secondary', 
+						'encode' => false,
+						'title' => $isCompactMode ? Yii::t('app', 'Search') : '',
+						'data-toggle' => $isCompactMode ? 'tooltip' : ''
+					]) ?>
 				</div>
 			</div>
 			<?= Html::endForm() ?>

@@ -9,6 +9,17 @@ use yii\widgets\DetailView;
 $this->title = Yii::t('app/estimate', 'Estimate') . ': ' . $model->estimate_number;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/estimate', 'Estimates'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="estimate-view">
 
@@ -24,13 +35,20 @@ $this->params['breadcrumbs'][] = $this->title;
 		</h1>
 		<div class="btn-group" role="group">
 			<?php if (!$model->converted_to_invoice): ?>
-			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Edit'), ['update', 'id' => $model->id], [
+				'class' => 'btn btn-primary', 
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/estimate', 'Edit') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', 'Preview'), ['preview', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Preview'), ['preview', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'target' => '_blank',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/estimate', 'Preview') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 
 			<?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED])): ?>
@@ -39,58 +57,66 @@ $this->params['breadcrumbs'][] = $this->title;
 				$hasEmailConfig = $company && $company->hasEmailConfiguration();
 			?>
 			<?= Html::a(
-				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', 'Send Email'), 
+				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Send Email'), 
 				$hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
 				[
 					'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
 					'encode' => false,
 					'disabled' => !$hasEmailConfig,
-					'title' => $hasEmailConfig ? '' : Yii::t('app/estimate', 'Email not configured. Configure SMTP2GO in Company Settings.'),
-					'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
+					'title' => $hasEmailConfig ? ($isCompactMode ? Yii::t('app/estimate', 'Send Email') : '') : Yii::t('app/estimate', 'Email not configured. Configure SMTP2GO in Company Settings.'),
+					'data-toggle' => 'tooltip',
 					'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
 				]
 			) ?>
 			<?php endif; ?>
 
 			<?php if (in_array($model->status, [\app\models\Estimate::STATUS_DRAFT, \app\models\Estimate::STATUS_PRINTED, \app\models\Estimate::STATUS_SENT])): ?>
-			<?= Html::a('<i class="fas fa-check mr-1"></i>' . Yii::t('app/estimate', 'Mark as Accepted'), ['mark-as-accepted', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-check mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Mark as Accepted'), ['mark-as-accepted', 'id' => $model->id], [
 				'class' => 'btn btn-success',
 				'data' => [
 					'confirm' => Yii::t('app/estimate', 'Are you sure you want to mark this estimate as accepted?'),
 					'method' => 'post',
 				],
-				'encode' => false
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/estimate', 'Mark as Accepted') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
 			]) ?>
 			<?php endif; ?>
 
 			<?php if ($model->canConvertToInvoice()): ?>
-			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>' . Yii::t('app/estimate', 'Convert to Invoice'), ['convert-to-invoice', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-exchange-alt mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Convert to Invoice'), ['convert-to-invoice', 'id' => $model->id], [
 				'class' => 'btn btn-warning',
 				'data' => [
 					'confirm' => Yii::t('app/estimate', 'Are you sure you want to convert this estimate to an invoice?'),
 					'method' => 'post',
 				],
-				'encode' => false
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/estimate', 'Convert to Invoice') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
 			]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-copy mr-1"></i>' . Yii::t('app/estimate', 'Duplicate'), ['duplicate', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-copy mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Duplicate'), ['duplicate', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'data' => [
                     'confirm' => Yii::t('app/estimate', 'Are you sure you want to duplicate this estimate?'),
                     'method' => 'post',
                 ],
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/estimate', 'Duplicate') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 
 			<?php if (!$model->converted_to_invoice): ?>
-			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/estimate', 'Delete'), ['delete', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/estimate', $isCompactMode ? '' : 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
                         'confirm' => Yii::t('app/estimate', 'Are you sure you want to delete this estimate?'),
                         'method' => 'post',
                     ],
-                    'encode' => false
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app/estimate', 'Delete') : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
 			<?php endif; ?>
 		</div>

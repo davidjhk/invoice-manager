@@ -12,6 +12,7 @@ return [
     'Companies' => '회사',
     'Reports' => '보고서',
     'Settings' => '설정',
+    'Company Settings' => '회사 설정',
     'Admin' => '관리자',
     'Help' => '도움말',
     'Profile' => '프로필',

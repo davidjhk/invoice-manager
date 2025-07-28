@@ -4,6 +4,7 @@
  */
 return [
     'Company Settings' => '회사 설정',
+    'Switch Company' => '회사 전환',
     'Company Information' => '회사 정보',
     'Company Name' => '회사명',
     'Company Address' => '회사 주소',

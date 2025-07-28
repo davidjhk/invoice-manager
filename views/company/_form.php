@@ -9,10 +9,12 @@ use app\components\PdfTemplateManager;
 /** @var app\models\Company $model */
 /** @var yii\widgets\ActiveForm $form */
 /** @var string $mode 'create' or 'settings' */
+/** @var bool $isCompactMode */
 
 $mode = $mode ?? 'settings';
 $isSettings = $mode === 'settings';
 $isCreate = $mode === 'create';
+$isCompactMode = $isCompactMode ?? false;
 
 // collapse-helper.js is loaded via AppAsset
 ?>
@@ -135,9 +137,12 @@ $isCreate = $mode === 'create';
 								<small class="text-muted"><?= Yii::t('app/company', 'Filename') ?>:
 									<?= Html::encode($model->logo_filename) ?></small>
 								<br>
-								<?= Html::button(Yii::t('app/company', 'Delete Logo'), [
+								<?= Html::button('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Delete Logo'), [
                                     'class' => 'btn btn-outline-danger btn-sm mt-1',
-                                    'id' => 'delete-logo-btn'
+                                    'id' => 'delete-logo-btn',
+                                    'encode' => false,
+                                    'title' => $isCompactMode ? Yii::t('app/company', 'Delete Logo') : '',
+                                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                                 ]) ?>
 							</div>
 						</div>
@@ -387,13 +392,14 @@ $isCreate = $mode === 'create';
 						<?php 
 							$hasSmtpKey = !empty($model->smtp2go_api_key);
 						?>
-						<?= Html::button(Yii::t('app/company', 'Test Email'), [
+						<?= Html::button('<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Test Email'), [
                             'class' => 'btn ' . ($hasSmtpKey ? 'btn-outline-primary' : 'btn-outline-secondary') . ' btn-sm',
                             'id' => 'test-email-btn',
-                            'data-toggle' => $hasSmtpKey ? 'modal' : null,
+                            'data-toggle' => $hasSmtpKey ? 'modal' : ($isCompactMode ? 'tooltip' : null),
                             'data-target' => $hasSmtpKey ? '#test-email-modal' : null,
                             'disabled' => !$hasSmtpKey,
-                            'title' => $hasSmtpKey ? null : Yii::t('app/company', 'Please configure SMTP2GO API Key first')
+                            'title' => $hasSmtpKey ? ($isCompactMode ? Yii::t('app/company', 'Test Email') : null) : Yii::t('app/company', 'Please configure SMTP2GO API Key first'),
+                            'encode' => false
                         ]) ?>
 					</div>
 					<?php endif; ?>
@@ -410,10 +416,12 @@ $isCreate = $mode === 'create';
 								'id' => 'smtp2go-api-key-input'
 							]) ?>
 							<div class="input-group-append">
-								<?= Html::button('<i class="fas fa-check"></i> ' . Yii::t('app/company', 'Apply'), [
+								<?= Html::button('<i class="fas fa-check"></i> ' . Yii::t('app/company', $isCompactMode ? '' : 'Apply'), [
 									'class' => 'btn btn-outline-success btn-sm',
 									'id' => 'apply-smtp-key-btn',
-									'title' => Yii::t('app/company', 'Apply SMTP2GO API Key')
+									'title' => $isCompactMode ? Yii::t('app/company', 'Apply SMTP2GO API Key') : Yii::t('app/company', 'Apply SMTP2GO API Key'),
+									'encode' => false,
+									'data-toggle' => $isCompactMode ? 'tooltip' : ''
 								]) ?>
 							</div>
 						</div>
@@ -669,20 +677,29 @@ $this->registerCss("
 <div class="form-group">
 	<div class="row align-items-center">
 		<div class="col-md-6">
-			<?= Html::submitButton(Yii::t('app/company', 'Save Settings'), [
+			<?= Html::submitButton('<i class="fas fa-save mr-1"></i>' . Yii::t('app/company', $isCompactMode ? 'Save' : 'Save Settings'), [
                 'class' => 'btn btn-success btn-block',
-                'id' => 'save-settings-btn'
+                'id' => 'save-settings-btn',
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/company', 'Save Settings') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 		</div>
 		<div class="col-md-6 d-flex justify-content-end">
-			<?= Html::button(Yii::t('app/company', 'Reset to Defaults'), [
+			<?= Html::button('<i class="fas fa-undo mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Reset to Defaults'), [
                 'class' => 'btn btn-outline-warning mobile-hidden',
                 'id' => 'reset-defaults-btn',
-                'data-confirm' => Yii::t('app/company', 'Are you sure you want to reset all settings to default values?')
+                'data-confirm' => Yii::t('app/company', 'Are you sure you want to reset all settings to default values?'),
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/company', 'Reset to Defaults') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
-			<?= Html::a(Yii::t('app/company', 'Export Backup'), ['/company/backup'], [
+			<?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Export Backup'), ['/company/backup'], [
                 'class' => 'btn btn-outline-info ml-2 mobile-hidden',
-                'target' => '_blank'
+                'target' => '_blank',
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/company', 'Export Backup') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 		</div>
 	</div>

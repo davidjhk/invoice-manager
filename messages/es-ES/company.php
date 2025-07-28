@@ -4,6 +4,7 @@
  */
 return [
     'Company Settings' => 'Configuración de Empresa',
+    'Switch Company' => 'Cambiar Empresa',
     'Company Information' => 'Información de la Empresa',
     'Company Name' => 'Nombre de la Empresa',
     'Company Address' => 'Dirección de la Empresa',

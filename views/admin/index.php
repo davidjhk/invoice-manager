@@ -7,15 +7,46 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Admin Dashboard');
 $this->params['breadcrumbs'][] = $this->title;
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="admin-index">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1><?= Html::encode($this->title) ?></h1>
 		<div class="action-buttons">
-			<?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create User'), ['create-user'], ['class' => 'btn btn-success']) ?>
-			<?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app', 'Settings'), ['settings'], ['class' => 'btn btn-outline-primary']) ?>
-			<?= Html::a('<i class="fas fa-users mr-2"></i>' . Yii::t('app', 'Manage Users'), ['users'], ['class' => 'btn btn-outline-primary']) ?>
-			<?= Html::a('<i class="fas fa-calculator mr-2"></i>' . Yii::t('app', 'Tax Management'), ['/tax-jurisdiction/index'], ['class' => 'btn btn-outline-warning']) ?>
+			<?= Html::a('<i class="fas fa-cog mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'System Settings'), ['settings'], [
+				'class' => 'btn btn-outline-primary',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app', 'Settings') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
+			<?= Html::a('<i class="fas fa-user-plus mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Create User'), ['create-user'], [
+				'class' => 'btn btn-success',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app', 'Create User') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
+			<?= Html::a('<i class="fas fa-users mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Manage Users'), ['users'], [
+				'class' => 'btn btn-outline-primary',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app', 'Manage Users') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
+			<?= Html::a('<i class="fas fa-calculator mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Tax Management'), ['/tax-jurisdiction/index'], [
+				'class' => 'btn btn-outline-warning',
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app', 'Tax Management') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
 		</div>
 	</div>
 
@@ -135,10 +166,30 @@ $this->params['breadcrumbs'][] = $this->title;
 				</div>
 				<div class="card-body">
 					<div class="list-group list-group-flush">
-						<?= Html::a('<i class="fas fa-cogs mr-2"></i>' . Yii::t('app', 'System Settings'), ['settings'], ['class' => 'list-group-item list-group-item-action']) ?>
-						<?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create New User'), ['create-user'], ['class' => 'list-group-item list-group-item-action']) ?>
-						<?= Html::a('<i class="fas fa-users-cog mr-2"></i>' . Yii::t('app', 'User Management'), ['users'], ['class' => 'list-group-item list-group-item-action']) ?>
-						<?= Html::a('<i class="fas fa-calculator mr-2"></i>' . Yii::t('app', 'Tax Management'), ['/tax-jurisdiction/index'], ['class' => 'list-group-item list-group-item-action']) ?>
+						<?= Html::a('<i class="fas fa-cogs mr-2"></i>' . Yii::t('app', 'System Settings'), ['settings'], [
+							'class' => 'list-group-item list-group-item-action',
+							'encode' => false,
+							'title' => $isCompactMode ? Yii::t('app', 'System Settings') : '',
+							'data-toggle' => $isCompactMode ? 'tooltip' : ''
+						]) ?>
+						<?= Html::a('<i class="fas fa-user-plus mr-2"></i>' . Yii::t('app', 'Create New User'), ['create-user'], [
+							'class' => 'list-group-item list-group-item-action',
+							'encode' => false,
+							'title' => $isCompactMode ? Yii::t('app', 'Create New User') : '',
+							'data-toggle' => $isCompactMode ? 'tooltip' : ''
+						]) ?>
+						<?= Html::a('<i class="fas fa-users-cog mr-2"></i>' . Yii::t('app', 'User Management'), ['users'], [
+							'class' => 'list-group-item list-group-item-action',
+							'encode' => false,
+							'title' => $isCompactMode ? Yii::t('app', 'User Management') : '',
+							'data-toggle' => $isCompactMode ? 'tooltip' : ''
+						]) ?>
+						<?= Html::a('<i class="fas fa-calculator mr-2"></i>' . Yii::t('app', 'Tax Management'), ['/tax-jurisdiction/index'], [
+							'class' => 'list-group-item list-group-item-action',
+							'encode' => false,
+							'title' => $isCompactMode ? Yii::t('app', 'Tax Management') : '',
+							'data-toggle' => $isCompactMode ? 'tooltip' : ''
+						]) ?>
 					</div>
 				</div>
 			</div>
@@ -276,3 +327,9 @@ body.dark-mode dl.row dd {
 	transform: translateX(5px);
 }
 </style>
+
+<?php
+$this->registerJs("
+    $('[data-toggle=\"tooltip\"]').tooltip();
+");
+?>

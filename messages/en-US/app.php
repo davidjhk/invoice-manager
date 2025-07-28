@@ -7,6 +7,7 @@ return [
     'Invoice Manager' => 'Invoice Manager',
     'Dashboard' => 'Dashboard',
     'Settings' => 'Settings',
+    'Company Settings' => 'Company Settings',
     'Logout' => 'Logout',
     'Login' => 'Login',
     'Save' => 'Save',

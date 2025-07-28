@@ -9,6 +9,17 @@ use yii\widgets\DetailView;
 $this->title = $model->invoice_number;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/invoice', 'Invoices'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// Determine dark mode setting
+$currentCompany = null;
+if (!Yii::$app->user->isGuest) {
+	$companyId = Yii::$app->session->get('current_company_id');
+	if ($companyId) {
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+	}
+}
+$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="invoice-view">
 
@@ -21,13 +32,20 @@ $this->params['breadcrumbs'][] = $this->title;
 		</h1>
 		<div class="btn-group" role="group">
 			<?php if ($model->isEditable()): ?>
-			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/invoice', 'Edit'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-edit mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Edit'), ['update', 'id' => $model->id], [
+				'class' => 'btn btn-primary', 
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/invoice', 'Edit') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/invoice', 'Preview'), ['preview', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Preview'), ['preview', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'target' => '_blank',
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/invoice', 'Preview') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 
 			<?php if ($model->canBeSent()): ?>
@@ -36,40 +54,49 @@ $this->params['breadcrumbs'][] = $this->title;
 				$hasEmailConfig = $company && $company->hasEmailConfiguration();
 			?>
 			<?= Html::a(
-				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', 'Send Email'), 
+				'<i class="fas fa-envelope mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Send Email'), 
 				$hasEmailConfig ? ['send-email', 'id' => $model->id] : '#', 
 				[
 					'class' => 'btn ' . ($hasEmailConfig ? 'btn-success' : 'btn-secondary'),
 					'encode' => false,
 					'disabled' => !$hasEmailConfig,
-					'title' => $hasEmailConfig ? '' : Yii::t('app/invoice', 'Email not configured. Configure SMTP2GO in Company Settings.'),
-					'data-toggle' => !$hasEmailConfig ? 'tooltip' : '',
+					'title' => $hasEmailConfig ? ($isCompactMode ? Yii::t('app/invoice', 'Send Email') : '') : Yii::t('app/invoice', 'Email not configured. Configure SMTP2GO in Company Settings.'),
+					'data-toggle' => 'tooltip',
 					'style' => !$hasEmailConfig ? 'cursor: not-allowed; opacity: 0.6;' : ''
 				]
 			) ?>
 			<?php endif; ?>
 
 			<?php if ($model->canReceivePayment()): ?>
-			<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i>' . Yii::t('app/invoice', 'Receive Payment'), ['receive-payment', 'id' => $model->id], ['class' => 'btn btn-warning', 'encode' => false]) ?>
+			<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Receive Payment'), ['receive-payment', 'id' => $model->id], [
+				'class' => 'btn btn-warning', 
+				'encode' => false,
+				'title' => $isCompactMode ? Yii::t('app/invoice', 'Receive Payment') : '',
+				'data-toggle' => $isCompactMode ? 'tooltip' : ''
+			]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-copy mr-1"></i>' . Yii::t('app/invoice', 'Duplicate'), ['duplicate', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-copy mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Duplicate'), ['duplicate', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'data' => [
                     'confirm' => Yii::t('app/invoice', 'Are you sure you want to duplicate this invoice?'),
                     'method' => 'post',
                 ],
-                'encode' => false
+                'encode' => false,
+                'title' => $isCompactMode ? Yii::t('app/invoice', 'Duplicate') : '',
+                'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 
 			<?php if ($model->isEditable()): ?>
-			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/invoice', 'Delete'), ['delete', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-trash mr-1"></i>' . Yii::t('app/invoice', $isCompactMode ? '' : 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
                         'confirm' => Yii::t('app/invoice', 'Are you sure you want to delete this invoice?'),
                         'method' => 'post',
                     ],
-                    'encode' => false
+                    'encode' => false,
+                    'title' => $isCompactMode ? Yii::t('app/invoice', 'Delete') : '',
+                    'data-toggle' => $isCompactMode ? 'tooltip' : ''
                 ]) ?>
 			<?php endif; ?>
 		</div>
@@ -267,7 +294,12 @@ $this->params['breadcrumbs'][] = $this->title;
 					</dl>
 					<?php if ($model->canReceivePayment()): ?>
 					<div class="mt-3">
-						<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i> ' . Yii::t('app/invoice', 'Receive Payment'), ['receive-payment', 'id' => $model->id], ['class' => 'btn btn-warning btn-block', 'encode' => false]) ?>
+						<?= Html::a('<i class="fas fa-dollar-sign mr-1"></i> ' . Yii::t('app/invoice', $isCompactMode ? '' : 'Receive Payment'), ['receive-payment', 'id' => $model->id], [
+							'class' => 'btn btn-warning btn-block', 
+							'encode' => false,
+							'title' => $isCompactMode ? Yii::t('app/invoice', 'Receive Payment') : '',
+							'data-toggle' => $isCompactMode ? 'tooltip' : ''
+						]) ?>
 					</div>
 					<?php endif; ?>
 				</div>
