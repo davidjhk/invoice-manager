@@ -316,6 +316,7 @@ $isCompactMode = $isCompactMode ?? false;
 						</small>
 					</div>
 
+					<?php if (Yii::$app->user->identity && Yii::$app->user->identity->canUseCustomTemplates()): ?>
 					<div class="form-group">
 						<?= $form->field($model, 'pdf_template')->dropDownList(
 							PdfTemplateManager::getTemplateOptions(),
@@ -337,6 +338,23 @@ $isCompactMode = $isCompactMode ?? false;
 							<?= Yii::t('invoice', 'Select a template for your invoice PDF') ?>
 						</small>
 					</div>
+					<?php else: ?>
+					<div class="form-group">
+						<label class="font-weight-bold"><?= Yii::t('invoice', 'Choose Template') ?></label>
+						<div class="alert alert-info">
+							<i class="fas fa-info-circle mr-2"></i>
+							<?= Yii::t('app', 'Template selection is available for Pro plan subscribers.') ?>
+							<?= Yii::t('app', 'You are currently using the Classic template.') ?>
+							<br>
+							<?= Html::a(
+								'<i class="fas fa-arrow-up mr-1"></i>' . Yii::t('app', 'Upgrade Plan'),
+								['/subscription/my-account'],
+								['class' => 'btn btn-primary btn-sm mt-2', 'encode' => false]
+							) ?>
+						</div>
+						<?= Html::activeHiddenInput($model, 'pdf_template', ['value' => 'classic']) ?>
+					</div>
+					<?php endif; ?>
 
 					<div class="form-group">
 						<label class="font-weight-bold"><?= Yii::t('app/company', 'Use CJK Fonts for PDF') ?></label>

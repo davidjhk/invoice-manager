@@ -581,4 +581,8 @@ return [
     'Feature Not Available' => '기능 사용 불가',
     'Import functionality is only available for Pro plan users. Please upgrade your plan to access this feature.' => '가져오기 기능은 Pro 플랜 사용자만 사용할 수 있습니다. 이 기능에 액세스하려면 플랜을 업그레이드하세요.',
     
+    // Template Restrictions
+    'Template selection is available for Pro plan subscribers.' => '템플릿 선택은 Pro 플랜 구독자만 사용할 수 있습니다.',
+    'You are currently using the Classic template.' => '현재 클래식 템플릿을 사용하고 있습니다.',
+    
 ];

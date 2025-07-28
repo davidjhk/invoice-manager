@@ -698,4 +698,8 @@ return [
     'Feature Not Available' => '功能不可用',
     'Import functionality is only available for Pro plan users. Please upgrade your plan to access this feature.' => '匯入功能僅適用於 Pro 計劃用戶。請升級您的計劃以使用此功能。',
     
+    // Template Restrictions
+    'Template selection is available for Pro plan subscribers.' => '模板選擇功能僅適用於Pro計劃訂閱者。',
+    'You are currently using the Classic template.' => '您目前正在使用經典模板。',
+    
 ];

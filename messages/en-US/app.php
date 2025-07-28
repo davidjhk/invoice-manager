@@ -541,4 +541,8 @@ return [
     'Feature Not Available' => 'Feature Not Available',
     'Import functionality is only available for Pro plan users. Please upgrade your plan to access this feature.' => 'Import functionality is only available for Pro plan users. Please upgrade your plan to access this feature.',
     
+    // Template Restrictions
+    'Template selection is available for Pro plan subscribers.' => 'Template selection is available for Pro plan subscribers.',
+    'You are currently using the Classic template.' => 'You are currently using the Classic template.',
+    
 ];

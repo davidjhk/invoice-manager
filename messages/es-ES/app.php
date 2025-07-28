@@ -718,4 +718,8 @@ return [
     'Feature Not Available' => 'Función No Disponible',
     'Import functionality is only available for Pro plan users. Please upgrade your plan to access this feature.' => 'La funcionalidad de importación solo está disponible para usuarios del plan Pro. Actualice su plan para acceder a esta función.',
     
+    // Template Restrictions
+    'Template selection is available for Pro plan subscribers.' => 'La selección de plantillas está disponible para suscriptores del plan Pro.',
+    'You are currently using the Classic template.' => 'Actualmente está usando la plantilla Clásica.',
+    
 ];
