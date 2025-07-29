@@ -54,8 +54,18 @@ class LanguageBootstrap implements BootstrapInterface
         if ($sessionLanguage && $this->isValidLanguage($sessionLanguage)) {
             Yii::$app->language = $sessionLanguage;
             Yii::info('LanguageBootstrap - Set app language to: ' . $sessionLanguage, 'language');
+
+            // Set date format based on language
+            if ($sessionLanguage === 'ko-KR') {
+                Yii::$app->formatter->dateFormat = 'php:Y년 n월 j일';
+            } else {
+                // Default date format for other languages
+                Yii::$app->formatter->dateFormat = 'php:M d, Y';
+            }
         } else {
             Yii::info('LanguageBootstrap - Using default language: ' . Yii::$app->language, 'language');
+            // Default date format if no language is set
+            Yii::$app->formatter->dateFormat = 'php:M d, Y';
         }
     }
     

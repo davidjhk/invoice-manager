@@ -151,11 +151,11 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                             ],
                             [
                                 'attribute' => 'estimate_date',
-                                'format' => ['date', 'php:F j, Y'],
+                                'format' => 'date',
                             ],
                             [
                                 'attribute' => 'expiry_date',
-                                'format' => ['date', 'php:F j, Y'],
+                                'format' => 'date',
                                 'value' => $model->expiry_date ?: Yii::t('app/estimate', 'Not set'),
                             ],
                             [

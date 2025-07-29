@@ -116,16 +116,15 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                             'invoice_number',
                             [
                                 'attribute' => 'invoice_date',
-                                'format' => ['date', 'php:F j, Y'],
+                                'format' => 'date',
                             ],
                             [
                                 'attribute' => 'due_date',
-                                'format' => ['date', 'php:F j, Y'],
                                 'value' => function($model) {
                                     if (!$model->due_date) return Yii::t('app/invoice', 'Not set');
                                     
                                     $isOverdue = $model->due_date < date('Y-m-d') && $model->status !== 'paid';
-                                    $formatted = Yii::$app->formatter->asDate($model->due_date, 'php:F j, Y');
+                                    $formatted = Yii::$app->formatter->asDate($model->due_date);
                                     
                                     if ($isOverdue) {
                                         return Html::tag('span', $formatted . ' (' . Yii::t('app/invoice', 'OVERDUE') . ')', ['class' => 'text-danger font-weight-bold']);
