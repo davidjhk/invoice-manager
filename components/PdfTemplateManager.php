@@ -177,12 +177,13 @@ class PdfTemplateManager
     {
         switch ($language) {
             case 'ko-KR':
-                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+                return 'notosanskr, sans-serif';
             case 'zh-CN':
+                return 'notosanssc, sans-serif';
             case 'zh-TW':
-                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+                return 'notosanstc, sans-serif';
             case 'ja-JP':
-                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+                return 'notosansjp, sans-serif'; // Assuming notosansjp is defined
             default:
                 return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
         }
