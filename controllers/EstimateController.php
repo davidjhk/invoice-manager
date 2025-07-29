@@ -15,6 +15,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\helpers\Url;
+use app\components\PdfGenerator;
 
 /**
  * EstimateController implements the CRUD actions for Estimate model.
@@ -396,25 +397,8 @@ class EstimateController extends Controller
         // Mark as printed if in draft status
         $model->markAsPrinted();
         
-        // Generate PDF filename
-        $filename = 'Estimate-' . $model->estimate_number . '.pdf';
-        
-        // Set response headers for PDF download
-        Yii::$app->response->format = Response::FORMAT_RAW;
-        Yii::$app->response->headers->add('Content-Type', 'application/pdf');
-        Yii::$app->response->headers->add('Content-Disposition', 'attachment; filename="' . $filename . '"');
-        
-        // Render PDF content
-        $content = $this->renderPartial('/estimate/print', [
-            'model' => $model,
-            'company' => $company,
-            'isPreview' => false
-        ]);
-        
-        // Generate PDF using TCPDF
-        $pdf = Yii::$app->pdfGenerator->generate($content, $company);
-        
-        return $pdf->Output($filename, 'D'); // D = Download
+        // Generate and output PDF
+        PdfGenerator::generateEstimatePdf($model, 'D');
     }
     
     /**

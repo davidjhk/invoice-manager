@@ -103,7 +103,8 @@ class PdfHtmlGenerator
         $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
         
         // CSS Styles for PDF using selected template
-        $css = PdfTemplateManager::generateTemplateStyles($templateId, $company->use_cjk_font);
+        $language = $company->language ?? 'en-US';
+        $css = PdfTemplateManager::generateTemplateStyles($templateId, $company->use_cjk_font, $language);
         
         // HTML Content
         $html = $css;
@@ -136,7 +137,8 @@ class PdfHtmlGenerator
         $templateId = PdfTemplateManager::validateTemplateId($company->pdf_template ?? 'classic');
         
         // CSS Styles for PDF using selected template
-        $css = PdfTemplateManager::generateTemplateStyles($templateId, $company->use_cjk_font);
+        $language = $company->language ?? 'en-US';
+        $css = PdfTemplateManager::generateTemplateStyles($templateId, $company->use_cjk_font, $language);
         
         // HTML Content
         $html = $css;
@@ -160,10 +162,10 @@ class PdfHtmlGenerator
      * @return string
      * @deprecated Use PdfTemplateManager::generateTemplateStyles() instead
      */
-    public static function getTemplateStyles($useCJKFont = false, $colorScheme = '#667eea')
+    public static function getTemplateStyles($useCJKFont = false, $colorScheme = '#667eea', $language = 'en-US')
     {
         // Fallback for backward compatibility - use classic template
-        return PdfTemplateManager::generateTemplateStyles('classic', $useCJKFont);
+        return PdfTemplateManager::generateTemplateStyles('classic', $useCJKFont, $language);
     }
 
     /**
@@ -834,7 +836,7 @@ class PdfHtmlGenerator
 <div class="document-preview-container"
 	style="max-width: 1000px; margin: 0 auto; padding: 40px; position: relative;">
 
-	<?php echo PdfTemplateManager::generatePreviewStyles($templateId); ?>
+	<?php echo PdfTemplateManager::generatePreviewStyles($templateId, $company->use_cjk_font, $company->language ?? 'en-US'); ?>
 
 	<?php if ($invoice->status === 'paid' || $invoice->isFullyPaid()): ?>
 	<div class="paid-watermark">PAID</div>
@@ -1262,7 +1264,7 @@ class PdfHtmlGenerator
 <div class="document-preview-container"
 	style="max-width: 1000px; margin: 0 auto; padding: 40px; sans-serif; position: relative;">
 
-	<?php echo PdfTemplateManager::generatePreviewStyles($templateId); ?>
+	<?php echo PdfTemplateManager::generatePreviewStyles($templateId, $company->use_cjk_font, $company->language ?? 'en-US'); ?>
 
 	<?php echo self::generateUnifiedPreviewHeader($company, $config); ?>
 	<?php echo self::generateEstimatePreviewSubHeader($customer, $estimate, $company); ?>

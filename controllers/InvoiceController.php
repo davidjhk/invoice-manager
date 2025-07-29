@@ -366,7 +366,7 @@ class InvoiceController extends Controller
         $model->markAsPrinted();
         
         // Generate and output PDF
-        return PdfGenerator::generateInvoicePdf($model, 'D');
+        PdfGenerator::generateInvoicePdf($model, 'D');
     }
 
     /**
@@ -384,7 +384,7 @@ class InvoiceController extends Controller
         $model->markAsPrinted();
         
         // Generate PDF using PdfGenerator
-        return PdfGenerator::generateInvoicePdf($model, 'D');
+        PdfGenerator::generateInvoicePdf($model, 'D');
     }
 
     /**

@@ -29,7 +29,7 @@ class MpdfGenerator implements PdfGeneratorInterface
         // Use simple configuration to avoid TTC font issues
         $config = [
             'mode' => 'utf-8',
-            'format' => 'A4',
+            'format' => 'Letter',
             'tempDir' => sys_get_temp_dir(),
             'fontDir' => [
                 \Yii::getAlias('@app/fonts/mpdf-fonts'),
@@ -41,12 +41,26 @@ class MpdfGenerator implements PdfGeneratorInterface
                     'B' => 'Poppins-Bold.ttf',
                     'SB' => 'Poppins-SemiBold.ttf',
                 ],
+				'dejavusans' => [
+					'R' => 'DejaVuSans.ttf',
+					'B' => 'DejaVuSans-Bold.ttf',
+					'SB' => 'DejaVuSans-BoldOblique.ttf',
+				],
+                'freesans' => [
+                    'R' => 'FreeSans.ttf',
+                    'B' => 'FreeSansBold.ttf',
+                    'SB' => 'FreeSansOblique.ttf',
+                ],
             ],
+            // Enable substitute fonts for better CJK support
+            'useSubstitutions' => true,
+            'useKashida' => 75,
         ];
 
         // Set default font based on CJK preference
         if ($invoice->company->use_cjk_font) {
-            $config['default_font'] = 'dejavusans'; // Use DejaVu Sans for CJK support
+            $config['default_font'] = 'dejavusans'; // Use DejaVuSans for better Korean support
+            $config['default_font_size'] = 9;
         } else {
             $config['default_font'] = 'freesans'; // Use FreeSans for non-CJK (helvetica alternative)
         }
@@ -55,10 +69,13 @@ class MpdfGenerator implements PdfGeneratorInterface
 
         // Set CJK font preference with fallback fonts
         if ($invoice->company->use_cjk_font) {
+            // Use DejaVuSans which has Korean character support in mPDF
+            $mpdf->SetDefaultFont('dejavusans');
             $mpdf->autoScriptToLang = true;
             $mpdf->autoLangToFont = true;
-            // Use built-in fonts that support CJK
-            $mpdf->SetDefaultFont('dejavusans');
+            
+            // Force all text to use DejaVuSans
+            $mpdf->SetDefaultBodyCSS('font-family', 'dejavusans');
         } else {
             // Explicitly set non-CJK font
             $mpdf->SetDefaultFont('freesans');
@@ -73,6 +90,11 @@ class MpdfGenerator implements PdfGeneratorInterface
         
         // Adjust font sizes in HTML for better readability
         $html = self::adjustFontSizes($html);
+        
+        // Force DejaVu Sans font for CJK content in Bill To and Ship To areas
+        if ($invoice->company->use_cjk_font) {
+            $html = self::forceCJKFontInHTML($html);
+        }
 
 
         // Write HTML content
@@ -106,7 +128,7 @@ class MpdfGenerator implements PdfGeneratorInterface
         // Use simple configuration to avoid TTC font issues
         $config = [
             'mode' => 'utf-8',
-            'format' => 'A4',
+            'format' => 'Letter',
             'tempDir' => sys_get_temp_dir(),
             'fontDir' => [
                 \Yii::getAlias('@app/fonts/mpdf-fonts'),
@@ -118,24 +140,41 @@ class MpdfGenerator implements PdfGeneratorInterface
                     'B' => 'Poppins-Bold.ttf',
                     'SB' => 'Poppins-SemiBold.ttf',
                 ],
+				'dejavusans' => [
+					'R' => 'DejaVuSans.ttf',
+					'B' => 'DejaVuSans-Bold.ttf',
+					'SB' => 'DejaVuSans-BoldOblique.ttf',
+				],
+                'freesans' => [
+                    'R' => 'FreeSans.ttf',
+                    'B' => 'FreeSansBold.ttf',
+                    'SB' => 'FreeSansOblique.ttf',
+                ],
             ],
+            // Enable substitute fonts for better CJK support
+            'useSubstitutions' => true,
+            'useKashida' => 75,
         ];
 
         // Set default font based on CJK preference
         if ($estimate->company->use_cjk_font) {
-            $config['default_font'] = 'dejavusans'; // Use DejaVu Sans for CJK support
+            $config['default_font'] = 'dejavusans'; // Use DejaVuSans for better Korean support
+            $config['default_font_size'] = 9;
         } else {
-            $config['default_font'] = 'helvetica'; // Use Helvetica for non-CJK
+            $config['default_font'] = 'freesans'; // Use FreeSans for non-CJK
         }
 
         $mpdf = new Mpdf($config);
 
         // Set CJK font preference with fallback fonts
         if ($estimate->company->use_cjk_font) {
+            // Use DejaVuSans which has Korean character support in mPDF
+            $mpdf->SetDefaultFont('dejavusans');
             $mpdf->autoScriptToLang = true;
             $mpdf->autoLangToFont = true;
-            // Use built-in fonts that support CJK
-            $mpdf->SetDefaultFont('dejavusans');
+            
+            // Force all text to use DejaVuSans
+            $mpdf->SetDefaultBodyCSS('font-family', 'dejavusans');
         } else {
             // Explicitly set non-CJK font
             $mpdf->SetDefaultFont('freesans');
@@ -150,6 +189,11 @@ class MpdfGenerator implements PdfGeneratorInterface
         
         // Adjust font sizes in HTML for better readability
         $html = self::adjustFontSizes($html);
+        
+        // Force NotoSansCJK font for CJK content in Bill To and Ship To areas
+        if ($estimate->company->use_cjk_font) {
+            $html = self::forceCJKFontInHTML($html);
+        }
 
 
         // Write HTML content
@@ -323,5 +367,49 @@ class MpdfGenerator implements PdfGeneratorInterface
 
             $mpdf->SetHTMLFooter($footerHtml);
         }
+    }
+
+    /**
+     * Force CJK font in HTML content for Bill To and Ship To areas
+     *
+     * @param string $html
+     * @return string
+     */
+    private static function forceCJKFontInHTML($html)
+    {
+        // Replace bill-to and ship-to div classes with explicit font styling
+        $html = preg_replace(
+            '/<div class="bill-to">/i',
+            '<div class="bill-to" style="font-family: dejavusans, DejaVuSans, sans-serif !important;">',
+            $html
+        );
+        
+        $html = preg_replace(
+            '/<div class="ship-to">/i',
+            '<div class="ship-to" style="font-family: dejavusans, DejaVuSans, sans-serif !important;">',
+            $html
+        );
+        
+        // Force font on all text content in these areas using font tags
+        $html = preg_replace(
+            '/(<div class="bill-to"[^>]*>)(.*?)(<\/div>)/is',
+            '$1<font face="dejavusans,DejaVuSans,sans-serif">$2</font>$3',
+            $html
+        );
+        
+        $html = preg_replace(
+            '/(<div class="ship-to"[^>]*>)(.*?)(<\/div>)/is',
+            '$1<font face="dejavusans,DejaVuSans,sans-serif">$2</font>$3',
+            $html
+        );
+        
+        // Force font on all elements for better CJK support
+        $html = preg_replace(
+            '/<body([^>]*)>/i',
+            '<body$1 style="font-family: dejavusans, DejaVuSans, sans-serif;">',
+            $html
+        );
+        
+        return $html;
     }
 }

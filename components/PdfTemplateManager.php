@@ -14,7 +14,7 @@ class PdfTemplateManager
             'name' => 'Classic',
             'description' => 'Traditional professional layout with clean lines and borders',
             'color_scheme' => '#667eea',
-            'font_family' => '"FreeSans", "DejavuSans", "Arial", sans-serif',
+            'font_family' => '"DejavuSerif",dejavuserif,sans-serif,"FreeSans", "DejavuSans", "dejavusans", "Arial", sans-serif',
             'header_style' => 'bordered',
             'layout_type' => 'traditional',
             'accent_color' => '#667eea',
@@ -76,7 +76,7 @@ class PdfTemplateManager
             'name' => 'Elegant',
             'description' => 'Sophisticated design with refined typography and subtle dividers',
             'color_scheme' => '#059669',
-            'font_family' => '"Playfair Display","FreeSerif", "Times", "DejavuSerif", serif',
+            'font_family' => '"Playfair Display",playfairdisplay,"FreeSerif", "Times", "DejavuSerif", serif',
             'header_style' => 'underlined',
             'layout_type' => 'refined',
             'accent_color' => '#059669',
@@ -168,6 +168,27 @@ class PdfTemplateManager
     ];
 
     /**
+     * Get font family based on language
+     *
+     * @param string $language
+     * @return string
+     */
+    public static function getFontFamily($language = 'en-US')
+    {
+        switch ($language) {
+            case 'ko-KR':
+                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+            case 'zh-CN':
+            case 'zh-TW':
+                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+            case 'ja-JP':
+                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+            default:
+                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+        }
+    }
+
+    /**
      * Get all available templates
      *
      * @return array
@@ -229,17 +250,20 @@ class PdfTemplateManager
      * @param bool $useCJKFont
      * @return string
      */
-    public static function generateTemplateStyles($templateId, $useCJKFont = false)
+    public static function generateTemplateStyles($templateId, $useCJKFont = false, $language = 'en-US')
     {
         $template = self::getTemplate($templateId) ?? self::getTemplate('classic');
         
         $letterSpacing = $useCJKFont ? 'letter-spacing: 0.5px;' : '';
         
+        // Get font family based on language
+        $fontFamily = self::getFontFamily($language);
+        
         // Base styles compatible with mPDF
         $baseStyles = '
         <style>
             body { 
-                font-family: ' . $template['font_family'] . '; 
+                font-family: ' . $fontFamily . '; 
                 font-size: 9px; 
                 line-height: 1.4; 
                 color: ' . $template['text_color'] . ';
@@ -255,7 +279,7 @@ class PdfTemplateManager
         ';
         
         // Add template-specific styles that are mPDF compatible
-        $templateStyles = self::getTemplateSpecificStylesMpdf($template, $letterSpacing);
+        $templateStyles = self::getTemplateSpecificStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
         return $baseStyles . $templateStyles . '</style>';
     }
 
@@ -266,21 +290,21 @@ class PdfTemplateManager
      * @param string $letterSpacing
      * @return string
      */
-    private static function getTemplateSpecificStylesMpdf($template, $letterSpacing)
+    private static function getTemplateSpecificStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
     {
         switch ($template['layout_type']) {
             case 'traditional':
-                return self::getClassicStylesMpdf($template, $letterSpacing);
+                return self::getClassicStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
             case 'spacious':
-                return self::getModernStylesMpdf($template, $letterSpacing);
+                return self::getModernStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
             case 'refined':
-                return self::getElegantStylesMpdf($template, $letterSpacing);
+                return self::getElegantStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
             case 'structured':
-                return self::getCorporateStylesMpdf($template, $letterSpacing);
+                return self::getCorporateStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
             case 'dynamic':
-                return self::getCreativeStylesMpdf($template, $letterSpacing);
+                return self::getCreativeStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
             default:
-                return self::getClassicStylesMpdf($template, $letterSpacing);
+                return self::getClassicStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
         }
     }
 
@@ -320,8 +344,6 @@ class PdfTemplateManager
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 page-break-after: avoid; 
                 background: ' . $template['header_bg'] . ';
-                border: ' . $template['border_width'] . ' ' . $template['border_style'] . ' ' . $template['accent_color'] . ';
-                border-radius: ' . $template['border_radius'] . ';
                 padding: 15px;
             }
             .company-info { font-size: 10px; line-height: 1.4; ' . $letterSpacing . ' }
@@ -336,7 +358,6 @@ class PdfTemplateManager
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 page-break-after: avoid; 
-                border-radius: ' . $template['border_radius'] . ';
                 padding: 5px;
             }
             .sub-header-column { vertical-align: top; padding: 10px; }
@@ -837,9 +858,12 @@ class PdfTemplateManager
     /**
      * Classic template styles - Traditional bordered layout (mPDF compatible)
      */
-    private static function getClassicStylesMpdf($template, $letterSpacing)
+    private static function getClassicStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
     {
+        $fontFamily = self::getFontFamily($language);
+        
         return '
+            body { font-family: ' . $fontFamily . ', sans-serif; }
             .header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 background-color: ' . $template['header_bg'] . ' !important;
@@ -862,6 +886,8 @@ class PdfTemplateManager
             .bill-to, .ship-to { 
                 padding: 10px; 
                 background-color: #fafafa !important;
+                font-family: ' . $fontFamily . ', sans-serif;
+                ' . $letterSpacing . '
             }
             .document-details-box { 
                 padding: 10px;
@@ -924,9 +950,12 @@ class PdfTemplateManager
     /**
      * Modern template styles - Clean minimal layout (mPDF compatible)
      */
-    private static function getModernStylesMpdf($template, $letterSpacing)
+    private static function getModernStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
     {
+        $fontFamily = self::getFontFamily($language);
+        
         return '
+            body { font-family: ' . $fontFamily . ', sans-serif; }
             .header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 background-color: ' . $template['header_bg'] . ' !important;
@@ -948,6 +977,8 @@ class PdfTemplateManager
                 padding: 0; 
                 background: transparent;
                 margin-bottom: 20px;
+                font-family: ' . $fontFamily . ', sans-serif;
+                ' . $letterSpacing . '
             }
             .document-details-box { 
                 padding: 20px; 
@@ -1008,9 +1039,12 @@ class PdfTemplateManager
     /**
      * Elegant template styles - Sophisticated refined layout (mPDF compatible)
      */
-    private static function getElegantStylesMpdf($template, $letterSpacing)
+    private static function getElegantStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
     {
+        $fontFamily = self::getFontFamily($language);
+        
         return '
+            body { font-family: ' . $fontFamily . ', sans-serif; }
             .header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 background-color: ' . $template['header_bg'] . ' !important;
@@ -1035,6 +1069,8 @@ class PdfTemplateManager
                 padding: 0 0 0 10px; 
                 background: transparent;
                 border-left: 0px solid ' . $template['accent_color'] . ';
+                font-family: ' . $fontFamily . ', sans-serif;
+                ' . $letterSpacing . '
             }
             .document-details-box { 
                 padding: 15px; 
@@ -1098,9 +1134,12 @@ class PdfTemplateManager
     /**
      * Corporate template styles - Bold structured layout (mPDF compatible)
      */
-    private static function getCorporateStylesMpdf($template, $letterSpacing)
+    private static function getCorporateStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
     {
+        $fontFamily = self::getFontFamily($language);
+        
         return '
+            body { font-family: ' . $fontFamily . ', sans-serif; }
             .header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 background-color: ' . $template['header_bg'] . ' !important;
@@ -1121,13 +1160,15 @@ class PdfTemplateManager
 			}
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
-                border: 2px solid ' . $template['accent_color'] . ';
+                border: 1px solid ' . $template['accent_color'] . ';
                 padding: 15px;
             }
             .sub-header-column { vertical-align: top; padding: 10px; }
             .bill-to, .ship-to { 
                 padding: 10px; 
                 margin-bottom: 10px;
+                font-family: ' . $fontFamily . ', sans-serif;
+                ' . $letterSpacing . '
             }
             .document-details-box { 
                 padding: 15px; 
@@ -1153,7 +1194,7 @@ class PdfTemplateManager
                 padding: 15px; 
                 font-size: 11px; 
                 font-weight: bold; 
-                border-bottom: 3px solid ' . $template['accent_color'] . ';
+                border-bottom: 2px solid ' . $template['accent_color'] . ';
                 text-align: left;
             }
             .items-table td { 
@@ -1165,7 +1206,7 @@ class PdfTemplateManager
             }
             .totals { margin-top: ' . $template['section_spacing'] . '; }
             .totals-table { 
-                border: 2px solid ' . $template['accent_color'] . ';
+                border: 1px solid ' . $template['accent_color'] . ';
             }
             .totals-table td { 
                 padding: 12px; 
@@ -1192,9 +1233,12 @@ class PdfTemplateManager
     /**
      * Creative template styles - Dynamic artistic layout (mPDF compatible)
      */
-    private static function getCreativeStylesMpdf($template, $letterSpacing)
+    private static function getCreativeStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
     {
+        $fontFamily = self::getFontFamily($language);
+        
         return '
+            body { font-family: ' . $fontFamily . ', sans-serif; }
             .header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
                 background-color: #f9fafb;
@@ -1220,9 +1264,10 @@ class PdfTemplateManager
             .bill-to, .ship-to { 
                 background-color: ' . $template['secondary_color'] . ';
                 margin-bottom: 20px;
-                border: 2px dashed ' . $template['accent_color'] . ';
                 padding: 15px;
                 border-radius: 8px;
+                font-family: ' . $fontFamily . ', sans-serif;
+                ' . $letterSpacing . '
             }
             .document-details-box { 
                 padding: 20px; 
@@ -1292,11 +1337,16 @@ class PdfTemplateManager
      * Generate preview CSS styles for web display
      *
      * @param string $templateId
+     * @param bool $useCJKFont
+     * @param string $language
      * @return string
      */
-    public static function generatePreviewStyles($templateId)
+    public static function generatePreviewStyles($templateId, $useCJKFont = false, $language = 'en-US')
     {
         $template = self::getTemplate($templateId) ?? self::getTemplate('classic');
+        
+        // Get appropriate font family based on CJK setting and language
+        $fontFamily = $useCJKFont ? self::getFontFamily($language) : $template['font_family'];
         
         $baseStyles = '
         <style>
@@ -1307,7 +1357,7 @@ class PdfTemplateManager
 			body.dark-mode .document-preview-container span,
             .document-preview-container span,
 			.document-preview-container { 
-                font-family: ' . $template['font_family'] . ';
+                font-family: ' . $fontFamily . ';
             }
 			.document-preview-container { 
                 background: white; 
@@ -1366,7 +1416,6 @@ class PdfTemplateManager
         return '
             .document-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
-                border-radius: ' . $template['border_radius'] . ';
                 padding: 20px;
                 background: ' . $template['header_bg'] . ' !important;
             }
@@ -1392,7 +1441,6 @@ class PdfTemplateManager
             }
             .sub-header { 
                 margin-bottom: ' . $template['section_spacing'] . '; 
-                border-radius: ' . $template['border_radius'] . ';
                 padding: 5px;
             }
             .sub-header table { width: 100%; border-collapse: collapse; }
@@ -2118,7 +2166,7 @@ class PdfTemplateManager
             }
             .items-table td { 
                 padding: 20px; 
-                border-bottom: 2px solid #e5e7eb; 
+                border-bottom: 1px solid #e5e7eb; 
             }
             .items-table tr:nth-child(even) td { 
                 background: linear-gradient(135deg, #ffffff 0%, ' . $template['secondary_color'] . ' 100%); 
