@@ -51,6 +51,7 @@ tests/_support/_generated
 
 # temporary files
 /temp_backup/
+/runtime
 
 # uploads folder - ignore content but keep structure
 /web/uploads/*
