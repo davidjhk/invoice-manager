@@ -70,13 +70,7 @@ $defaultParams = [
             'description' => 'Open-source model with strong performance',
             'provider' => 'Meta',
             'pricing' => 'Standard'
-        ],
-		'qwen/qwen3-235b-a22b-2507:free' => [
-			'name' => 'Qwen 3.5 235B',
-			'description' => 'High-performance model with advanced capabilities',
-			'provider' => 'Qwen AI',
-			'pricing' => 'Free'
-		]
+        ]
     ],
     
     // Default AI model
