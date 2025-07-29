@@ -14,7 +14,7 @@ class PdfTemplateManager
             'name' => 'Classic',
             'description' => 'Traditional professional layout with clean lines and borders',
             'color_scheme' => '#667eea',
-            'font_family' => '"DejavuSerif",dejavuserif,sans-serif,"FreeSans", "DejavuSans", "dejavusans", "Arial", sans-serif',
+            'font_family' => '"Times",dejavuserif,sans-serif,"FreeSans", "DejavuSans", "dejavusans", "Arial", sans-serif',
             'header_style' => 'bordered',
             'layout_type' => 'traditional',
             'accent_color' => '#667eea',
@@ -76,7 +76,7 @@ class PdfTemplateManager
             'name' => 'Elegant',
             'description' => 'Sophisticated design with refined typography and subtle dividers',
             'color_scheme' => '#059669',
-            'font_family' => '"Playfair Display",playfairdisplay,"FreeSerif", "Times", "DejavuSerif", serif',
+            'font_family' => 'playfairdisplay,"FreeSerif", "Times", "DejavuSerif", serif',
             'header_style' => 'underlined',
             'layout_type' => 'refined',
             'accent_color' => '#059669',
@@ -173,19 +173,24 @@ class PdfTemplateManager
      * @param string $language
      * @return string
      */
-    public static function getFontFamily($language = 'en-US')
+    public static function getFontFamily($language = 'en-US', $templateId = null)
     {
+        // For CJK languages, always use appropriate CJK fonts
         switch ($language) {
             case 'ko-KR':
-                return 'notosanskr, sans-serif';
+                return 'notosanskr, dejavusans, sans-serif';
             case 'zh-CN':
-                return 'notosanssc, sans-serif';
+                return 'notosanssc, dejavusans, sans-serif';
             case 'zh-TW':
-                return 'notosanstc, sans-serif';
+                return 'notosanstc, dejavusans, sans-serif';
             case 'ja-JP':
-                return 'notosansjp, sans-serif'; // Assuming notosansjp is defined
+                return 'notosansjp, dejavusans, sans-serif';
             default:
-                return 'FreeSans, freesans, DejaVuSans, dejavusans, sans-serif';
+                // For non-CJK languages, use template-specific fonts if available
+                if ($templateId === 'elegant') {
+                    return 'playfairdisplay, freeserif, dejavuserif, serif';
+                }
+                return 'dejavusans, freesans, sans-serif';
         }
     }
 
@@ -254,11 +259,10 @@ class PdfTemplateManager
     public static function generateTemplateStyles($templateId, $useCJKFont = false, $language = 'en-US')
     {
         $template = self::getTemplate($templateId) ?? self::getTemplate('classic');
-        
         $letterSpacing = $useCJKFont ? 'letter-spacing: 0.5px;' : '';
         
         // Get font family based on language
-        $fontFamily = self::getFontFamily($language);
+		$fontFamily = $useCJKFont ? self::getFontFamily($language) : $template['font_family'];
         
         // Base styles compatible with mPDF
         $baseStyles = '
@@ -280,7 +284,7 @@ class PdfTemplateManager
         ';
         
         // Add template-specific styles that are mPDF compatible
-        $templateStyles = self::getTemplateSpecificStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+        $templateStyles = self::getTemplateSpecificStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
         return $baseStyles . $templateStyles . '</style>';
     }
 
@@ -291,21 +295,21 @@ class PdfTemplateManager
      * @param string $letterSpacing
      * @return string
      */
-    private static function getTemplateSpecificStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
+    private static function getTemplateSpecificStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US', $templateId = null)
     {
         switch ($template['layout_type']) {
             case 'traditional':
-                return self::getClassicStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+                return self::getClassicStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
             case 'spacious':
-                return self::getModernStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+                return self::getModernStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
             case 'refined':
-                return self::getElegantStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+                return self::getElegantStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
             case 'structured':
-                return self::getCorporateStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+                return self::getCorporateStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
             case 'dynamic':
-                return self::getCreativeStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+                return self::getCreativeStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
             default:
-                return self::getClassicStylesMpdf($template, $letterSpacing, $useCJKFont, $language);
+                return self::getClassicStylesMpdf($template, $letterSpacing, $useCJKFont, $language, $templateId);
         }
     }
 
@@ -859,9 +863,9 @@ class PdfTemplateManager
     /**
      * Classic template styles - Traditional bordered layout (mPDF compatible)
      */
-    private static function getClassicStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
+    private static function getClassicStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US', $templateId = null)
     {
-        $fontFamily = self::getFontFamily($language);
+        $fontFamily = $useCJKFont ? self::getFontFamily($language, $templateId) : $template['font_family'];
         
         return '
             body { font-family: ' . $fontFamily . ', sans-serif; }
@@ -887,7 +891,6 @@ class PdfTemplateManager
             .bill-to, .ship-to { 
                 padding: 10px; 
                 background-color: #fafafa !important;
-                font-family: ' . $fontFamily . ', sans-serif;
                 ' . $letterSpacing . '
             }
             .document-details-box { 
@@ -951,9 +954,9 @@ class PdfTemplateManager
     /**
      * Modern template styles - Clean minimal layout (mPDF compatible)
      */
-    private static function getModernStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
+    private static function getModernStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US', $templateId = null)
     {
-        $fontFamily = self::getFontFamily($language);
+        $fontFamily = $useCJKFont ? self::getFontFamily($language, $templateId) : $template['font_family'];
         
         return '
             body { font-family: ' . $fontFamily . ', sans-serif; }
@@ -1040,9 +1043,9 @@ class PdfTemplateManager
     /**
      * Elegant template styles - Sophisticated refined layout (mPDF compatible)
      */
-    private static function getElegantStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
+    private static function getElegantStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US', $templateId = null)
     {
-        $fontFamily = self::getFontFamily($language);
+        $fontFamily = $useCJKFont ? self::getFontFamily($language, $templateId) : $template['font_family'];
         
         return '
             body { font-family: ' . $fontFamily . ', sans-serif; }
@@ -1135,9 +1138,9 @@ class PdfTemplateManager
     /**
      * Corporate template styles - Bold structured layout (mPDF compatible)
      */
-    private static function getCorporateStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
+    private static function getCorporateStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US', $templateId = null)
     {
-        $fontFamily = self::getFontFamily($language);
+        $fontFamily = $useCJKFont ? self::getFontFamily($language, $templateId) : $template['font_family'];
         
         return '
             body { font-family: ' . $fontFamily . ', sans-serif; }
@@ -1234,9 +1237,9 @@ class PdfTemplateManager
     /**
      * Creative template styles - Dynamic artistic layout (mPDF compatible)
      */
-    private static function getCreativeStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US')
+    private static function getCreativeStylesMpdf($template, $letterSpacing, $useCJKFont = false, $language = 'en-US', $templateId = null)
     {
-        $fontFamily = self::getFontFamily($language);
+        $fontFamily = $useCJKFont ? self::getFontFamily($language, $templateId) : $template['font_family'];
         
         return '
             body { font-family: ' . $fontFamily . ', sans-serif; }
@@ -1347,7 +1350,7 @@ class PdfTemplateManager
         $template = self::getTemplate($templateId) ?? self::getTemplate('classic');
         
         // Get appropriate font family based on CJK setting and language
-        $fontFamily = $useCJKFont ? self::getFontFamily($language) : $template['font_family'];
+        $fontFamily = $template['font_family'];
         
         $baseStyles = '
         <style>

@@ -12,20 +12,8 @@ class MpdfGenerator implements PdfGeneratorInterface
     private static function getMpdfConfig($document)
     {
         $company = $document->company;
-        $language = $company->language ?? 'en-US';
 
-        $defaultFont = 'freesans';
-        if ($company->use_cjk_font) {
-            if (strpos($language, 'ko') === 0) {
-                $defaultFont = 'notosanskr';
-            } elseif (strpos($language, 'zh-CN') === 0) {
-                $defaultFont = 'notosanssc';
-            } elseif (strpos($language, 'zh') === 0) {
-                $defaultFont = 'notosanstc';
-            } else {
-                $defaultFont = 'notosanskr'; // Fallback for general CJK
-            }
-        }
+        $defaultFont = $company->use_cjk_font ? 'notosanskr' : 'freesans';
 
         return [
             'mode' => 'utf-8',
@@ -37,14 +25,37 @@ class MpdfGenerator implements PdfGeneratorInterface
             ],
             'fontdata' => [
                 'poppins' => ['R' => 'Poppins-Regular.ttf', 'B' => 'Poppins-Bold.ttf'],
-                'dejavusans' => ['R' => 'DejaVuSans.ttf', 'B' => 'DejaVuSans-Bold.ttf'],
+				'dejavusans' => ['R' => 'DejaVuSans.ttf', 'B' => 'DejaVuSans-Bold.ttf'],
+				'dejavuserif' => ['R' => 'DejaVuSerif.ttf', 'B' => 'DejaVuSerif-Bold.ttf'],
                 'freesans' => ['R' => 'FreeSans.ttf', 'B' => 'FreeSansBold.ttf'],
-                'notosanskr' => ['R' => 'NotoSansKR-Regular.ttf'],
-                'notosanssc' => ['R' => 'NotoSansSC-Regular.ttf'],
-                'notosanstc' => ['R' => 'NotoSansTC-Regular.ttf'],
+                'freeserif' => ['R' => 'FreeSerif.ttf', 'B' => 'FreeSerifBold.ttf'],
+				'playfairdisplay' => [
+					'R' => 'PlayfairDisplay-Regular.ttf',
+					'B' => 'PlayfairDisplay-Bold.ttf',
+				],
+				'roboto' => [
+					'R' => 'Roboto-Regular.ttf',
+					'B' => 'Roboto-Bold.ttf',
+				],
+                'notosanskr' => [
+					'R' => 'NotoSansKR-Regular.ttf',
+					'B' => 'NotoSansKR-Bold.ttf',
+				],
+                'notosanssc' => [
+					'R' => 'NotoSansSC-Regular.ttf',
+					'B' => 'NotoSansSC-Bold.ttf',
+				],
+                'notosanstc' => [
+					'R' => 'NotoSansTC-Regular.ttf',
+					'B' => 'NotoSansTC-Bold.ttf',
+				],
+                'notosansjp' => [
+					'R' => 'NotoSansJP-Regular.ttf',
+					'B' => 'NotoSansJP-Bold.ttf',
+				],
             ],
             'default_font' => $defaultFont,
-            'useSubstitutions' => false, // Reverted to false
+            'useSubstitutions' => true,
         ];
     }
 
@@ -58,7 +69,6 @@ class MpdfGenerator implements PdfGeneratorInterface
         $config = self::getMpdfConfig($invoice);
         $mpdf = new Mpdf($config);
 
-        // Reverted to false
         $mpdf->autoScriptToLang = false;
         $mpdf->autoLangToFont = false;
 
@@ -72,7 +82,7 @@ class MpdfGenerator implements PdfGeneratorInterface
 
         $filename = 'Invoice_' . $invoice->invoice_number . '.pdf';
         ob_end_clean();
-        return $mpdf->Output($filename, 'I');
+        return $mpdf->Output($filename, $mode);
     }
 
     public static function generateEstimatePdf(Estimate $estimate, $mode = 'I')
@@ -85,7 +95,6 @@ class MpdfGenerator implements PdfGeneratorInterface
         $config = self::getMpdfConfig($estimate);
         $mpdf = new Mpdf($config);
 
-        // Reverted to false
         $mpdf->autoScriptToLang = false;
         $mpdf->autoLangToFont = false;
 
@@ -99,7 +108,7 @@ class MpdfGenerator implements PdfGeneratorInterface
 
         $filename = 'Estimate_' . $estimate->estimate_number . '.pdf';
         ob_end_clean();
-        return $mpdf->Output($filename, 'I');
+        return $mpdf->Output($filename, $mode);
     }
 
     private static function setSimpleHeaderAndFooter($mpdf, $company, $config, $document)
