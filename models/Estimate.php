@@ -407,6 +407,16 @@ class Estimate extends ActiveRecord
         return $this->expiry_date && $this->expiry_date < date('Y-m-d') && $this->status !== self::STATUS_ACCEPTED;
     }
 
+    /**
+     * Check if invoice is editable
+     *
+     * @return bool
+     */
+    public function isEditable()
+    {
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_PRINTED, self::STATUS_SENT]) && 
+               $this->status !== self::STATUS_VOID;
+    }
 
     /**
      * Convert estimate to invoice

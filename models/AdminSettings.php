@@ -22,7 +22,7 @@ class AdminSettings extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'jdosa_admin_settings';
+        return '{{%admin_settings}}';
     }
 
     /**

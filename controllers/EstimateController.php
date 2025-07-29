@@ -207,8 +207,8 @@ class EstimateController extends Controller
         $model = $this->findModel($id, $company->id);
         
         // Prevent editing if estimate is not in draft status
-        if ($model->status !== Estimate::STATUS_DRAFT) {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Only draft estimates can be edited.'));
+        if (!$model->isEditable()) {
+            Yii::$app->session->setFlash('error', Yii::t('app', 'This estimate cannot be edited.'));
             return $this->redirect(['view', 'id' => $model->id]);
         }
         
