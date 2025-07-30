@@ -369,7 +369,7 @@ $isCompactMode = $isCompactMode ?? false;
 							</label>
 						</div>
 						<small class="form-text text-muted">
-							<?= Yii::t('app/company', 'Use CJK (Chinese, Japanese, Korean) fonts for better PDF rendering of Asian characters') ?>
+							<?= Yii::t('app/company', 'Use CJK Description') ?>
 						</small>
 					</div>
 

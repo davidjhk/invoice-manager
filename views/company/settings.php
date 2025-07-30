@@ -279,5 +279,77 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (templateSelect && templateSelect.value) {
 		updateCompanyTemplatePreview(templateSelect.value);
 	}
+	
+	// Test Email functionality
+	const sendTestEmailBtn = document.getElementById('send-test-email');
+	const testEmailInput = document.getElementById('test-email');
+	const testEmailResult = document.getElementById('test-email-result');
+	
+	if (sendTestEmailBtn && testEmailInput && testEmailResult) {
+		sendTestEmailBtn.addEventListener('click', function() {
+			const email = testEmailInput.value.trim();
+			
+			if (!email) {
+				alert('<?= Yii::t('app/company', 'Please enter an email address') ?>');
+				return;
+			}
+			
+			// Validate email format
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(email)) {
+				alert('<?= Yii::t('app/company', 'Please enter a valid email address') ?>');
+				return;
+			}
+			
+			// Show loading state
+			const originalText = sendTestEmailBtn.innerHTML;
+			sendTestEmailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('app/company', 'Sending...') ?>';
+			sendTestEmailBtn.disabled = true;
+			
+			// Prepare form data
+			const formData = new FormData();
+			formData.append('email', email);
+			formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->csrfToken ?>');
+			
+			// Send AJAX request
+			fetch('<?= \yii\helpers\Url::to(['company/test-email']) ?>', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.json())
+			.then(data => {
+				// Show result
+				testEmailResult.style.display = 'block';
+				
+				if (data.success) {
+					testEmailResult.className = 'alert alert-success';
+					testEmailResult.innerHTML = '<i class="fas fa-check-circle mr-2"></i>' + data.message;
+				} else {
+					testEmailResult.className = 'alert alert-danger';
+					testEmailResult.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>' + data.message;
+					if (data.details) {
+						testEmailResult.innerHTML += '<br><small>' + data.details + '</small>';
+					}
+				}
+				
+				// Reset button
+				sendTestEmailBtn.innerHTML = originalText;
+				sendTestEmailBtn.disabled = false;
+			})
+			.catch(error => {
+				console.error('Test Email Error:', error);
+				
+				// Show error
+				testEmailResult.style.display = 'block';
+				testEmailResult.className = 'alert alert-danger';
+				testEmailResult.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i><?= Yii::t('app/company', 'Network error occurred') ?>';
+				
+				// Reset button
+				sendTestEmailBtn.innerHTML = originalText;
+				sendTestEmailBtn.disabled = false;
+			});
+		});
+	}
 });
 </script>
+>>>>>>> REPLACE
