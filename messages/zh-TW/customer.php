@@ -133,4 +133,23 @@ return [
     'No Invoices' => '無發票',
     'This customer doesn\'t have any invoices yet.' => '此客戶尚無任何發票。',
     'Create First Invoice' => '建立第一張發票',
+    
+    // Customer management
+    'Active Customers' => '活躍客戶',
+    'Add Customer' => '新增客戶',
+    'Customer Name' => '客戶姓名',
+    'Email' => '電子郵件',
+    'Phone' => '電話',
+    'Address' => '地址',
+    'City' => '城市',
+    'State' => '州',
+    'ZIP Code' => '郵遞區號',
+    'Payment Terms' => '付款條件',
+    'Select terms' => '選擇條件',
+    'Select State' => '選擇州',
+    'Customer name is required.' => '客戶姓名是必需的。',
+    'Customer added successfully!' => '客戶新增成功！',
+    'Failed to add customer. Please try again.' => '新增客戶失敗。請重試。',
+    'Error adding customer. Please try again.' => '新增客戶時出錯。請重試。',
+    'Phone number can only contain numbers, spaces, parentheses, plus signs, hyphens, periods, hash and asterisk symbols.' => '電話號碼只能包含數字、空格、括號、加號、連字符、句號、井號和星號。',
 ];

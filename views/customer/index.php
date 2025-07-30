@@ -95,8 +95,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                         <th><?= Yii::t('app/customer', 'Contact Person') ?></th>
                         <th><?= Yii::t('app/customer', 'Email') ?></th>
                         <th><?= Yii::t('app/customer', 'Phone') ?></th>
-                        <th><?= Yii::t('app/invoice', 'Total Invoices') ?></th>
-                        <th><?= Yii::t('app/invoice', 'Total Amount') ?></th>
+                        <th><?= Yii::t('invoice', 'Total Invoices') ?></th>
+                        <th><?= Yii::t('invoice', 'Total Amount') ?></th>
                         <th><?= Yii::t('app/customer', 'Status') ?></th>
                         <th><?= Yii::t('app', 'Actions') ?></th>
                     </tr>

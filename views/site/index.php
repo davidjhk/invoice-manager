@@ -49,7 +49,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 				<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
 			</div>
 			<div class="header-actions">
-				<?= Html::a('<i class="fas fa-plus"></i>' . Yii::t('app/invoice', 'New Invoice'), ['/invoice/create'], [
+				<?= Html::a('<i class="fas fa-plus"></i>' . Yii::t('invoice', 'New Invoice'), ['/invoice/create'], [
                     'class' => 'btn btn-primary btn-md'
                 ]) ?>
 				<?= Html::a('<i class="fas fa-chart-line"></i>' . Yii::t('app', 'Reports'), ['/invoice/index'], [
@@ -150,7 +150,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 						<span class="status-count"><?= $draftInvoices ?></span>
 						<span class="status-icon"><i class="fas fa-file-alt"></i></span>
 					</div>
-					<div class="status-label"><?= Yii::t('app/invoice', 'Draft') ?></div>
+					<div class="status-label"><?= Yii::t('invoice', 'Draft') ?></div>
 				</div>
 				<div class="status-card printed-card"
 					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'printed']) ?>'">
@@ -158,7 +158,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 						<span class="status-count"><?= $printedInvoices ?></span>
 						<span class="status-icon"><i class="fas fa-print"></i></span>
 					</div>
-					<div class="status-label"><?= Yii::t('app/invoice', 'Printed') ?></div>
+					<div class="status-label"><?= Yii::t('invoice', 'Printed') ?></div>
 				</div>
 				<div class="status-card sent-card"
 					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'sent']) ?>'">
@@ -166,7 +166,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 						<span class="status-count"><?= $sentInvoices ?></span>
 						<span class="status-icon"><i class="fas fa-paper-plane"></i></span>
 					</div>
-					<div class="status-label"><?= Yii::t('app/invoice', 'Sent') ?></div>
+					<div class="status-label"><?= Yii::t('invoice', 'Sent') ?></div>
 				</div>
 				<div class="status-card paid-card"
 					onclick="location.href='<?= Url::to(['/invoice/index', 'status' => 'paid']) ?>'">
@@ -174,7 +174,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 						<span class="status-count"><?= $paidInvoices ?></span>
 						<span class="status-icon"><i class="fas fa-check"></i></span>
 					</div>
-					<div class="status-label"><?= Yii::t('app/invoice', 'Paid') ?></div>
+					<div class="status-label"><?= Yii::t('invoice', 'Paid') ?></div>
 				</div>
 			</div>
 
@@ -203,7 +203,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 					<?php else: ?>
 					<div class="empty-state-compact">
 						<p><?= Yii::t('app', 'No invoices yet') ?></p>
-						<?= Html::a(Yii::t('app/invoice', 'Create First Invoice'), ['/invoice/create'], ['class' => 'btn btn-primary btn-sm']) ?>
+						<?= Html::a(Yii::t('invoice', 'Create First Invoice'), ['/invoice/create'], ['class' => 'btn btn-primary btn-sm']) ?>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -216,7 +216,7 @@ $averageInvoiceValue = $totalInvoices > 0 ? $totalAmount / $totalInvoices : 0;
 			<div class="quick-actions">
 				<h5 class="mb-4"><?= Yii::t('app', 'Quick Actions') ?></h5>
 				<div class="action-grid">
-					<?= Html::a('<i class="fas fa-file-invoice"></i>' . Yii::t('app/invoice', 'Invoice'), ['/invoice/create'], [
+					<?= Html::a('<i class="fas fa-file-invoice"></i>' . Yii::t('invoice', 'Invoice'), ['/invoice/create'], [
                         'class' => 'action-btn secondary'
                     ]) ?>
 					<?= Html::a('<i class="fas fa-file-alt"></i>' . Yii::t('app/estimate', 'Estimate'), ['/estimate/create'], [

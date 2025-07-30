@@ -136,4 +136,14 @@ return [
     'No Invoices' => '인보이스 없음',
     'This customer doesn\'t have any invoices yet.' => '이 고객은 아직 인보이스가 없습니다.',
     'Create First Invoice' => '첫 번째 인보이스 생성',
+    
+    // Customer management
+    'Active Customers' => '활성 고객',
+    'Add Customer' => '고객 추가',
+    'Select terms' => '조건 선택',
+    'Customer name is required.' => '고객명은 필수입니다.',
+    'Customer added successfully!' => '고객이 성공적으로 추가되었습니다!',
+    'Failed to add customer. Please try again.' => '고객 추가에 실패했습니다. 다시 시도해주세요.',
+    'Error adding customer. Please try again.' => '고객 추가 중 오류가 발생했습니다. 다시 시도해주세요.',
+    'Phone number can only contain numbers, spaces, parentheses, plus signs, hyphens, periods, hash and asterisk symbols.' => '전화번호는 숫자, 공백, 괄호, 플러스 기호, 하이픈, 마침표, 샵, 별표 기호만 포함할 수 있습니다.',
 ];

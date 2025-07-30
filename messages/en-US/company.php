@@ -17,6 +17,12 @@ return [
     'Company Phone' => 'Company Phone',
     'Company Email' => 'Company Email',
     'Company Logo' => 'Company Logo',
+    'ID' => 'ID',
+    'Logo Path' => 'Logo Path',
+    'Logo Filename' => 'Logo Filename',
+    'Owner' => 'Owner',
+    'Created At' => 'Created At',
+    'Updated At' => 'Updated At',
     'Upload New Logo' => 'Upload New Logo',
     'Current Logo' => 'Current Logo',
     'Delete Logo' => 'Delete Logo',
@@ -53,6 +59,10 @@ return [
     'Next Estimate Number' => 'Next Estimate Number',
     'Default Due Date' => 'Default Due Date',
     'Default Estimate Expiry' => 'Default Estimate Expiry',
+    'Tax Rate (%)' => 'Tax Rate (%)',
+    'Currency' => 'Currency',
+    'PDF Template' => 'PDF Template',
+    'Is Active' => 'Is Active',
     
     // Email Settings
     'Email Settings' => 'Email Settings',
@@ -142,4 +152,22 @@ return [
     'Language & Display Settings' => 'Language & Display Settings',
     'Display & PDF Settings' => 'Display & PDF Settings',
     'Language Settings' => 'Language Settings',
+    
+    // Company selection and management
+    'Select Company' => 'Select Company',
+    'Please select a company to continue' => 'Please select a company to continue',
+    'Select' => 'Select',
+    'Start managing invoices for a new business or client' => 'Start managing invoices for a new business or client',
+    'You can create {count} more companies' => 'You can create {count} more companies',
+    'Add New Company' => 'Add New Company',
+    'Company Limit Reached' => 'Company Limit Reached',
+    'You have reached your maximum number of companies ({max})' => 'You have reached your maximum number of companies ({max})',
+    'Please upgrade your account or contact support to create more companies' => 'Please upgrade your account or contact support to create more companies',
+    'Selecting...' => 'Selecting...',
+    'Switch Company' => 'Switch Company',
+    'Back to Company List' => 'Back to Company List',
+    
+    // Default values
+    '10.00' => '10.00',
+    '30' => '30',
 ];

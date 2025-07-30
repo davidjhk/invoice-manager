@@ -852,7 +852,7 @@ class InvoiceController extends Controller
         if (!$customerId || !$companyId) {
             return [
                 'success' => false, 
-                'message' => Yii::t('app/invoice', 'Customer and company are required')
+                'message' => Yii::t('invoice', 'Customer and company are required')
             ];
         }
         
@@ -863,7 +863,7 @@ class InvoiceController extends Controller
             if (!$customer || !$company) {
                 return [
                     'success' => false, 
-                    'message' => Yii::t('app/invoice', 'Customer or company not found')
+                    'message' => Yii::t('invoice', 'Customer or company not found')
                 ];
             }
             
@@ -880,7 +880,7 @@ class InvoiceController extends Controller
             
             if ($taxRate !== null) {
                 $details = Json::decode($invoice->tax_calculation_details);
-                $message = Yii::t('app/invoice', 'Tax rate calculated automatically based on customer address');
+                $message = Yii::t('invoice', 'Tax rate calculated automatically based on customer address');
                 $messageType = 'success';
                 
                 // Check if fallback was used and modify message accordingly
@@ -888,13 +888,13 @@ class InvoiceController extends Controller
                     $fallbackReason = $details['fallback_reason'] ?? 'unknown';
                     
                     if ($fallbackReason === 'no_data_in_table') {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (tax rate database is empty)');
+                        $message = Yii::t('invoice', 'Tax rate calculated using fallback rates (tax rate database is empty)');
                         $messageType = 'warning';
                     } elseif ($fallbackReason === 'database_error') {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates (database connection error)');
+                        $message = Yii::t('invoice', 'Tax rate calculated using fallback rates (database connection error)');
                         $messageType = 'warning';
                     } else {
-                        $message = Yii::t('app/invoice', 'Tax rate calculated using fallback rates');
+                        $message = Yii::t('invoice', 'Tax rate calculated using fallback rates');
                         $messageType = 'warning';
                     }
                 }
@@ -911,7 +911,7 @@ class InvoiceController extends Controller
                 return [
                     'success' => true,
                     'tax_rate' => $company->tax_rate ?? 0,
-                    'message' => Yii::t('app/invoice', 'Using company default tax rate (address not found or invalid)'),
+                    'message' => Yii::t('invoice', 'Using company default tax rate (address not found or invalid)'),
                     'message_type' => 'info'
                 ];
             }
@@ -922,7 +922,7 @@ class InvoiceController extends Controller
                       " | Company ID: " . $companyId);
             return [
                 'success' => false,
-                'message' => Yii::t('app/invoice', 'Error calculating tax rate'),
+                'message' => Yii::t('invoice', 'Error calculating tax rate'),
                 'error' => YII_DEBUG ? $e->getMessage() : null,
                 'fallback_rate' => isset($company) ? ($company->tax_rate ?? 0) : 0
             ];

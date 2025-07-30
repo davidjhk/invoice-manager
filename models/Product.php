@@ -92,21 +92,21 @@ class Product extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'company_id' => 'Company ID',
-            'name' => 'Product/Service Name',
-            'description' => 'Description',
-            'type' => 'Type',
-            'category' => 'Category (Legacy)',
-            'category_id' => 'Category',
-            'sku' => 'SKU',
-            'unit' => 'Unit',
-            'price' => 'Price',
-            'cost' => 'Cost',
-            'is_taxable' => 'Taxable',
-            'is_active' => 'Active',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'id' => Yii::t('app/product', 'ID'),
+            'company_id' => Yii::t('app/product', 'Company ID'),
+            'name' => Yii::t('app/product', 'Product/Service Name'),
+            'description' => Yii::t('app/product', 'Description'),
+            'type' => Yii::t('app/product', 'Type'),
+            'category' => Yii::t('app/product', 'Category (Legacy)'),
+            'category_id' => Yii::t('app/product', 'Category'),
+            'sku' => Yii::t('app/product', 'SKU'),
+            'unit' => Yii::t('app/product', 'Unit'),
+            'price' => Yii::t('app/product', 'Price'),
+            'cost' => Yii::t('app/product', 'Cost'),
+            'is_taxable' => Yii::t('app/product', 'Taxable'),
+            'is_active' => Yii::t('app/product', 'Active'),
+            'created_at' => Yii::t('app/product', 'Created At'),
+            'updated_at' => Yii::t('app/product', 'Updated At'),
         ];
     }
 

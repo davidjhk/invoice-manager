@@ -4,7 +4,6 @@
  */
 return [
     'Company Settings' => '公司设置',
-    'Switch Company' => '切换公司',
     'Company Information' => '公司信息',
     'Company Name' => '公司名称',
     'Company Address' => '公司地址',
@@ -140,6 +139,18 @@ return [
     'Network error occurred' => '发生网络错误',
     'Please configure SMTP2GO API Key first' => '请先配置SMTP2GO API密钥',
     'Language & Display Settings' => '语言和显示设置',
-    'Display & PDF Settings' => '显示和PDF设置',
-    'Language Settings' => '语言设置',
+    
+    // Company selection and management
+    'Select Company' => '选择公司',
+    'Please select a company to continue' => '请选择一个公司以继续',
+    'Select' => '选择',
+    'Start managing invoices for a new business or client' => '开始为新业务或客户管理发票',
+    'You can create {count} more companies' => '您可以再创建{count}个公司',
+    'Add New Company' => '添加新公司',
+    'Company Limit Reached' => '公司数量已达上限',
+    'You have reached your maximum number of companies ({max})' => '您已达到最大公司数量({max})',
+    'Please upgrade your account or contact support to create more companies' => '请升级您的账户或联系支持以创建更多公司',
+    'Selecting...' => '选择中...',
+    'Switch Company' => '切换公司',
+    'Back to Company List' => '返回公司列表',
 ];

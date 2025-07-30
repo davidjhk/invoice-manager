@@ -133,4 +133,25 @@ return [
     'No Invoices' => 'No Invoices',
     'This customer doesn\'t have any invoices yet.' => 'This customer doesn\'t have any invoices yet.',
     'Create First Invoice' => 'Create First Invoice',
+    
+    // Model attribute labels
+    'ID' => 'ID',
+    'Customer Address' => 'Customer Address',
+    'Contact Name' => 'Contact Name',
+    'Billing Address' => 'Billing Address',
+    'Shipping Address' => 'Shipping Address',
+    'Company ID' => 'Company ID',
+    'Is Active' => 'Is Active',
+    'Created At' => 'Created At',
+    'Updated At' => 'Updated At',
+    
+    // Customer management
+    'Active Customers' => 'Active Customers',
+    'Add Customer' => 'Add Customer',
+    'Select terms' => 'Select terms',
+    'Customer name is required.' => 'Customer name is required.',
+    'Customer added successfully!' => 'Customer added successfully!',
+    'Failed to add customer. Please try again.' => 'Failed to add customer. Please try again.',
+    'Error adding customer. Please try again.' => 'Error adding customer. Please try again.',
+    'Phone number can only contain numbers, spaces, parentheses, plus signs, hyphens, periods, hash and asterisk symbols.' => 'Phone number can only contain numbers, spaces, parentheses, plus signs, hyphens, periods, hash and asterisk symbols.',
 ];

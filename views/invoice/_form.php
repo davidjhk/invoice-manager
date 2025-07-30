@@ -78,15 +78,15 @@ $this->registerJsVar('invoiceConfig', [
 							<?= $form->field($model, 'customer_id')->dropDownList(
                                 ArrayHelper::map($customers, 'id', 'customer_name'),
                                 [
-                                    'prompt' => Yii::t('app/invoice', 'Select Customer'),
+                                    'prompt' => Yii::t('invoice', 'Select Customer'),
                                     'id' => 'customer-select',
                                 ]
-                            )->label(Yii::t('app/invoice', 'Customer')) ?>
+                            )->label(Yii::t('invoice', 'Customer')) ?>
 
 							<div class="d-flex align-items-center mb-3">
 								<small
-									class="text-muted mr-2"><?= Yii::t('app/invoice', 'Customer not in list?') ?></small>
-								<?= Html::button(Yii::t('app/invoice', 'Add New Customer'), [
+									class="text-muted mr-2"><?= Yii::t('invoice', 'Customer not in list?') ?></small>
+								<?= Html::button(Yii::t('invoice', 'Add New Customer'), [
 									'class' => 'btn btn-outline-success btn-sm',
 									'id' => 'add-customer-btn',
 									'data-toggle' => 'modal',
@@ -97,17 +97,17 @@ $this->registerJsVar('invoiceConfig', [
 						<div class="col-md-6">
 
 							<div id="customer-details" class="mb-3">
-								<label class="form-label font-weight-bold"><?= Yii::t('app/invoice', 'Customer Information') ?></label>
+								<label class="form-label font-weight-bold"><?= Yii::t('invoice', 'Customer Information') ?></label>
 								<div id="bill-to-address" class="border p-2 bg-light min-h-100 rounded">
 									<?php if (!empty($model->bill_to_address)): ?>
 									<?= nl2br(Html::encode($model->bill_to_address)) ?>
 									<?php else: ?>
-									<span class="text-muted"><?= Yii::t('app/invoice', 'Select Customer') ?>.</span>
+									<span class="text-muted"><?= Yii::t('invoice', 'Select Customer') ?>.</span>
 									<?php endif; ?>
 								</div>
 								<?= $form->field($model, 'bill_to_address')->hiddenInput(['id' => 'invoice-bill_to_address'])->label(false) ?>
 							</div>
-							<?= Html::button(Yii::t('app/invoice', 'Edit'), [
+							<?= Html::button(Yii::t('invoice', 'Edit'), [
                                 'class' => 'btn btn-outline-primary btn-sm',
                                 'id' => 'edit-customer-btn'
                             ]) ?>
@@ -115,10 +115,10 @@ $this->registerJsVar('invoiceConfig', [
 						<div class="col-md-6">
 							<?= $form->field($model, 'ship_to_address')->textarea([
                                 'rows' => 4,
-                                'placeholder' => Yii::t('app/invoice', 'Shipping address (if different from billing)')
-                            ])->label(Yii::t('app/invoice', 'Ship To')) ?>
+                                'placeholder' => Yii::t('invoice', 'Shipping address (if different from billing)')
+                            ])->label(Yii::t('invoice', 'Ship To')) ?>
 
-							<?= Html::button(Yii::t('app/invoice', 'Clear Shipping Info'), [
+							<?= Html::button(Yii::t('invoice', 'Clear Shipping Info'), [
                                 'class' => 'btn btn-link btn-sm p-0',
                                 'id' => 'remove-shipping-btn'
                             ]) ?>
@@ -132,14 +132,14 @@ $this->registerJsVar('invoiceConfig', [
 			<div class="card card-default">
 				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-info-circle mr-2"></i><?= Yii::t('app/invoice', 'Invoice Details') ?>
+						<i class="fas fa-info-circle mr-2"></i><?= Yii::t('invoice', 'Invoice Details') ?>
 					</h5>
 				</div>
 				<div class="card-body">
 					<div class="row">
 						<div class="col-md-6">
-							<?= $form->field($model, 'invoice_number')->textInput(['maxlength' => true])->label(Yii::t('app/invoice', 'Invoice Number')) ?>
-							<?= $form->field($model, 'invoice_date')->input('date')->label(Yii::t('app/invoice', 'Invoice Date')) ?>
+							<?= $form->field($model, 'invoice_number')->textInput(['maxlength' => true])->label(Yii::t('invoice', 'Invoice Number')) ?>
+							<?= $form->field($model, 'invoice_date')->input('date')->label(Yii::t('invoice', 'Invoice Date')) ?>
 						</div>
 						<div class="col-md-6">
 							<?= $form->field($model, 'terms')->dropDownList([
@@ -147,8 +147,8 @@ $this->registerJsVar('invoiceConfig', [
                                 'Net 30' => 'Net 30',
                                 'Net 60' => 'Net 60',
                                 'Due on receipt' => 'Due on receipt'
-                            ], ['prompt' => Yii::t('app/invoice', 'Select terms')]) ?>
-							<?= $form->field($model, 'due_date')->input('date')->label(Yii::t('app/invoice', 'Due Date')) ?>
+                            ], ['prompt' => Yii::t('invoice', 'Select terms')]) ?>
+							<?= $form->field($model, 'due_date')->input('date')->label(Yii::t('invoice', 'Due Date')) ?>
 						</div>
 					</div>
 				</div>
@@ -160,7 +160,7 @@ $this->registerJsVar('invoiceConfig', [
 					data-target="#invoice-help-collapse" aria-expanded="false">
 					<h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
 						<span><i
-								class="fas fa-question-circle mr-2"></i><?= Yii::t('app/invoice', 'Invoice Help') ?></span>
+								class="fas fa-question-circle mr-2"></i><?= Yii::t('invoice', 'Invoice Help') ?></span>
 						<i class="fas fa-chevron-down collapse-icon"></i>
 					</h6>
 				</div>
@@ -168,18 +168,18 @@ $this->registerJsVar('invoiceConfig', [
 					<div class="card-body py-2">
 						<div class="alert alert-info py-2 mb-0">
 							<small>
-								<strong><?= Yii::t('app/invoice', 'Invoice Number') ?>:</strong>
-								<?= Yii::t('app/invoice', 'Unique identifier for this invoice.') ?><br>
-								<strong><?= Yii::t('app/invoice', 'Terms') ?>:</strong>
-								<?= Yii::t('app/invoice', 'Payment terms that determine due date.') ?><br>
-								<strong><?= Yii::t('app/invoice', 'Invoice Date') ?>:</strong>
-								<?= Yii::t('app/invoice', 'Date when invoice is issued.') ?><br>
-								<strong><?= Yii::t('app/invoice', 'Due Date') ?>:</strong>
-								<?= Yii::t('app/invoice', 'Payment deadline automatically calculated from terms.') ?><br>
-								<strong><?= Yii::t('app/invoice', 'Items') ?>:</strong>
-								<?= Yii::t('app/invoice', 'Add products/services with quantity and rate.') ?><br>
-								<strong><?= Yii::t('app/invoice', 'Tax') ?>:</strong>
-								<?= Yii::t('app/invoice', 'Check items that are taxable for automatic calculation.') ?>
+								<strong><?= Yii::t('invoice', 'Invoice Number') ?>:</strong>
+								<?= Yii::t('invoice', 'Unique identifier for this invoice.') ?><br>
+								<strong><?= Yii::t('invoice', 'Terms') ?>:</strong>
+								<?= Yii::t('invoice', 'Payment terms that determine due date.') ?><br>
+								<strong><?= Yii::t('invoice', 'Invoice Date') ?>:</strong>
+								<?= Yii::t('invoice', 'Date when invoice is issued.') ?><br>
+								<strong><?= Yii::t('invoice', 'Due Date') ?>:</strong>
+								<?= Yii::t('invoice', 'Payment deadline automatically calculated from terms.') ?><br>
+								<strong><?= Yii::t('invoice', 'Items') ?>:</strong>
+								<?= Yii::t('invoice', 'Add products/services with quantity and rate.') ?><br>
+								<strong><?= Yii::t('invoice', 'Tax') ?>:</strong>
+								<?= Yii::t('invoice', 'Check items that are taxable for automatic calculation.') ?>
 							</small>
 						</div>
 					</div>
@@ -191,7 +191,7 @@ $this->registerJsVar('invoiceConfig', [
 	<div class="card card-default mt-4">
 		<div class="card-header" style="display: none;">
 			<h5 class="card-title mb-0">
-				<i class="fas fa-list mr-2"></i><?= Yii::t('app/invoice', 'Items') ?>
+				<i class="fas fa-list mr-2"></i><?= Yii::t('invoice', 'Items') ?>
 			</h5>
 		</div>
 		<div class="card-body">
@@ -200,12 +200,12 @@ $this->registerJsVar('invoiceConfig', [
 					<thead class="thead-light">
 						<tr>
 							<th style="width: 5%;">#</th>
-							<th style="width: 25%;"><?= Yii::t('app/invoice', 'Product/Service') ?></th>
-							<th style="width: 35%;"><?= Yii::t('app/invoice', 'Description') ?></th>
-							<th style="width: 10%;" class="text-right"><?= Yii::t('app/invoice', 'Quantity') ?></th>
-							<th style="width: 10%;" class="text-right"><?= Yii::t('app/invoice', 'Price') ?></th>
-							<th style="width: 10%;" class="text-right"><?= Yii::t('app/invoice', 'Amount') ?></th>
-							<th style="width: 5%;" class="text-center"><?= Yii::t('app/invoice', 'Tax') ?></th>
+							<th style="width: 25%;"><?= Yii::t('invoice', 'Product/Service') ?></th>
+							<th style="width: 35%;"><?= Yii::t('invoice', 'Description') ?></th>
+							<th style="width: 10%;" class="text-right"><?= Yii::t('invoice', 'Quantity') ?></th>
+							<th style="width: 10%;" class="text-right"><?= Yii::t('invoice', 'Price') ?></th>
+							<th style="width: 10%;" class="text-right"><?= Yii::t('invoice', 'Amount') ?></th>
+							<th style="width: 5%;" class="text-center"><?= Yii::t('invoice', 'Tax') ?></th>
 							<th style="width: 5%;"></th>
 						</tr>
 					</thead>
@@ -214,8 +214,8 @@ $this->registerJsVar('invoiceConfig', [
 					</tbody>
 				</table>
 			</div>
-			<?= Html::button(Yii::t('app/invoice', 'Add Item'), ['class' => 'btn btn-outline-primary', 'id' => 'add-item-btn']) ?>
-			<?= Html::button(Yii::t('app/invoice', 'Clear All'), ['class' => 'btn btn-outline-danger', 'id' => 'clear-lines-btn']) ?>
+			<?= Html::button(Yii::t('invoice', 'Add Item'), ['class' => 'btn btn-outline-primary', 'id' => 'add-item-btn']) ?>
+			<?= Html::button(Yii::t('invoice', 'Clear All'), ['class' => 'btn btn-outline-danger', 'id' => 'clear-lines-btn']) ?>
 		</div>
 	</div>
 
@@ -224,12 +224,12 @@ $this->registerJsVar('invoiceConfig', [
 			<div class="card card-default">
 				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-comment mr-2"></i><?= Yii::t('app/invoice', 'Notes & Payment') ?>
+						<i class="fas fa-comment mr-2"></i><?= Yii::t('invoice', 'Notes & Payment') ?>
 					</h5>
 				</div>
 				<div class="card-body">
-					<?= $form->field($model, 'customer_notes')->textarea(['rows' => 3, 'placeholder' => Yii::t('app/invoice', 'Thank you for your business.')])->label(Yii::t('app/invoice', 'Note to Customer')) ?>
-					<?= $form->field($model, 'payment_instructions')->textarea(['rows' => 3, 'placeholder' => Yii::t('app/invoice', 'e.g. Bank transfer details')])->label(Yii::t('app/invoice', 'Payment Instructions')) ?>
+					<?= $form->field($model, 'customer_notes')->textarea(['rows' => 3, 'placeholder' => Yii::t('invoice', 'Thank you for your business.')])->label(Yii::t('invoice', 'Note to Customer')) ?>
+					<?= $form->field($model, 'payment_instructions')->textarea(['rows' => 3, 'placeholder' => Yii::t('invoice', 'e.g. Bank transfer details')])->label(Yii::t('invoice', 'Payment Instructions')) ?>
 				</div>
 			</div>
 		</div>
@@ -238,25 +238,25 @@ $this->registerJsVar('invoiceConfig', [
 			<div class="card card-default">
 				<div class="card-header" style="display: none;">
 					<h5 class="card-title mb-0">
-						<i class="fas fa-calculator mr-2"></i><?= Yii::t('app/invoice', 'Total') ?>
+						<i class="fas fa-calculator mr-2"></i><?= Yii::t('invoice', 'Total') ?>
 					</h5>
 				</div>
 				<div class="card-body">
 					<div class="totals-grid">
-						<span><?= Yii::t('app/invoice', 'Subtotal') ?></span>
+						<span><?= Yii::t('invoice', 'Subtotal') ?></span>
 						<span id="subtotal-display" class="text-right">$0.00</span>
 
-						<span><?= Yii::t('app/invoice', 'Discount') ?></span>
+						<span><?= Yii::t('invoice', 'Discount') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
 							<?= $form->field($model, 'discount_value', ['options' => ['class' => 'mb-0 mr-1'], 'template' => '{input}'])->textInput(['id' => 'discount-input', 'class' => 'form-control form-control-sm text-right', 'style' => 'width: 60px;', 'placeholder' => '0']) ?>
 							<?= $form->field($model, 'discount_type', ['options' => ['class' => 'mb-0'], 'template' => '{input}'])->dropDownList(['percentage' => '%', 'fixed' => '$'], ['id' => 'discount-type', 'class' => 'form-control form-control-sm', 'style' => 'width: 50px;']) ?>
 							<span id="discount-display" class="ml-2">-$0.00</span>
 						</div>
 
-						<span><?= Yii::t('app/invoice', 'Taxable Subtotal') ?></span>
+						<span><?= Yii::t('invoice', 'Taxable Subtotal') ?></span>
 						<span id="taxable-subtotal-display" class="text-right">$0.00</span>
 
-						<span><?= Yii::t('app/invoice', 'Tax Calculation') ?></span>
+						<span><?= Yii::t('invoice', 'Tax Calculation') ?></span>
 						<div class="text-right">
 							<?php if ($model->hasAttribute('tax_calculation_mode')): ?>
 							<?= $form->field($model, 'tax_calculation_mode', ['options' => ['class' => 'mb-2'], 'template' => '{input}'])->dropDownList(
@@ -265,19 +265,19 @@ $this->registerJsVar('invoiceConfig', [
 								) ?>
 							<?php else: ?>
 							<select id="tax-calculation-mode" class="form-control form-control-sm mb-2">
-								<option value="manual" selected><?= Yii::t('app/invoice', 'Manual Input') ?></option>
-								<option value="automatic"><?= Yii::t('app/invoice', 'Automatic Calculation') ?></option>
+								<option value="manual" selected><?= Yii::t('invoice', 'Manual Input') ?></option>
+								<option value="automatic"><?= Yii::t('invoice', 'Automatic Calculation') ?></option>
 							</select>
 							<?php endif; ?>
 						</div>
 
-						<span><?= Yii::t('app/invoice', 'Shipping Fee') ?></span>
+						<span><?= Yii::t('invoice', 'Shipping Fee') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
 							<?= $form->field($model, 'shipping_fee', ['options' => ['class' => 'mb-0'], 'template' => '{input}'])->textInput(['id' => 'shipping-fee-input', 'class' => 'form-control form-control-sm text-right', 'style' => 'width: 120px;', 'placeholder' => '0.00', 'type' => 'number', 'step' => '0.01', 'min' => '0']) ?>
 							<span id="shipping-fee-display" class="ml-2">$0.00</span>
 						</div>
 
-						<span><?= Yii::t('app/invoice', 'Sales Tax') ?></span>
+						<span><?= Yii::t('invoice', 'Sales Tax') ?></span>
 						<div class="text-right d-flex justify-content-end align-items-center">
 							<input type="number" class="form-control form-control-sm mr-2" id="tax-rate-input"
 								style="width: 120px;" min="0" max="100" step="0.01"
@@ -287,7 +287,7 @@ $this->registerJsVar('invoiceConfig', [
 							<span id="tax-display">$0.00</span>
 							<button type="button" class="btn btn-outline-primary btn-sm ml-2" id="calculate-tax-btn"
 								style="display: none;">
-								<i class="fas fa-calculator"></i> <?= Yii::t('app/invoice', 'Calculate') ?>
+								<i class="fas fa-calculator"></i> <?= Yii::t('invoice', 'Calculate') ?>
 							</button>
 						</div>
 					</div>
@@ -295,11 +295,11 @@ $this->registerJsVar('invoiceConfig', [
 					<hr>
 
 					<div class="totals-grid font-weight-bold h5">
-						<span><?= Yii::t('app/invoice', 'Total') ?></span>
+						<span><?= Yii::t('invoice', 'Total') ?></span>
 						<span id="total-display" class="text-right">$0.00</span>
-						<span><?= Yii::t('app/invoice', 'Deposit') ?></span>
+						<span><?= Yii::t('invoice', 'Deposit') ?></span>
 						<span id="deposit-display" class="text-right">$0.00</span>
-						<span><?= Yii::t('app/invoice', 'Balance Due') ?></span>
+						<span><?= Yii::t('invoice', 'Balance Due') ?></span>
 						<span id="balance-display" class="text-right">$0.00</span>
 					</div>
 				</div>
@@ -311,8 +311,8 @@ $this->registerJsVar('invoiceConfig', [
 	<?= $form->field($model, 'tax_rate')->hiddenInput(['id' => 'tax-rate-hidden'])->label(false) ?>
 
 	<div class="form-group mt-4">
-		<?= Html::submitButton($model->isNewRecord ? Yii::t('app/invoice', 'Create Invoice') : Yii::t('app/invoice', 'Update Invoice'), ['class' => 'btn btn-success']) ?>
-		<?= Html::a(Yii::t('app/invoice', 'Cancel'), ['index'], ['class' => 'btn btn-secondary']) ?>
+		<?= Html::submitButton($model->isNewRecord ? Yii::t('invoice', 'Create Invoice') : Yii::t('invoice', 'Update Invoice'), ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('invoice', 'Cancel'), ['index'], ['class' => 'btn btn-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
@@ -325,7 +325,7 @@ $this->registerJsVar('invoiceConfig', [
 	<div class="modal-dialog modal-dialog-wide" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="addCustomerModalLabel"><?= Yii::t('app/invoice', 'Add New Customer') ?></h5>
+				<h5 class="modal-title" id="addCustomerModalLabel"><?= Yii::t('invoice', 'Add New Customer') ?></h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -966,7 +966,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const customerId = customerSelect.value;
 		if (!customerId) {
 			alert(
-				'<?= Yii::t('app/invoice', 'Please select a customer first to calculate automatic tax.') ?>'
+				'<?= Yii::t('invoice', 'Please select a customer first to calculate automatic tax.') ?>'
 			);
 			return;
 		}
@@ -974,7 +974,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const calculateBtn = document.getElementById('calculate-tax-btn');
 		const originalText = calculateBtn.innerHTML;
 		calculateBtn.innerHTML =
-			'<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('app/invoice', 'Calculating...') ?>';
+			'<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('invoice', 'Calculating...') ?>';
 		calculateBtn.disabled = true;
 
 		try {
@@ -1005,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				// No message for normal success to avoid cluttering the UI
 			} else {
 				NotificationUtils.showError(data.message ||
-					'<?= Yii::t('app/invoice', 'Failed to calculate automatic tax.') ?>');
+					'<?= Yii::t('invoice', 'Failed to calculate automatic tax.') ?>');
 				// Fallback to company default or provided fallback rate
 				const fallbackRate = data.fallback_rate !== undefined ? data.fallback_rate :
 					<?= $company->tax_rate ?? 0 ?>;
@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		} catch (error) {
 			console.error('Tax calculation error:', error);
 			NotificationUtils.showError(
-				'<?= Yii::t('app/invoice', 'Error calculating tax. Using company default.') ?>');
+				'<?= Yii::t('invoice', 'Error calculating tax. Using company default.') ?>');
 			// Fallback to company default
 			document.getElementById('tax-rate-input').value = <?= $company->tax_rate ?? 0 ?>;
 			calculateTotals();

@@ -254,7 +254,7 @@ $this->registerJsVar('estimateConfig', [
 						<span><?= Yii::t('app/estimate', 'Taxable Subtotal') ?></span>
 						<span id="taxable-subtotal-display" class="text-right">$0.00</span>
 
-						<span><?= Yii::t('app/invoice', 'Tax Calculation') ?></span>
+						<span><?= Yii::t('invoice', 'Tax Calculation') ?></span>
 						<div class="text-right">
 							<?php if ($model->hasAttribute('tax_calculation_mode')): ?>
 							<?= $form->field($model, 'tax_calculation_mode', ['options' => ['class' => 'mb-2'], 'template' => '{input}'])->dropDownList(
@@ -263,8 +263,8 @@ $this->registerJsVar('estimateConfig', [
 								) ?>
 							<?php else: ?>
 							<select id="tax-calculation-mode" class="form-control form-control-sm mb-2">
-								<option value="manual" selected><?= Yii::t('app/invoice', 'Manual Input') ?></option>
-								<option value="automatic"><?= Yii::t('app/invoice', 'Automatic Calculation') ?></option>
+								<option value="manual" selected><?= Yii::t('invoice', 'Manual Input') ?></option>
+								<option value="automatic"><?= Yii::t('invoice', 'Automatic Calculation') ?></option>
 							</select>
 							<?php endif; ?>
 						</div>
@@ -285,7 +285,7 @@ $this->registerJsVar('estimateConfig', [
 							<span id="tax-display">$0.00</span>
 							<button type="button" class="btn btn-outline-primary btn-sm ml-2" id="calculate-tax-btn"
 								style="display: none;">
-								<i class="fas fa-calculator"></i> <?= Yii::t('app/invoice', 'Calculate') ?>
+								<i class="fas fa-calculator"></i> <?= Yii::t('invoice', 'Calculate') ?>
 							</button>
 						</div>
 					</div>
@@ -951,7 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const customerId = customerSelect.value;
 		if (!customerId) {
 			alert(
-				'<?= Yii::t('app/invoice', 'Please select a customer first to calculate automatic tax.') ?>'
+				'<?= Yii::t('invoice', 'Please select a customer first to calculate automatic tax.') ?>'
 			);
 			return;
 		}
@@ -959,7 +959,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const calculateBtn = document.getElementById('calculate-tax-btn');
 		const originalText = calculateBtn.innerHTML;
 		calculateBtn.innerHTML =
-			'<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('app/invoice', 'Calculating...') ?>';
+			'<i class="fas fa-spinner fa-spin"></i> <?= Yii::t('invoice', 'Calculating...') ?>';
 		calculateBtn.disabled = true;
 
 		try {
@@ -990,7 +990,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				// No message for normal success to avoid cluttering the UI
 			} else {
 				NotificationUtils.showError(data.message ||
-					'<?= Yii::t('app/invoice', 'Failed to calculate automatic tax.') ?>');
+					'<?= Yii::t('invoice', 'Failed to calculate automatic tax.') ?>');
 				// Fallback to company default or provided fallback rate
 				const fallbackRate = data.fallback_rate !== undefined ? data.fallback_rate :
 					<?= $company->tax_rate ?? 0 ?>;
@@ -1000,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		} catch (error) {
 			console.error('Tax calculation error:', error);
 			NotificationUtils.showError(
-				'<?= Yii::t('app/invoice', 'Error calculating tax. Using company default.') ?>');
+				'<?= Yii::t('invoice', 'Error calculating tax. Using company default.') ?>');
 			// Fallback to company default
 			document.getElementById('tax-rate-input').value = <?= $company->tax_rate ?? 0 ?>;
 			calculateTotals();

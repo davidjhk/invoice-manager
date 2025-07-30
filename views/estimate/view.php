@@ -185,7 +185,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
             <!-- Estimate Items -->
             <div class="card">
                 <div class="card-header" style="display:none;">
-                    <h5 class="card-title mb-0">Estimate Items</h5>
+                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Items') ?></h5>
                 </div>
                 <div class="card-body">
                     <?php if (!empty($model->estimateItems)): ?>

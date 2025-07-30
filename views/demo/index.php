@@ -46,14 +46,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				<div class="card-header bg-primary text-white">
 					<h5 class="card-title mb-0">
 						<i class="fas fa-file-invoice mr-2"></i>
-						<?= Yii::t('app/invoice', 'Invoice Management') ?>
+						<?= Yii::t('invoice', 'Invoice Management') ?>
 					</h5>
 				</div>
 				<div class="card-body">
 					<p class="card-text">
 						<?= Yii::t('app', 'Create, edit, and manage invoices for your demo company') ?>.</p>
 					<div class="mt-auto">
-						<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/invoice', 'Create Invoice'), ['/invoice/create'], [
+						<?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('invoice', 'Create Invoice'), ['/invoice/create'], [
                             'class' => 'btn btn-primary btn-sm mr-2'
                         ]) ?>
 						<?= Html::a('<i class="fas fa-list mr-2"></i>' . Yii::t('app', 'View All'), ['/invoice/index'], [

@@ -4,7 +4,6 @@
  */
 return [
     'Company Settings' => 'Configuración de Empresa',
-    'Switch Company' => 'Cambiar Empresa',
     'Company Information' => 'Información de la Empresa',
     'Company Name' => 'Nombre de la Empresa',
     'Company Address' => 'Dirección de la Empresa',
@@ -140,6 +139,18 @@ return [
     'Network error occurred' => 'Ocurrió un error de red',
     'Please configure SMTP2GO API Key first' => 'Por favor configure primero la Clave API de SMTP2GO',
     'Language & Display Settings' => 'Configuración de Idioma y Pantalla',
-    'Display & PDF Settings' => 'Configuración de Pantalla y PDF',
-    'Language Settings' => 'Configuración de Idioma',
+    
+    // Company selection and management
+    'Select Company' => 'Seleccionar Empresa',
+    'Please select a company to continue' => 'Por favor seleccione una empresa para continuar',
+    'Select' => 'Seleccionar',
+    'Start managing invoices for a new business or client' => 'Comience a gestionar facturas para un nuevo negocio o cliente',
+    'You can create {count} more companies' => 'Puede crear {count} empresas más',
+    'Add New Company' => 'Agregar Nueva Empresa',
+    'Company Limit Reached' => 'Límite de Empresas Alcanzado',
+    'You have reached your maximum number of companies ({max})' => 'Ha alcanzado su número máximo de empresas ({max})',
+    'Please upgrade your account or contact support to create more companies' => 'Por favor actualice su cuenta o contacte soporte para crear más empresas',
+    'Selecting...' => 'Seleccionando...',
+    'Switch Company' => 'Cambiar Empresa',
+    'Back to Company List' => 'Volver a Lista de Empresas',
 ];

@@ -132,4 +132,23 @@ return [
     'No Invoices' => 'Sin Facturas',
     'This customer doesn\'t have any invoices yet.' => 'Este cliente aún no tiene facturas.',
     'Create First Invoice' => 'Crear Primera Factura',
+    
+    // Customer management
+    'Active Customers' => 'Clientes Activos',
+    'Add Customer' => 'Añadir Cliente',
+    'Customer Name' => 'Nombre del Cliente',
+    'Email' => 'Correo Electrónico',
+    'Phone' => 'Teléfono',
+    'Address' => 'Dirección',
+    'City' => 'Ciudad',
+    'State' => 'Estado',
+    'ZIP Code' => 'Código Postal',
+    'Payment Terms' => 'Términos de Pago',
+    'Select terms' => 'Seleccionar términos',
+    'Select State' => 'Seleccionar Estado',
+    'Customer name is required.' => 'El nombre del cliente es obligatorio.',
+    'Customer added successfully!' => '¡Cliente añadido exitosamente!',
+    'Failed to add customer. Please try again.' => 'Error al añadir cliente. Por favor intente de nuevo.',
+    'Error adding customer. Please try again.' => 'Error añadiendo cliente. Por favor intente de nuevo.',
+    'Phone number can only contain numbers, spaces, parentheses, plus signs, hyphens, periods, hash and asterisk symbols.' => 'El número de teléfono solo puede contener números, espacios, paréntesis, signos más, guiones, puntos, símbolos de almohadilla y asterisco.',
 ];
