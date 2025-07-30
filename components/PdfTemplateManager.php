@@ -14,7 +14,7 @@ class PdfTemplateManager
             'name' => 'Classic',
             'description' => 'Traditional professional layout with clean lines and borders',
             'color_scheme' => '#667eea',
-            'font_family' => '"Times",dejavuserif,sans-serif,"FreeSans", "DejavuSans", "dejavusans", "Arial", sans-serif',
+            'font_family' => '"Noto Sans KR",dejavuserif,sans-serif,"FreeSans", "DejavuSans", "dejavusans", "Arial", sans-serif',
             'header_style' => 'bordered',
             'layout_type' => 'traditional',
             'accent_color' => '#667eea',
@@ -157,8 +157,8 @@ class PdfTemplateManager
             'notes_style' => 'artistic',
             'notes_bg' => 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)',
             'notes_border' => '2px dashed #7c3aed',
-            'bill_to_border' => '2px dashed #7c3aed',
-            'ship_to_border' => '2px dashed #7c3aed',
+            'bill_to_border' => '0px solid #efefef',
+            'ship_to_border' => '0px solid #efefef',
             'use_address_borders' => true,
             'separator_style' => 'decorative',
             'header_bg' => 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
@@ -259,7 +259,7 @@ class PdfTemplateManager
     public static function generateTemplateStyles($templateId, $useCJKFont = false, $language = 'en-US')
     {
         $template = self::getTemplate($templateId) ?? self::getTemplate('classic');
-        $letterSpacing = $useCJKFont ? 'letter-spacing: 0.5px;' : '';
+        $letterSpacing = ''; // $useCJKFont ? 'letter-spacing: 0.5px;' : '';
         
         // Get font family based on language
 		$fontFamily = $useCJKFont ? self::getFontFamily($language) : $template['font_family'];
@@ -1222,7 +1222,7 @@ class PdfTemplateManager
                 font-weight: bold; 
                 font-size: 12px; 
                 background: ' . $template['accent_color'] . '; 
-                color: white;
+                color: ' . $template['table_header_color'] . ' !important; 
             }
             .notes { 
                 margin-top: ' . $template['section_spacing'] . '; 
@@ -1313,7 +1313,7 @@ class PdfTemplateManager
             .items-table tr:nth-child(even) td { 
                 background-color: ' . $template['secondary_color'] . ' !important; 
             }
-            .totals { margin-top: ' . $template['section_spacing'] . '; }
+			.totals { margin-top: ' . $template['section_spacing'] . '; }
             .totals-table { 
             }
             .totals-table td { 
@@ -1325,8 +1325,14 @@ class PdfTemplateManager
                 font-weight: 700; 
                 font-size: 12px; 
                 background: ' . $template['accent_color'] . '; 
-                color: white;
+                color: white !important; 
             }
+			/* Added new rules for more specific targeting */
+			.totals-table .total-row td,
+			.total-row td { 
+			    background: ' . $template['accent_color'] . ' !important; 
+			    color: white !important; 
+			}
             .notes { 
                 margin-top: ' . $template['section_spacing'] . '; 
                 padding: 20px; 
@@ -2129,7 +2135,7 @@ class PdfTemplateManager
                 padding: 20px; 
                 background: linear-gradient(135deg, #ffffff 0%, ' . $template['secondary_color'] . ' 100%);
                 border-radius: ' . $template['border_radius'] . ';
-                border: ' . $template['border_width'] . ' dashed ' . $template['accent_color'] . ';
+                border: 0px solid #efefef;
                 margin-bottom: 20px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }

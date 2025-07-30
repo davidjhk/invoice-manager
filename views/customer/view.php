@@ -264,7 +264,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                                                 'title' => Yii::t('app/customer', 'View Invoice')
                                             ]) ?>
                                             
-                                            <?= Html::a('<i class="fas fa-file-pdf"></i>', ['/invoice/preview', 'id' => $invoice->id], [
+                                            <?= Html::a('<i class="fas fa-search"></i>', ['/invoice/preview', 'id' => $invoice->id], [
                                                 'class' => 'btn btn-outline-info',
                                                 'title' => Yii::t('app/customer', 'Preview PDF'),
                                                 'target' => '_blank'

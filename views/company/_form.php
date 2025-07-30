@@ -328,9 +328,11 @@ $isCompactMode = $isCompactMode ?? false;
 						)->label(Yii::t('invoice', 'Choose Template'), ['class' => 'font-weight-bold']) ?>
 						<div class="row">
 							<div class="col-md-12">
-								<div id="company-template-preview" class="border rounded p-3 text-center mt-2" style="min-height: 120px; background: #f8f9fa;">
-									<i class="fas fa-file-pdf fa-3x text-muted mb-2"></i>
-									<div class="text-muted"><?= Yii::t('invoice', 'Template Preview') ?></div>
+								<div id="company-template-preview" class="border rounded mt-2" style="min-height: 300px; background: #f8f9fa;">
+									<div class="text-center p-4">
+										<i class="fas fa-file-pdf fa-3x text-muted mb-2"></i>
+										<div class="text-muted"><?= Yii::t('invoice', 'Template Preview') ?></div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -687,6 +689,9 @@ $this->registerCss("
     body.dark-mode .upload-hint {
         color: #9ca3af;
     }
+    .modal.show .modal-dialog{
+        border-radius: 12px;
+    }		
 ");
 ?>
 
