@@ -40,11 +40,11 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			<p class="subtitle"><?= Html::encode($company->company_name) ?></p>
 		</div>
 		<div class="action-buttons">
-			<?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Export'), ['export'], [
+			<?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('app', $isCompactMode ? '' : 'Export') . ' CSV', ['export'], [
                 'class' => 'btn btn-outline-info',
                 'target' => '_blank',
                 'encode' => false,
-                'title' => $isCompactMode ? Yii::t('app', 'Export') : '',
+                'title' => $isCompactMode ? Yii::t('app', 'Export') . ' CSV' : '',
                 'data-toggle' => $isCompactMode ? 'tooltip' : ''
             ]) ?>
 			<?php if ($remainingInvoices > 0 || $remainingInvoices === null): ?>
@@ -245,7 +245,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                                         ]) ?>
 							<?php endif; ?>
 
-							<?= Html::a('<i class="fas fa-file-pdf"></i>', ['preview', 'id' => $invoice->id], [
+							<?= Html::a('<i class="fas fa-search"></i>', ['preview', 'id' => $invoice->id], [
                                         'class' => 'btn btn-outline-info',
                                         'title' => Yii::t('invoice', 'Invoice Preview'),
                                         'data-toggle' => 'tooltip',

@@ -189,7 +189,7 @@ $this->params['breadcrumbs'][] = 'Send Email';
 				</div>
 				<div class="card-body">
 					<div class="d-grid gap-2">
-						<?= Html::a('<i class="fas fa-eye mr-2"></i>Preview PDF', ['preview', 'id' => $model->id], [
+						<?= Html::a('<i class="fas fa-search mr-2"></i>Preview PDF', ['preview', 'id' => $model->id], [
                             'class' => 'btn btn-outline-primary btn-sm',
                             'target' => '_blank'
                         ]) ?>

@@ -40,7 +40,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			]) ?>
 			<?php endif; ?>
 
-			<?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('invoice', $isCompactMode ? '' : 'Preview'), ['preview', 'id' => $model->id], [
+			<?= Html::a('<i class="fas fa-search mr-1"></i>' . Yii::t('invoice', $isCompactMode ? '' : 'Preview'), ['preview', 'id' => $model->id], [
                 'class' => 'btn btn-info',
                 'target' => '_blank',
                 'encode' => false,

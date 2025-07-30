@@ -28,7 +28,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
     <div class="d-flex justify-content-between align-items-center mb-4 print-hidden">
         <h1><?= Html::encode($this->title) ?></h1>
         <div class="action-buttons">
-            <?= Html::a('<i class="fas fa-file-pdf mr-1"></i>' . Yii::t('invoice', $isCompactMode ? '' : 'Download PDF'), ['download-pdf', 'id' => $model->id], [
+            <?= Html::a('<i class="fas fa-download mr-1"></i>' . Yii::t('invoice', $isCompactMode ? '' : 'Download PDF'), ['download-pdf', 'id' => $model->id], [
                 'class' => 'btn btn-primary',
                 'target' => '_blank',
                 'encode' => false,
