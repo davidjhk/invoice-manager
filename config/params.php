@@ -70,7 +70,13 @@ $defaultParams = [
             'description' => 'Open-source model with strong performance',
             'provider' => 'Meta',
             'pricing' => 'Standard'
-        ]
+		],
+		'google/gemma-3n-e2b-it:free' => [
+			'name' => 'Gemma 3N E2B',
+			'description' => 'Google\'s advanced AI model for complex tasks',
+			'provider' => 'Google',
+			'pricing' => 'Budget'
+		]
     ],
     
     // Default AI model
