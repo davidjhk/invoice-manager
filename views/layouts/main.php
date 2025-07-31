@@ -37,7 +37,7 @@ AppAsset::register($this);
 			var userId = "<?= !Yii::$app->user->isGuest ? Yii::$app->user->id : '' ?>";
 			var selectedCompanyKey = "selectedCompanyId_" + userId;
 			var redirectCountKey = "companyRedirectCount_" + userId;
-			
+
 			var selectedCompanyId = localStorage.getItem(selectedCompanyKey);
 			var currentCompanyId = "<?= Yii::$app->session->get('current_company_id') ?>";
 			var isLoggedIn = <?= !Yii::$app->user->isGuest ? 'true' : 'false' ?>;
@@ -62,19 +62,20 @@ AppAsset::register($this);
 					}
 				}
 			}
-			
+
 			// Reset redirect count on successful page load
 			if (isLoggedIn && !isOnLoginPage) {
 				localStorage.removeItem(redirectCountKey);
 			}
-			
+
 			// Clean up localStorage for other users when logging in
 			if (isLoggedIn && userId) {
 				// Remove localStorage entries for other users (keep only current user's data)
 				var keysToRemove = [];
 				for (var i = 0; i < localStorage.length; i++) {
 					var key = localStorage.key(i);
-					if (key && (key.startsWith("selectedCompanyId_") || key.startsWith("companyRedirectCount_")) && !key.endsWith("_" + userId)) {
+					if (key && (key.startsWith("selectedCompanyId_") || key.startsWith("companyRedirectCount_")) && !
+						key.endsWith("_" + userId)) {
 						keysToRemove.push(key);
 					}
 				}
@@ -878,7 +879,7 @@ AppAsset::register($this);
 		position: relative !important;
 	}
 
-	.dropdown-submenu > .dropdown-menu {
+	.dropdown-submenu>.dropdown-menu {
 		position: absolute !important;
 		top: 0 !important;
 		left: 100% !important;
@@ -893,23 +894,23 @@ AppAsset::register($this);
 		z-index: 1001 !important;
 	}
 
-	.dropdown-submenu > .dropdown-menu.show {
+	.dropdown-submenu>.dropdown-menu.show {
 		display: block !important;
 		opacity: 1 !important;
 		transform: translateX(0) !important;
 	}
 
-	.dropdown-submenu > .dropdown-menu.dropdown-menu-left {
+	.dropdown-submenu>.dropdown-menu.dropdown-menu-left {
 		left: -100% !important;
 		margin-left: 1px !important;
 		transform: translateX(10px) !important;
 	}
 
-	.dropdown-submenu > .dropdown-menu.dropdown-menu-left.show {
+	.dropdown-submenu>.dropdown-menu.dropdown-menu-left.show {
 		transform: translateX(0) !important;
 	}
 
-	.dropdown-submenu > .dropdown-toggle::after {
+	.dropdown-submenu>.dropdown-toggle::after {
 		display: inline-block !important;
 		margin-left: auto !important;
 		vertical-align: 0.255em !important;
@@ -923,7 +924,7 @@ AppAsset::register($this);
 	}
 
 	/* Light mode submenu styles */
-	body:not(.dark-mode) .dropdown-submenu > .dropdown-menu {
+	body:not(.dark-mode) .dropdown-submenu>.dropdown-menu {
 		background: rgba(255, 255, 255, 0.98) !important;
 		border: 1px solid rgba(229, 231, 235, 0.8) !important;
 		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
@@ -947,7 +948,7 @@ AppAsset::register($this);
 	}
 
 	/* Dark mode submenu styles */
-	body.dark-mode .dropdown-submenu > .dropdown-menu {
+	body.dark-mode .dropdown-submenu>.dropdown-menu {
 		background: rgba(31, 41, 55, 0.98) !important;
 		border: 1px solid rgba(75, 85, 99, 0.8) !important;
 		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
@@ -970,11 +971,11 @@ AppAsset::register($this);
 		font-weight: 600 !important;
 	}
 
-	body.dark-mode .dropdown-submenu > .dropdown-toggle::after {
+	body.dark-mode .dropdown-submenu>.dropdown-toggle::after {
 		border-left-color: #d1d5db !important;
 	}
 
-	body.dark-mode .dropdown-submenu > .dropdown-toggle:hover::after {
+	body.dark-mode .dropdown-submenu>.dropdown-toggle:hover::after {
 		border-left-color: #a5b4fc !important;
 	}
 
@@ -2318,7 +2319,7 @@ if (!Yii::$app->user->isGuest) {
 								<li><?= Html::a('<i class="fas fa-user-cog mr-2"></i>' . Yii::t('app/nav', 'My Account'), ['/subscription/my-account'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php endif; ?>
-								<?php if ($currentCompany): ?>
+								<?php if (!Yii::$app->user->identity->isSubuser() && $currentCompany): ?>
 								<li><?= Html::a('<i class="fas fa-cog mr-2"></i>' . Yii::t('app/nav', 'Company Settings'), ['/company/settings'], ['class' =>
 									'dropdown-item']) ?>
 								</li>
@@ -2331,14 +2332,16 @@ if (!Yii::$app->user->isGuest) {
 								<?php if (count($userCompanies) > 1): ?>
 								<li class="dropdown-submenu dropdown-submenu-down">
 									<a class="dropdown-item dropdown-toggle" href="#" data-submenu-toggle="true">
-										<i class="fas fa-exchange-alt mr-2"></i><?= Yii::t('app/nav', 'Switch Company') ?>
+										<i
+											class="fas fa-exchange-alt mr-2"></i><?= Yii::t('app/nav', 'Switch Company') ?>
 									</a>
 									<ul class="dropdown-menu">
 										<?php foreach ($userCompanies as $company): ?>
 										<li>
 											<?php if ($company->id == $currentCompany->id): ?>
 											<a class="dropdown-item active" href="#">
-												<i class="fas fa-check mr-2"></i><?= Html::encode($company->company_name) ?>
+												<i
+													class="fas fa-check mr-2"></i><?= Html::encode($company->company_name) ?>
 											</a>
 											<?php else: ?>
 											<?= Html::a('<i class="fas fa-building mr-2"></i>' . Html::encode($company->company_name), 
@@ -2581,12 +2584,11 @@ if (!Yii::$app->user->isGuest) {
 	</script>
 
 	<script>
-
 	// Initialize Bootstrap 4 dropdowns and navigation
 	$(document).ready(function() {
 		// Initialize all submenus to closed state on page load
 		$('.dropdown-submenu .dropdown-menu').removeClass('show');
-		
+
 		// Run debug function
 
 		// Debug main navbar dropdowns
@@ -2602,7 +2604,8 @@ if (!Yii::$app->user->isGuest) {
 		}
 
 		// Test all possible event handlers for top bar dropdowns (excluding language switcher)
-		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').not('[data-submenu-toggle]').off('click').on('click',
+		$('.top-bar .dropdown-toggle').not('.language-switcher .dropdown-toggle').not('[data-submenu-toggle]').off(
+			'click').on('click',
 			function(e) {
 				console.log('=== Top bar dropdown clicked ===');
 				console.log('Target element:', this);
@@ -2634,35 +2637,37 @@ if (!Yii::$app->user->isGuest) {
 					$dropdown.addClass('show');
 					$menu.addClass('show');
 					console.log('Dropdown opened');
-					
+
 					// Initialize all submenus to closed state when dropdown opens
 					$dropdown.find('.dropdown-submenu .dropdown-menu').removeClass('show');
 				}
 			});
 
 		// Alternative event binding methods (excluding language switcher and submenu toggles)
-		$('.top-bar').on('click', '.dropdown-toggle:not(.language-switcher .dropdown-toggle):not([data-submenu-toggle])', function(e) {
-			console.log('=== Alternative click handler triggered ===');
-			e.preventDefault();
-			e.stopPropagation();
+		$('.top-bar').on('click',
+			'.dropdown-toggle:not(.language-switcher .dropdown-toggle):not([data-submenu-toggle])',
+			function(e) {
+				console.log('=== Alternative click handler triggered ===');
+				e.preventDefault();
+				e.stopPropagation();
 
-			var $button = $(this);
-			var $dropdown = $button.closest('.dropdown');
-			var $menu = $dropdown.find('.dropdown-menu');
+				var $button = $(this);
+				var $dropdown = $button.closest('.dropdown');
+				var $menu = $dropdown.find('.dropdown-menu');
 
-			// Close all other dropdowns
-			$('.top-bar .dropdown').not($dropdown).removeClass('show');
-			$('.top-bar .dropdown-menu').not($menu).removeClass('show');
+				// Close all other dropdowns
+				$('.top-bar .dropdown').not($dropdown).removeClass('show');
+				$('.top-bar .dropdown-menu').not($menu).removeClass('show');
 
-			// Toggle current dropdown
-			$dropdown.toggleClass('show');
-			$menu.toggleClass('show');
-			
-			// Initialize all submenus to closed state when dropdown opens
-			if ($dropdown.hasClass('show')) {
-				$dropdown.find('.dropdown-submenu .dropdown-menu').removeClass('show');
-			}
-		});
+				// Toggle current dropdown
+				$dropdown.toggleClass('show');
+				$menu.toggleClass('show');
+
+				// Initialize all submenus to closed state when dropdown opens
+				if ($dropdown.hasClass('show')) {
+					$dropdown.find('.dropdown-submenu .dropdown-menu').removeClass('show');
+				}
+			});
 
 		// Test with mousedown event (excluding submenu toggles)
 		$('.top-bar .dropdown-toggle').not('[data-submenu-toggle]').on('mousedown', function(e) {
@@ -2775,8 +2780,8 @@ if (!Yii::$app->user->isGuest) {
 			$button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Switching...');
 
 			// Choose URL based on user type
-			var toggleUrl = isSubuser ? 
-				'<?= \yii\helpers\Url::to(['/site/toggle-compact-mode']) ?>' : 
+			var toggleUrl = isSubuser ?
+				'<?= \yii\helpers\Url::to(['/site/toggle-compact-mode']) ?>' :
 				'<?= \yii\helpers\Url::to(['/company/toggle-compact-mode']) ?>';
 
 			// Make AJAX request
@@ -2815,20 +2820,20 @@ if (!Yii::$app->user->isGuest) {
 		// Company Switch Handler with localStorage
 		$('.company-switch-item').on('click', function(e) {
 			e.preventDefault();
-			
+
 			var companyId = $(this).data('company-id');
 			var url = $(this).attr('href');
-			
+
 			// Store selected company in localStorage and reset redirect count
 			if (typeof(Storage) !== "undefined") {
 				var userId = "<?= !Yii::$app->user->isGuest ? Yii::$app->user->id : '' ?>";
 				var selectedCompanyKey = "selectedCompanyId_" + userId;
 				var redirectCountKey = "companyRedirectCount_" + userId;
-				
+
 				localStorage.setItem(selectedCompanyKey, companyId);
 				localStorage.removeItem(redirectCountKey);
 			}
-			
+
 			// Navigate to the URL
 			window.location.href = url;
 		});
@@ -2838,20 +2843,20 @@ if (!Yii::$app->user->isGuest) {
 			console.log('=== Submenu toggle clicked ===');
 			e.preventDefault();
 			e.stopPropagation();
-			
+
 			var $this = $(this);
 			var $submenu = $this.siblings('.dropdown-menu').first();
-			
+
 			if ($submenu.length === 0) {
 				$submenu = $this.next('.dropdown-menu');
 			}
-			
+
 			console.log('Submenu found:', $submenu.length);
 			console.log('Submenu current classes:', $submenu.attr('class'));
-			
+
 			// Close other submenus
 			$('.dropdown-submenu .dropdown-menu').not($submenu).removeClass('show');
-			
+
 			// Toggle current submenu
 			var wasShown = $submenu.hasClass('show');
 			if (wasShown) {
@@ -2893,7 +2898,7 @@ if (!Yii::$app->user->isGuest) {
 
 		// Additional protection for submenu area
 		$(document).on('click', '.dropdown-submenu', function(e) {
-			if ($(e.target).closest('[data-submenu-toggle]').length || 
+			if ($(e.target).closest('[data-submenu-toggle]').length ||
 				$(e.target).closest('.dropdown-menu').length) {
 				e.stopPropagation();
 			}
@@ -2906,7 +2911,7 @@ if (!Yii::$app->user->isGuest) {
 				if (userId) {
 					var selectedCompanyKey = "selectedCompanyId_" + userId;
 					var redirectCountKey = "companyRedirectCount_" + userId;
-					
+
 					localStorage.removeItem(selectedCompanyKey);
 					localStorage.removeItem(redirectCountKey);
 					console.log("Cleared localStorage for user: " + userId);
