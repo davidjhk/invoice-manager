@@ -400,4 +400,113 @@ $this->params['breadcrumbs'][] = $this->title;
 	border-top: 1px solid #e2e8f0;
 	padding-top: 1.5rem;
 }
+
+/* Dark mode support for My Account page */
+body.dark-mode .plan-upgrade-card,
+body.dark-mode .plan-downgrade-card {
+	background: #374151;
+	border: 1px solid #4b5563;
+	color: #f9fafb;
+}
+
+body.dark-mode .plan-upgrade-card:hover {
+	border-color: #6366f1;
+	background: rgba(99, 102, 241, 0.1);
+}
+
+body.dark-mode .plan-downgrade-card:hover {
+	border-color: #f59e0b;
+	background: rgba(245, 158, 11, 0.1);
+}
+
+body.dark-mode .plan-changes {
+	border-top: 1px solid #4b5563;
+}
+
+/* Dark mode list group items in sidebar */
+body.dark-mode .list-group-item {
+	background-color: #374151;
+	border-color: #4b5563;
+	color: #f9fafb;
+}
+
+body.dark-mode .list-group-item:hover,
+body.dark-mode .list-group-item:focus {
+	background-color: #4b5563;
+	color: #f9fafb;
+	border-color: #6b7280;
+}
+
+body.dark-mode .list-group-item-action:hover,
+body.dark-mode .list-group-item-action:focus {
+	background-color: #4b5563;
+	color: #f9fafb;
+}
+
+/* Dark mode usage summary badges */
+body.dark-mode .badge-info {
+	background-color: #1f2937;
+	color: #60a5fa;
+	border: 1px solid #374151;
+}
+
+/* Dark mode form control plaintext */
+body.dark-mode .form-control-plaintext {
+	color: #e5e7eb;
+}
+
+/* Dark mode alert styles */
+body.dark-mode .alert-info {
+	background-color: #1e3a8a;
+	border-color: #3b82f6;
+	color: #dbeafe;
+}
+
+/* Dark mode subscription status badges */
+body.dark-mode .badge-success {
+	background-color: #065f46;
+	color: #a7f3d0;
+}
+
+body.dark-mode .badge-secondary {
+	background-color: #374151;
+	color: #d1d5db;
+}
+
+/* Dark mode card borders for plan selection */
+body.dark-mode .card.border-primary {
+	border-color: #3b82f6 !important;
+	background-color: #1f2937;
+}
+
+body.dark-mode .card.border-primary .card-body {
+	background-color: #1f2937;
+	color: #f9fafb;
+}
+
+body.dark-mode .card.border-primary .text-primary {
+	color: #60a5fa !important;
+}
+
+/* Dark mode text colors */
+body.dark-mode .text-success {
+	color: #34d399 !important;
+}
+
+body.dark-mode .text-primary {
+	color: #60a5fa !important;
+}
+
+body.dark-mode .text-warning {
+	color: #fbbf24 !important;
+}
+
+body.dark-mode .text-muted {
+	color: #9ca3af !important;
+}
+
+/* Dark mode small text */
+body.dark-mode small.text-muted {
+	color: #9ca3af !important;
+}
 </style>
