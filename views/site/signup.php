@@ -125,13 +125,12 @@ $this->context->layout = 'auth';
 </div>
 
 <style>
-/* Plan selection styling fixes for dark theme */
+/* Plan selection styling for both light and dark themes */
 .plan-selection-section {
     margin-top: 1rem;
 }
 
 .plan-section-title {
-    color: #ffffff !important;
     font-weight: 600;
     margin-bottom: 1rem;
     text-align: center;
@@ -155,25 +154,12 @@ $this->context->layout = 'auth';
 
 .plan-label {
     display: block;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     padding: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 0;
-}
-
-.plan-label:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
-}
-
-.plan-radio:checked + .plan-label {
-    background: rgba(79, 70, 229, 0.3);
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    border: 2px solid;
 }
 
 .plan-info {
@@ -181,21 +167,18 @@ $this->context->layout = 'auth';
 }
 
 .plan-name {
-    color: #ffffff !important;
     font-weight: 600;
     font-size: 1.1rem;
     margin-bottom: 0.25rem;
 }
 
 .plan-price {
-    color: #a5b4fc !important;
     font-weight: 500;
     font-size: 1rem;
     margin-bottom: 0.25rem;
 }
 
 .plan-description {
-    color: #cbd5e1 !important;
     font-size: 0.875rem;
     line-height: 1.4;
 }
@@ -216,5 +199,74 @@ $this->context->layout = 'auth';
     justify-content: center;
     font-size: 12px;
     font-weight: bold;
+}
+
+/* Light Mode Styles */
+body:not(.dark-mode) .plan-section-title {
+    color: #1f2937 !important;
+}
+
+body:not(.dark-mode) .plan-label {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+body:not(.dark-mode) .plan-label:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .plan-radio:checked + .plan-label {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+body:not(.dark-mode) .plan-name {
+    color: #1f2937 !important;
+}
+
+body:not(.dark-mode) .plan-price {
+    color: #3b82f6 !important;
+}
+
+body:not(.dark-mode) .plan-description {
+    color: #6b7280 !important;
+}
+
+/* Dark Mode Styles */
+body.dark-mode .plan-section-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .plan-label {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .plan-label:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+body.dark-mode .plan-radio:checked + .plan-label {
+    background: rgba(79, 70, 229, 0.3);
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+body.dark-mode .plan-name {
+    color: #ffffff !important;
+}
+
+body.dark-mode .plan-price {
+    color: #a5b4fc !important;
+}
+
+body.dark-mode .plan-description {
+    color: #cbd5e1 !important;
 }
 </style>]]>
