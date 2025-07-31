@@ -23,6 +23,12 @@ $defaultParams = [
     
     // Available OpenRouter AI models
     'openRouterModels' => [
+		'google/gemma-3n-e2b-it:free' => [
+			'name' => 'Gemma 3N E2B',
+			'description' => 'Google\'s advanced AI model for complex tasks',
+			'provider' => 'Google',
+			'pricing' => 'Free'
+		],
         'anthropic/claude-3.5-sonnet' => [
             'name' => 'Claude 3.5 Sonnet',
             'description' => 'Most intelligent model with excellent reasoning capabilities',
@@ -71,12 +77,6 @@ $defaultParams = [
             'provider' => 'Meta',
             'pricing' => 'Standard'
 		],
-		'google/gemma-3n-e2b-it:free' => [
-			'name' => 'Gemma 3N E2B',
-			'description' => 'Google\'s advanced AI model for complex tasks',
-			'provider' => 'Google',
-			'pricing' => 'Budget'
-		]
     ],
     
     // Default AI model
