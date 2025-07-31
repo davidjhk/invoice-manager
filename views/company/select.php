@@ -25,8 +25,18 @@ $this->registerJs("
 <div class="company-select">
 	<h1><?= Html::encode($this->title) ?></h1>
 
+	<?php if (Yii::$app->user->identity->isSubuser()): ?>
+	<p class="lead"><?= Yii::t('app/company', 'Please select a company from your parent user\'s companies') ?>:</p>
+	<?php else: ?>
 	<p class="lead"><?= Yii::t('app/company', 'Please select a company to continue') ?>:</p>
+	<?php endif; ?>
 
+	<?php if (empty($companies) && Yii::$app->user->identity->isSubuser()): ?>
+	<div class="alert alert-info">
+		<h5><?= Yii::t('app/company', 'No Companies Available') ?></h5>
+		<p><?= Yii::t('app/company', 'Your parent user has not created any companies yet. Please contact your administrator to create companies first.') ?></p>
+	</div>
+	<?php else: ?>
 	<div class="row">
 		<?php foreach ($companies as $company): ?>
 		<div class="col-md-6 col-lg-4 mb-4">
@@ -51,8 +61,9 @@ $this->registerJs("
 		</div>
 		<?php endforeach; ?>
 	</div>
+	<?php endif; ?>
 
-	<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
+	<?php if (!Yii::$app->user->identity->isSubuser() && Yii::$app->user->identity->canCreateMoreCompanies()): ?>
 	<div class="mt-4">
 		<div class="card">
 			<div class="card-body text-center">
@@ -69,13 +80,18 @@ $this->registerJs("
 			</div>
 		</div>
 	</div>
-	<?php else: ?>
+	<?php elseif (!Yii::$app->user->identity->isSubuser()): ?>
 	<div class="mt-4">
 		<div class="card">
 			<div class="card-body text-center">
 				<h5 class="card-title"><?= Yii::t('app/company', 'Company Limit Reached') ?></h5>
 				<p class="card-text text-muted">
-					<?= Yii::t('app/company', 'You have reached your maximum number of companies ({max})', ['max' => Yii::$app->user->identity->max_companies]) ?>.
+					<?php 
+					$user = Yii::$app->user->identity;
+					$effectiveUser = $user->isSubuser() ? $user->getParentUser()->one() : $user;
+					$maxCompanies = $effectiveUser ? $effectiveUser->max_companies : $user->max_companies;
+					?>
+					<?= Yii::t('app/company', 'You have reached your maximum number of companies ({max})', ['max' => $maxCompanies]) ?>.
 					<br><?= Yii::t('app/company', 'Please upgrade your account or contact support to create more companies') ?>.
 				</p>
 				<button class="btn btn-secondary btn-lg" disabled><?= Yii::t('app/company', 'Add New Company') ?></button>

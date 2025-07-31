@@ -15,21 +15,30 @@ $currentCompany = null;
 if (!Yii::$app->user->isGuest) {
 	$companyId = Yii::$app->session->get('current_company_id');
 	if ($companyId) {
-		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
 	}
 }
 $isDarkMode = $currentCompany && $currentCompany->dark_mode;
 $isCompactMode = $currentCompany && $currentCompany->compact_mode;
+$isSubuser = Yii::$app->user->identity->isSubuser();
 
 // collapse-helper.js is loaded via AppAsset
 ?>
 
 <div class="company-settings">
 
+	<?php if ($isSubuser): ?>
+	<div class="alert alert-info mb-4">
+		<i class="fas fa-info-circle mr-2"></i>
+		<strong><?= Yii::t('app/company', 'Read-Only Access') ?>:</strong>
+		<?= Yii::t('app/company', 'As a subuser, you can view company settings but cannot modify them. Contact your administrator to make changes.') ?>
+	</div>
+	<?php endif; ?>
+
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1><?= Html::encode($this->title) ?></h1>
 		<div>
-			<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
+			<?php if (!$isSubuser && Yii::$app->user->identity->canCreateMoreCompanies()): ?>
 			<?= Html::a('<i class="fas fa-plus mr-1"></i>' . Yii::t('app/company', $isCompactMode ? '' : 'Create New Company'), ['/company/create'], [
 					'class' => 'btn btn-success me-2',
 					'encode' => false,
@@ -70,7 +79,8 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
         'model' => $model,
         'form' => $form,
         'mode' => 'settings',
-        'isCompactMode' => $isCompactMode
+        'isCompactMode' => $isCompactMode,
+        'isReadOnly' => $isSubuser
     ]) ?>
 
 

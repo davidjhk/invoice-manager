@@ -2213,16 +2213,27 @@ AppAsset::register($this);
 </head>
 
 <?php
-// Determine dark mode setting
+// Determine dark mode and compact mode settings
 $currentCompany = null;
+$isDarkMode = false;
+$isCompactMode = false;
+
 if (!Yii::$app->user->isGuest) {
 	$companyId = Yii::$app->session->get('current_company_id');
 	if ($companyId) {
-		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
+	}
+	
+	// For subusers, use session-based personal settings that override company settings
+	if (Yii::$app->user->identity->isSubuser()) {
+		$isDarkMode = Yii::$app->session->get('subuser_dark_mode', $currentCompany ? $currentCompany->dark_mode : false);
+		$isCompactMode = Yii::$app->session->get('subuser_compact_mode', $currentCompany ? $currentCompany->compact_mode : false);
+	} else {
+		// For regular users, use company settings
+		$isDarkMode = $currentCompany && $currentCompany->dark_mode;
+		$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 	}
 }
-$isDarkMode = $currentCompany && $currentCompany->dark_mode;
-$isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 
 <body class="d-flex flex-column h-100<?= $isDarkMode ? ' dark-mode' : '' ?>">
@@ -2245,7 +2256,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 							$currentCompany = null;
 							$companyId = Yii::$app->session->get('current_company_id');
 							if ($companyId) {
-								$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+								$currentCompany = \app\models\Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
 							}
 							?>
 
@@ -2270,17 +2281,17 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 							<ul class="dropdown-menu">
 								<li>
 									<a href="#" class="dropdown-item theme-toggle-item"
-										data-mode="<?= $currentCompany->dark_mode ? 'light' : 'dark' ?>">
-										<i class="fas fa-<?= $currentCompany->dark_mode ? 'sun' : 'moon' ?> mr-2"></i>
-										<?= $currentCompany->dark_mode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
+										data-mode="<?= $isDarkMode ? 'light' : 'dark' ?>">
+										<i class="fas fa-<?= $isDarkMode ? 'sun' : 'moon' ?> mr-2"></i>
+										<?= $isDarkMode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
 									</a>
 								</li>
 								<li>
 									<a href="#" class="dropdown-item compact-toggle-item"
-										data-compact-mode="<?= $currentCompany->compact_mode ? 'normal' : 'compact' ?>">
+										data-compact-mode="<?= $isCompactMode ? 'normal' : 'compact' ?>">
 										<i
-											class="fas fa-<?= $currentCompany->compact_mode ? 'expand-arrows-alt' : 'compress-arrows-alt' ?> mr-2"></i>
-										<?= $currentCompany->compact_mode ? Yii::t('app/nav', 'Switch to Normal Mode') : Yii::t('app/nav', 'Switch to Compact Mode') ?>
+											class="fas fa-<?= $isCompactMode ? 'expand-arrows-alt' : 'compress-arrows-alt' ?> mr-2"></i>
+										<?= $isCompactMode ? Yii::t('app/nav', 'Switch to Normal Mode') : Yii::t('app/nav', 'Switch to Compact Mode') ?>
 									</a>
 								</li>
 							</ul>
@@ -2339,7 +2350,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 									</ul>
 								</li>
 								<?php endif; ?>
-								<?php if (Yii::$app->user->identity->canCreateMoreCompanies()): ?>
+								<?php if (!Yii::$app->user->identity->isSubuser() && Yii::$app->user->identity->canCreateMoreCompanies()): ?>
 								<li><?= Html::a('<i class="fas fa-plus mr-2"></i>' . Yii::t('app/nav', 'Add New Company'), ['/company/create'], ['class' => 'dropdown-item']) ?>
 								</li>
 								<?php endif; ?>
@@ -2392,8 +2403,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 							['label' => $productsLabel, 'icon' => 'fas fa-box', 'url' => ['/product/index']],
 						];
 
-						// Check if compact mode is enabled
-						$isCompactMode = $currentCompany && $currentCompany->compact_mode;
+						// Use the computed compact mode from the top
 						$compactClass = $isCompactMode ? ' compact-mode' : '';
 
 						// Render navigation items directly
@@ -2478,9 +2488,9 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 				<!-- Change Mode -->
 				<?php if ($currentCompany): ?>
 				<a href="#" class="nav-link mobile-nav-link theme-toggle-item"
-					data-mode="<?= $currentCompany->dark_mode ? 'light' : 'dark' ?>">
-					<i class="fas fa-<?= $currentCompany->dark_mode ? 'sun' : 'moon' ?> mr-2"></i>
-					<?= $currentCompany->dark_mode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
+					data-mode="<?= $isDarkMode ? 'light' : 'dark' ?>">
+					<i class="fas fa-<?= $isDarkMode ? 'sun' : 'moon' ?> mr-2"></i>
+					<?= $isDarkMode ? Yii::t('app/nav', 'Switch to Light Mode') : Yii::t('app/nav', 'Switch to Dark Mode') ?>
 				</a>
 				<?php endif; ?>
 				<!-- Admin Panel (for admin users) -->
@@ -2523,7 +2533,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 			if (!Yii::$app->user->isGuest) {
 				$companyId = Yii::$app->session->get('current_company_id');
 				if ($companyId) {
-					$company = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+					$company = \app\models\Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
 				}
 			}
 			$siteName = Yii::$app->params['siteName'] ?? 'Invoice Manager';
@@ -2706,6 +2716,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 
 			var $button = $(this);
 			var mode = $button.data('mode');
+			var isSubuser = <?= Yii::$app->user->identity->isSubuser() ? 'true' : 'false' ?>;
 
 			// Show loading state
 			$button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Switching...');
@@ -2751,19 +2762,33 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 
 			var $button = $(this);
 			var currentMode = $button.data('compact-mode');
+			var isSubuser = <?= Yii::$app->user->identity->isSubuser() ? 'true' : 'false' ?>;
+
+			console.log('Compact mode toggle clicked:', {
+				currentMode: currentMode,
+				isSubuser: isSubuser,
+				buttonText: $button.text().trim()
+			});
 
 			// Show loading state
 			var originalHtml = $button.html();
 			$button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Switching...');
 
+			// Choose URL based on user type
+			var toggleUrl = isSubuser ? 
+				'<?= \yii\helpers\Url::to(['/site/toggle-compact-mode']) ?>' : 
+				'<?= \yii\helpers\Url::to(['/company/toggle-compact-mode']) ?>';
+
 			// Make AJAX request
 			$.ajax({
-				url: '<?= \yii\helpers\Url::to(['/company/toggle-compact-mode']) ?>',
+				url: toggleUrl,
 				type: 'POST',
 				data: {
-					'<?= Yii::$app->request->csrfParam ?>': '<?= Yii::$app->request->csrfToken ?>'
+					'<?= Yii::$app->request->csrfParam ?>': '<?= Yii::$app->request->csrfToken ?>',
+					mode: currentMode
 				},
 				success: function(response) {
+					console.log('Compact mode toggle response:', response);
 					if (response.success) {
 						// Show success message briefly
 						$button.html('<i class="fas fa-check mr-2"></i>' + response.message);

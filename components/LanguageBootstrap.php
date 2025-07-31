@@ -25,27 +25,54 @@ class LanguageBootstrap implements BootstrapInterface
         Yii::info('LanguageBootstrap - Initial session language: ' . ($sessionLanguage ?? 'null'), 'language');
         Yii::info('LanguageBootstrap - User is guest: ' . (Yii::$app->user->isGuest ? 'yes' : 'no'), 'language');
         
-        // If user is logged in, try to get language from company settings
+        // If user is logged in, try to get language from appropriate source
         if (!Yii::$app->user->isGuest) {
             $user = Yii::$app->user->identity;
-            $companyId = Yii::$app->session->get('current_company_id');
             
-            Yii::info('LanguageBootstrap - Company ID: ' . ($companyId ?? 'null'), 'language');
-            
-            if ($companyId && $user) {
-                try {
-                    $company = Company::findOne(['id' => $companyId, 'user_id' => $user->id]);
-                    if ($company && $company->language) {
-                        $sessionLanguage = $company->language;
-                        // Update session language
-                        Yii::$app->session->set('language', $sessionLanguage);
-                        Yii::info('LanguageBootstrap - Updated language from company: ' . $sessionLanguage, 'language');
-                    } else {
-                        Yii::info('LanguageBootstrap - No company or language found', 'language');
+            // For subusers, check session-based personal settings first
+            if ($user && $user->isSubuser()) {
+                $subuserLanguage = Yii::$app->session->get('subuser_language');
+                if ($subuserLanguage && $this->isValidLanguage($subuserLanguage)) {
+                    $sessionLanguage = $subuserLanguage;
+                    Yii::$app->session->set('language', $sessionLanguage);
+                    Yii::info('LanguageBootstrap - Using subuser language: ' . $sessionLanguage, 'language');
+                } else {
+                    // Fallback to company language for subusers
+                    $companyId = Yii::$app->session->get('current_company_id');
+                    if ($companyId) {
+                        try {
+                            $company = Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
+                            if ($company && $company->language) {
+                                $sessionLanguage = $company->language;
+                                Yii::$app->session->set('language', $sessionLanguage);
+                                Yii::info('LanguageBootstrap - Subuser using company language: ' . $sessionLanguage, 'language');
+                            }
+                        } catch (\Exception $e) {
+                            Yii::info('LanguageBootstrap - Database error for subuser: ' . $e->getMessage(), 'language');
+                        }
                     }
-                } catch (\Exception $e) {
-                    // Ignore database errors during bootstrap
-                    Yii::info('LanguageBootstrap - Database error: ' . $e->getMessage(), 'language');
+                }
+            } else {
+                // For regular users, get language from company settings
+                $companyId = Yii::$app->session->get('current_company_id');
+                
+                Yii::info('LanguageBootstrap - Company ID: ' . ($companyId ?? 'null'), 'language');
+                
+                if ($companyId && $user) {
+                    try {
+                        $company = Company::findOne(['id' => $companyId, 'user_id' => $user->id]);
+                        if ($company && $company->language) {
+                            $sessionLanguage = $company->language;
+                            // Update session language
+                            Yii::$app->session->set('language', $sessionLanguage);
+                            Yii::info('LanguageBootstrap - Updated language from company: ' . $sessionLanguage, 'language');
+                        } else {
+                            Yii::info('LanguageBootstrap - No company or language found', 'language');
+                        }
+                    } catch (\Exception $e) {
+                        // Ignore database errors during bootstrap
+                        Yii::info('LanguageBootstrap - Database error: ' . $e->getMessage(), 'language');
+                    }
                 }
             }
         }

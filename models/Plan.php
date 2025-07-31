@@ -20,6 +20,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $sort_order
  * @property string $created_at
  * @property string $updated_at
+ * @property int $max_subusers
  *
  * @property UserSubscription[] $userSubscriptions
  */
@@ -62,6 +63,7 @@ class Plan extends ActiveRecord
             [['features'], 'safe'],
             [['is_active'], 'boolean'],
             [['sort_order'], 'integer', 'min' => 0],
+            [['max_subusers'], 'integer', 'min' => -1],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 50],
             [['stripe_plan_id', 'paypal_plan_id'], 'string', 'max' => 100],
@@ -84,6 +86,7 @@ class Plan extends ActiveRecord
             'features' => 'Features',
             'is_active' => 'Active',
             'sort_order' => 'Sort Order',
+            'max_subusers' => 'Maximum Subusers',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -229,6 +232,7 @@ class Plan extends ActiveRecord
             'import' => $this->can_use_import,
             'custom_templates' => $this->can_use_custom_templates,
             'ai_helper' => $this->can_use_ai_helper,
+            'max_subusers' => $this->max_subusers,
         ];
     }
 
@@ -322,6 +326,36 @@ class Plan extends ActiveRecord
     public function canUseAiHelper()
     {
         return (bool) $this->can_use_ai_helper;
+    }
+
+    /**
+     * Get maximum subusers allowed
+     *
+     * @return int|null Null means unlimited, 0 means not allowed
+     */
+    public function getMaxSubusers()
+    {
+        return $this->max_subusers;
+    }
+
+    /**
+     * Check if plan has unlimited subusers
+     *
+     * @return bool
+     */
+    public function hasUnlimitedSubusers()
+    {
+        return $this->getMaxSubusers() === -1;
+    }
+
+    /**
+     * Check if plan allows subuser functionality
+     *
+     * @return bool
+     */
+    public function canUseSubusers()
+    {
+        return $this->getMaxSubusers() > 0 || $this->hasUnlimitedSubusers();
     }
 
     /**

@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			</div>
 
 			<!-- Subscription Information -->
+			<?php if (!$user->isSubuser()): ?>
 			<div class="card mt-4">
 				<div class="card-header">
 					<h4><i class="fas fa-credit-card"></i> <?= Yii::t('app', 'Subscription') ?></h4>
@@ -296,6 +297,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					<?php endif; ?>
 				</div>
 			</div>
+			<?php endif; ?>
 		</div>
 
 		<div class="col-lg-4">

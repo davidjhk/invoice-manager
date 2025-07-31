@@ -19,7 +19,7 @@ $currentCompany = null;
 if (!Yii::$app->user->isGuest) {
 	$companyId = Yii::$app->session->get('current_company_id');
 	if ($companyId) {
-		$currentCompany = \app\models\Company::findForCurrentUser()->where(['id' => $companyId])->one();
+		$currentCompany = \app\models\Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
 	}
 }
 $isDarkMode = $currentCompany && $currentCompany->dark_mode;

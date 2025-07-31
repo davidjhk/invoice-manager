@@ -30,14 +30,14 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'index', 'check-auth',  'change-password', 'change-language', 'toggle-theme'],
+                'only' => ['logout', 'index', 'check-auth',  'change-password', 'change-language', 'toggle-theme', 'toggle-compact-mode'],
                 'rules' => [
                     [
                         'actions' => ['change-language'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'check-auth', 'change-password', 'toggle-theme'],
+                        'actions' => ['logout', 'index', 'check-auth', 'change-password', 'toggle-theme', 'toggle-compact-mode'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -48,6 +48,7 @@ class SiteController extends Controller
                 'actions' => [
                     'logout' => ['post'],
                     'toggle-theme' => ['post'],
+                    'toggle-compact-mode' => ['post'],
                 ],
             ],
         ];
@@ -472,13 +473,20 @@ class SiteController extends Controller
         // Update user's company language preference if logged in
         if (!Yii::$app->user->isGuest) {
             $user = Yii::$app->user->identity;
-            $companyId = Yii::$app->session->get('current_company_id');
             
-            if ($companyId) {
-                $company = Company::findOne(['id' => $companyId, 'user_id' => $user->id]);
-                if ($company) {
-                    $company->language = $language;
-                    $company->save(false, ['language']);
+            // For subusers, store in session instead of company settings
+            if ($user->isSubuser()) {
+                Yii::$app->session->set('subuser_language', $language);
+            } else {
+                // For regular users, update company language
+                $companyId = Yii::$app->session->get('current_company_id');
+                
+                if ($companyId) {
+                    $company = Company::findOne(['id' => $companyId, 'user_id' => $user->id]);
+                    if ($company) {
+                        $company->language = $language;
+                        $company->save(false, ['language']);
+                    }
                 }
             }
         }
@@ -516,8 +524,15 @@ class SiteController extends Controller
 
         $mode = Yii::$app->request->post('mode', 'light');
         $darkMode = ($mode === 'dark') ? 1 : 0;
-
         $user = Yii::$app->user->identity;
+
+        // For subusers, store in session instead of company settings
+        if ($user->isSubuser()) {
+            Yii::$app->session->set('subuser_dark_mode', $darkMode);
+            return ['success' => true, 'mode' => $mode, 'dark_mode' => $darkMode];
+        }
+
+        // For regular users, update company settings
         $companyId = Yii::$app->session->get('current_company_id');
 
         if (!$companyId) {
@@ -535,5 +550,61 @@ class SiteController extends Controller
         } else {
             return ['success' => false, 'message' => 'Failed to save theme preference'];
         }
+    }
+
+    /**
+     * Toggle compact mode action for subusers
+     *
+     * @return array
+     */
+    public function actionToggleCompactMode()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if (Yii::$app->user->isGuest) {
+            return ['success' => false, 'message' => 'User not logged in'];
+        }
+
+        $user = Yii::$app->user->identity;
+
+        // For subusers, store in session instead of company settings
+        if ($user->isSubuser()) {
+            // Get current company for fallback
+            $companyId = Yii::$app->session->get('current_company_id');
+            $currentCompany = null;
+            if ($companyId) {
+                $currentCompany = Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
+            }
+            
+            // Get current compact mode (session overrides company setting)
+            $currentCompactMode = Yii::$app->session->get('subuser_compact_mode', $currentCompany ? $currentCompany->compact_mode : false);
+            
+            // Get mode from POST data if available
+            $requestedMode = Yii::$app->request->post('mode');
+            
+            // Determine new mode
+            if ($requestedMode === 'normal') {
+                $newCompactMode = false;
+            } elseif ($requestedMode === 'compact') {
+                $newCompactMode = true;  
+            } else {
+                // Toggle if no specific mode requested
+                $newCompactMode = !$currentCompactMode;
+            }
+            
+            Yii::$app->session->set('subuser_compact_mode', $newCompactMode);
+            
+            $message = $newCompactMode ? 
+                Yii::t('app/nav', 'Switched to Compact Mode') : 
+                Yii::t('app/nav', 'Switched to Normal Mode');
+                
+            // Debug logging
+            Yii::info('Subuser compact mode toggle: current=' . ($currentCompactMode ? 'true' : 'false') . ', requested=' . $requestedMode . ', new=' . ($newCompactMode ? 'true' : 'false'), 'app');
+                
+            return ['success' => true, 'compact_mode' => $newCompactMode, 'message' => $message];
+        }
+
+        // For regular users, this should be handled by CompanyController
+        return ['success' => false, 'message' => 'Regular users should use company settings'];
     }
 }

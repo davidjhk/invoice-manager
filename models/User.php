@@ -26,6 +26,8 @@ use yii\web\IdentityInterface;
  * @property boolean $email_verified
  * @property integer $max_companies
  * @property string $role
+ * @property integer $parent_user_id
+ * @property integer $company_id
  * @property string $google_id
  * @property string $avatar_url
  */
@@ -98,7 +100,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['max_companies'], 'integer', 'min' => 1, 'max' => 100],
             [['max_companies'], 'default', 'value' => 1],
             [['role'], 'string'],
-            [['role'], 'in', 'range' => ['admin', 'user', 'demo']],
+            [['role'], 'in', 'range' => ['admin', 'user', 'demo', 'subuser']],
             [['role'], 'default', 'value' => 'user'],
             [['created_at', 'updated_at'], 'safe'],
             [['username'], 'string', 'max' => 50],
@@ -114,6 +116,9 @@ class User extends ActiveRecord implements IdentityInterface
             [['login_type'], 'in', 'range' => [self::LOGIN_TYPE_LOCAL, self::LOGIN_TYPE_GOOGLE]],
             [['login_type'], 'default', 'value' => self::LOGIN_TYPE_LOCAL],
             [['auth_key'], 'string', 'max' => 32],
+            [['parent_user_id', 'company_id'], 'integer'],
+            [['parent_user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => 'id'],
+            [['company_id'], 'exist', 'targetClass' => Company::class, 'targetAttribute' => 'id'],
         ];
     }
 
@@ -125,6 +130,7 @@ class User extends ActiveRecord implements IdentityInterface
         $scenarios = parent::scenarios();
         $scenarios['create'] = ['username', 'email', 'password', 'password_repeat', 'full_name', 'role', 'max_companies', 'is_active'];
         $scenarios['update'] = ['username', 'email', 'password', 'full_name', 'role', 'max_companies', 'is_active'];
+        $scenarios['create_subuser'] = ['username', 'email', 'password', 'password_repeat', 'full_name', 'parent_user_id', 'company_id', 'is_active'];
         return $scenarios;
     }
 
@@ -150,6 +156,8 @@ class User extends ActiveRecord implements IdentityInterface
             'auth_key' => 'Auth Key',
             'password_reset_token' => 'Password Reset Token',
             'max_companies' => 'Maximum Companies',
+            'parent_user_id' => 'Parent User',
+            'company_id' => 'Default Company',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -173,6 +181,36 @@ class User extends ActiveRecord implements IdentityInterface
     public function getSubscriptions()
     {
         return $this->hasMany(UserSubscription::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ParentUser]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParentUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'parent_user_id']);
+    }
+
+    /**
+     * Gets query for [[Subusers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSubusers()
+    {
+        return $this->hasMany(User::class, ['parent_user_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[DefaultCompany]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDefaultCompanyRelation()
+    {
+        return $this->hasOne(Company::class, ['id' => 'company_id']);
     }
 
     /**
@@ -460,6 +498,15 @@ class User extends ActiveRecord implements IdentityInterface
             return true;
         }
         
+        // For subusers, check parent user's limits
+        if ($this->isSubuser()) {
+            $parentUser = $this->getParentUser()->one();
+            if ($parentUser) {
+                return $parentUser->canCreateMoreCompanies();
+            }
+            return false; // No parent user found
+        }
+        
         return $this->getCompanyCount() < $this->max_companies;
     }
 
@@ -473,6 +520,15 @@ class User extends ActiveRecord implements IdentityInterface
         // Admin users have unlimited access
         if ($this->isAdmin()) {
 //            return PHP_INT_MAX; // Unlimited
+        }
+        
+        // For subusers, check parent user's limits
+        if ($this->isSubuser()) {
+            $parentUser = $this->getParentUser()->one();
+            if ($parentUser) {
+                return $parentUser->getRemainingCompanySlots();
+            }
+            return 0; // No parent user found
         }
         
         return max(0, $this->max_companies - $this->getCompanyCount());
@@ -951,6 +1007,16 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Check if user is subuser
+     *
+     * @return bool
+     */
+    public function isSubuser()
+    {
+        return $this->role === 'subuser';
+    }
+
+    /**
      * Get role options for dropdown
      *
      * @return array
@@ -961,6 +1027,7 @@ class User extends ActiveRecord implements IdentityInterface
             'user' => 'User',
             'admin' => 'Admin',
             'demo' => 'Demo',
+            'subuser' => 'Subuser',
         ];
     }
 
@@ -1121,5 +1188,278 @@ class User extends ActiveRecord implements IdentityInterface
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get current subuser count for this user
+     *
+     * @return int
+     */
+    public function getSubuserCount()
+    {
+        return (int) $this->getSubusers()->where(['is_active' => true])->count();
+    }
+
+    /**
+     * Check if user can create more subusers
+     *
+     * @return bool
+     */
+    public function canCreateMoreSubusers()
+    {
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+		// Only user role can create subusers
+        if (!$this->isUser()) {
+            return false;
+        }
+
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means no subuser access
+        if (!$plan) {
+            return false;
+        }
+
+        $maxSubusers = $plan->max_subusers ?? 0;
+        
+        // Unlimited
+        if ($maxSubusers === -1) {
+            return true;
+        }
+
+        return $this->getSubuserCount() < $maxSubusers;
+    }
+
+    /**
+     * Get remaining subuser slots
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getRemainingSubuserSlots()
+    {
+        // Only user role can create subusers
+        if (!$this->isUser()) {
+            return 0;
+        }
+
+        // Admin users have unlimited access
+        if ($this->isAdmin()) {
+            return null; // Unlimited
+        }
+
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means no subuser access
+        if (!$plan) {
+            return 0;
+        }
+
+        $maxSubusers = $plan->max_subusers ?? 0;
+        
+        // Unlimited
+        if ($maxSubusers === -1) {
+            return null; // Unlimited
+        }
+
+        return max(0, $maxSubusers - $this->getSubuserCount());
+    }
+
+    /**
+     * Get maximum subusers allowed
+     *
+     * @return int|null Null means unlimited
+     */
+    public function getMaxSubusersLimit()
+    {
+        // Only user role can create subusers
+        if (!$this->isUser()) {
+            return 0;
+        }
+
+        // Admin users have unlimited subusers
+        if ($this->isAdmin()) {
+            return null;
+        }
+        
+        $plan = $this->getCurrentPlan();
+        
+        // No subscription means no subuser access
+        if (!$plan) {
+            return 0;
+        }
+
+        $maxSubusers = $plan->max_subusers ?? 0;
+        
+        // Unlimited
+        if ($maxSubusers === -1) {
+            return null;
+        }
+
+        return $maxSubusers;
+    }
+
+    /**
+     * Create a new subuser
+     *
+     * @param array $attributes
+     * @return User|null
+     */
+    public function createSubuser($attributes)
+    {
+        // Check if user can create more subusers
+        if (!$this->canCreateMoreSubusers()) {
+            return null;
+        }
+
+        $subuser = new User();
+        $subuser->scenario = 'create_subuser';
+        $subuser->attributes = $attributes;
+        $subuser->role = 'subuser';
+        $subuser->parent_user_id = $this->id;
+        $subuser->max_companies = 0; // Subusers cannot create companies
+        
+        if ($subuser->save()) {
+            return $subuser;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get parent user (for subusers)
+     *
+     * @return User|null
+     */
+    public function getParent()
+    {
+        return $this->parentUser;
+    }
+
+    /**
+     * Get effective user (parent user for subusers, self for regular users)
+     *
+     * @return User
+     */
+    public function getEffectiveUser()
+    {
+        return $this->isSubuser() ? $this->getParent() : $this;
+    }
+
+    /**
+     * Check if subuser can access a specific company
+     *
+     * @param int $companyId
+     * @return bool
+     */
+    public function canAccessCompany($companyId)
+    {
+        if (!$this->isSubuser()) {
+            // Regular users can access their own companies
+            return $this->getCompanies()->where(['id' => $companyId])->exists();
+        }
+
+        // Subusers can access their parent's companies
+        $parent = $this->getParent();
+        if (!$parent) {
+            return false;
+        }
+
+        return $parent->getCompanies()->where(['id' => $companyId])->exists();
+    }
+
+    /**
+     * Get accessible companies (for subusers, returns companies through access table)
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAccessibleCompanies()
+    {
+        if (!$this->isSubuser()) {
+            // Non-subusers get their own companies
+            return $this->getCompanies()->where(['is_active' => true]);
+        }
+
+        // Subusers get companies through SubuserCompanyAccess
+        return \app\models\SubuserCompanyAccess::getAccessibleCompanies($this->id);
+    }
+
+    /**
+     * Check if user can manage subusers (create, edit, delete)
+     *
+     * @return bool
+     */
+    public function canManageSubusers()
+    {
+        // Admin users can always manage subusers
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Only user role with Pro plan or higher can manage subusers
+        if (!$this->isUser()) {
+            return false;
+        }
+
+        $plan = $this->getCurrentPlan();
+        
+        // Pro plan or higher required
+        if (!$plan || $plan->max_subusers <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Check if this user has access to a specific company
+     *
+     * @param int $companyId
+     * @return bool
+     */
+    public function hasCompanyAccess($companyId)
+    {
+        if (!$this->isSubuser()) {
+            // Non-subusers: check ownership
+            return $this->getCompanies()->where(['id' => $companyId, 'is_active' => true])->exists();
+        }
+
+        // Subusers: check access table
+        return \app\models\SubuserCompanyAccess::hasAccess($this->id, $companyId);
+    }
+
+    /**
+     * Grant company access to this subuser
+     *
+     * @param int $companyId
+     * @param int $grantedBy
+     * @return bool
+     */
+    public function grantCompanyAccess($companyId, $grantedBy)
+    {
+        if (!$this->isSubuser()) {
+            return false; // Only for subusers
+        }
+
+        return \app\models\SubuserCompanyAccess::grantAccess($this->id, $companyId, $grantedBy);
+    }
+
+    /**
+     * Revoke company access from this subuser
+     *
+     * @param int $companyId
+     * @return bool
+     */
+    public function revokeCompanyAccess($companyId)
+    {
+        if (!$this->isSubuser()) {
+            return false; // Only for subusers
+        }
+
+        return \app\models\SubuserCompanyAccess::revokeAccess($this->id, $companyId);
     }
 }

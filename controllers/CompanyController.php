@@ -11,6 +11,7 @@ use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\web\BadRequestHttpException;
+use app\models\User;
 
 /**
  * CompanyController implements the CRUD actions for Company model.
@@ -37,6 +38,11 @@ class CompanyController extends Controller
                 'actions' => [
                     'delete' => ['POST'],
                     'set-current' => ['GET', 'POST'], // Allow both GET and POST
+                    'delete-subuser' => ['POST'],
+                    'create-subuser' => ['POST'],
+                    'update-subuser' => ['POST'],
+                    'grant-company-access' => ['POST'],
+                    'revoke-company-access' => ['POST'],
                 ],
             ],
         ];
@@ -65,7 +71,8 @@ class CompanyController extends Controller
     {
         $companies = Company::findForCurrentUser()->all();
         
-        if (empty($companies)) {
+        // Only create default company for non-subusers
+        if (empty($companies) && !Yii::$app->user->identity->isSubuser()) {
             // If user has no companies, create a default one
             $company = new Company();
             $company->company_name = Yii::$app->user->identity->getDisplayName() . "'s Company";
@@ -91,8 +98,13 @@ class CompanyController extends Controller
      */
     public function actionCreate()
     {
-        // Check if user can create more companies
+        // Check if user can create companies (subusers cannot)
         $user = Yii::$app->user->identity;
+        if ($user->isSubuser()) {
+            throw new BadRequestHttpException('Subusers cannot create companies.');
+        }
+
+        // Check if user can create more companies
         if (!$user->canCreateMoreCompanies()) {
             Yii::$app->session->setFlash('error', 'You have reached your maximum number of companies (' . $user->max_companies . '). Please upgrade your account or contact support.');
             return $this->redirect(['select']);
@@ -182,7 +194,7 @@ class CompanyController extends Controller
             }
             
             // Enhanced security: Verify company belongs to current user
-            $company = Company::findForCurrentUser()->where(['id' => $id])->one();
+            $company = Company::findForCurrentUser()->where(['c.id' => $id])->one();
             
             if (!$company) {
                 // Log unauthorized access attempt
@@ -208,19 +220,30 @@ class CompanyController extends Controller
                 return $this->redirect(['company/select']);
             }
             
-            // Additional verification: Double-check user_id matches
-            if ($company->user_id !== Yii::$app->user->id) {
-                Yii::warning('Security violation: Company user_id mismatch. Expected: ' . Yii::$app->user->id . ', Got: ' . $company->user_id, 'security');
+            // Additional verification: Check access rights
+            $user = Yii::$app->user->identity;
+            $hasAccess = false;
+            
+            if ($user->isSubuser()) {
+                // For subusers, check SubuserCompanyAccess table
+                $hasAccess = $user->hasCompanyAccess($company->id);
+            } else {
+                // For regular users, check ownership
+                $hasAccess = $company->user_id === Yii::$app->user->id;
+            }
+            
+            if (!$hasAccess) {
+                Yii::warning('Security violation: User lacks access to company. User ID: ' . Yii::$app->user->id . ', Company ID: ' . $company->id . ', Is Subuser: ' . ($user->isSubuser() ? 'Yes' : 'No'), 'security');
                 
                 if (Yii::$app->request->isAjax) {
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     return [
                         'success' => false,
-                        'message' => 'Access denied. Security violation detected.',
+                        'message' => 'Access denied. You do not have permission to access this company.',
                     ];
                 }
                 
-                Yii::$app->session->setFlash('error', 'Access denied. Security violation detected.');
+                Yii::$app->session->setFlash('error', 'Access denied. You do not have permission to access this company.');
                 return $this->redirect(['company/select']);
             }
             
@@ -268,6 +291,13 @@ class CompanyController extends Controller
      */
     public function actionSettings()
     {
+        // Check if user can modify company settings (subusers cannot)
+        $user = Yii::$app->user->identity;
+        if ($user->isSubuser()) {
+            Yii::$app->session->setFlash('error', 'Subusers cannot modify company settings.');
+            return $this->redirect(['site/index']);
+        }
+
         $model = Company::getCurrent();
         
         if (!$model) {
@@ -483,7 +513,7 @@ class CompanyController extends Controller
         }
         
         if ($companyId) {
-            $company = Company::findForCurrentUser()->where(['id' => $companyId])->one();
+            $company = Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
             if ($company) {
                 return [
                     'success' => true,
@@ -546,7 +576,7 @@ class CompanyController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         
         $companyId = Yii::$app->session->get('current_company_id');
-        $model = Company::findForCurrentUser()->where(['id' => $companyId])->one();
+        $model = Company::findForCurrentUser()->where(['c.id' => $companyId])->one();
         
         if (!$model) {
             return ['error' => 'Company not found'];
@@ -834,6 +864,335 @@ class CompanyController extends Controller
             'success' => false,
             'message' => 'Failed to update compact mode.',
             'errors' => $model->errors,
+        ];
+    }
+
+    /**
+     * Create a new subuser
+     *
+     * @return Response
+     */
+    public function actionCreateSubuser()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Check if user can manage subusers
+        if (!Yii::$app->user->identity->canManageSubusers()) {
+            return [
+                'success' => false,
+                'message' => 'You do not have permission to create subusers.',
+            ];
+        }
+
+        // Check if user can create more subusers
+        if (!Yii::$app->user->identity->canCreateMoreSubusers()) {
+            return [
+                'success' => false,
+                'message' => 'You have reached the maximum number of subusers for your plan.',
+            ];
+        }
+
+        $post = Yii::$app->request->post();
+        
+        $attributes = [
+            'full_name' => $post['full_name'] ?? '',
+            'username' => $post['username'] ?? '',
+            'email' => $post['email'] ?? '',
+            'password' => $post['password'] ?? '',
+            'company_id' => !empty($post['company_id']) ? (int)$post['company_id'] : null,
+        ];
+
+        $subuser = Yii::$app->user->identity->createSubuser($attributes);
+        
+        if ($subuser) {
+            return [
+                'success' => true,
+                'message' => 'Subuser created successfully.',
+                'subuser' => [
+                    'id' => $subuser->id,
+                    'full_name' => $subuser->full_name,
+                    'username' => $subuser->username,
+                    'email' => $subuser->email,
+                ],
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to create subuser.',
+            'errors' => $subuser ? $subuser->errors : ['Unknown error occurred'],
+        ];
+    }
+
+    /**
+     * Grant company access to a subuser
+     */
+    public function actionGrantCompanyAccess()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Check if user can manage subusers
+        if (!Yii::$app->user->identity->canManageSubusers()) {
+            return [
+                'success' => false,
+                'message' => 'You do not have permission to manage subuser access.',
+            ];
+        }
+
+        $post = Yii::$app->request->post();
+        $subuserId = (int)($post['subuser_id'] ?? 0);
+        $companyId = (int)($post['company_id'] ?? 0);
+
+        if (!$subuserId || !$companyId) {
+            return [
+                'success' => false,
+                'message' => 'Invalid subuser or company ID.',
+            ];
+        }
+
+        // Verify subuser belongs to current user
+        $subuser = Yii::$app->user->identity->getSubusers()->where(['id' => $subuserId])->one();
+        if (!$subuser) {
+            return [
+                'success' => false,
+                'message' => 'Subuser not found.',
+            ];
+        }
+
+        // Verify company belongs to current user
+        $company = Yii::$app->user->identity->getCompanies()->where(['id' => $companyId])->one();
+        if (!$company) {
+            return [
+                'success' => false,
+                'message' => 'Company not found.',
+            ];
+        }
+
+        if ($subuser->grantCompanyAccess($companyId, Yii::$app->user->id)) {
+            return [
+                'success' => true,
+                'message' => 'Company access granted successfully.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to grant company access.',
+        ];
+    }
+
+    /**
+     * Revoke company access from a subuser
+     */
+    public function actionRevokeCompanyAccess()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Check if user can manage subusers
+        if (!Yii::$app->user->identity->canManageSubusers()) {
+            return [
+                'success' => false,
+                'message' => 'You do not have permission to manage subuser access.',
+            ];
+        }
+
+        $post = Yii::$app->request->post();
+        $subuserId = (int)($post['subuser_id'] ?? 0);
+        $companyId = (int)($post['company_id'] ?? 0);
+
+        if (!$subuserId || !$companyId) {
+            return [
+                'success' => false,
+                'message' => 'Invalid subuser or company ID.',
+            ];
+        }
+
+        // Verify subuser belongs to current user
+        $subuser = Yii::$app->user->identity->getSubusers()->where(['id' => $subuserId])->one();
+        if (!$subuser) {
+            return [
+                'success' => false,
+                'message' => 'Subuser not found.',
+            ];
+        }
+
+        if ($subuser->revokeCompanyAccess($companyId)) {
+            return [
+                'success' => true,
+                'message' => 'Company access revoked successfully.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to revoke company access.',
+        ];
+    }
+
+    /**
+     * Get subuser data for editing
+     *
+     * @return Response
+     */
+    public function actionGetSubuser()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $id = Yii::$app->request->get('id');
+        if (!$id) {
+            return [
+                'success' => false,
+                'message' => 'Subuser ID is required.',
+            ];
+        }
+
+        // Find subuser that belongs to current user
+        $subuser = User::find()
+            ->where(['id' => $id, 'parent_user_id' => Yii::$app->user->id, 'is_active' => true])
+            ->one();
+
+        if (!$subuser) {
+            return [
+                'success' => false,
+                'message' => 'Subuser not found.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'subuser' => [
+                'id' => $subuser->id,
+                'full_name' => $subuser->full_name,
+                'username' => $subuser->username,
+                'email' => $subuser->email,
+                'company_id' => $subuser->company_id,
+            ],
+        ];
+    }
+
+    /**
+     * Update an existing subuser
+     *
+     * @return Response
+     */
+    public function actionUpdateSubuser()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Check if user can manage subusers
+        if (!Yii::$app->user->identity->canManageSubusers()) {
+            return [
+                'success' => false,
+                'message' => 'You do not have permission to update subusers.',
+            ];
+        }
+
+        $post = Yii::$app->request->post();
+        $id = $post['subuser_id'] ?? null;
+        
+        if (!$id) {
+            return [
+                'success' => false,
+                'message' => 'Subuser ID is required.',
+            ];
+        }
+
+        // Find subuser that belongs to current user
+        $subuser = User::find()
+            ->where(['id' => $id, 'parent_user_id' => Yii::$app->user->id, 'is_active' => true])
+            ->one();
+
+        if (!$subuser) {
+            return [
+                'success' => false,
+                'message' => 'Subuser not found.',
+            ];
+        }
+
+        // Update attributes
+        $subuser->full_name = $post['full_name'] ?? $subuser->full_name;
+        $subuser->username = $post['username'] ?? $subuser->username;
+        $subuser->email = $post['email'] ?? $subuser->email;
+        $subuser->company_id = !empty($post['company_id']) ? (int)$post['company_id'] : null;
+
+        // Update password if provided
+        if (!empty($post['password'])) {
+            $subuser->password = $post['password'];
+        }
+
+        if ($subuser->save()) {
+            return [
+                'success' => true,
+                'message' => 'Subuser updated successfully.',
+                'subuser' => [
+                    'id' => $subuser->id,
+                    'full_name' => $subuser->full_name,
+                    'username' => $subuser->username,
+                    'email' => $subuser->email,
+                ],
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to update subuser.',
+            'errors' => $subuser->errors,
+        ];
+    }
+
+    /**
+     * Delete a subuser
+     *
+     * @return Response
+     */
+    public function actionDeleteSubuser()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Check if user can manage subusers
+        if (!Yii::$app->user->identity->canManageSubusers()) {
+            return [
+                'success' => false,
+                'message' => 'You do not have permission to delete subusers.',
+            ];
+        }
+
+        $post = Yii::$app->request->post();
+        $id = $post['id'] ?? null;
+        
+        if (!$id) {
+            return [
+                'success' => false,
+                'message' => 'Subuser ID is required.',
+            ];
+        }
+
+        // Find subuser that belongs to current user
+        $subuser = User::find()
+            ->where(['id' => $id, 'parent_user_id' => Yii::$app->user->id, 'is_active' => true])
+            ->one();
+
+        if (!$subuser) {
+            return [
+                'success' => false,
+                'message' => 'Subuser not found.',
+            ];
+        }
+
+        // Soft delete - set is_active to false
+        $subuser->is_active = false;
+        
+        if ($subuser->save()) {
+            return [
+                'success' => true,
+                'message' => 'Subuser deleted successfully.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to delete subuser.',
+            'errors' => $subuser->errors,
         ];
     }
 }

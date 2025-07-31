@@ -225,7 +225,14 @@ class Company extends ActiveRecord
     {
         $companyId = Yii::$app->session->get('current_company_id');
         if ($companyId) {
-            return static::findForCurrentUser()->where(['id' => $companyId])->one();
+            $user = Yii::$app->user->identity;
+            if ($user && $user->isSubuser()) {
+                // For subusers, use the aliased query to avoid ambiguous id column
+                return $user->getAccessibleCompanies()->andWhere(['c.id' => $companyId])->one();
+            } else {
+                // For regular users, use aliased query for consistency
+                return static::findForCurrentUser()->andWhere(['c.id' => $companyId])->one();
+            }
         }
         
         // If no company is selected, get the first company for the user
@@ -246,9 +253,17 @@ class Company extends ActiveRecord
     {
         $userId = Yii::$app->user->id;
         if ($userId) {
-            return static::find()->where(['user_id' => $userId, 'is_active' => true]);
+            $user = Yii::$app->user->identity;
+            
+            // For subusers, get companies they have access to
+            if ($user && $user->isSubuser()) {
+                return $user->getAccessibleCompanies();
+            }
+            
+            // For regular users, use alias to avoid conflicts when additional conditions are added
+            return static::find()->alias('c')->where(['c.user_id' => $userId, 'c.is_active' => true]);
         }
-        return static::find()->where(['0' => '1']); // Return empty result if no user
+        return static::find()->alias('c')->where(['0' => '1']); // Return empty result if no user
     }
 
     /**
