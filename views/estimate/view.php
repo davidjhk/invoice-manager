@@ -23,14 +23,14 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="estimate-view">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1>
 			<?= Html::encode($model->estimate_number) ?>
 			<span class="badge badge-<?= $model->getStatusClass() ?> ml-2">
 				<?= Html::encode($model->getStatusLabel()) ?>
 			</span>
 			<?php if ($model->isExpired()): ?>
-				<span class="badge badge-warning ml-1"><?= Yii::t('app/estimate', 'Expired') ?></span>
+			<span class="badge badge-warning ml-1"><?= Yii::t('app/estimate', 'Expired') ?></span>
 			<?php endif; ?>
 		</h1>
 		<div class="btn-group" role="group">
@@ -122,25 +122,25 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 		</div>
 	</div>
 
-    <?php if ($model->converted_to_invoice): ?>
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <?= Yii::t('app/estimate', 'This estimate has been converted to invoice') ?>: 
-            <?= Html::a($model->invoice->invoice_number, ['/invoice/view', 'id' => $model->invoice_id], [
+	<?php if ($model->converted_to_invoice): ?>
+	<div class="alert alert-success">
+		<i class="fas fa-check-circle"></i>
+		<?= Yii::t('app/estimate', 'This estimate has been converted to invoice') ?>:
+		<?= Html::a($model->invoice->invoice_number, ['/invoice/view', 'id' => $model->invoice_id], [
                 'class' => 'font-weight-bold'
             ]) ?>
-        </div>
-    <?php endif; ?>
+	</div>
+	<?php endif; ?>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Estimate Details -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Information') ?></h5>
-                </div>
-                <div class="card-body">
-                    <?= DetailView::widget([
+	<div class="row">
+		<div class="col-lg-8">
+			<!-- Estimate Details -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Information') ?></h5>
+				</div>
+				<div class="card-body">
+					<?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
                             'estimate_number',
@@ -179,149 +179,170 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
                             ],
                         ],
                     ]) ?>
-                </div>
-            </div>
+				</div>
+			</div>
 
-            <!-- Estimate Items -->
-            <div class="card">
-                <div class="card-header" style="display:none;">
-                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Items') ?></h5>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($model->estimateItems)): ?>
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th><?= Yii::t('app/estimate', 'Product/Service') ?></th>
-                                        <th><?= Yii::t('app/estimate', 'Description') ?></th>
-                                        <th class="text-right"><?= Yii::t('app/estimate', 'Qty') ?></th>
-                                        <th class="text-right"><?= Yii::t('app/estimate', 'Rate') ?></th>
-                                        <th class="text-right"><?= Yii::t('app/estimate', 'Amount') ?></th>
-                                        <th class="text-center"><?= Yii::t('app/estimate', 'Tax') ?></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($model->estimateItems as $index => $item): ?>
-                                        <tr>
-                                            <td><?= Html::encode($item->product_service_name ?: '-') ?></td>
-                                            <td><?= Html::encode($item->description) ?></td>
-                                            <td class="text-right"><?= $item->getFormattedQuantity() ?></td>
-                                            <td class="text-right"><?= $item->getFormattedRate() ?></td>
-                                            <td class="text-right font-weight-bold"><?= $item->getFormattedAmount() ?></td>
-                                            <td class="text-center">
-                                                <?php if ($item->is_taxable): ?>
-                                                    <i class="fas fa-check text-success"></i>
-                                                <?php else: ?>
-                                                    <i class="fas fa-times text-muted"></i>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-center py-4">
-                            <i class="fas fa-list fa-3x text-muted mb-3"></i>
-                            <h5><?= Yii::t('app/estimate', 'No Items') ?></h5>
-                            <p class="text-muted"><?= Yii::t('app/estimate', 'This estimate doesn\'t have any items yet.') ?></p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
+			<!-- Estimate Items -->
+			<div class="card">
+				<div class="card-header" style="display:none;">
+					<h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Items') ?></h5>
+				</div>
+				<div class="card-body">
+					<?php if (!empty($model->estimateItems)): ?>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th><?= Yii::t('app/estimate', 'Product/Service') ?></th>
+									<th><?= Yii::t('app/estimate', 'Description') ?></th>
+									<th class="text-right"><?= Yii::t('app/estimate', 'Qty') ?></th>
+									<th class="text-right"><?= Yii::t('app/estimate', 'Rate') ?></th>
+									<th class="text-right"><?= Yii::t('app/estimate', 'Amount') ?></th>
+									<th class="text-center"><?= Yii::t('app/estimate', 'Tax') ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($model->estimateItems as $index => $item): ?>
+								<tr>
+									<td><?= Html::encode($item->product_service_name ?: '-') ?></td>
+									<td><?= Html::encode($item->description) ?></td>
+									<td class="text-right"><?= $item->getFormattedQuantity() ?></td>
+									<td class="text-right"><?= $item->getFormattedRate() ?></td>
+									<td class="text-right font-weight-bold"><?= $item->getFormattedAmount() ?></td>
+									<td class="text-center">
+										<?php if ($item->is_taxable): ?>
+										<i class="fas fa-check text-success"></i>
+										<?php else: ?>
+										<i class="fas fa-times text-muted"></i>
+										<?php endif; ?>
+									</td>
+								</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
+					<?php else: ?>
+					<div class="text-center py-4">
+						<i class="fas fa-list fa-3x text-muted mb-3"></i>
+						<h5><?= Yii::t('app/estimate', 'No Items') ?></h5>
+						<p class="text-muted">
+							<?= Yii::t('app/estimate', 'This estimate doesn\'t have any items yet.') ?></p>
+					</div>
+					<?php endif; ?>
+				</div>
+			</div>
+		</div>
 
-        <div class="col-lg-4">
-            <!-- Customer Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Customer Information') ?></h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <strong><?= Html::encode($model->customer->customer_name) ?></strong>
-                        <?php if ($model->customer->contact_name): ?>
-                            <br><small class="text-muted"><?= Yii::t('app/estimate', 'Contact') ?>: <?= Html::encode($model->customer->contact_name) ?></small>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <?php if ($model->customer->customer_email): ?>
-                        <div class="mb-2">
-                            <i class="fas fa-envelope text-primary mr-2"></i>
-                            <a href="mailto:<?= Html::encode($model->customer->customer_email) ?>">
-                                <?= Html::encode($model->customer->customer_email) ?>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($model->customer->customer_phone): ?>
-                        <div class="mb-2">
-                            <i class="fas fa-phone text-primary mr-2"></i>
-                            <a href="tel:<?= Html::encode($model->customer->customer_phone) ?>">
-                                <?= Html::encode($model->customer->customer_phone) ?>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($model->customer->billing_address): ?>
-                        <div class="mt-3">
-                            <small class="text-muted"><?= Yii::t('app/estimate', 'Billing Address') ?>:</small><br>
-                            <?= nl2br(Html::encode($model->customer->billing_address)) ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+		<div class="col-lg-4">
+			<!-- Customer Information -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Customer Information') ?></h5>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<strong><?= Html::encode($model->customer->customer_name) ?></strong>
+						<?php if ($model->customer->contact_name): ?>
+						<br><small class="text-muted"><?= Yii::t('app/estimate', 'Contact') ?>:
+							<?= Html::encode($model->customer->contact_name) ?></small>
+						<?php endif; ?>
+					</div>
 
-            <!-- Estimate Totals -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Totals') ?></h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-6"><?= Yii::t('app/estimate', 'Subtotal') ?>:</div>
-                        <div class="col-6 text-right"><?= $model->formatAmount($model->subtotal) ?></div>
-                    </div>
-                    
-                    <?php if ($model->discount_amount > 0): ?>
-                        <div class="row mb-2">
-                            <div class="col-6">
-                                <?= Yii::t('app/estimate', 'Discount') ?> 
-                                <?php if ($model->discount_type == 'percentage'): ?>
-                                    (<?= $model->discount_value ?>%):
-                                <?php else: ?>
-                                    (<?= Yii::t('app/estimate', 'Fixed') ?>):
-                                <?php endif; ?>
-                            </div>
-                            <div class="col-6 text-right text-danger">
-                                -<?= $model->formatAmount($model->discount_amount) ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($model->shipping_fee > 0): ?>
-                        <div class="row mb-2">
-                            <div class="col-6"><?= Yii::t('app/estimate', 'Shipping Fee') ?>:</div>
-                            <div class="col-6 text-right"><?= $model->formatAmount($model->shipping_fee) ?></div>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($model->tax_amount > 0): ?>
-                        <div class="row mb-2">
-                            <div class="col-6"><?= Yii::t('app/estimate', 'Tax') ?> (<?= $model->tax_rate ?>%):</div>
-                            <div class="col-6 text-right"><?= $model->formatAmount($model->tax_amount) ?></div>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <hr>
-                    <div class="row">
-                        <div class="col-6"><strong><?= Yii::t('app/estimate', 'Total') ?>:</strong></div>
-                        <div class="col-6 text-right"><strong><?= $model->formatAmount($model->total_amount) ?></strong></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+					<?php if ($model->customer->customer_email): ?>
+					<div class="mb-2">
+						<i class="fas fa-envelope text-primary mr-2"></i>
+						<a href="mailto:<?= Html::encode($model->customer->customer_email) ?>">
+							<?= Html::encode($model->customer->customer_email) ?>
+						</a>
+					</div>
+					<?php endif; ?>
+
+					<?php if ($model->customer->customer_phone): ?>
+					<div class="mb-2">
+						<i class="fas fa-phone text-primary mr-2"></i>
+						<a href="tel:<?= Html::encode($model->customer->customer_phone) ?>">
+							<?= Html::encode($model->customer->customer_phone) ?>
+						</a>
+					</div>
+					<?php endif; ?>
+
+					<?php if ($model->customer->billing_address): ?>
+					<div class="mt-3">
+						<small class="text-muted"><?= Yii::t('app/estimate', 'Billing Address') ?>:</small><br>
+						<?= nl2br(Html::encode($model->customer->billing_address)) ?>
+					</div>
+					<?php endif; ?>
+				</div>
+			</div>
+
+			<!-- Estimate Totals -->
+			<div class="card">
+				<div class="card-header">
+					<h5 class="card-title mb-0"><?= Yii::t('app/estimate', 'Estimate Totals') ?></h5>
+				</div>
+				<div class="card-body">
+					<div class="row mb-2">
+						<div class="col-6"><?= Yii::t('app/estimate', 'Subtotal') ?>:</div>
+						<div class="col-6 text-right"><?= $model->formatAmount($model->subtotal) ?></div>
+					</div>
+
+					<?php if ($model->discount_amount > 0): ?>
+					<div class="row mb-2">
+						<div class="col-6">
+							<?= Yii::t('app/estimate', 'Discount') ?>
+							<?php if ($model->discount_type == 'percentage'): ?>
+							(<?= $model->discount_value ?>%):
+							<?php else: ?>
+							(<?= Yii::t('app/estimate', 'Fixed') ?>):
+							<?php endif; ?>
+						</div>
+						<div class="col-6 text-right text-danger">
+							-<?= $model->formatAmount($model->discount_amount) ?>
+						</div>
+					</div>
+					<?php endif; ?>
+
+					<?php if ($model->shipping_fee > 0): ?>
+					<div class="row mb-2">
+						<div class="col-6"><?= Yii::t('app/estimate', 'Shipping Fee') ?>:</div>
+						<div class="col-6 text-right"><?= $model->formatAmount($model->shipping_fee) ?></div>
+					</div>
+					<?php endif; ?>
+
+					<?php if ($model->tax_amount > 0): ?>
+					<div class="row mb-2">
+						<div class="col-6"><?= Yii::t('app/estimate', 'Tax') ?> (<?= $model->tax_rate ?>%):</div>
+						<div class="col-6 text-right"><?= $model->formatAmount($model->tax_amount) ?></div>
+					</div>
+					<?php endif; ?>
+
+					<hr>
+					<div class="row">
+						<div class="col-6"><strong><?= Yii::t('app/estimate', 'Total') ?>:</strong></div>
+						<div class="col-6 text-right"><strong><?= $model->formatAmount($model->total_amount) ?></strong>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Update Log -->
+			<?php 
+            $latestUpdate = \app\models\UpdateLog::getLatestUpdate(\app\models\UpdateLog::ENTITY_ESTIMATE, $model->id);
+            if ($latestUpdate): ?>
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="card-title mb-0"><?= Yii::t('app', 'Last Updated') ?></h5>
+				</div>
+				<div class="card-body">
+					<p class="mb-0">
+						<strong><?= Yii::$app->formatter->asDatetime($latestUpdate->created_at) ?></strong>
+						<?= Yii::t('app', 'by') ?>
+						<?= Html::encode($latestUpdate->user_name) ?>
+					</p>
+				</div>
+			</div>
+			<?php endif; ?>
+		</div>
+	</div>
 
 </div>

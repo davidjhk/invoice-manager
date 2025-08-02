@@ -69,6 +69,15 @@
 - **실시간 조회**: ZIP 코드 입력으로 즉시 세율 확인
 - **이력 관리**: 세율 변경 이력 및 유효기간 추적
 
+### 🤖 AI Helper (2025년 8월 추가)
+
+- **인보이스 설명 생성**: 제품/서비스명으로 전문적인 인보이스 항목 설명 자동 생성
+- **결제 조건 제안**: 고객 유형과 금액에 맞는 적절한 결제 조건 자동 제안
+- **가격 제안**: 시장 데이터 기반의 제품/서비스 가격 제안
+- **작업 범위 생성**: 서비스 키워드로 전문적인 작업 범위 및 세부 항목 자동 생성
+- **관리자 설정**: AI 모델 선택으로 성능과 비용 최적화
+- **결제 기반 권한**: 플랜 기반 AI 기능 사용 제어 (무료/유료 플랜 차별화)
+
 ## 시스템 요구사항
 
 - **PHP**: 8.1 이상 (권장)
@@ -127,6 +136,7 @@ return [
 ```
 
 **주요 마이그레이션 포함 사항:**
+
 - 다국어 지원 (언어 필드)
 - 다크모드/컴팩트모드 설정
 - 제품 카테고리 시스템
@@ -175,15 +185,18 @@ return [
 #### 6.3. 주요 이메일 제공업체 설정
 
 **Gmail:**
+
 - Host: `smtp.gmail.com`
 - Port: `587` (TLS) 또는 `465` (SSL)
 - 2단계 인증 활성화 후 앱 비밀번호 생성 필요
 
 **Outlook/Hotmail:**
+
 - Host: `smtp-mail.outlook.com`
 - Port: `587` (TLS)
 
 **Yahoo:**
+
 - Host: `smtp.mail.yahoo.com`
 - Port: `587` (TLS)
 
@@ -202,24 +215,28 @@ DocumentRoot를 `web/` 디렉토리로 설정하고 URL 리라이팅 활성화
 프로젝트는 3가지 `.htaccess` 설정을 제공합니다:
 
 **기본 설정 (현재 사용 중)**
+
 ```bash
 # 단순한 Yii2 라우팅만 제공
 web/.htaccess
 ```
 
 **고급 설정 (보안 강화)**
+
 ```bash
 # 고급 보안 및 성능 최적화 설정으로 교체
 cp web/.htaccess.advanced web/.htaccess
 ```
 
 **단순 설정 (문제 해결용)**
+
 ```bash
 # 최소한의 설정 (문제 발생 시 사용)
 cp web/.htaccess.simple web/.htaccess
 ```
 
 **고급 설정 기능:**
+
 - 🔒 보안 헤더 추가 (XSS, 클릭재킹 방지)
 - 🚫 민감한 파일 접근 차단
 - 📁 디렉토리 브라우징 방지
@@ -227,11 +244,13 @@ cp web/.htaccess.simple web/.htaccess
 - ⚡ 브라우저 캐싱 (로딩 속도 향상)
 
 **필요 Apache 모듈:**
+
 - `mod_headers` (보안 헤더)
 - `mod_deflate` (압축)
 - `mod_expires` (캐싱)
 
 **모듈 활성화:**
+
 ```bash
 sudo a2enmod headers deflate expires
 sudo systemctl restart apache2
@@ -308,6 +327,7 @@ sudo usermod -a -G daemon $(whoami)
 ### 🌍 다국어 시스템
 
 #### 지원 언어
+
 - **English (en-US)**: 영어
 - **한국어 (ko-KR)**: 완전한 한국어 지원
 - **Español (es-ES)**: 스페인어
@@ -315,6 +335,7 @@ sudo usermod -a -G daemon $(whoami)
 - **繁體中文 (zh-TW)**: 중국어 번체
 
 #### 특징
+
 - **실시간 언어 전환**: 페이지 새로고침 없이 즉시 언어 변경
 - **회사별 설정**: 각 회사가 독립적으로 언어 선택
 - **완전 번역**: 모든 UI 요소, 메뉴, 메시지, 오류 텍스트 번역
@@ -323,12 +344,14 @@ sudo usermod -a -G daemon $(whoami)
 ### 🎨 테마 시스템
 
 #### 다크모드 (Dark Mode)
+
 - **개별 설정**: 각 회사가 독립적으로 다크모드 설정
 - **테마 토글**: 상단바에서 원클릭 테마 전환
 - **완전한 스타일링**: 모든 UI 요소가 다크모드 지원
 - **시각적 일관성**: 전체 인터페이스의 통일된 다크모드 경험
 
 #### 컴팩트 모드 (Compact Mode)
+
 - **공간 효율성**: 네비게이션에서 텍스트를 숨기고 아이콘만 표시
 - **툴팁 지원**: 마우스 오버시 기능 설명 툴팁 표시
 - **반응형 디자인**: 모든 화면 크기에서 최적화
@@ -337,26 +360,54 @@ sudo usermod -a -G daemon $(whoami)
 ### 🗂️ 제품 카테고리
 
 #### 기능
+
 - **계층적 분류**: 제품을 체계적으로 분류 관리
 - **드래그 앤 드롭**: 직관적인 카테고리 순서 변경
 - **AJAX 생성**: 페이지 새로고침 없는 실시간 카테고리 추가
 - **상태 관리**: 활성/비활성 상태로 카테고리 제어
 
 #### 사용법
+
 1. 제품 관리 → 카테고리 탭
 2. "새 카테고리" 버튼으로 즉시 추가
 3. 드래그로 순서 변경
 4. 체크박스로 활성/비활성 전환
 
+### 🤖 AI Helper (2025년 8월 추가)
+
+#### 주요 기능
+
+- **인보이스 설명 생성**: 제품/서비스명만으로 전문적인 인보이스 항목 설명 자동 생성
+- **결제 조건 제안**: 고객 유형(개인/소기업/대기업)과 금액에 맞는 적절한 결제 조건 자동 제안
+- **가격 제안**: 시장 데이터 기반의 제품/서비스 가격 제안
+- **작업 범위 생성**: 서비스 키워드로 전문적인 작업 범위 및 세부 항목 자동 생성
+- **고객 맞춤형 제안**: 기존 고객 정보를 기반으로 맞춤형 설명 제안
+
+#### 기술 사양
+
+- **OpenRouter 통합**: Anthropic Claude, OpenAI GPT, Google Gemini 등 다양한 AI 모델 지원
+- **관리자 설정**: 시스템 관리자가 기본 AI 모델 선택 가능
+- **플랜 기반 접근**: 무료/표준/프로 플랜별 AI 기능 사용 권한 제어
+- **보안 설계**: API 키는 서버측에서 안전하게 관리
+
+#### 활용 방법
+
+1. 인보이스 생성/편집 화면에서 AI Helper 아이콘 클릭
+2. 제품/서비스명 입력
+3. AI가 생성한 설명 중 원하는 것을 선택하거나 수정
+4. 자동 생성된 결제 조건이나 가격 제안 검토 및 적용
+
 ### 👑 고급 관리자 기능
 
 #### 시스템 설정
+
 - **사용자 제한**: 최대 사용자 수 설정
 - **회원가입 제어**: 신규 가입 허용/차단
 - **유지보수 모드**: 시스템 점검시 사용자 접근 제한
 - **보안 설정**: 비밀번호 정책, 세션 타임아웃
 
 #### 사용자 관리
+
 - **역할 할당**: Admin, User, Demo 역할 세밀한 제어
 - **회사 제한**: 사용자별 최대 생성 가능 회사 수
 - **계정 상태**: 사용자 계정 활성화/비활성화
@@ -371,6 +422,7 @@ sudo usermod -a -G daemon $(whoami)
 - **이메일 발송**: 고객에게 직접 이메일 전송
 - **상태 관리**: 초안, 발송, 결제 완료 등 상태 추적
 - **번호 자동 생성**: 커스터마이즈 가능한 인보이스 번호
+- **AI Helper 통합**: 인보이스 항목 설명 자동 생성 (2025년 8월 추가)
 
 ### 📄 견적서 관리
 
@@ -406,30 +458,35 @@ sudo usermod -a -G daemon $(whoami)
 ### 📋 주요 기능
 
 #### 🗄️ 완전한 세율 데이터베이스
+
 - **50개 주 기본 세율**: 각 주별 기본 세율 및 평균 세율
 - **ZIP 코드별 상세 세율**: 정확한 지역별 세율 지원
 - **Economic Nexus 확인**: 각 주별 경제적 연결점 임계값 자동 확인
 - **세율 분해**: 주/카운티/시/특별구역 세율 개별 관리
 
 #### 🔐 Admin 전용 관리 시스템
+
 - **관리자 권한 필요**: Admin Role 사용자만 세율 관리 접근 가능
 - **Admin Dashboard 통합**: 관리자 패널에서 바로 접근
 - **완전한 CRUD**: 세율 생성, 조회, 수정, 삭제 지원
 - **벌크 작업**: 다중 선택으로 일괄 활성화/비활성화/삭제
 
 #### 📊 실시간 세율 조회
+
 - **ZIP 코드 검색**: 우편번호 입력으로 즉시 세율 확인
 - **AJAX 기반**: 페이지 새로고침 없는 실시간 조회
 - **상세 정보**: 세율 분해, 유효기간, 데이터 소스 표시
 - **빠른 필터링**: 주/ZIP 코드/데이터 소스별 필터링
 
 #### 📤 CSV 데이터 가져오기
+
 - **파일 업로드**: CSV 파일을 통한 대량 세율 데이터 입력
 - **샘플 다운로드**: 정확한 형식의 샘플 CSV 제공
 - **데이터 검증**: 업로드 시 자동 유효성 검사
 - **진행 상황**: 실시간 업로드 진행 상황 표시
 
 #### 📈 통계 대시보드
+
 - **전체 현황**: 총 관할지역, 활성 상태, 커버리지 통계
 - **주별 분포**: 각 주별 관할지역 수 및 비율
 - **데이터 소스 분석**: 소스별 데이터 분포 현황
@@ -438,6 +495,7 @@ sudo usermod -a -G daemon $(whoami)
 ### 🛠️ 콘솔 명령어
 
 #### 기본 세율 생성
+
 ```bash
 # 50개 주 기본 세율 생성 (무료)
 ./yii tax-rate/seed-basic-rates
@@ -447,6 +505,7 @@ sudo usermod -a -G daemon $(whoami)
 ```
 
 #### CSV 파일 관리
+
 ```bash
 # CSV 파일에서 세율 가져오기
 ./yii tax-rate/import-csv /path/to/rates.csv
@@ -456,6 +515,7 @@ sudo usermod -a -G daemon $(whoami)
 ```
 
 #### 시스템 관리
+
 ```bash
 # 세율 통계 확인
 ./yii tax-rate/stats
@@ -475,6 +535,7 @@ sudo usermod -a -G daemon $(whoami)
 #### 🆓 무료 소스
 
 **1. Avalara (기본 주별 세율)**
+
 - **URL**: https://www.avalara.com/taxrates/en/download-tax-tables.html
 - **형식**: CSV
 - **커버리지**: 50개 주 기본 세율
@@ -482,11 +543,13 @@ sudo usermod -a -G daemon $(whoami)
 - **제한**: ZIP 코드별 상세 세율 없음
 
 **2. 정부 소스 (각 주 세무청)**
+
 - **워싱턴주**: https://dor.wa.gov/taxes-rates/sales-use-tax-rates/downloadable-database
 - **캘리포니아, 뉴욕 등**: 각 주 세무청 공식 사이트
 - **제한**: 주별로 개별 다운로드 필요
 
 **3. GitHub 오픈소스**
+
 - **URL**: https://github.com/dirk/sales_tax
 - **URL**: https://github.com/MirzaAreebBaig/Woocommerce-US-ZipCodes-TaxRates
 - **제한**: 데이터 정확성 및 최신성 확인 필요
@@ -494,8 +557,9 @@ sudo usermod -a -G daemon $(whoami)
 #### 💰 유료 상용 소스 (정확한 ZIP 코드별 세율)
 
 **1. Sales Tax Handbook** ⭐ 추천
+
 - **URL**: https://www.salestaxhandbook.com/data
-- **가격**: 
+- **가격**:
   - 단일 주: $34.99 (일회성)
   - 전체 50개 주: $119.99 (일회성)
   - 월별 구독: $19.99/월 (단일 주), $59.99/월 (전체)
@@ -503,12 +567,14 @@ sudo usermod -a -G daemon $(whoami)
 - **특징**: ZIP 코드별 상세 세율, 월별 업데이트
 
 **2. Zip2Tax**
+
 - **URL**: https://www.zip2tax.com/products/state-tax-rate-table
 - **가격**: 구독 또는 일회성 구매
 - **형식**: 다양한 CSV 형식 제공
 - **특징**: API도 함께 제공
 
 **3. Sales Tax USA (WooCommerce용)**
+
 - **URL**: https://salestaxusa.com/woocommerce-tax-rates-csv/
 - **가격**: 일회성 구매
 - **형식**: WooCommerce 호환 CSV
@@ -517,11 +583,13 @@ sudo usermod -a -G daemon $(whoami)
 #### 🔌 API 기반 실시간 소스
 
 **1. TaxJar API**
+
 - **URL**: https://developers.taxjar.com/api/reference/
 - **가격**: 유료 API 서비스
 - **특징**: 실시간 세율 조회, JSON 응답
 
 **2. Avalara API**
+
 - **URL**: Avalara AvaTax API
 - **가격**: 유료 API 서비스
 - **특징**: 기업급 세무 솔루션
@@ -529,7 +597,9 @@ sudo usermod -a -G daemon $(whoami)
 ### 🎯 권장 사용 시나리오
 
 #### 개발/테스트 단계
+
 1. **기본 세율로 시작**:
+
    ```bash
    ./yii tax-rate/seed-basic-rates
    ```
@@ -540,11 +610,13 @@ sudo usermod -a -G daemon $(whoami)
    - 다운로드된 파일을 바로 import
 
 #### 프로덕션 준비
+
 1. **정확한 데이터 구매**: Sales Tax Handbook ($119.99 일회성)
 2. **ZIP 코드별 정확한 세율 확보**
 3. **월별 업데이트 구독 고려**
 
 #### 대기업/고량 처리
+
 1. **TaxJar 또는 Avalara API 연동**
 2. **실시간 세율 조회**
 3. **자동 업데이트 구현**
@@ -552,6 +624,7 @@ sudo usermod -a -G daemon $(whoami)
 ### 📋 CSV 파일 형식
 
 #### 필수 컬럼
+
 ```csv
 zip_code,state_code,combined_rate
 90210,CA,9.5000
@@ -559,6 +632,7 @@ zip_code,state_code,combined_rate
 ```
 
 #### 전체 컬럼 (권장)
+
 ```csv
 zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_rate,state_rate,county_rate,city_rate,special_rate,estimated_population
 90210,CA,California,Los Angeles,Beverly Hills,Beverly Hills Tax Region,9.5000,6.0000,1.0000,2.5000,0.0000,34000
@@ -568,10 +642,12 @@ zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_ra
 ### 🗄️ 데이터베이스 구조
 
 #### 새로운 테이블
+
 - `jdosa_tax_jurisdictions` - ZIP 코드별 세율 정보
 - `jdosa_tax_rates_history` - 세율 변경 이력
 
 #### 기존 테이블 확장
+
 - `jdosa_companies` - 세금 설정 (주 코드, ZIP 코드, 자동 계산 설정)
 - `jdosa_customers` - 고객 세금 정보 (면세 여부, 증명서)
 - `jdosa_invoices` - 세금 계산 상세 정보
@@ -580,11 +656,13 @@ zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_ra
 ### 🔧 Administration
 
 #### 관리자 패널 접근
+
 1. **Admin 계정으로 로그인**
 2. **Admin Panel > Tax Management**
 3. **세율 목록, 통계, 가져오기 메뉴 사용**
 
 #### 주요 관리 기능
+
 - **세율 관리**: 개별 세율 생성, 수정, 삭제
 - **벌크 작업**: 다중 선택으로 일괄 작업
 - **데이터 가져오기**: CSV 파일 업로드
@@ -620,7 +698,8 @@ zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_ra
 - **Yii2 Framework**: 최신 PHP MVC 프레임워크
 - **MySQL**: 안정적인 데이터베이스 시스템
 - **Symfony Mailer**: 현대적인 이메일 전송 시스템
-- **TCPDF**: PDF 생성 라이브러리
+- **mPDF**: PDF 생성 라이브러리
+- **OpenRouter API**: AI Helper 기능을 위한 외부 API 통합
 
 ### 🎨 프론트엔드
 
@@ -631,7 +710,7 @@ zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_ra
 
 ## 데이터베이스 구조
 
-### 테이블 목록 (2025년 7월 업데이트)
+### 테이블 목록 (2025년 8월 업데이트)
 
 - `jdosa_users` - 사용자 계정 정보 (역할, 최대 회사 수 포함)
 - `jdosa_companies` - 회사 정보 및 설정 (다크모드, 컴팩트모드, 언어, CJK폰트 설정)
@@ -643,6 +722,8 @@ zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_ra
 - `jdosa_estimates` - 견적서 데이터
 - `jdosa_estimate_items` - 견적서 항목
 - `jdosa_admin_settings` - 관리자 시스템 설정 (신규)
+- `jdosa_plans` - 구독 플랜 정보 (AI Helper 권한 포함)
+- `jdosa_user_subscriptions` - 사용자 구독 정보
 
 ## 보안 기능
 
@@ -685,6 +766,7 @@ zip_code,state_code,state_name,county_name,city_name,tax_region_name,combined_ra
 ```
 
 **업데이트 스크립트 주요 기능:**
+
 - ✅ 자동 백업 생성 (설정 파일 보존)
 - ✅ Git 권한 자동 관리
 - ✅ Composer 의존성 자동 업데이트
@@ -840,6 +922,7 @@ git status
 ```
 
 **이 방법의 장점:**
+
 - ✅ 로컬 이메일 설정 (`web-local.php`) 보존
 - ✅ 사용자 정의 설정 유지
 - ✅ 충돌 즉시 해결
@@ -871,6 +954,7 @@ cp web/.htaccess.advanced web/.htaccess
 ```
 
 **자동 보존 과정:**
+
 1. 업데이트 전: 현재 `.htaccess` 자동 백업
 2. Git Pull: 원격 저장소 파일로 덮어쓰기
 3. 업데이트 후: 백업된 `.htaccess` 자동 복원
@@ -878,6 +962,7 @@ cp web/.htaccess.advanced web/.htaccess
 #### 기타 로컬 설정 보존
 
 **자동 백업 파일들:**
+
 - `config/db.php` - 데이터베이스 설정
 - `config/web.php` - 웹 애플리케이션 설정
 - `web/.htaccess` - Apache 설정
@@ -931,6 +1016,7 @@ GitHub Issues를 통해 버그 리포트나 기능 요청을 제출해주세요.
 ## 📋 변경사항 (2025년 7월)
 
 ### 🆕 신규 기능
+
 - **다국어 지원**: 5개 언어 완전 지원
 - **컴팩트 모드**: 아이콘 전용 네비게이션 모드
 - **제품 카테고리**: 완전한 카테고리 관리 시스템
@@ -938,6 +1024,7 @@ GitHub Issues를 통해 버그 리포트나 기능 요청을 제출해주세요.
 - **CJK 폰트 지원**: 아시아 언어 PDF 지원
 
 ### 🔧 개선사항
+
 - **다크모드 향상**: 더 완전한 다크모드 지원
 - **UI/UX 개선**: Liquid Glass 디자인 적용
 - **보안 강화**: 역할 기반 접근 제어 향상
@@ -946,6 +1033,7 @@ GitHub Issues를 통해 버그 리포트나 기능 요청을 제출해주세요.
 - **US Sales Tax 시스템**: 완전한 미국 세율 자동 계산 시스템 구축
 
 ### 🗄️ 데이터베이스 변경
+
 - 새로운 테이블: `jdosa_product_categories`, `jdosa_admin_settings`, `jdosa_tax_jurisdictions`, `jdosa_tax_rates_history`
 - 업데이트된 테이블: `jdosa_companies` (언어, 테마, 세금 설정), `jdosa_users` (역할, 제한), `jdosa_customers` (세금 정보), `jdosa_invoices` (세금 상세), `jdosa_invoice_items` (세금 카테고리)
 - 새로운 필드: 다국어, 테마, 카테고리, 관리자 설정, US Sales Tax 관련

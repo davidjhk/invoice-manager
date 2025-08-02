@@ -46,9 +46,9 @@ class ChangePasswordForm extends Model
     public function attributeLabels()
     {
         return [
-            'currentPassword' => 'Current Password',
-            'newPassword' => 'New Password',
-            'confirmPassword' => 'Confirm New Password',
+            'currentPassword' => Yii::t('app', 'Current Password'),
+            'newPassword' => Yii::t('app', 'New Password'),
+            'confirmPassword' => Yii::t('app', 'Confirm New Password'),
         ];
     }
 
@@ -59,7 +59,7 @@ class ChangePasswordForm extends Model
     {
         if (!$this->hasErrors()) {
             if (!$this->_user->validatePassword($this->currentPassword)) {
-                $this->addError($attribute, 'Current password is incorrect.');
+                $this->addError($attribute, Yii::t('app', 'Current password is incorrect.'));
             }
         }
     }

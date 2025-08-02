@@ -255,4 +255,27 @@ class Customer extends ActiveRecord
             ->where(['not in', 'status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELLED]])
             ->orderBy(['due_date' => SORT_ASC]);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        // Log the update
+        $action = $insert ? UpdateLog::ACTION_CREATE : UpdateLog::ACTION_UPDATE;
+        UpdateLog::logUpdate(UpdateLog::ENTITY_CUSTOMER, $this->id, $action);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        // Log the deletion
+        UpdateLog::logUpdate(UpdateLog::ENTITY_CUSTOMER, $this->id, UpdateLog::ACTION_DELETE);
+    }
 }

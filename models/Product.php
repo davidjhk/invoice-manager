@@ -341,4 +341,27 @@ class Product extends ActiveRecord
         $desc .= ' (' . $this->getFormattedPrice() . ' per ' . $this->getUnitLabel() . ')';
         return $desc;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        // Log the update
+        $action = $insert ? UpdateLog::ACTION_CREATE : UpdateLog::ACTION_UPDATE;
+        UpdateLog::logUpdate(UpdateLog::ENTITY_PRODUCT, $this->id, $action);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        // Log the deletion
+        UpdateLog::logUpdate(UpdateLog::ENTITY_PRODUCT, $this->id, UpdateLog::ACTION_DELETE);
+    }
 }

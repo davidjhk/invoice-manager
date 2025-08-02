@@ -189,6 +189,24 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 				</div>
 			</div>
 
+			<!-- Update Log -->
+			<?php 
+			$latestUpdate = \app\models\UpdateLog::getLatestUpdate(\app\models\UpdateLog::ENTITY_PRODUCT, $model->id);
+			if ($latestUpdate): ?>
+			<div class="card mb-4">
+				<div class="card-header">
+					<h6 class="mb-0"><?= Yii::t('app', 'Last Updated') ?></h6>
+				</div>
+				<div class="card-body">
+					<p class="mb-0">
+						<strong><?= Yii::$app->formatter->asDatetime($latestUpdate->created_at) ?></strong>
+						<?= Yii::t('app', 'by') ?>
+						<?= Html::encode($latestUpdate->user_name) ?>
+					</p>
+				</div>
+			</div>
+			<?php endif; ?>
+
 		</div>
 	</div>
 

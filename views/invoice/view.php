@@ -23,7 +23,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 ?>
 <div class="invoice-view">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1>
 			<?= Html::encode($this->title) ?>
 			<span class="badge badge-<?= $model->getStatusClass() ?> ml-2">
@@ -161,7 +161,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 						<table class="table table-striped">
 							<thead>
 								<tr>
-                                    <th><?= Yii::t('invoice', 'Product/Service') ?></th>
+									<th><?= Yii::t('invoice', 'Product/Service') ?></th>
 									<th><?= Yii::t('invoice', 'Description') ?></th>
 									<th class="text-center"><?= Yii::t('invoice', 'Quantity') ?></th>
 									<th class="text-right"><?= Yii::t('invoice', 'Price') ?></th>
@@ -171,7 +171,7 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 							<tbody>
 								<?php foreach ($model->invoiceItems as $item): ?>
 								<tr>
-                                    <td><?= Html::encode($item->product_service_name ?: '-') ?></td>
+									<td><?= Html::encode($item->product_service_name ?: '-') ?></td>
 									<td><?= nl2br(Html::encode($item->description)) ?></td>
 									<td class="text-center"><?= $item->getFormattedQuantity() ?></td>
 									<td class="text-right"><?= $item->getFormattedRate() ?></td>
@@ -349,6 +349,25 @@ $isCompactMode = $currentCompany && $currentCompany->compact_mode;
 					</table>
 				</div>
 			</div>
+
+			<!-- Update Log -->
+			<?php 
+			$latestUpdate = \app\models\UpdateLog::getLatestUpdate(\app\models\UpdateLog::ENTITY_INVOICE, $model->id);
+			if ($latestUpdate): ?>
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="card-title mb-0"><?= Yii::t('app', 'Last Updated') ?></h5>
+				</div>
+				<div class="card-body">
+					<p class="mb-0">
+						<strong><?= Yii::$app->formatter->asDatetime($latestUpdate->created_at) ?></strong>
+						<?= Yii::t('app', 'by') ?>
+						<?= Html::encode($latestUpdate->user_name) ?>
+					</p>
+				</div>
+			</div>
+			<?php endif; ?>
+
 		</div>
 	</div>
 

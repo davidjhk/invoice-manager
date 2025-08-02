@@ -6,7 +6,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-$this->title = 'Change Password';
+$this->title = Yii::t('app', 'Change Password');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-change-password">
@@ -15,11 +15,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-key mr-2"></i>Change Password
+                        <i class="fas fa-key mr-2"></i><?= Yii::t('app', 'Change Password') ?>
                     </h3>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Please enter your current password and choose a new one.</p>
+                    <p class="text-muted"><?= Yii::t('app', 'Please enter your current password and choose a new one.') ?></p>
 
                     <?php $form = ActiveForm::begin([
                         'id' => 'change-password-form',
@@ -31,26 +31,26 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]); ?>
 
                     <?= $form->field($model, 'currentPassword')->passwordInput([
-                        'placeholder' => 'Enter current password',
+                        'placeholder' => Yii::t('app', 'Enter current password'),
                         'class' => 'form-control',
-                    ])->label('Current Password') ?>
+                    ])->label(Yii::t('app', 'Current Password')) ?>
 
                     <?= $form->field($model, 'newPassword')->passwordInput([
-                        'placeholder' => 'Enter new password (min 6 characters)',
+                        'placeholder' => Yii::t('app', 'Enter new password (min 6 characters)'),
                         'class' => 'form-control',
-                    ])->label('New Password') ?>
+                    ])->label(Yii::t('app', 'New Password')) ?>
 
                     <?= $form->field($model, 'confirmPassword')->passwordInput([
-                        'placeholder' => 'Confirm new password',
+                        'placeholder' => Yii::t('app', 'Confirm new password'),
                         'class' => 'form-control',
-                    ])->label('Confirm New Password') ?>
+                    ])->label(Yii::t('app', 'Confirm New Password')) ?>
 
                     <div class="form-group">
-                        <?= Html::submitButton('<i class="fas fa-save mr-2"></i>Change Password', [
+                        <?= Html::submitButton('<i class="fas fa-save mr-2"></i>' . Yii::t('app', 'Change Password'), [
                             'class' => 'btn btn-primary',
                             'name' => 'change-password-button'
                         ]) ?>
-                        <?= Html::a('<i class="fas fa-times mr-2"></i>Cancel', ['/site/index'], [
+                        <?= Html::a('<i class="fas fa-times mr-2"></i>' . Yii::t('app', 'Cancel'), ['/site/index'], [
                             'class' => 'btn btn-secondary ml-2'
                         ]) ?>
                     </div>

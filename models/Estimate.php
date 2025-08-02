@@ -577,6 +577,29 @@ class Estimate extends ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        // Log the update
+        $action = $insert ? UpdateLog::ACTION_CREATE : UpdateLog::ACTION_UPDATE;
+        UpdateLog::logUpdate(UpdateLog::ENTITY_ESTIMATE, $this->id, $action);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        // Log the deletion
+        UpdateLog::logUpdate(UpdateLog::ENTITY_ESTIMATE, $this->id, UpdateLog::ACTION_DELETE);
+    }
+
+    /**
      * Mark estimate as printed
      * 
      * @return bool
