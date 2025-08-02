@@ -209,18 +209,18 @@ class InvoiceController extends Controller
                         $itemsData = Yii::$app->request->post('InvoiceItem', []);
                     }
                     
-                    if (!empty($itemsData)) {
-                        $this->saveInvoiceItems($model->id, $itemsData);
-                    }
-                    
-                    // Ensure required fields have default values before calculating totals
+                    // Ensure required fields have default values before saving items
                     if ($model->discount_value === null) $model->discount_value = 0;
                     if ($model->discount_type === null) $model->discount_type = 'percentage';
                     if ($model->tax_rate === null) $model->tax_rate = 0;
                     
-                    // Recalculate totals
-                    $model->calculateTotals();
-                    $model->save();
+                    if (!empty($itemsData)) {
+                        // saveInvoiceItems now handles total calculation internally
+                        $this->saveInvoiceItems($model->id, $itemsData);
+                    } else {
+                        // If no items, just save the invoice
+                        $model->save();
+                    }
                     
                     $transaction->commit();
                     
@@ -277,18 +277,18 @@ class InvoiceController extends Controller
                         $itemsData = Yii::$app->request->post('InvoiceItem', []);
                     }
                     
-                    if (!empty($itemsData)) {
-                        $this->saveInvoiceItems($model->id, $itemsData);
-                    }
-                    
-                    // Ensure required fields have default values before calculating totals
+                    // Ensure required fields have default values before saving items
                     if ($model->discount_value === null) $model->discount_value = 0;
                     if ($model->discount_type === null) $model->discount_type = 'percentage';
                     if ($model->tax_rate === null) $model->tax_rate = 0;
                     
-                    // Recalculate totals
-                    $model->calculateTotals();
-                    $model->save();
+                    if (!empty($itemsData)) {
+                        // saveInvoiceItems now handles total calculation internally
+                        $this->saveInvoiceItems($model->id, $itemsData);
+                    } else {
+                        // If no items, just save the invoice
+                        $model->save();
+                    }
                     
                     $transaction->commit();
                     
@@ -583,37 +583,27 @@ class InvoiceController extends Controller
      */
     protected function saveInvoiceItems($invoiceId, $itemsData)
     {
-        // Delete existing items
-        InvoiceItem::deleteAll(['invoice_id' => $invoiceId]);
+        // Use optimized batch save method
+        $formattedItems = [];
         
-        // Log items data for debugging
-        Yii::info('Saving invoice items: ' . print_r($itemsData, true));
-        
-        // Save new items
         foreach ($itemsData as $index => $itemData) {
             if (empty($itemData['product_service_name']) && empty($itemData['description'])) {
                 continue; // Skip empty rows
             }
             
-            $item = new InvoiceItem();
-            $item->invoice_id = $invoiceId;
-            $item->product_id = !empty($itemData['product_id']) ? $itemData['product_id'] : null;
-            $item->product_service_name = $itemData['product_service_name'] ?? '';
-            $item->description = $itemData['description'] ?? '';
-            $item->quantity = !empty($itemData['quantity']) ? (float)$itemData['quantity'] : 1;
-            $item->rate = !empty($itemData['rate']) ? (float)$itemData['rate'] : 0;
-            $item->amount = $item->quantity * $item->rate;
-            $item->is_taxable = isset($itemData['is_taxable']) ? (bool)$itemData['is_taxable'] : false;
-            $item->sort_order = $index + 1;
-            $item->tax_rate = 0; // Set default tax rate
-            $item->tax_amount = 0; // Set default tax amount
-            
-            if (!$item->save()) {
-                Yii::error('Failed to save invoice item: ' . print_r($item->errors, true));
-                throw new \Exception('Failed to save invoice item: ' . implode(', ', array_map(function($errors) {
-                    return implode(', ', $errors);
-                }, $item->errors)));
-            }
+            $formattedItems[] = [
+                'id' => $itemData['id'] ?? null,
+                'description' => $itemData['description'] ?? $itemData['product_service_name'] ?? '',
+                'quantity' => !empty($itemData['quantity']) ? (float)$itemData['quantity'] : 1,
+                'rate' => !empty($itemData['rate']) ? (float)$itemData['rate'] : 0,
+                'is_taxable' => isset($itemData['is_taxable']) ? (bool)$itemData['is_taxable'] : false,
+                'product_id' => !empty($itemData['product_id']) ? $itemData['product_id'] : null,
+                'product_service_name' => $itemData['product_service_name'] ?? '',
+            ];
+        }
+        
+        if (!InvoiceItem::createMultiple($invoiceId, $formattedItems)) {
+            throw new \Exception('Failed to save invoice items');
         }
     }
 

@@ -156,19 +156,23 @@ class EstimateController extends Controller
             
             try {
                 if ($model->save()) {
-                    // Handle estimate items
+                    // Handle estimate items using optimized batch method
                     $itemsData = Yii::$app->request->post('EstimateItem', []);
                     if (!empty($itemsData)) {
+                        $formattedItems = [];
                         foreach ($itemsData as $itemData) {
                             if (!empty($itemData['description']) || !empty($itemData['product_id'])) {
-                                $item = new EstimateItem();
-                                $item->estimate_id = $model->id;
-                                $item->description = $itemData['description'] ?? '';
-                                $item->quantity = $itemData['quantity'] ?? 1;
-                                $item->rate = $itemData['rate'] ?? ($itemData['unit_price'] ?? 0);
-                                $item->product_id = $itemData['product_id'] ?? null;
-                                $item->save();
+                                $formattedItems[] = [
+                                    'description' => $itemData['description'] ?? '',
+                                    'quantity' => $itemData['quantity'] ?? 1,
+                                    'rate' => $itemData['rate'] ?? ($itemData['unit_price'] ?? 0),
+                                    'product_id' => $itemData['product_id'] ?? null,
+                                ];
                             }
+                        }
+                        
+                        if (!empty($formattedItems)) {
+                            EstimateItem::createMultiple($model->id, $formattedItems);
                         }
                     }
                     
@@ -218,23 +222,23 @@ class EstimateController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
             
             try {
-                // Delete existing items
-                EstimateItem::deleteAll(['estimate_id' => $model->id]);
-                
-                // Handle estimate items
+                // Handle estimate items using optimized batch method
                 $itemsData = Yii::$app->request->post('EstimateItem', []);
                 if (!empty($itemsData)) {
+                    $formattedItems = [];
                     foreach ($itemsData as $itemData) {
                         if (!empty($itemData['description']) || !empty($itemData['product_id'])) {
-                            $item = new EstimateItem();
-                            $item->estimate_id = $model->id;
-                            $item->description = $itemData['description'] ?? '';
-                            $item->quantity = $itemData['quantity'] ?? 1;
-                            $item->rate = $itemData['rate'] ?? ($itemData['unit_price'] ?? 0);
-                            $item->product_id = $itemData['product_id'] ?? null;
-                            $item->save();
+                            $formattedItems[] = [
+                                'description' => $itemData['description'] ?? '',
+                                'quantity' => $itemData['quantity'] ?? 1,
+                                'rate' => $itemData['rate'] ?? ($itemData['unit_price'] ?? 0),
+                                'product_id' => $itemData['product_id'] ?? null,
+                            ];
                         }
                     }
+                    
+                    // This will handle deletion and creation efficiently
+                    EstimateItem::createMultiple($model->id, $formattedItems);
                 }
                 
                 if ($model->save()) {
@@ -622,15 +626,22 @@ class EstimateController extends Controller
             $newEstimate->discount_amount = $originalEstimate->discount_amount;
             
             if ($newEstimate->save()) {
-                // Copy estimate items
+                // Copy estimate items using optimized batch method
+                $itemsData = [];
                 foreach ($originalEstimate->estimateItems as $originalItem) {
-                    $newItem = new EstimateItem();
-                    $newItem->estimate_id = $newEstimate->id;
-                    $newItem->description = $originalItem->description;
-                    $newItem->quantity = $originalItem->quantity;
-                    $newItem->rate = $originalItem->rate;
-                    $newItem->product_id = $originalItem->product_id;
-                    $newItem->save();
+                    $itemsData[] = [
+                        'description' => $originalItem->description,
+                        'quantity' => $originalItem->quantity,
+                        'rate' => $originalItem->rate,
+                        'product_id' => $originalItem->product_id,
+                        'product_service_name' => $originalItem->product_service_name,
+                        'tax_rate' => $originalItem->tax_rate,
+                        'is_taxable' => $originalItem->is_taxable,
+                    ];
+                }
+                
+                if (!empty($itemsData)) {
+                    EstimateItem::createMultiple($newEstimate->id, $itemsData);
                 }
                 
                 $transaction->commit();
